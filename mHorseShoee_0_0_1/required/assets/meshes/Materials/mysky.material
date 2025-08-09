@@ -1,0 +1,80 @@
+
+
+
+vertex_program skyVertProgram hlsl
+{
+	source skyVertShader.hlsl
+	entry_point mainVS
+	target vs_4_0
+	default_params {
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+		
+}
+
+fragment_program skyFragProgram hlsl	
+{
+	source skyFragShader.hlsl
+	entry_point mainPS
+	target ps_4_0
+	
+	
+	default_params{
+		//param_named_auto time time
+		
+		// sky Color
+		//param_named skyColHigh float4 1 1 1 1
+		//param_named skyColMid float4 1 1 1 1
+		//param_named skyColLow float4 1 1 1 1
+		
+		//param_named middleSmooth float 0.2
+		//param_named topSmooth float 0.5
+		
+		// Suns
+		//param_named sunSize float 0.5
+		//param_named sunColor float4 1 1 1 1
+		
+		// Moon
+		//param_named moonSize float 0.2
+		//param_named moonColor float4 1 1 1 1
+		//param_named moonPhase float 0.1f
+		
+		//Stars
+		//texture
+		//param_named starsIntensity float 0.5
+		
+		// Clouds
+		//param_named cloudColor float4 1 1 1 1 
+		//param_named cloudThreshold float 0.2
+		//param_named cloudSmoothness float 0.1
+		//param_named sunCloudIntensity float 0.1
+		//param_named panningSpeedX float 0.1
+		//param_named panningSpeedY float 0.1
+	}
+}
+
+material mySky{
+	technique{
+		pass{
+			
+		lighting off
+		depth_write off
+		//polygon_mode wireframe
+		cull_hardware anticlockwise
+		scene_blend alpha_blend
+			vertex_program_ref skyVertProgram{
+			}
+			
+			fragment_program_ref skyFragProgram{
+			}
+			
+			// stars texture
+			texture_unit farFog{
+				texture fogtex.png 
+				
+			}
+		
+			
+		}
+	}
+}

@@ -1,0 +1,52 @@
+
+vertex_program cloudsVert hlsl{
+	source clouds_vert.hlsl
+	entry_point mainVS
+	target vs_4_0
+	default_params{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+	
+}
+
+fragment_program cloudsFrag hlsl{
+	source clouds_frag.hlsl
+	entry_point mainPS
+	target ps_4_0
+	default_params{
+		param_named_auto time time
+	}
+}
+
+material clouds_material{
+	receive_shadows off
+	technique{
+		pass
+		{
+			depth_write off
+			lighting off
+			cull_hardware anticlockwise
+			
+			scene_blend alpha_blend
+			
+			vertex_program_ref cloudsVert{
+			}
+			
+			fragment_program_ref cloudsFrag{
+			}
+			
+			texture_unit base{
+				texture base_clouds.png
+				filtering anisotropic
+			}
+			texture_unit distort{
+				texture distort.png
+				filtering anisotropic
+			}
+			texture_unit secondary{
+				texture secondary.png
+				filtering anisotropic
+			}
+		}
+	}
+}

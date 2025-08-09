@@ -1,0 +1,53 @@
+
+vertex_program skyHighVertProgram hlsl
+{
+	source skyHighVert.hlsl
+	entry_point mainVS
+	target vs_4_0
+	default_params {
+		param_named that float 0.1
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+fragment_program skyHighFragProgram hlsl
+{
+	source skyHighFrag.hlsl
+	entry_point mainPS
+	target ps_4_0
+	
+	default_params{
+		param_named_auto time time
+	}
+}
+
+material myskyHigh{
+	technique
+	{
+		pass
+		{
+			depth_write off
+			lighting off
+			cull_hardware anticlockwise
+			scene_blend add
+			
+			vertex_program_ref skyHighVertProgram
+			{
+				param_named this float 0.1
+			}
+			fragment_program_ref skyHighFragProgram
+			{
+			}
+			texture_unit stars_tex{
+				texture stars.png
+				filtering trilinear
+			}
+			texture_unit farFog{
+				texture far_fog_tex.png
+				tex_address_mode wrap
+			}
+	
+		
+		}
+	}
+}
