@@ -1,9 +1,9 @@
 Finding meshes
 Render_Mesh
-./assets/meshes/RenderMeshes
+../assets/meshes/RenderMeshes
 
 Collider_Mesh
-.\assets\meshes\ColliderMeshes
+..\assets\meshes\ColliderMeshes
 
 Mesh_Materials
-.\assets\meshes\Materials
+..\assets\meshes\Materials

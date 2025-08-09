@@ -88,27 +88,3 @@ target_link_libraries(MHorseShoe
 
 
 
-find_file(
-	post_builder
-	NAME postbuilder.py
-	PATHS "${CMAKE_SOURCE_DIR}"
-	RESULT_VARIABLE result
-)
-
-
-SET(POST_SCRIPT "${post_builder}")
-SET(POST_ARGS "${ogre_SOURCE_DIR}" "${sdl3_SOURCE_DIR} "${CMAKE_BINARY_DIR}")
-find_package(Python3 COMPONENTS Interpreter REQUIRED)
-
-add_custom_command(
-	TARGET mHorseShoe
-	POST_BUILD
-	COMMAND ${Python3_EXECUTABLE} ${POST_SCRIPT} ${POST_ARGS}
-	COMMENT "Copying files"
-)
-
-
-
-
-
-
