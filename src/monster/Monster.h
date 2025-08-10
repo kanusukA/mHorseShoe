@@ -130,6 +130,8 @@ private:
 
 	Ogre::Vector3 result = Ogre::Vector3();
 
+	IKEYS* inputkeys;
+
 public:
 
 	Ogre::MovableObject* RayCastFromPoint();
@@ -166,8 +168,10 @@ public:
 	// Add Subject and observer for render meshes available in Monster
 	std::vector<Ogre::MeshPtr> preLoadRenderMeshes = std::vector<Ogre::MeshPtr>();
 
-	SDL_Window* sdlWindow;
+	
 
+	// RENDERING RELATED 
+	
 	Ogre::SceneNode* addCamera(Ogre::String camName, Ogre::Vector3 startPos);
 	Ogre::Entity* getMeshEntity(Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
 	Ogre::SceneNode* addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode);
@@ -248,10 +252,16 @@ public:
 
 	void deleteScnNode(Ogre::SceneNode* scnNode);
 
-	void _setupSDL3(INT64 windowWidth, INT64 windowHeight, Ogre::String windowName);
+	
 	void _setupRTShader();
 	void _loadResource();
 	Ogre::ManualObject* _createGrassBlade(float scaleX, float scaleY);
+
+	// WINDOW RELATED
+	bool window_fullScreen = false;
+	SDL_Window* sdlWindow;
+	void _setupSDL3(INT64 windowWidth, INT64 windowHeight, Ogre::String windowName);
+	void windowUpdate();
 
 	void Shutdown();
 

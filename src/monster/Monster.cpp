@@ -95,6 +95,8 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	// raycast setup
 	mRayScnQuery =  oScnManager->createRayQuery(Ogre::Ray(), Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
 
+	inputkeys = InputHandler::GetInstance()->getInputKeys();
+
 	
 	
 }
@@ -1100,6 +1102,9 @@ void Monster::updateMonster()
 		skyHighNode->setPosition(CameraNode->getPosition().x, CameraNode->getPosition().y - 2500 , CameraNode->getPosition().z);
 		
 	}
+
+	this->windowUpdate();
+
 	
 }
 
@@ -1139,6 +1144,34 @@ void Monster::_setupSDL3(INT64 windowWidth, INT64 windowHeight, Ogre::String win
 	// SDL WINDOW
 	sdlWindow = SDL_CreateWindowWithProperties(props);
 	SDL_SetWindowSize(sdlWindow, windowWidth, windowHeight);
+
+}
+
+void Monster::windowUpdate()
+{
+	// Fullscreen
+
+	if (inputkeys->ALT_L_KEY || inputkeys->ALT_R_KEY) {
+		if (inputkeys->ENTER_KEY) {
+			SDL_SetWindowFullscreen(sdlWindow, !window_fullScreen);
+		}
+	
+		
+	}
+	else {
+		// add full screen toggle
+		auto flag = SDL_GetWindowFlags(sdlWindow);
+		auto is_fullscreen = flag & SDL_WINDOW_FULLSCREEN;
+		if (is_fullscreen == SDL_WINDOW_FULLSCREEN) {
+			//is fullscreen
+			window_fullScreen = true;
+		}
+		else {
+			window_fullScreen = false;
+		}
+
+	}
+	
 
 }
 

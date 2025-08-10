@@ -278,7 +278,7 @@ void Gui::_heightMapTab()
 		}
 	}
 
-	
+	ImGui::End();
 
 }
 
@@ -556,6 +556,8 @@ void Gui::_diegnos()
 	ImGui::Text("Total Frame Time : ");
 	ImGui::SameLine();
 	ImGui::Text(std::to_string(*guiComponent->getDiegnostics()->TotalFrameTime).c_str());
+
+	ImGui::End();
 }
 
 void Gui::_RSUSTab()

@@ -43,6 +43,10 @@ struct IKEYS {
 
 	bool ALT_L_KEY = false;
 	bool CTRL_L_KEY = false;
+	bool ALT_R_KEY = false;
+	bool CTRL_R_KEY = false;
+
+	bool ENTER_KEY = false;
 
 	// GUI CONTROL BINDS
 	bool ADD_OBJECT_KEY_T = false;
@@ -56,10 +60,6 @@ struct IKEYS {
 	bool LIGHT_TAB_KEY_T_Lock = false;
 	bool ALL_TAB_KEY_T_Lock = false;
 
-	bool LEFT_CRTL_KEY = false;
-	bool RIGHT_CRTL_KEY = false;
-	bool LEFT_SHIFT_KEY = false;
-	bool RIGHT_SHIFT_KEY = false;
 
 	int MOUSE_LEFT_CLICK = 0;
 	int MOUSE_RIGHT_CLICK = 0;
@@ -117,6 +117,8 @@ struct KEYBINDS {
 
 	int ALT_L_KEY = SDLK_LALT;
 	int CTRL_L_KEY = SDLK_LCTRL;
+	int ALT_R_KEY = SDLK_RALT;
+	int CTRL_R_KEY = SDLK_RCTRL;
 
 	// GUI CONTROL BINDS
 	int ADD_OBJECT_KEY = ACTION_KEY;
@@ -130,6 +132,8 @@ struct KEYBINDS {
 
 	// DEBUG
 	int GRAB_MOUSE_KEY = SDLK_M;
+
+	int ENTER_KEY = SDLK_RETURN;
 
 };
 

@@ -126,6 +126,10 @@ void Feel::updateInput(float deltaTime) {
 				keyHandler->inputKeys->S_RIGHT_KEY = true;
 			}
 
+			if (event.key.key == keyHandler->keyBinds->ENTER_KEY) {
+				keyHandler->inputKeys->ENTER_KEY = true;
+			}
+
 
 
 
@@ -168,11 +172,16 @@ void Feel::updateInput(float deltaTime) {
 			if (event.key.key == keyHandler->keyBinds->CTRL_L_KEY) {
 				keyHandler->inputKeys->CTRL_L_KEY = true;
 			}
-			if (event.key.key == SDLK_RCTRL) {
-				keyHandler->inputKeys->RIGHT_CRTL_KEY = true;
-			}
+			
 			if (event.key.key == keyHandler->keyBinds->ALT_L_KEY) {
 				keyHandler->inputKeys->ALT_L_KEY = true;
+			}
+			if (event.key.key == keyHandler->keyBinds->CTRL_R_KEY) {
+				keyHandler->inputKeys->CTRL_R_KEY = true;
+			}
+			
+			if (event.key.key == keyHandler->keyBinds->ALT_R_KEY) {
+				keyHandler->inputKeys->ALT_R_KEY = true;
 			}
 			
 
@@ -232,6 +241,10 @@ void Feel::updateInput(float deltaTime) {
 				keyHandler->inputKeys->SPACE_KEY = false;
 			}
 
+			if (event.key.key == keyHandler->keyBinds->ENTER_KEY) {
+				keyHandler->inputKeys->ENTER_KEY = false;
+			}
+
 			// TOGGLE SWITCHES
 			if (event.key.key == keyHandler->keyBinds->ADD_OBJECT_KEY ) {
 				keyHandler->inputKeys->ADD_OBJECT_KEY_T_Lock = false;
@@ -255,11 +268,17 @@ void Feel::updateInput(float deltaTime) {
 			if (event.key.key == keyHandler->keyBinds->CTRL_L_KEY) {
 				keyHandler->inputKeys->CTRL_L_KEY = false;
 			}
-			if (event.key.key == SDLK_RCTRL) {
-				keyHandler->inputKeys->RIGHT_CRTL_KEY = false;
-			}
+			
 			if (event.key.key == keyHandler->keyBinds->ALT_L_KEY) {
 				keyHandler->inputKeys->ALT_L_KEY = false;
+			}
+
+			if (event.key.key == keyHandler->keyBinds->CTRL_R_KEY) {
+				keyHandler->inputKeys->CTRL_R_KEY = false;
+			}
+
+			if (event.key.key == keyHandler->keyBinds->ALT_R_KEY) {
+				keyHandler->inputKeys->ALT_R_KEY = false;
 			}
 			
 			
