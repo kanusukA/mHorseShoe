@@ -84,6 +84,94 @@ std::filesystem::path ResourceHandler::_getSaveFileLoc(std::string filename)
 	return cur_path;
 }
 
+void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::filesystem::path path)
+{
+
+	in_stream.open(path);
+	std::string line;
+
+	std::string word = "";
+
+	bool uniFound = false;
+	bool uniName = false;
+	int type;
+
+	std::cout << "Variables : " << std::endl;
+
+	if (in_stream.is_open()) {
+		while (std::getline(in_stream, line))
+		{
+			//std::cout << line << std::endl;
+
+			// first check uniform keyword
+			for (int i = 0; i < line.size(); i++)
+			{
+				if (line.at(i) != ' ' && line.at(i) != ',' && line.at(i) != ')') {
+					word += line.at(i);
+				}
+				else {
+
+					if (word == "uniform") {
+
+						std::cout << "uniform" << std::endl;
+						uniFound = true;
+
+					}
+					else if (uniFound) {
+						std::cout << "type : ";
+
+						uniFound = false;
+						uniName = true;
+
+						if (word == "int") {
+							shaderVar->push_back("0");
+							std::cout << "int" << std::endl;
+						}
+						else if (word == "float")
+						{
+							shaderVar->push_back("1");
+							std::cout << "float" << std::endl;
+						}
+						else if (word == "float2")
+						{
+							shaderVar->push_back("2");
+							std::cout << "float2" << std::endl;
+						}
+						else if (word == "float3")
+						{
+							shaderVar->push_back("3");
+							std::cout << "float3" << std::endl;
+						}
+						else if (word == "float4")
+						{
+							shaderVar->push_back("4");
+							std::cout << "float4" << std::endl;
+						}
+						else {
+							std::cout << "invalid type" << std::endl;
+							uniName = false;
+						}
+
+
+					}
+					else if (uniName)
+					{
+						shaderVar->push_back(word);
+						std::cout << "Word: " << word << std::endl;
+						uniName = false;
+					}
+					word = "";
+				}
+			}
+
+		}
+	}
+
+	in_stream.close();
+
+
+}
+
 void ResourceHandler::findAll(std::string location, ResourceHandlerType type = ResourceHandlerType::GLOBAL) {
 
 	if (location.empty()) {
@@ -425,106 +513,47 @@ ResourceHandler* ResourceHandler::GetInstance() {
 
 }
 
-void ResourceHandler::readShaderFiles(std::string shaderName)
+void ResourceHandler::readShaderFiles(Ogre::MaterialPtr mat)
 {
-	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName("myskyHigh");
+	Ogre::String fragFileName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();
+	Ogre::String vertFileName = mat.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getSourceFile();
 	Ogre::GpuProgramParametersPtr fragParam = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+	Ogre::GpuProgramParametersPtr vertParam = mat.get()->getTechnique(0)->getPass(0)->getVertexProgramParameters();
 
-	if (!ShaderVariables) {
-		ShaderVariables = new std::vector<std::string>();
+	if (!fragShaderVariables) {
+		fragShaderVariables = new std::vector<std::string>();
+	}
+	else {
+		fragShaderVariables->clear();
+	}
+	if (!vertShaderVariables) {
+		vertShaderVariables = new std::vector<std::string>();
+	}
+	else {
+		vertShaderVariables->clear();
 	}
 
-	std::filesystem::path filepath;
+	std::filesystem::path vertfilepath;
+	std::filesystem::path fragfilepath;
 
 	for (int i = 0; i < meshMaterials->size(); i++)
 	{
-		if (meshMaterials->at(i).filename().string() == shaderName)
+		if (meshMaterials->at(i).filename().string() == vertFileName)
 		{
-			filepath = meshMaterials->at(i);
+			vertfilepath = meshMaterials->at(i);
+		}
+		if (meshMaterials->at(i).filename().string() == fragFileName)
+		{
+			fragfilepath = meshMaterials->at(i);
 		}
 	}
 
-	std::cout << "File loc : " << filepath.relative_path().string() << std::endl;
+	std::cout << "vert File loc : " << vertfilepath.relative_path().string() << std::endl;
+	std::cout << "frag File loc : " << fragfilepath.relative_path().string() << std::endl;
+	_readShaderFile(fragShaderVariables, fragfilepath);
+	_readShaderFile(vertShaderVariables, vertfilepath);
 
-	in_stream.open(filepath);
-	std::string line;
-
-	std::string word = "";
-
-	bool uniFound = false;
-	bool uniName = false;
-	int type;
-
-	std::cout << "Variables : " << std::endl;
-
-	if (in_stream.is_open()) {
-		while (std::getline(in_stream,line))
-		{
-			//std::cout << line << std::endl;
-
-			// first check uniform keyword
-			for (int i = 0; i < line.size(); i++)
-			{
-				if (line.at(i) != ' ' && line.at(i) != ',') {
-					word += line.at(i);
-				}
-				else {
-					
-					if (word == "uniform") {
-
-						std::cout << "uniform" << std::endl;
-						uniFound = true;
-
-					}
-					else if (uniFound) {
-						std::cout << "type : ";
-
-						uniFound = false;
-						uniName = true;
-
-						if (word == "int") {
-							ShaderVariables->push_back("0");
-							std::cout << "int" << std::endl;
-						}
-						else if (word == "float")
-						{
-							ShaderVariables->push_back("1");
-							std::cout << "float" << std::endl;
-						}
-						else if (word == "float2")
-						{
-							ShaderVariables->push_back("2");
-							std::cout << "float2" << std::endl;
-						}
-						else if (word == "float3")
-						{
-							ShaderVariables->push_back("3");
-							std::cout << "float3" << std::endl;
-						}
-						else if(word == "float4")
-						{
-							ShaderVariables->push_back("4");
-							std::cout << "float4" << std::endl;
-						}
-						else {
-							std::cout << "invalid type" << std::endl;
-							uniName = false;
-						}
-						
-
-					}
-					else if (uniName)
-					{
-						ShaderVariables->push_back(word);
-						std::cout << "Word: " << word << std::endl;
-						uniName = false;
-					}
-					word = "";
-				}
-			}
-
-		}
-	}
+	
 
 
 }

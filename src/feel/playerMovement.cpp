@@ -4,7 +4,7 @@ const int MOUSESENS = 200;
 
 const float MOUSEROLLNUM = 0.9975;
 
-const float PLAYERSPEED = 1;
+float PLAYERSPEED = 1;
 
 double mouseX = 0.0f;
 double mouseY = 0.0f;
@@ -24,6 +24,13 @@ Ogre::Math mathunDa = Ogre::Math();
 void updatePosition(float deltaTime , PlayerSubject* playerSub)
 {
 	IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
+
+	if (inputKeys->SPRINT_KEY) {
+		PLAYERSPEED = 3;
+	}
+	else {
+		PLAYERSPEED = 1;
+	}
 	
 	Ogre::Radian Yaxis = playerSub->getPlayerRotation().getYaw();
 

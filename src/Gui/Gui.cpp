@@ -592,60 +592,114 @@ void Gui::_RSUSTab()
 	if (ImGui::Button("Get Materials")) {
 		resourceHandler->updateOgreMaterials();
 	}
+
+
 	
 	if (guiComponent->getRSUSParam()->rsusObj) {
 
-		ImGui::Text("Shader Name : ");
+		ImGui::Text(" Fragment Shader Name : ");
 		ImGui::SameLine();
-		ImGui::Text(guiComponent->getRSUSParam()->rsusObj->shaderName.c_str());
+		ImGui::Text(guiComponent->getRSUSParam()->rsusObj->fragShaderName.c_str());
 
-		ImGui::Text("Shader File Name : ");
+		ImGui::Text(" Fragment Shader File Name : ");
 		ImGui::SameLine();
-		ImGui::Text(guiComponent->getRSUSParam()->rsusObj->shaderFileName.c_str());
+		ImGui::Text(guiComponent->getRSUSParam()->rsusObj->fragShaderName.c_str());
 
 		RSUShader* shade = guiComponent->getRSUSParam()->rsusObj;
 
 		// Variables
-		for (int i = 0; i < guiComponent->getRSUSParam()->rsusObj->variables.size(); i++)
+		for (int i = 0; i < guiComponent->getRSUSParam()->rsusObj->fragVariables.size(); i++)
 		{
 
-			ShaderVarType type = shade->variables.at(i).varType;
+			ShaderVarType type = shade->fragVariables.at(i).varType;
 
 			switch (type)
 			{
 			case INTEGER:
-				ImGui::InputInt(shade->variables.at(i).varName.c_str(), shade->variables.at(i).varInt);
+				ImGui::InputInt(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varInt);
 				break;
 			case FLOAT0:
-				if (ImGui::SliderFloat(shade->variables.at(i).varName.c_str(), shade->variables.at(i).varFloat, 0.0f, 1.0f)) {
-					guiComponent->updateRsusFloat(shade->variables.at(i).varName, shade->variables.at(i).varFloat);
+				if (ImGui::SliderFloat(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat, 0.0f, 1.0f)) {
+					guiComponent->updateFragRsusFloat(shade->fragVariables.at(i).varName, shade->fragVariables.at(i).varFloat);
 				}
 				break;
 			case FLOAT2:
-				if (ImGui::SliderFloat2(shade->variables.at(i).varName.c_str(), shade->variables.at(i).varFloat2, 0.0f, 1.0f)) {
-					guiComponent->updateRsusFloat2(shade->variables.at(i).varName, shade->variables.at(i).varFloat);
+				if (ImGui::SliderFloat2(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat2, 0.0f, 1.0f)) {
+					guiComponent->updateFragRsusFloat2(shade->fragVariables.at(i).varName, shade->fragVariables.at(i).varFloat);
 				}
 				break;
 			case FLOAT3:
-				if (ImGui::SliderFloat3(shade->variables.at(i).varName.c_str(), shade->variables.at(i).varFloat3, 0.0f, 1.0f)) {
-					guiComponent->updateRsusFloat3(shade->variables.at(i).varName, shade->variables.at(i).varFloat);
+				if (ImGui::SliderFloat3(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat3, 0.0f, 1.0f)) {
+					guiComponent->updateFragRsusFloat3(shade->fragVariables.at(i).varName, shade->fragVariables.at(i).varFloat);
 				}
 				break;
 			case FLOAT4:
-				if (ImGui::SliderFloat4(shade->variables.at(i).varName.c_str(), shade->variables.at(i).varFloat4, 0.0f, 1.0f)) {
-					Ogre::Vector4 slid = Ogre::Vector4(shade->variables.at(i).varFloat4[0], shade->variables.at(i).varFloat4[1], shade->variables.at(i).varFloat4[2], shade->variables.at(i).varFloat4[3]);
-					guiComponent->updateRsusFloat4(shade->variables.at(i).varName, slid);
+				if (ImGui::SliderFloat4(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat4, 0.0f, 1.0f)) {
+					Ogre::Vector4 slid = Ogre::Vector4(shade->fragVariables.at(i).varFloat4[0], shade->fragVariables.at(i).varFloat4[1], shade->fragVariables.at(i).varFloat4[2], shade->fragVariables.at(i).varFloat4[3]);
+					guiComponent->updateFragRsusFloat4(shade->fragVariables.at(i).varName, slid);
 				}
 				break;
 			default:
 				ImGui::Text("Invalid Type : ");
 				ImGui::SameLine();
-				ImGui::Text(shade->variables.at(i).varName.c_str());
+				ImGui::Text(shade->fragVariables.at(i).varName.c_str());
 				break;
 			}
 			
+		}
+
+		ImGui::Spacing();
+
+		ImGui::Text(" Vertex Shader Name : ");
+		ImGui::SameLine();
+		ImGui::Text(guiComponent->getRSUSParam()->rsusObj->vertShaderName.c_str());
+
+		ImGui::Text(" Vertex Shader File Name : ");
+		ImGui::SameLine();
+		ImGui::Text(guiComponent->getRSUSParam()->rsusObj->vertShaderName.c_str());
+
+		// Variables
+		for (int i = 0; i < guiComponent->getRSUSParam()->rsusObj->vertVariables.size(); i++)
+		{
+
+			ShaderVarType type = shade->vertVariables.at(i).varType;
+
+			switch (type)
+			{
+			case INTEGER:
+				ImGui::InputInt(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varInt);
+				break;
+			case FLOAT0:
+				if (ImGui::SliderFloat(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat, 0.0f, 10.0f)) {
+					guiComponent->updateVertRsusFloat(shade->vertVariables.at(i).varName, shade->vertVariables.at(i).varFloat);
+				}
+				break;
+			case FLOAT2:
+				if (ImGui::SliderFloat2(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat2, 0.0f, 10.0f)) {
+					guiComponent->updateVertRsusFloat2(shade->vertVariables.at(i).varName, shade->vertVariables.at(i).varFloat);
+				}
+				break;
+			case FLOAT3:
+				if (ImGui::SliderFloat3(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat3, 0.0f, 1.0f)) {
+					guiComponent->updateVertRsusFloat3(shade->vertVariables.at(i).varName, shade->vertVariables.at(i).varFloat);
+				}
+				break;
+			case FLOAT4:
+				if (ImGui::SliderFloat4(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat4, 0.0f, 1.0f)) {
+					Ogre::Vector4 slid = Ogre::Vector4(shade->vertVariables.at(i).varFloat4[0], shade->vertVariables.at(i).varFloat4[1], shade->vertVariables.at(i).varFloat4[2], shade->vertVariables.at(i).varFloat4[3]);
+					guiComponent->updateVertRsusFloat4(shade->vertVariables.at(i).varName, slid);
+				}
+				break;
+			default:
+				ImGui::Text("Invalid Type : ");
+				ImGui::SameLine();
+				ImGui::Text(shade->vertVariables.at(i).varName.c_str());
+				break;
+			}
+
 
 		}
+
 		ImGui::Spacing();
 		if (ImGui::Button("Save")) {
 			guiComponent->saveRsusObj();

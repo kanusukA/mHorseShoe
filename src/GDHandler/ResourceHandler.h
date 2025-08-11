@@ -71,6 +71,7 @@ private:
 	void addResource(std::filesystem::path filePath, ResourceHandlerType type);
 
 	std::filesystem::path _getSaveFileLoc(std::string filename);
+	void _readShaderFile(std::vector<std::string>* shaderVar, std::filesystem::path path);
 
 	// Hide the constructor and destructor of the class
 protected:
@@ -92,7 +93,8 @@ public:
 	std::vector<std::filesystem::path>* images = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* globalResources = new std::vector<std::filesystem::path>();
 	std::vector<std::string>* OgreMaterials;
-	std::vector<std::string>* ShaderVariables;
+	std::vector<std::string>* fragShaderVariables;
+	std::vector<std::string>* vertShaderVariables;
 
 	std::filesystem::path SourceDir;
 
@@ -122,7 +124,7 @@ public:
 	// Only way to initalize the class
 	static ResourceHandler* GetInstance();
 
-	void readShaderFiles(std::string shaderName);
+	void readShaderFiles(Ogre::MaterialPtr mat);
 
 	void writeToFile(std::string key, std::string value, std::string filename);
 	void clearFile(std::string filename);

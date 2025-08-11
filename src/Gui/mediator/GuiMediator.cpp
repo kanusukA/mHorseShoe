@@ -51,14 +51,19 @@ void GuiComponent::showGuiTab(bool visibility, GuiTabs tab)
 
 void GuiComponent::saveRsusObj()
 {
-	std::string filename = this->rsusParam->rsusObj->shaderName;
+	std::string filename = this->rsusParam->rsusObj->fragShaderName;
 	std::cout << "saving " + filename  << std::endl;
 	ResourceHandler::GetInstance()->clearFile(filename);
-	ShaderVar shaVar = rsusParam->rsusObj->variables.at(0);
+	ShaderVar shaVar = rsusParam->rsusObj->fragVariables.at(0);
+
+	if (rsusParam->rsusObj->fragVariables.empty()) {
+		std::cout << "Nothing to save in fragment program!" << std::endl;
+		return;
+	}
 	
-	for (int i = 0; i < rsusParam->rsusObj->variables.size(); i++)
+	for (int i = 0; i < rsusParam->rsusObj->fragVariables.size(); i++)
 	{
-		ShaderVar shaVar = rsusParam->rsusObj->variables.at(i);
+		shaVar = rsusParam->rsusObj->fragVariables.at(i);
 		switch (shaVar.varType)
 		{
 		case ShaderVarType::INTEGER :
@@ -95,6 +100,58 @@ void GuiComponent::saveRsusObj()
 			break;
 		}
 		
+	}
+
+	filename = this->rsusParam->rsusObj->vertShaderName;
+	std::cout << "saving " + filename << std::endl;
+	ResourceHandler::GetInstance()->clearFile(filename);
+	
+	if (rsusParam->rsusObj->vertVariables.empty()) {
+		std::cout << "Nothing to save in vertex program!" << std::endl;
+		return;
+	}
+
+	shaVar = rsusParam->rsusObj->vertVariables.at(0);
+
+	for (int i = 0; i < rsusParam->rsusObj->vertVariables.size(); i++)
+	{
+		shaVar = rsusParam->rsusObj->vertVariables.at(i);
+		switch (shaVar.varType)
+		{
+		case ShaderVarType::INTEGER:
+			ResourceHandler::GetInstance()->writeToFile(shaVar.varName, std::to_string(shaVar.varType) + " " +
+				std::to_string(*shaVar.varInt), filename);
+			break;
+		case ShaderVarType::FLOAT0:
+			ResourceHandler::GetInstance()->writeToFile(shaVar.varName, std::to_string(shaVar.varType) + " " +
+				std::to_string(*shaVar.varFloat), filename);
+			break;
+		case ShaderVarType::FLOAT2:
+			ResourceHandler::GetInstance()->writeToFile(shaVar.varName, std::to_string(shaVar.varType) + " " +
+				std::to_string(shaVar.varFloat2[0]) + " " +
+				std::to_string(shaVar.varFloat2[1]),
+				filename);
+			break;
+		case ShaderVarType::FLOAT3:
+			ResourceHandler::GetInstance()->writeToFile(shaVar.varName, std::to_string(shaVar.varType) + " " +
+				std::to_string(shaVar.varFloat3[0]) + " " +
+				std::to_string(shaVar.varFloat3[1]) + " " +
+				std::to_string(shaVar.varFloat3[2]),
+				filename);
+			break;
+		case ShaderVarType::FLOAT4:
+			ResourceHandler::GetInstance()->writeToFile(shaVar.varName, std::to_string(shaVar.varType) + " " +
+				std::to_string(shaVar.varFloat4[0]) + " " +
+				std::to_string(shaVar.varFloat4[1]) + " " +
+				std::to_string(shaVar.varFloat4[2]) + " " +
+				std::to_string(shaVar.varFloat4[3]),
+				filename);
+			break;
+		default:
+			std::cout << "Error filling value " << std::endl;
+			break;
+		}
+
 	}
 
 }

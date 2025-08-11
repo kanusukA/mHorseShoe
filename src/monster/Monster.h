@@ -70,10 +70,14 @@ struct RSUShader
 	std::string materialName;
 
 	Ogre::GpuProgramParametersPtr fragProgramPtr;
+	Ogre::GpuProgramParametersPtr vertProgramPtr;
 
-	std::string shaderName;
-	std::string shaderFileName;
-	std::vector<ShaderVar> variables;
+	std::string fragShaderName;
+	std::string fragShaderFileName;
+	std::string vertShaderName;
+	std::string vertShaderFileName;
+	std::vector<ShaderVar> fragVariables;
+	std::vector<ShaderVar> vertVariables;
 
 };
 
@@ -85,11 +89,18 @@ public:
 	RSUShader* rsusObj = new RSUShader();
 
 	void readMaterial(Ogre::String matName);
-	void updateParameterInt(Ogre::String parameterName, int val);
-	void updateParameterFloat(Ogre::String parameterName, float* val);
-	void updateParameterFloat2(Ogre::String parameterName, float* val);
-	void updateParameterFloat3(Ogre::String parameterName, float* val);
-	void updateParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
+
+	void updateFragParameterInt(Ogre::String parameterName, int val);
+	void updateFragParameterFloat(Ogre::String parameterName, float* val);
+	void updateFragParameterFloat2(Ogre::String parameterName, float* val);
+	void updateFragParameterFloat3(Ogre::String parameterName, float* val);
+	void updateFragParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
+
+	void updateVertParameterInt(Ogre::String parameterName, int val);
+	void updateVertParameterFloat(Ogre::String parameterName, float* val);
+	void updateVertParameterFloat2(Ogre::String parameterName, float* val);
+	void updateVertParameterFloat3(Ogre::String parameterName, float* val);
+	void updateVertParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
 
 	// Class should not be clonable
 	RSUS(RSUS& copy) = delete;
@@ -111,6 +122,7 @@ private:
 
 	// to be used with ResourceHandler Save
 	ShaderVar _putShaderValue(std::string valueStr);
+	std::vector<ShaderVar> _initShaderValue(Ogre::GpuProgramParametersPtr params, Ogre::StringVector* vec, Ogre::String filename);
 
 	// Multi-Thread Shit
 	static RSUS* pinstance_;
@@ -236,6 +248,7 @@ public:
 	Ogre::Camera* getCamera() { return cam; }
 
 	void setSkyBox();
+	void setGrid();
 
 	void createTerrain(Ogre::Vector2 size, unsigned int vertSize, unsigned int grassDensity);
 	void setHeightMap(Ogre::String loc, Ogre::String grassMapImg, int vertSize, int displacementFac, int grassDensity, float scale);
@@ -271,6 +284,16 @@ public:
 void setObjRotation(Ogre::SceneNode* scnNode, Ogre::Vector3& rot);
 
 Ogre::Vector3 getObjRotation(Ogre::SceneNode* scnNode);
+
+
+class ShaderSaveFileInconsistent : public std::exception {
+public:
+
+	char* what() {
+		std::cout << "Shader Save File is not inline with the shader script. " << std::endl;
+	}
+
+};
 
 
 

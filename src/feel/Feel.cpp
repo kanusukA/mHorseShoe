@@ -183,6 +183,11 @@ void Feel::updateInput(float deltaTime) {
 			if (event.key.key == keyHandler->keyBinds->ALT_R_KEY) {
 				keyHandler->inputKeys->ALT_R_KEY = true;
 			}
+
+			// ACTION KEYS
+			if (event.key.key == keyHandler->keyBinds->SPRINT_KEY) {
+				keyHandler->inputKeys->SPRINT_KEY = true;
+			}
 			
 
 		}
@@ -279,6 +284,11 @@ void Feel::updateInput(float deltaTime) {
 
 			if (event.key.key == keyHandler->keyBinds->ALT_R_KEY) {
 				keyHandler->inputKeys->ALT_R_KEY = false;
+			}
+
+			// ACTION KEYS
+			if (event.key.key == keyHandler->keyBinds->SPRINT_KEY) {
+				keyHandler->inputKeys->SPRINT_KEY = false;
 			}
 			
 			

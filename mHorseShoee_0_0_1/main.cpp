@@ -60,6 +60,7 @@ int main() {
 
 	std::cout << "Setting up Skybox" << std::endl;
 	monster->setSkyBox();
+	monster->setGrid();
 
 	//monster->_createGrassBlade(0.3, 1);
 

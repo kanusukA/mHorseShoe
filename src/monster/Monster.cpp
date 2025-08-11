@@ -54,7 +54,7 @@ std::mutex RSUS::mutex_;
 					
 				}
 			}
-			std::cout << "Selected : " << resultEntry.movable->getName() << std::endl;
+			//std::cout << "Selected : " << resultEntry.movable->getName() << std::endl;
 			if(resultEntry.movable){
 				return resultEntry.movable;
 			}
@@ -710,6 +710,51 @@ void Monster::setSkyBox()
 	
 }
 
+void Monster::setGrid()
+{
+
+	Ogre::MaterialPtr gridMat = Ogre::MaterialManager::getSingleton().getByName("myGrid");
+	RSUS::GetInstance()->readMaterial("myGrid");
+
+
+	Ogre::ManualObject* gridObj = oScnManager->createManualObject();
+
+	gridObj->begin("myGrid", Ogre::RenderOperation::OT_TRIANGLE_STRIP, "Mesh_Materials");
+
+	gridObj->position(Ogre::Vector3(0, 0, 0));
+	gridObj->normal(0, 1, 0);
+	gridObj->textureCoord(0, 0);
+
+	gridObj->position(Ogre::Vector3(0, 0, 10000));
+	gridObj->normal(0, 1, 0);
+	gridObj->textureCoord(0, 1);
+
+	gridObj->position(Ogre::Vector3(10000, 0, 0));
+	gridObj->normal(0, 1, 0);
+	gridObj->textureCoord(1, 0);
+
+	gridObj->position(Ogre::Vector3(10000, 0, 10000));
+	gridObj->normal(0, 1, 0);
+	gridObj->textureCoord(1, 1);
+
+
+	gridObj->end();
+
+	//update bounding box
+
+
+	gridObj->convertToMesh("gridMesh");
+
+	
+
+	Ogre::SceneNode* gridNode = oScnManager->getRootSceneNode()->createChildSceneNode("GridScnNode");
+	gridNode->attachObject(gridObj);
+
+	gridNode->setPosition(-5000, 0, -5000);
+
+	//send Camera position to shader script and fade out outter grid 
+}
+
 void Monster::createTerrain(Ogre::Vector2 size,unsigned int vertSize, unsigned int grassDensity)
 {
 
@@ -1287,175 +1332,143 @@ void RSUS::readMaterial(Ogre::String matName)
 	Ogre::String fragProgramName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getName();
 	Ogre::String fragProgramFileName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();
 	Ogre::GpuProgramParametersPtr fragParam = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+
+	Ogre::String vertProgramName = mat.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getName();
+	Ogre::String vertProgramFileName = mat.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getSourceFile();
+	Ogre::GpuProgramParametersPtr vertParam = mat.get()->getTechnique(0)->getPass(0)->getVertexProgramParameters();
 	
-	std::cout << "Program Name : " << fragProgramName << std::endl;
-	std::cout << "Program File Name : " << fragProgramFileName << std::endl;
+	std::cout << " Frag Program Name : " << fragProgramName << std::endl;
+	std::cout << " Frag Program File Name : " << fragProgramFileName << std::endl;
+	std::cout << " Vert Program Name : " << vertProgramName << std::endl;
+	std::cout << " Vert Program File Name : " << vertProgramFileName << std::endl;
 
 	// Read the shader file
-	ResourceHandler::GetInstance()->readShaderFiles(fragProgramFileName);
+	ResourceHandler::GetInstance()->readShaderFiles(mat);
 
+	std::vector<std::string>* fragshaderVar = ResourceHandler::GetInstance()->fragShaderVariables;
+	std::vector<std::string>* vertshaderVar = ResourceHandler::GetInstance()->vertShaderVariables;
 
-	std::vector<ShaderVar> variables = std::vector<ShaderVar>();
+	rsusObj->fragVariables =  _initShaderValue(fragParam, fragshaderVar, fragProgramName);
+	rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
+
 	
-	std::vector<std::string>* shaderVar = ResourceHandler::GetInstance()->ShaderVariables;
-
-	// check if save file is found
-	bool hasSave = ResourceHandler::GetInstance()->fileExists(fragProgramName);
-
-	for (int i = 0; i < shaderVar->size(); i++) {
-		std::cout << "This :: " << shaderVar->at(i) << std::endl;
-	}
-	
-
-	//Validate output
-	// must be not null
-	std::string vari = "";
-	if (shaderVar) {
-		// must be even
-		if (shaderVar->size() % 2 == 0)
-		{
-			for (int i = 0; i < shaderVar->size() /2; i+=2)
-			{
-				// List if validated and correct 
-				// Cross Check variables with the Parameter file
-				vari = shaderVar->at(i + 1);
-				//std::cout << "Output :: " << vari << std::endl;
-				ShaderVar var = ShaderVar();
-				
-				
-				if (hasSave) {
-					var = _putShaderValue(ResourceHandler::GetInstance()->readFromFile(vari, fragProgramName));
-
-					// Input values to shader
-					switch (var.varType)
-					{
-					case ShaderVarType::INTEGER:
-						fragParam.get()->setNamedConstant(vari, *var.varInt);
-						break;
-					case ShaderVarType::FLOAT0:
-						fragParam.get()->setNamedConstant(vari, *var.varFloat);
-						break;
-					case ShaderVarType::FLOAT2:
-						fragParam.get()->setNamedConstant(vari, Ogre::Vector2(var.varFloat2[0],var.varFloat2[1]));
-						break;
-					case ShaderVarType::FLOAT3:
-						fragParam.get()->setNamedConstant(vari, 
-							Ogre::Vector3(var.varFloat3[0], 
-							var.varFloat3[1],
-							var.varFloat3[2]
-						));
-						break;
-					case ShaderVarType::FLOAT4:
-						fragParam.get()->setNamedConstant(vari,
-							Ogre::Vector4(var.varFloat4[0],
-								var.varFloat4[1],
-								var.varFloat4[2],
-								var.varFloat4[3]
-							));
-						break;
-					default:
-						std::cout << "Invalid type found" << std::endl;
-						break;
-					}
-
-
-				}
-				
-				else {
-					try
-					{
-
-						if (shaderVar->at(i) == "0") {
-							std::cout << "int" << std::endl;
-							fragParam.get()->setNamedConstant(vari, 0);
-							var.varType = ShaderVarType::INTEGER;
-							var.varInt = new int(0);
-						}
-						else if (shaderVar->at(i) == "1")
-						{
-							std::cout << "float" << std::endl;
-							fragParam.get()->setNamedConstant(vari, 0.0f);
-							var.varType = ShaderVarType::FLOAT0;
-							var.varFloat = new float(0.0);
-						}
-						else if (shaderVar->at(i) == "2")
-						{
-							std::cout << "float2" << std::endl;
-							fragParam.get()->setNamedConstant(vari, Ogre::Vector2(0.0, 0.0));
-
-							var.varType = ShaderVarType::FLOAT2;
-
-						}
-						else if (shaderVar->at(i) == "3")
-						{
-							std::cout << "float3" << std::endl;
-							fragParam.get()->setNamedConstant(vari, Ogre::Vector3(0.0, 0.0, 0.0));
-							var.varType = ShaderVarType::FLOAT3;
-
-						}
-						else if (shaderVar->at(i) == "4")
-						{
-							std::cout << "float4" << std::endl;
-							fragParam.get()->setNamedConstant(vari, Ogre::Vector4(0.0, 0.0, 0.0, 0.0));
-							var.varType = ShaderVarType::FLOAT4;
-
-						}
-					}
-
-					catch (const std::exception& e)
-					{
-						std::cout << e.what() << std::endl;
-						std::cout << "Found invalid Parameter : " << shaderVar->at(i + 1) << " " << shaderVar->at(i) << std::endl;
-					}
-				}
-
-				var.varName = shaderVar->at(i + 1);
-				variables.push_back(var);
-					
-				
-
-				
-
-			}
-		
-		}
-	}
-
 	// file verified
-	std::cout << "file verified";
+	std::cout << "file verified" << std::endl;
 
-	rsusObj->shaderName = fragProgramName;
-	rsusObj->shaderFileName = fragProgramFileName;
+	rsusObj->fragShaderName = fragProgramName;
+	rsusObj->fragShaderFileName = fragProgramFileName;
+	rsusObj->vertShaderName = vertProgramName;
+	rsusObj->vertShaderFileName = vertProgramFileName;
 	rsusObj->materialName = matName;
 	rsusObj->fragProgramPtr = fragParam;
-	rsusObj->variables = variables;
+	rsusObj->vertProgramPtr = vertParam;
+	
 
 	
 }
 
-void RSUS::updateParameterInt(Ogre::String parameterName, int val)
+void RSUS::updateFragParameterInt(Ogre::String parameterName, int val)
 {
-	this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+	try {
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+	}
+	catch (...) {
+		std::cout << "Invalid Float Input For : " << parameterName << " Value : " << val << std::endl;
+	}
 }
 
-void RSUS::updateParameterFloat(Ogre::String parameterName, float* val)
+void RSUS::updateFragParameterFloat(Ogre::String parameterName, float* val)
 {
-	this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val[0]);
+	try {
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val[0]);
+	}
+	catch (...) {
+		std::cout << "Invalid Float Input For : " << parameterName << " Value : " << val[0] << std::endl;
+	}
+	
 }
 
-void RSUS::updateParameterFloat2(Ogre::String parameterName, float* val)
+void RSUS::updateFragParameterFloat2(Ogre::String parameterName, float* val)
 {
-	this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector2(val[0],val[1]));
+	try {
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector2(val[0], val[1]));
+	}
+	catch (...) {
+		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << Ogre::Vector2(val[0], val[1]) << std::endl;
+	}
+	
 }
 
-void RSUS::updateParameterFloat3(Ogre::String parameterName, float* val)
+void RSUS::updateFragParameterFloat3(Ogre::String parameterName, float* val)
 {
-	this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector3(val[0], val[1], val[2]));
+	try {
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector3(val[0], val[1], val[2]));
+	}
+	catch (...) {
+		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << Ogre::Vector3(val[0], val[1], val[2]) << std::endl;
+	}
+	
 }
 
-void RSUS::updateParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val)
+void RSUS::updateFragParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val)
 {
-	this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+	try {
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+	}
+	catch (...) {
+		std::cout << "Invalid Float4 Input For : " << parameterName << " Value : " << val << std::endl;
+	}
+	
+}
+
+void RSUS::updateVertParameterInt(Ogre::String parameterName, int val)
+{
+	try {
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
+	}
+	catch (...) {
+		std::cout << "Invalid Float Input For : " << parameterName << " Value : " << val << std::endl;
+	}
+}
+
+void RSUS::updateVertParameterFloat(Ogre::String parameterName, float* val)
+{
+	try {
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val[0]);
+	}
+	catch (...) {
+		std::cout << "Invalid Float Input For : " << parameterName << " Value : " << val[0] << std::endl;
+	}
+}
+
+void RSUS::updateVertParameterFloat2(Ogre::String parameterName, float* val)
+{
+	try {
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector2(val[0], val[1]));
+	}
+	catch (...) {
+		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << Ogre::Vector2(val[0], val[1]) << std::endl;
+	}
+}
+
+void RSUS::updateVertParameterFloat3(Ogre::String parameterName, float* val)
+{
+	try {
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector3(val[0], val[1], val[2]));
+	}
+	catch (...) {
+		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << Ogre::Vector3(val[0], val[1], val[2]) << std::endl;
+	}
+}
+
+void RSUS::updateVertParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val)
+{
+	try {
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
+	}
+	catch (...) {
+		std::cout << "Invalid Float4 Input For : " << parameterName << " Value : " << val << std::endl;
+	}
 }
 
 RSUS* RSUS::GetInstance()
@@ -1549,7 +1562,166 @@ ShaderVar RSUS::_putShaderValue(std::string valueStr)
 			std::cout << "Unknown Type in Save file" << std::endl;
 		}
 	}
+	else {
+		std::cout << "Invalid save file contents" << std::endl;
+		// throw exception here
+		throw ShaderSaveFileInconsistent();
+	}
 
 	return var;
 	
+}
+
+std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr params, Ogre::StringVector* vec , Ogre::String filename)
+{
+
+	std::vector<ShaderVar> variables = std::vector<ShaderVar>();
+
+	// check if save file is found
+	bool hasSave = ResourceHandler::GetInstance()->fileExists(filename);
+	bool inSave = false;
+
+	for (int i = 0; i < vec->size(); i++) {
+		std::cout << "This :: " << vec->at(i) << std::endl;
+	}
+
+	std::cout << "Graphics File : " << filename << " Found : " << hasSave << std::endl;
+
+	
+
+	//Validate output
+	// must be not null
+	std::string vari = "";
+	if (vec) {
+		// must be even
+		if (vec->size() % 2 == 0)
+		{
+			for (int i = 0; i < vec->size(); i += 2)
+			{
+				// List if validated and correct 
+				// Cross Check variables with the Parameter file
+				vari = vec->at(i + 1);
+				std::cout <<"Output Type : " <<  vec->at(i) << std::endl;
+				std::cout << "Output name : " << vec->at(i + 1) << std::endl;
+				//std::cout << "Output :: " << vari << std::endl;
+				ShaderVar var = ShaderVar();
+
+				try
+				{
+					var = _putShaderValue(ResourceHandler::GetInstance()->readFromFile(vari, filename));
+				}
+				catch (const std::exception &e)
+				{
+					std::cout << "ERROR FOUND : ";
+					e.what();
+					hasSave = false;
+				}
+				
+
+				
+				// add save update
+				if (hasSave) {
+					
+					//std::cout << "value" << var << std::endl;
+
+					// Input values to shader
+					try {
+						switch (var.varType)
+						{
+						case ShaderVarType::INTEGER:
+
+							params.get()->setNamedConstant(vari, *var.varInt);
+
+
+							break;
+						case ShaderVarType::FLOAT0:
+							params.get()->setNamedConstant(vari, *var.varFloat);
+							break;
+						case ShaderVarType::FLOAT2:
+							params.get()->setNamedConstant(vari, Ogre::Vector2(var.varFloat2[0], var.varFloat2[1]));
+							break;
+						case ShaderVarType::FLOAT3:
+							params.get()->setNamedConstant(vari,
+								Ogre::Vector3(var.varFloat3[0],
+									var.varFloat3[1],
+									var.varFloat3[2]
+								));
+							break;
+						case ShaderVarType::FLOAT4:
+							params.get()->setNamedConstant(vari,
+								Ogre::Vector4(var.varFloat4[0],
+									var.varFloat4[1],
+									var.varFloat4[2],
+									var.varFloat4[3]
+								));
+							break;
+						default:
+							std::cout << "Invalid type found" << std::endl;
+							break;
+						}
+
+					}
+					catch (const std::exception& e) {
+						std::cout << filename << " : Save file invalid or old." << std::endl;
+					}
+
+
+				}
+
+				else {
+					try
+					{
+
+						if (vec->at(i) == "0") {
+							std::cout << "int" << std::endl;
+							params.get()->setNamedConstant(vari, 0);
+							var.varType = ShaderVarType::INTEGER;
+							var.varInt = new int(0);
+						}
+						else if (vec->at(i) == "1")
+						{
+							std::cout << "float" << std::endl;
+							params.get()->setNamedConstant(vari, 0.0f);
+							var.varType = ShaderVarType::FLOAT0;
+							var.varFloat = new float(0.0);
+						}
+						else if (vec->at(i) == "2")
+						{
+							std::cout << "float2" << std::endl;
+							params.get()->setNamedConstant(vari, Ogre::Vector2(0.0, 0.0));
+
+							var.varType = ShaderVarType::FLOAT2;
+
+						}
+						else if (vec->at(i) == "3")
+						{
+							std::cout << "float3" << std::endl;
+							params.get()->setNamedConstant(vari, Ogre::Vector3(0.0, 0.0, 0.0));
+							var.varType = ShaderVarType::FLOAT3;
+
+						}
+						else if (vec->at(i) == "4")
+						{
+							std::cout << "float4" << std::endl;
+							params.get()->setNamedConstant(vari, Ogre::Vector4(0.0, 0.0, 0.0, 0.0));
+							var.varType = ShaderVarType::FLOAT4;
+
+						}
+					}
+
+					catch (const std::exception& e)
+					{
+						std::cout << e.what() << std::endl;
+						std::cout << "Found invalid Parameter : " << vec->at(i + 1) << " " << vec->at(i) << std::endl;
+					}
+				}
+
+				var.varName = vec->at(i + 1);
+				variables.push_back(var);
+
+			}
+
+		}
+	}
+	return variables;
 }

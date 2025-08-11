@@ -232,20 +232,35 @@ public:
 		RSUS::GetInstance()->readMaterial(ResourceHandler::GetInstance()->OgreMaterials->at(this->rsusParam->selectedMaterial));
 		this->rsusParam->rsusObj = RSUS::GetInstance()->rsusObj;
 	}
-	void updateRsusInt(std::string varName, int val) {
-		RSUS::GetInstance()->updateParameterInt(varName, val);
+	void updateFragRsusInt(std::string varName, int val) {
+		RSUS::GetInstance()->updateFragParameterInt(varName, val);
 	}
-	void updateRsusFloat(std::string varName, float* val) {
-		RSUS::GetInstance()->updateParameterFloat(varName, val);
+	void updateFragRsusFloat(std::string varName, float* val) {
+		RSUS::GetInstance()->updateFragParameterFloat(varName, val);
 	}
-	void updateRsusFloat2(std::string varName, float* val) {
-		RSUS::GetInstance()->updateParameterFloat2(varName, val);
+	void updateFragRsusFloat2(std::string varName, float* val) {
+		RSUS::GetInstance()->updateFragParameterFloat2(varName, val);
 	}
-	void updateRsusFloat3(std::string varName, float* val) {
-		RSUS::GetInstance()->updateParameterFloat3(varName, val);
+	void updateFragRsusFloat3(std::string varName, float* val) {
+		RSUS::GetInstance()->updateFragParameterFloat3(varName, val);
 	}
-	void updateRsusFloat4(std::string varName, Ogre::Vector4 val) {
-		RSUS::GetInstance()->updateParameterFloat4(varName, val);
+	void updateFragRsusFloat4(std::string varName, Ogre::Vector4 val) {
+		RSUS::GetInstance()->updateFragParameterFloat4(varName, val);
+	}
+	void updateVertRsusInt(std::string varName, int val) {
+		RSUS::GetInstance()->updateVertParameterInt(varName, val);
+	}
+	void updateVertRsusFloat(std::string varName, float* val) {
+		RSUS::GetInstance()->updateVertParameterFloat(varName, val);
+	}
+	void updateVertRsusFloat2(std::string varName, float* val) {
+		RSUS::GetInstance()->updateVertParameterFloat2(varName, val);
+	}
+	void updateVertRsusFloat3(std::string varName, float* val) {
+		RSUS::GetInstance()->updateVertParameterFloat3(varName, val);
+	}
+	void updateVertRsusFloat4(std::string varName, Ogre::Vector4 val) {
+		RSUS::GetInstance()->updateVertParameterFloat4(varName, val);
 	}
 	
 };
