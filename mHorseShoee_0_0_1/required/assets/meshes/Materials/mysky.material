@@ -18,8 +18,9 @@ fragment_program skyFragProgram hlsl
 	entry_point mainPS
 	target ps_4_0
 	
-	
+	// ADD PARAMETER FROM THE MONSTER CLASS
 	default_params{
+		
 		//param_named_auto time time
 		
 		// sky Color

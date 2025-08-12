@@ -1,0 +1,72 @@
+
+vertex_program mShadowRecivVP hlsl
+{
+    source mShadowRecivVP.hlsl
+    entry_point mainVS
+    target vs_4_0
+    default_params{
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto worldMat world_matrix
+        param_named_auto texMatrix0 texture_viewproj_matrix 0
+    }
+}
+
+fragment_program mShadowRecivFP hlsl
+{
+    source mShadowRecivFP.hlsl
+    entry_point mainPS
+    target ps_4_0
+    default_params{
+        
+        param_named_auto lightDirection light_direction 0
+        param_named_auto ambientColor ambient_light_colour
+        param_named_auto shadowMapSize packed_texture_size 1
+
+        param_named fixedDepthBias float4 0.005, 0.001, 0.001, 0.003;
+        param_named gradientScaleBias float4 0.0005, 0.001, 0.001, 0.003;
+        param_named shadowFadeDist float 500;
+        param_named shadowMaxDist float 6000;
+    }
+}
+
+material mShadowReciv {
+    technique{
+        pass{
+
+            vertex_program_ref mShadowRecivVP{
+
+            }
+            fragment_program_ref mShadowRecivFP{
+
+            }
+
+
+            texture_unit Diffuse
+            {
+
+            }
+            texture_unit
+            {
+                content_type shadow
+                tex_address_mode clamp
+            }
+            texture_unit
+            {
+                content_type shadow
+                tex_address_mode clamp
+            }
+            texture_unit
+            {
+                content_type shadow
+                tex_address_mode clamp
+            }
+            texture_unit
+            {
+                content_type shadow
+                tex_address_mode clamp
+            }
+
+
+        }
+    }
+}

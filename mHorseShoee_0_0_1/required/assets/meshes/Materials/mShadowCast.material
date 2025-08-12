@@ -1,0 +1,37 @@
+
+vertex_program shadowCastVP hlsl
+{
+    source shadowCastVP.hlsl
+    entry_point mainVP
+    target vs_4_0
+    default_params{
+        param_named_auto cWorldViewProj worldviewproj_matrix
+        param_named_auto cWorldView worldview_matrix
+    }
+}
+
+fragment_program shadowCastFP hlsl
+{
+    source shadowCastFP.hlsl
+    entry_point mainPS
+    target ps_4_0
+    default_params{
+        param_named_auto cFarDistance far_clip_distance
+    }
+
+}
+
+material mShadowCast{
+    technique{
+        pass{
+
+            vertex_program_ref shadowCastVP{
+
+            }
+            fragment_program_ref shadowCastFP{
+
+            }
+
+        }
+    }
+}

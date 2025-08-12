@@ -9,6 +9,7 @@ vertex_program Ogre/Instancing/HW_VTF_hlsl_vs hlsl
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
+	
 	}
 	
 	//includes_instancing true

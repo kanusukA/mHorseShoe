@@ -25,6 +25,10 @@ const Ogre::String TRAY_SYSTEM_NAME = "Default_Tray_Man";
 
 #define MAIN_CAMERA_NAME "main_camera_name"
 
+#define SKY_SPHERE_NAME "sky_sphere"
+#define SKY_BOX_NAME "sky_high_box"
+#define WORLD_GRID_NAME "world_grid"
+
 
 struct MainDirectionalLight
 {
@@ -51,6 +55,13 @@ enum ShaderVarType
 	FLOAT2,
 	FLOAT3,
 	FLOAT4
+};
+
+enum QueryMask
+{
+	SKY = 1 << 0,
+	GRID = 1 << 1
+
 };
 
 struct ShaderVar {
@@ -186,6 +197,7 @@ public:
 	
 	Ogre::SceneNode* addCamera(Ogre::String camName, Ogre::Vector3 startPos);
 	Ogre::Entity* getMeshEntity(Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
+	Ogre::Entity* getMeshEntity(Ogre::String entityname ,Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
 	Ogre::SceneNode* addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode);
 
 	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::String scnNodeName, Ogre::Entity* ent);

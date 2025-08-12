@@ -43,13 +43,16 @@ std::mutex RSUS::mutex_;
 		Ogre::RaySceneQueryResult result = mRayScnQuery->execute();
 		Ogre::RaySceneQueryResultEntry resultEntry;
 		
-		if (result.size() > 2) { // Starts from 2 to compensate for skybox
+		if (result.size() > 0) { // Starts from 2 to compensate for skybox
 			// congrats hit!!
-			resultEntry = result[2];
-			for (int i = 2; i < result.size(); i++)
+			resultEntry = result[0];
+			for (int i = 0; i < result.size(); i++)
 			{
+
+				//std::cout << "Selectable : " << result.at(i).movable->getName() << " Dist : " << result[i].distance << std::endl;
 				//std::cout << "Hit : " << result[i].movable->getParentSceneNode()->getName() << std::endl;
 				if (result[i].distance < resultEntry.distance) {
+					
 					resultEntry = result[i];
 					
 				}
@@ -81,6 +84,14 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 
 	oScnManager->setAmbientLight(Ogre::ColourValue(0.53, 0.2, 0.12));
 	oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_MODULATIVE);
+
+	Ogre::MaterialPtr casterMat = Ogre::MaterialManager::getSingleton().getByName("mShadowCast");
+	Ogre::MaterialPtr receiverMat = Ogre::MaterialManager::getSingleton().getByName("mShadowReciv");
+
+	oScnManager->setShadowTextureCasterMaterial(casterMat);
+	oScnManager->setShadowTextureReceiverMaterial(receiverMat);
+
+
 	//oScnManager->setShadowTextureSelfShadow(true);
 	
 	oScnManager->setShowDebugShadows(true);
@@ -94,6 +105,9 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 
 	// raycast setup
 	mRayScnQuery =  oScnManager->createRayQuery(Ogre::Ray(), Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
+
+	mRayScnQuery->setQueryMask(~QueryMask::SKY & ~QueryMask::GRID);
+	
 
 	inputkeys = InputHandler::GetInstance()->getInputKeys();
 
@@ -145,6 +159,12 @@ Ogre::Entity* Monster::getMeshEntity(Ogre::String mshname, Ogre::String groupNam
 {
 	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(mshname, groupName);
 	return oScnManager->createEntity(msh);
+}
+
+Ogre::Entity* Monster::getMeshEntity(Ogre::String entityname, Ogre::String mshname, Ogre::String groupName)
+{
+	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(mshname, groupName);
+	return oScnManager->createEntity(entityname,msh);
 }
 
 Ogre::SceneNode* Monster::addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode)
@@ -679,10 +699,10 @@ void Monster::setSkyBox()
 
 
 	
-	skyHighNode = oScnManager->getRootSceneNode()->createChildSceneNode("sky_high_light");
+	skyHighNode = oScnManager->getRootSceneNode()->createChildSceneNode(SKY_BOX_NAME);
 
 	
-	Ogre::Entity* ent_high = this->getMeshEntity("Sphere_up.mesh");
+	Ogre::Entity* ent_high = this->getMeshEntity("sky_box_mesh", "Sphere_up.mesh", "Render_Mesh");
 
 	ent_high->setMaterial(skyHighMat);
 	ent_high->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_LATE);
@@ -690,9 +710,9 @@ void Monster::setSkyBox()
 	skyHighNode->setPosition(0, -2500, 0);
 	skyHighNode->setScale(Ogre::Vector3(9000));
 
-	skySphere = oScnManager->getRootSceneNode()->createChildSceneNode("sky");
+	skySphere = oScnManager->getRootSceneNode()->createChildSceneNode(SKY_SPHERE_NAME);
 
-	Ogre::Entity* ent_sky = this->getMeshEntity("Sphere.mesh");
+	Ogre::Entity* ent_sky = this->getMeshEntity("sky_sphere_mesh", "Sphere.mesh", "Render_Mesh");
 
 	ent_sky->setMaterial(skyMat);
 	ent_sky->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_EARLY);
@@ -704,6 +724,9 @@ void Monster::setSkyBox()
 	Ogre::Plane plane = Ogre::Plane();
 	plane.d = 1000.0f;
 	plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Y;
+
+	ent_high->setQueryFlags(QueryMask::SKY);
+	ent_sky->setQueryFlags(QueryMask::SKY);
 
 	//oScnManager->setSkyPlane(true, plane, "myCloud", 1000.0f, 1.0f, true, 1.0f, 16, 16, "Render_Mesh");
 	//oScnManager->setSkyBox(true, "mySky");
@@ -717,7 +740,7 @@ void Monster::setGrid()
 	RSUS::GetInstance()->readMaterial("myGrid");
 
 
-	Ogre::ManualObject* gridObj = oScnManager->createManualObject();
+	Ogre::ManualObject* gridObj = oScnManager->createManualObject(WORLD_GRID_NAME);
 
 	gridObj->begin("myGrid", Ogre::RenderOperation::OT_TRIANGLE_STRIP, "Mesh_Materials");
 
@@ -744,15 +767,15 @@ void Monster::setGrid()
 
 
 	gridObj->convertToMesh("gridMesh");
-
+	
+	gridObj->setQueryFlags(QueryMask::GRID);
 	
 
 	Ogre::SceneNode* gridNode = oScnManager->getRootSceneNode()->createChildSceneNode("GridScnNode");
 	gridNode->attachObject(gridObj);
-
+	
 	gridNode->setPosition(-5000, 0, -5000);
 
-	//send Camera position to shader script and fade out outter grid 
 }
 
 void Monster::createTerrain(Ogre::Vector2 size,unsigned int vertSize, unsigned int grassDensity)
@@ -1603,9 +1626,14 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 				vari = vec->at(i + 1);
 				std::cout <<"Output Type : " <<  vec->at(i) << std::endl;
 				std::cout << "Output name : " << vec->at(i + 1) << std::endl;
+
+				if (vec->at(i + 1) == "cameraPos") {
+					continue;
+				}
+
 				//std::cout << "Output :: " << vari << std::endl;
 				ShaderVar var = ShaderVar();
-
+				
 				try
 				{
 					var = _putShaderValue(ResourceHandler::GetInstance()->readFromFile(vari, filename));

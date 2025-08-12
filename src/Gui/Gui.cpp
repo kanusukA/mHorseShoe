@@ -465,6 +465,7 @@ void Gui::_objectTab()
 
 		ImGui::SetNextWindowPos(ImVec2(0, 200));
 		ImGui::SetNextWindowSize(ImVec2(250, 50));
+
 		ImGui::Begin("Selectable", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
 		ImGui::Text("Name : ");
@@ -513,8 +514,9 @@ void Gui::_objectTab()
 				if (ImGui::Button("Delete")) {
 					guiComponent->deleteSelectedObj();
 				}
-
+				
 				ImGui::End();
+				
 			}
 		}
 
@@ -543,6 +545,7 @@ void Gui::_diegnos()
 {
 	ImGui::SetNextWindowSize(ImVec2(200, 100));
 	ImGui::SetNextWindowPos(ImVec2(1400, 0));
+
 	ImGui::Begin("Diagnostics", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
 
 	ImGui::Text("FPS : ");
