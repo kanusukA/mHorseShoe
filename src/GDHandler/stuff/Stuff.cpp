@@ -489,45 +489,33 @@ void StuffHandler::update(float deltaTime)
 		if(InputHandler::GetInstance()->getInputKeys()->MOUSE_LEFT_CLICK > 0){
 
 			Ogre::Any any = rayObj->getParentSceneNode()->getUserObjectBindings().getUserAny();
+			
+			
 
 
 			if (any.type() == typeid(StuffDynamic*)) {
 
-				if (this->selectedObj->selectedStuff) {
-					*this->selectedObj->selectedStuff = *Ogre::any_cast<StuffDynamic*>(any);
-					this->selectedObj->type = STUFF_DYNAMIC;
-				}
-				else {
-					this->selectedObj->selectedStuff = Ogre::any_cast<StuffDynamic*>(any);
-					this->selectedObj->type = STUFF_DYNAMIC;
-				}
+				
+				this->selectedObj->selectedStuff = Ogre::any_cast<StuffDynamic*>(any);
+				this->selectedObj->type = STUFF_DYNAMIC;
+				
 				*this->selectedObj->shadowCasting = selectedObj->selectedStuff->getEntity()->getCastShadows();
 				
 			}
 			else if (any.type() == typeid(StuffStatic*)) {
-				if (this->selectedObj->selectedStuff)
-				{
-					*this->selectedObj->selectedStuff = *Ogre::any_cast<StuffStatic*>(any);
-					this->selectedObj->type = STUFF_STATIC;
+				
+				this->selectedObj->selectedStuff = Ogre::any_cast<StuffStatic*>(any);
+				this->selectedObj->type = STUFF_STATIC;
 					
-				}
-				else {
-					this->selectedObj->selectedStuff = Ogre::any_cast<StuffStatic*>(any);
-					this->selectedObj->type = STUFF_STATIC;
-				}
+				
 				*this->selectedObj->shadowCasting = selectedObj->selectedStuff->getEntity()->getCastShadows();
 				
 			}
 			else if (any.type() == typeid(StuffMesh*)) {
-				if (this->selectedObj->selectedStuff)
-				{
-					*this->selectedObj->selectedStuff = *Ogre::any_cast<StuffMesh*>(any);
-					this->selectedObj->type = STUFF_MESH_ONLY;
-				}
-				else {
-					this->selectedObj->selectedStuff = Ogre::any_cast<StuffMesh*>(any);
-					this->selectedObj->selectedStuff->type = STUFF_MESH_ONLY;
-				}
+				
+				this->selectedObj->selectedStuff = Ogre::any_cast<StuffMesh*>(any);
+				this->selectedObj->type = STUFF_MESH_ONLY;
+				
 				*this->selectedObj->shadowCasting = selectedObj->selectedStuff->getEntity()->getCastShadows();
 			}
 			
