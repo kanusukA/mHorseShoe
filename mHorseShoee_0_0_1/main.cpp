@@ -39,7 +39,7 @@ int main() {
 	Ogre::ImGuiOverlay* imOverlay = ctx.initialiseImGui(); // initalizes imgui before InitMonster! else will pop errors in renderOneFrame in Loop.
 	ctx.addInputListener(ctx.getImGuiInputListener());
 
-	monster->addMainDirectionalLight("mainLight", Ogre::Vector3(0, -0.9, -0.5), 1);
+	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.9, -0.5), 1);
 
 	std::cout << "Setting up Kint" << std::endl;
 	// Physics INIT
@@ -47,14 +47,17 @@ int main() {
 	kint->InitPhysics();
 
 	//GDHANDLER
+
+
 	
 	GDHandler gdhandler = GDHandler(monster,kint);
+	gdhandler.preSetup();
 	std::cout << "GDHandler setup!" << std::endl;
 	gdhandler.initGui(imOverlay, guiComponent); // initaliz Gui Seperately from monster as it conflicts with Stuff
 	std::cout << "Gui Initialized !" << std::endl;
 	gdhandler.addPlayerNode();
 	std::cout << "Player initialized!" << std::endl;
-	gdhandler.preSetup();
+	
 
 	guiComponent->setDiegnostics(diegnos);
 

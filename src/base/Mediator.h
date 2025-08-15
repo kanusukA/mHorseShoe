@@ -15,6 +15,7 @@
 #define GDEVENT_ADD_LIGHT "add_light_to_scene"
 #define GDEVENT_SET_HEIGHTMAP "set_height_map"
 #define GDEVENT_SEND_MAT_RSUS "send_material_to_rsus"
+#define GDEVENT_GENERATE_TERRAIN "generate_terrain"
 
 class MediatorComponent;
 

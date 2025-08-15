@@ -3,7 +3,9 @@
 #ifndef MONSTER_H
 #define MONSTER_H
 
-#include <Ogre.h>
+
+#include <monster/terrain.h>
+
 #include <OgreApplicationContext.h>
 #include <OgreTrays.h>
 
@@ -17,7 +19,7 @@
 
 #include <random>
 
-#include <iostream>
+
 
 
 
@@ -28,6 +30,7 @@ const Ogre::String TRAY_SYSTEM_NAME = "Default_Tray_Man";
 #define SKY_SPHERE_NAME "sky_sphere"
 #define SKY_BOX_NAME "sky_high_box"
 #define WORLD_GRID_NAME "world_grid"
+#define MAIN_DIRECTIONAL_LIGHT_NAME "root_scene_directional_light"
 
 
 struct MainDirectionalLight
@@ -103,14 +106,14 @@ public:
 
 	void updateFragParameterInt(Ogre::String parameterName, int val);
 	void updateFragParameterFloat(Ogre::String parameterName, float* val);
-	void updateFragParameterFloat2(Ogre::String parameterName, float* val);
-	void updateFragParameterFloat3(Ogre::String parameterName, float* val);
+	void updateFragParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val);
+	void updateFragParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val);
 	void updateFragParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
 
 	void updateVertParameterInt(Ogre::String parameterName, int val);
 	void updateVertParameterFloat(Ogre::String parameterName, float* val);
-	void updateVertParameterFloat2(Ogre::String parameterName, float* val);
-	void updateVertParameterFloat3(Ogre::String parameterName, float* val);
+	void updateVertParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val);
+	void updateVertParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val);
 	void updateVertParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
 
 	// Class should not be clonable

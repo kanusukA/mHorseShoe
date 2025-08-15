@@ -67,9 +67,10 @@ public:
 	}
 
 	void Notify(MediatorComponent* component, std::string event) const override {
+		GuiComponent* guiComp = static_cast<GuiComponent*>(component);
 		if (event == GDEVENT_ADD_OBJECT) {
 			try {
-				GuiComponent* guiComp = static_cast<GuiComponent*>(component);
+				
 				this->_addObject(guiComp);
 			}
 			catch (const std::exception &e) {
@@ -84,19 +85,42 @@ public:
 			stuffHandler->showDebugPhysxMeshes();
 		}
 		else if (event == GDEVENT_ADD_MDRL) {
-			GuiComponent* guiComp = static_cast<GuiComponent*>(component);
+			
 			this->_addMDRL(guiComp);
 		}
 		else if (event == GDEVENT_ADD_LIGHT) {
-			GuiComponent* guiComp = static_cast<GuiComponent*>(component);
+			
 			this->_addLight(guiComp);
 		}
 		else if (event == GDEVENT_SET_HEIGHTMAP){
-			GuiComponent* guiComp = static_cast<GuiComponent*>(component);
+			
 			this->_addHeightMap(guiComp);
 		}
 		else if (event == GDEVENT_DELETE_SELECTED_OBJ) {
 			stuffHandler->deleteSelectedObj();
+		}
+		else if (event == GDEVENT_GENERATE_TERRAIN) {
+
+			if (guiComp->terrainTab->selectedHeightMap > -1) {
+				stuffHandler->createHeightmapTerrain(
+					ResourceHandler::GetInstance()->images->at(guiComp->terrainTab->selectedHeightMap).filename().string().c_str(),
+					ResourceHandler::GetInstance()->OgreMaterials->at(guiComp->terrainTab->selectedMaterial),
+					guiComp->terrainTab->terrainSize,
+					guiComp->terrainTab->blocks,
+					guiComp->terrainTab->displacement,
+					guiComp->terrainTab->scale
+
+				);
+			}
+			else {
+				stuffHandler->createTerrain(
+					ResourceHandler::GetInstance()->OgreMaterials->at(guiComp->terrainTab->selectedMaterial),
+					guiComp->terrainTab->terrainSize,
+					guiComp->terrainTab->blocks
+				);
+			}
+			
+
 		}
 
 	}

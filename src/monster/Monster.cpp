@@ -4,35 +4,11 @@
 RSUS* RSUS::pinstance_{ nullptr };
 std::mutex RSUS::mutex_;
 
-//Monster::Monster(Ogre::String name)
-//{
-//	// Basic Ogre setup
-//	OgreBites::ApplicationContext ctx("mOgreCtx");
-//	ctx.initApp();
-//
-//	renderWindow = ctx.getRenderWindow();
-//	oRoot = ctx.getRoot();
-//	oScnManager = oRoot->createSceneManager();
-//
-//	// RTShader System
-//	_setupRTShader();
-//
-//	// Overlay | TraySystem Setup
-//	Ogre::OverlaySystem* overSys = ctx.getOverlaySystem();
-//	oScnManager->addRenderQueueListener(overSys);
-//
-//	oTrayMan = new OgreBites::TrayManager(TRAY_SYSTEM_NAME, ctx.getRenderWindow());
-//	ctx.addInputListener(oTrayMan);
-//
-//}
-
-
  Ogre::MovableObject* Monster::RayCastFromPoint()
 {
 	// create a ray (of hope)
 	Ogre::Ray ray = Ogre::Ray(cam->getRealPosition(), cam->getRealDirection());
-	//std::cout << "Direction " << ray.getDirection().x << " " << ray.getDirection().y << " " << ray.getDirection().z << std::endl;
-	//std::cout << "origin " << ray.getOrigin().x << " " << ray.getOrigin().y << " " << ray.getOrigin().z << std::endl;
+	
 	// null cheak
 	if (mRayScnQuery) {
 
@@ -43,21 +19,17 @@ std::mutex RSUS::mutex_;
 		Ogre::RaySceneQueryResult result = mRayScnQuery->execute();
 		Ogre::RaySceneQueryResultEntry resultEntry;
 		
-		if (result.size() > 0) { // Starts from 2 to compensate for skybox
+		if (result.size() > 0) { 
 			// congrats hit!!
 			resultEntry = result[0];
 			for (int i = 0; i < result.size(); i++)
 			{
-
-				//std::cout << "Selectable : " << result.at(i).movable->getName() << " Dist : " << result[i].distance << std::endl;
-				//std::cout << "Hit : " << result[i].movable->getParentSceneNode()->getName() << std::endl;
 				if (result[i].distance < resultEntry.distance) {
 					
 					resultEntry = result[i];
 					
 				}
 			}
-			//std::cout << "Selected : " << resultEntry.movable->getName() << std::endl;
 			if(resultEntry.movable){
 				return resultEntry.movable;
 			}
@@ -67,7 +39,6 @@ std::mutex RSUS::mutex_;
 			
 			return nullptr;
 		}
-
 	}
 	else {
 		return nullptr;
@@ -90,9 +61,6 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 
 	oScnManager->setShadowTextureCasterMaterial(casterMat);
 	oScnManager->setShadowTextureReceiverMaterial(receiverMat);
-
-
-	//oScnManager->setShadowTextureSelfShadow(true);
 	
 	oScnManager->setShowDebugShadows(true);
 
@@ -101,8 +69,6 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	oScnManager->addRenderQueueListener(overlay);
 	
 	
-	
-
 	// raycast setup
 	mRayScnQuery =  oScnManager->createRayQuery(Ogre::Ray(), Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
 
@@ -142,8 +108,6 @@ Ogre::SceneNode* Monster::addCamera(Ogre::String camName, Ogre::Vector3 startPos
 	cam->setNearClipDistance(0.5);
 	
 
-	
-
 	camNode->attachObject(cam);
 	camNode->setPosition(startPos);
 
@@ -151,7 +115,6 @@ Ogre::SceneNode* Monster::addCamera(Ogre::String camName, Ogre::Vector3 startPos
 
 	this->CameraNode = camNode;
 	
-
 	return camNode;
 }
 
@@ -273,81 +236,18 @@ void Monster::addMainDirectionalLight(std::string lightName, Ogre::Vector3 dir ,
 		Ogre::SceneNode* mainLightScnNode = oScnManager->getRootSceneNode()->createChildSceneNode(lightName + "_scn");
 		mainLightScnNode->attachObject(light);
 		mainLightScnNode->setDirection(dir);
-		mainLightScnNode->setPosition(100, 200, 0);
+		mainLightScnNode->setPosition(0, 0, 0);
 
 		mdrl->directionalLight = light;
 		mdrl->lightScnNode = mainLightScnNode;
 	}
 
+	//RSUS::GetInstance()->readMaterial("mySky");
+	//RSUS::GetInstance()->updateFragParameterFloat3("worldSpaceLightPos", dir);
+
+
 }
 
-
-
-
-//void Monster::showDebugLines(bool value)
-//{
-//	if (debugLineScnNode)
-//	{
-//		debugLineScnNode->setVisible(value);
-//	}
-//}
-
-//void Monster::initDebugLines()
-//{
-//	debugLineScnNode = oScnManager->getRootSceneNode()->createChildSceneNode("Gizmoz");
-//
-//	visualManualObj = new Ogre::ManualObject("This_Object");
-//	visualManualObj->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_LIST);
-//	visualManualObj->position(0, 0, 0);
-//	visualManualObj->position(0, 1, 0);
-//	visualManualObj->end();
-//
-//	debugLineScnNode->attachObject(visualManualObj);
-//
-//}
-//
-//void Monster::updateDebugLines(const physx::PxDebugLine* dbgLines, int nbLines)
-//{
-//	visualManualObj->beginUpdate(0);
-//
-//	for (int i = 0; i < nbLines; i++) {
-//		//First Vertex
-//		visualManualObj->position(dbgLines[i].pos0.x, dbgLines[i].pos0.y, dbgLines[i].pos0.z);
-//		// Second Vertex
-//		visualManualObj->position(dbgLines[i].pos1.x, dbgLines[i].pos1.y, dbgLines[i].pos1.z);
-//	}
-//	
-//	visualManualObj->end();
-//}
-//
-//void Monster::initDebugTriangles()
-//{
-//	debugTriangleScnNode = oScnManager->getRootSceneNode()->createChildSceneNode();
-//	
-//	debugTriangleObj = new Ogre::ManualObject("Triangle_Object");
-//	debugTriangleObj->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_TRIANGLE_LIST);
-//	debugTriangleObj->position(0, 0, 0);
-//	debugTriangleObj->position(1, 2, 0);
-//	debugTriangleObj->position(2, 0, 0);
-//	debugTriangleObj->end();
-//
-//	debugTriangleScnNode->attachObject(debugTriangleObj);
-//}
-//
-//void Monster::showDebugTriangles()
-//{
-//}
-//
-//void Monster::updateDebugTriangles(const physx::PxDebugTriangle* dbgTriangle, int nbTriangles)
-//{
-//	debugTriangleObj->beginUpdate(0);
-//	for (int i = 0; i < nbTriangles; i++) {
-//		debugTriangleObj->position(dbgTriangle[i].pos0.x, dbgTriangle[i].pos0.y, dbgTriangle[i].pos0.z);
-//		debugTriangleObj->position(dbgTriangle[i].pos1.x, dbgTriangle[i].pos1.y, dbgTriangle[i].pos1.z);
-//		debugTriangleObj->position(dbgTriangle[i].pos2.x, dbgTriangle[i].pos2.y, dbgTriangle[i].pos2.z);
-//	}
-//	debugTriangleObj->end();
-//}
 
 void Monster::addResourceLocation(const char* loc)
 {
@@ -564,21 +464,20 @@ void Monster::getMeshVerticesInformation(
 
 void Monster::setSkyBox()
 {
-
-	
-
-
 	//Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 	//oScnManager->setSkyBox(true, "mySky",300,true,Ogre::Quaternion::IDENTITY,"Render_Mesh");
 	
-
 	Ogre::MaterialPtr skyMat = Ogre::MaterialManager::getSingleton().getByName("mySky");
 	Ogre::MaterialPtr skyHighMat = Ogre::MaterialManager::getSingleton().getByName("myskyHigh");
 	Ogre::GpuProgramParametersPtr skyHighParam = skyHighMat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 	Ogre::GpuProgramParametersPtr param = skyMat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 
 
-	skyHighParam.get()->setNamedConstant("baseColor", Ogre::Vector4(0.1, 0.01, 0.06, 1.0));
+	RSUS::GetInstance()->readMaterial("mySky");
+	RSUS::GetInstance()->readMaterial("myskyHigh");
+
+
+	/*skyHighParam.get()->setNamedConstant("baseColor", Ogre::Vector4(0.1, 0.01, 0.06, 1.0));
 
 	skyHighParam.get()->setNamedConstant("highlightCol", Ogre::Vector4(0.82, 0.67, 1.0, 1.0));
 	skyHighParam.get()->setNamedConstant("highlightOffset", 0.26f); // higher value = lower highlight
@@ -604,75 +503,11 @@ void Monster::setSkyBox()
 
 	skyHighParam.get()->setNamedConstant("windSpeed", 0.2f);
 	
-	
-
-	// text colors
-	/*param.get()->setNamedConstant("skyHigh", Ogre::Vector4(0.62, 0.0, 1.0, 1.0));
-	param.get()->setNamedConstant("skyMid", Ogre::Vector4(0.0, 1.0, 0.13, 1.0));
-	param.get()->setNamedConstant("skyLow", Ogre::Vector4(1.0, 0.0, 0.0, 1.0));*/
-
-	//param.get()->setNamedConstant("skyHigh", Ogre::Vector4(1.0, 0.22, 0.0, 1.0));
-	//param.get()->setNamedConstant("skyMid", Ogre::Vector4(0.96, 0.82, 0.3, 1.0));
-	//param.get()->setNamedConstant("skyLow", Ogre::Vector4(0.0, 0.01, 0.14, 1.0));
-
 	param.get()->setNamedConstant("moonSize", 0.025f);
 	param.get()->setNamedConstant("moonSmoothCol", Ogre::Vector4(0.93, 0.61, 0.44, 1.0));
 	param.get()->setNamedConstant("moonCoreCol", Ogre::Vector4(1.0, 1.0, 1.0, 1.0));
 
-	param.get()->setNamedConstant("worldSpaceLightPos", Ogre::Vector3(-0.14,-0.6,0));
-
-	//param.get()->setNamedConstant("farFogOffset", 0.35f);
-	//param.get()->setNamedConstant("farFogSmoothness", 0.3f);
-
-	//param.get()->setNamedConstant("starCol", Ogre::Vector4(0.92, 0.85, 1.0, 1.0));
-
-	// NOTE : SMOOTHNESS IS ADDED TO THE OFFSET , USE SMALLER VALUES IN THE OFFSET
-
-	
-
-	//param.get()->setNamedConstant("baseHighXStartOffset", 0.2f);
-	//param.get()->setNamedConstant("baseHighXStartSmoothness", 0.2f);
-
-	//param.get()->setNamedConstant("baseHighXEndOffset", 0.6f); // NOT SMALLER THAN baseHighXStartOffset + baseHighXStartSmoothness
-	//param.get()->setNamedConstant("baseHighXEndSmoothness", 0.2f);
-
-	
-	//param.get()->setNamedConstant("cloudsLowOffset", 0.3f);
-	//param.get()->setNamedConstant("cloudsHighOffset", 0.5f);
-	
-
-	//param.get()->setNamedConstant("middleOffset", 0.5f); // low = more middle
-	//param.get()->setNamedConstant("topOffset", 0.0f);
-
-	//param.get()->setNamedConstant("topSmooth", 0.3f);
-	//param.get()->setNamedConstant("middleSmooth", 0.2f);
-
-	//param.get()->setNamedConstant("cloudThreshold", 0.2f); // the amount of clouds edge to smooth
-	//param.get()->setNamedConstant("cloudSmoothness", 0.6f); 
-	//param.get()->setNamedConstant("cloudColor", Ogre::Vector4(1.0, 1.0, 1.0, 1.0));
-	//param.get()->setNamedConstant("cloudTex_ST", Ogre::Vector4(1, 1, 0, 0));
-
-	//param.get()->setNamedConstant("panningSpeedX", 0.2f);
-	//param.get()->setNamedConstant("panningSpeedY", 0.2f);
-
-	//param.get()->setNamedConstant("starsTex_ST", Ogre::Vector4(1, 1, 1, 1));
-	//param.get()->setNamedConstant("starsIntensity", 0.5f);
-
-	//param.get()->setNamedConstant("sunSize", 0.5f);
-	//param.get()->setNamedConstant("sunColor", Ogre::Vector4(1, 1, 1, 1));
-	//param.get()->setNamedConstant("sunCloudIntensity", 0.5f);
-
-	//param.get()->setNamedConstant("moonPhase", 0.5f);
-	//param.get()->setNamedConstant("moonSize", 0.5f);
-	//param.get()->setNamedConstant("moonColor", Ogre::Vector4(1, 1, 1, 1));
-
-	//oScnManager->setSkyDome(true, "mySky", 12.0f, 1.0f, 4000, true, Ogre::Quaternion::IDENTITY, 16, 16, -1, "Render_Mesh");
-
-
-	// clouds
-	// custom object of plane
-	
-
+	param.get()->setNamedConstant("worldSpaceLightPos", Ogre::Vector3(-0.14,-0.6,0));*/
 	
 	Ogre::Entity* cloudsEnt = this->getMeshEntity("Plane.mesh");
 	Ogre::MaterialPtr cloudsMat = Ogre::MaterialManager::getSingleton().getByName("clouds_material", "Mesh_Materials");
@@ -705,7 +540,7 @@ void Monster::setSkyBox()
 	Ogre::Entity* ent_high = this->getMeshEntity("sky_box_mesh", "Sphere_up.mesh", "Render_Mesh");
 
 	ent_high->setMaterial(skyHighMat);
-	ent_high->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_LATE);
+	ent_high->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_EARLY);
 	skyHighNode->attachObject(ent_high);
 	skyHighNode->setPosition(0, -2500, 0);
 	skyHighNode->setScale(Ogre::Vector3(9000));
@@ -715,7 +550,7 @@ void Monster::setSkyBox()
 	Ogre::Entity* ent_sky = this->getMeshEntity("sky_sphere_mesh", "Sphere.mesh", "Render_Mesh");
 
 	ent_sky->setMaterial(skyMat);
-	ent_sky->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_EARLY);
+	ent_sky->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_LATE);
 	skySphere->attachObject(ent_sky);
 	skySphere->setPosition(0, -2500, 0);
 	//skySphere->setOrientation(Ogre::Quaternion(Ogre::Degree(180), Ogre::Vector3::UNIT_X));
@@ -728,8 +563,6 @@ void Monster::setSkyBox()
 	ent_high->setQueryFlags(QueryMask::SKY);
 	ent_sky->setQueryFlags(QueryMask::SKY);
 
-	//oScnManager->setSkyPlane(true, plane, "myCloud", 1000.0f, 1.0f, true, 1.0f, 16, 16, "Render_Mesh");
-	//oScnManager->setSkyBox(true, "mySky");
 	
 }
 
@@ -769,7 +602,7 @@ void Monster::setGrid()
 	gridObj->convertToMesh("gridMesh");
 	
 	gridObj->setQueryFlags(QueryMask::GRID);
-	
+	gridObj->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_OVERLAY);
 
 	Ogre::SceneNode* gridNode = oScnManager->getRootSceneNode()->createChildSceneNode("GridScnNode");
 	gridNode->attachObject(gridObj);
@@ -796,12 +629,7 @@ void Monster::createTerrain(Ogre::Vector2 size,unsigned int vertSize, unsigned i
 	Ogre::Entity* ent = this->getMeshEntity("Blade2mesh.mesh");
 	ent->setCastShadows(true);
 	
-	//Ogre::Entity* ent = oScnManager->createEntity(Ogre::MeshManager::getSingleton().getByName("CustomGrassMesh"));
 	Ogre::MaterialPtr ent_mat = Ogre::MaterialManager::getSingleton().getByName("Blade_mat");
-	//Ogre::MeshPtr grassMsh = gMO->convertToMesh("gMan");
-	//grassMsh.get()->buildEdgeList();
-	//Ogre::Entity* ent = oScnManager->createEntity(grassMsh);
-
 
 	ent->setMaterial(ent_mat);
 
@@ -880,15 +708,6 @@ void Monster::createTerrain(Ogre::Vector2 size,unsigned int vertSize, unsigned i
 
 				}
 
-				//std::cout << "position : " << grassX << " " << grassY << std::endl;
-				/*for (int g = 0; g < 3; g++) {
-					Ogre::Vector3 pos = Ogre::Vector3(grassX, 1, grassY);
-					Ogre::Quaternion quat = Ogre::Quaternion(Ogre::Degree(g * 60), Ogre::Vector3::UNIT_Y);
-
-					mField->addEntity(ent, pos, quat);
-					
-					numberOfGrasses += 1;
-				}*/
 			}
 			
 			
@@ -901,21 +720,11 @@ void Monster::createTerrain(Ogre::Vector2 size,unsigned int vertSize, unsigned i
 	terrainObj->end();
 
 	mField->build();
-	// X
-	//for (int i = 0; i < size.x; i++)
-	//{
-	//	// Y
-	//	for (int j = 0; j < size.y; j++)
-	//	{
-	//		terrainObj->position
-	//	}
-	//}
+	
 	terrainObj->setCastShadows(false);
 	Ogre::MeshPtr msh = terrainObj->convertToMesh("white_g");
-	//msh.get()->buildEdgeList();
 	oScnManager->getRootSceneNode()->createChildSceneNode()->attachObject(terrainObj);
-	//Ogre::MeshPtr terrainMesh = terrainObj->convertToMesh("terrain");
-	//terrainScnNode->attachObject(oScnManager->createEntity(terrainMesh));
+
 
 }
 
@@ -1003,12 +812,7 @@ void Monster::setHeightMap(Ogre::String heightMapImg, Ogre::String grassMapImg, 
 			// Grass re positioning
 			for (int grassPerVert = 0; grassPerVert < grassDensity; grassPerVert++)
 			{
-				// generates number between -6.0 to 6.0 for the offset
-				// Primitive way
-				//double randomX = 1.0 - static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2.0)));
-				//double randomY = 1.0 - static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2.0)));
-
-				//std::cout << "random " << randomX << " " << randomY << std::endl;
+				
 
 				double grassX = (terrainX) + Ogre::Math::RangeRandom(1.0f,2.0f);
 				double grassY = (terrainZ) + Ogre::Math::RangeRandom(1.0f,2.0f);
@@ -1080,13 +884,6 @@ void setUpGrassBlade(int numOfGrass) {
 
 void Monster::createGrass()
 {
-	//setUpGrassBlade(3);
-	
-	//ent->setMaterial(Ogre::MaterialManager::getSingleton().getByName("GrassMaterial"));
-	//Ogre::SceneNode* scn = oScnManager->getRootSceneNode()->createChildSceneNode();
-	//scn->attachObject(ent);
-	 
-	// static Geometry - GPU INSTANCING GRASS
 	
 	Ogre::StaticGeometry* mField = oScnManager->createStaticGeometry("stat_geo");
 	mField->setOrigin(Ogre::Vector3(0, 1, 0));
@@ -1109,28 +906,8 @@ void Monster::createGrass()
 	}
 
 
-	/*for (int x = 0; x < 100; x++)
-	{
-		for (int z = 0; z < 100; z++)
-		{
-			for (int i = 0; i < 3; i++)
-			{
-				Ogre::Vector3 pos = Ogre::Vector3(x, 1, z + z);
-				Ogre::Quaternion quat = Ogre::Quaternion(Ogre::Degree(i * 60), Ogre::Vector3::UNIT_Y);
-				mField->addEntity(ent, pos,quat);
-
-			}
-			
-		}
-	}*/
-
-	//mField->build();
-	
 
 
-	
-
-	//mInstanceNodes.clear();
 
 }
 
@@ -1142,10 +919,6 @@ void Monster::setupTestTrack()
 	pLightNode->attachObject(pLight);
 	pLightNode->setDirection(0, -1, 0);
 
-
-	//Ogre::ResourceGroupManager::getSingleton().setWorldResourceGroupName("Assets");
-	//Ogre::SceneNode* scn = oScnManager->getRootSceneNode()->createChildSceneNode("test_track");
-	//scn->loadChildren("test_track.scene");
 
 }
 
@@ -1170,6 +943,7 @@ void Monster::updateMonster()
 		skyHighNode->setPosition(CameraNode->getPosition().x, CameraNode->getPosition().y - 2500 , CameraNode->getPosition().z);
 		
 	}
+
 
 	this->windowUpdate();
 
@@ -1411,24 +1185,24 @@ void RSUS::updateFragParameterFloat(Ogre::String parameterName, float* val)
 	
 }
 
-void RSUS::updateFragParameterFloat2(Ogre::String parameterName, float* val)
+void RSUS::updateFragParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val)
 {
 	try {
-		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector2(val[0], val[1]));
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
 	}
 	catch (...) {
-		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << Ogre::Vector2(val[0], val[1]) << std::endl;
+		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 	
 }
 
-void RSUS::updateFragParameterFloat3(Ogre::String parameterName, float* val)
+void RSUS::updateFragParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val)
 {
 	try {
-		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector3(val[0], val[1], val[2]));
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
 	}
 	catch (...) {
-		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << Ogre::Vector3(val[0], val[1], val[2]) << std::endl;
+		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 	
 }
@@ -1464,23 +1238,23 @@ void RSUS::updateVertParameterFloat(Ogre::String parameterName, float* val)
 	}
 }
 
-void RSUS::updateVertParameterFloat2(Ogre::String parameterName, float* val)
+void RSUS::updateVertParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val)
 {
 	try {
-		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector2(val[0], val[1]));
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
 	}
 	catch (...) {
-		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << Ogre::Vector2(val[0], val[1]) << std::endl;
+		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 }
 
-void RSUS::updateVertParameterFloat3(Ogre::String parameterName, float* val)
+void RSUS::updateVertParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val)
 {
 	try {
-		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector3(val[0], val[1], val[2]));
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
 	}
 	catch (...) {
-		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << Ogre::Vector3(val[0], val[1], val[2]) << std::endl;
+		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 }
 

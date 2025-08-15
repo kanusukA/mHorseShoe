@@ -69,6 +69,7 @@ void ResourceHandler::addResource(std::filesystem::path filePath, ResourceHandle
 			std::cout << "Added Image " << filePath.string() << std::endl;
 			this->images->push_back(filePath.string());
 		}
+		break;
 	default:
 		break;
 	}
@@ -267,7 +268,7 @@ void ResourceHandler::getAllResources()
 	// open Resource default location file
 	this->in_stream.open(SourceDir.string() + "/" + RESOURCE_DEFAULT_LOC);
 	
-	 std::filesystem::current_path(SourceDir);
+	std::filesystem::current_path(SourceDir);
 
 
 	std::cout << "Current Working Path : " << std::filesystem::current_path() << std::endl;

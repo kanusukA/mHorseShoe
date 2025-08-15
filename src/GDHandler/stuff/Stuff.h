@@ -150,6 +150,9 @@ private:
 	std::vector<StuffStatic*>* stuffStatics = new std::vector<StuffStatic*>();
 	std::vector<StuffDynamic*>* stuffDynamics = new std::vector<StuffDynamic*>();
 
+	// KEY STUFFS
+	Terrain* terrainStuff;
+
 	IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
 
 	// last object
@@ -227,6 +230,10 @@ public:
 
 	void addMDRL(std::string name, Ogre::Vector3& direction, int powerScale);
 	void addLight(std::string name, Ogre::Vector3& position, Ogre::Vector3& direction, int powerScale, Ogre::Light::LightTypes type);
+
+	// TERRAIN
+	void createTerrain(Ogre::String materialStr, int terrainSize, int blocks);
+	void createHeightmapTerrain(Ogre::String heightMap, Ogre::String materialStr, int terrainSize, int blocks, float displacement, float scale);
 
 	// debug
 	void showDebugPhysxMeshes();

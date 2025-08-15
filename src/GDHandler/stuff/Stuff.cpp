@@ -406,6 +406,32 @@ void StuffHandler::addLight(std::string name, Ogre::Vector3& position, Ogre::Vec
 	monster->addLight(name, type, powerScale, position, direction);
 }
 
+// CREATE TERRAIN
+
+void StuffHandler::createTerrain(Ogre::String materialStr, int terrainSize, int blocks)
+{
+	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(materialStr);
+
+	if (terrainStuff == nullptr) {
+		terrainStuff = new Terrain(monster->oScnManager);
+	}
+
+	terrainStuff->createTerrain(terrainSize, blocks, mat);
+
+
+}
+
+void StuffHandler::createHeightmapTerrain(Ogre::String heightMap, Ogre::String materialStr, int terrainSize, int blocks, float displacement, float scale)
+{
+	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(materialStr);
+
+	if (terrainStuff == nullptr) {
+		terrainStuff = new Terrain(monster->oScnManager);
+	}
+
+	terrainStuff->createHightMapTerrain(heightMap, mat, blocks, displacement, scale);
+}
+
 void StuffHandler::showDebugPhysxMeshes()
 {
 

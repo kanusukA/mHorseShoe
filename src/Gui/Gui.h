@@ -77,6 +77,8 @@ public:
 	void _diegnos();
 	void _RSUSTab();
 
+	void _terrainTab();
+
 
 	void refreshResources() {
 		ResourceHandler::GetInstance()->getAllResources();

@@ -103,6 +103,16 @@ struct HeightMapTab {
 
 };
 
+struct TerrainTab {
+	int terrainSize = 0;
+	int blocks = 0;
+	int selectedMaterial = 0;
+	int selectedHeightMap = -1;
+	float displacement = 0.0f;
+	float scale = 1.0f;
+
+};
+
 struct RSUSParam
 {
 	int selectedMaterial = 0;
@@ -129,6 +139,7 @@ public:
 	GuiObjectTab* objParam = new GuiObjectTab();
 	LightTab* lightTab = new LightTab();
 	HeightMapTab* heightMapTab = new HeightMapTab();
+	TerrainTab* terrainTab = new TerrainTab();
 
 	// Set Stuff Objects
 	void setStuffObjects(std::vector<StuffDynamic*>* dyn, std::vector<StuffMesh*>* mesh, std::vector<StuffStatic*>* stat) {
@@ -220,6 +231,11 @@ public:
 		return diegnos;
 	}
 
+	// Terrain
+	void createTerrain() {
+		this->_mediator->Notify(this, GDEVENT_GENERATE_TERRAIN);
+	}
+
 
 	// RSUS
 	RSUSParam* getRSUSParam() {
@@ -239,10 +255,10 @@ public:
 		RSUS::GetInstance()->updateFragParameterFloat(varName, val);
 	}
 	void updateFragRsusFloat2(std::string varName, float* val) {
-		RSUS::GetInstance()->updateFragParameterFloat2(varName, val);
+		RSUS::GetInstance()->updateFragParameterFloat2(varName, Ogre::Vector2(val[0],val[1]));
 	}
 	void updateFragRsusFloat3(std::string varName, float* val) {
-		RSUS::GetInstance()->updateFragParameterFloat3(varName, val);
+		RSUS::GetInstance()->updateFragParameterFloat3(varName, Ogre::Vector3(val[0],val[1],val[2]));
 	}
 	void updateFragRsusFloat4(std::string varName, Ogre::Vector4 val) {
 		RSUS::GetInstance()->updateFragParameterFloat4(varName, val);
@@ -254,10 +270,10 @@ public:
 		RSUS::GetInstance()->updateVertParameterFloat(varName, val);
 	}
 	void updateVertRsusFloat2(std::string varName, float* val) {
-		RSUS::GetInstance()->updateVertParameterFloat2(varName, val);
+		RSUS::GetInstance()->updateVertParameterFloat2(varName, Ogre::Vector2(val[0],val[1]));
 	}
 	void updateVertRsusFloat3(std::string varName, float* val) {
-		RSUS::GetInstance()->updateVertParameterFloat3(varName, val);
+		RSUS::GetInstance()->updateVertParameterFloat3(varName, Ogre::Vector3(val[0],val[1],val[2]));
 	}
 	void updateVertRsusFloat4(std::string varName, Ogre::Vector4 val) {
 		RSUS::GetInstance()->updateVertParameterFloat4(varName, val);

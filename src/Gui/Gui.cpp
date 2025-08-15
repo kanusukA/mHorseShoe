@@ -19,6 +19,8 @@ void Gui::initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* component) {
 	this->viewport = ImGui::GetMainViewport();
 	std::cout << "DBUGGING - GUI MainViewport end" << std::endl;
 
+	resourceHandler->updateOgreMaterials();
+
 }
 
 
@@ -64,6 +66,8 @@ void Gui::updateGui()
 		_objectsPanel();
 
 		_heightMapTab();
+
+		_terrainTab();
 
 	}
 
@@ -622,22 +626,22 @@ void Gui::_RSUSTab()
 				ImGui::InputInt(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varInt);
 				break;
 			case FLOAT0:
-				if (ImGui::SliderFloat(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat, 0.0f, 1.0f)) {
+				if (ImGui::SliderFloat(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat, -1.0f, 1.0f)) {
 					guiComponent->updateFragRsusFloat(shade->fragVariables.at(i).varName, shade->fragVariables.at(i).varFloat);
 				}
 				break;
 			case FLOAT2:
-				if (ImGui::SliderFloat2(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat2, 0.0f, 1.0f)) {
-					guiComponent->updateFragRsusFloat2(shade->fragVariables.at(i).varName, shade->fragVariables.at(i).varFloat);
+				if (ImGui::SliderFloat2(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat2, -1.0f, 1.0f)) {
+					guiComponent->updateFragRsusFloat2(shade->fragVariables.at(i).varName, shade->fragVariables.at(i).varFloat2);
 				}
 				break;
 			case FLOAT3:
-				if (ImGui::SliderFloat3(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat3, 0.0f, 1.0f)) {
-					guiComponent->updateFragRsusFloat3(shade->fragVariables.at(i).varName, shade->fragVariables.at(i).varFloat);
+				if (ImGui::SliderFloat3(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat3, -1.0f, 1.0f)) {
+					guiComponent->updateFragRsusFloat3(shade->fragVariables.at(i).varName, shade->fragVariables.at(i).varFloat3);
 				}
 				break;
 			case FLOAT4:
-				if (ImGui::SliderFloat4(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat4, 0.0f, 1.0f)) {
+				if (ImGui::SliderFloat4(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat4, -1.0f, 1.0f)) {
 					Ogre::Vector4 slid = Ogre::Vector4(shade->fragVariables.at(i).varFloat4[0], shade->fragVariables.at(i).varFloat4[1], shade->fragVariables.at(i).varFloat4[2], shade->fragVariables.at(i).varFloat4[3]);
 					guiComponent->updateFragRsusFloat4(shade->fragVariables.at(i).varName, slid);
 				}
@@ -673,22 +677,22 @@ void Gui::_RSUSTab()
 				ImGui::InputInt(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varInt);
 				break;
 			case FLOAT0:
-				if (ImGui::SliderFloat(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat, 0.0f, 10.0f)) {
+				if (ImGui::SliderFloat(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat, -1.0f, 10.0f)) {
 					guiComponent->updateVertRsusFloat(shade->vertVariables.at(i).varName, shade->vertVariables.at(i).varFloat);
 				}
 				break;
 			case FLOAT2:
-				if (ImGui::SliderFloat2(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat2, 0.0f, 10.0f)) {
-					guiComponent->updateVertRsusFloat2(shade->vertVariables.at(i).varName, shade->vertVariables.at(i).varFloat);
+				if (ImGui::SliderFloat2(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat2, -1.0f, 10.0f)) {
+					guiComponent->updateVertRsusFloat2(shade->vertVariables.at(i).varName, shade->vertVariables.at(i).varFloat2);
 				}
 				break;
 			case FLOAT3:
-				if (ImGui::SliderFloat3(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat3, 0.0f, 1.0f)) {
-					guiComponent->updateVertRsusFloat3(shade->vertVariables.at(i).varName, shade->vertVariables.at(i).varFloat);
+				if (ImGui::SliderFloat3(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat3, -1.0f, 1.0f)) {
+					guiComponent->updateVertRsusFloat3(shade->vertVariables.at(i).varName, shade->vertVariables.at(i).varFloat3);
 				}
 				break;
 			case FLOAT4:
-				if (ImGui::SliderFloat4(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat4, 0.0f, 1.0f)) {
+				if (ImGui::SliderFloat4(shade->vertVariables.at(i).varName.c_str(), shade->vertVariables.at(i).varFloat4, -1.0f, 1.0f)) {
 					Ogre::Vector4 slid = Ogre::Vector4(shade->vertVariables.at(i).varFloat4[0], shade->vertVariables.at(i).varFloat4[1], shade->vertVariables.at(i).varFloat4[2], shade->vertVariables.at(i).varFloat4[3]);
 					guiComponent->updateVertRsusFloat4(shade->vertVariables.at(i).varName, slid);
 				}
