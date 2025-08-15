@@ -1,0 +1,36 @@
+vertex_program myTerrainVertex hlsl
+{
+	source myTerrainVertex.hlsl
+	entry_point mainVS
+	target vs_4_0
+	default_params{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+fragment_program myTerrainFragment hlsl	
+{
+	source myTerrainFragment.hlsl
+	entry_point mainPS
+	target ps_4_0
+}
+
+material myTerrain{
+	technique{
+		pass{
+			
+		
+		
+		polygon_mode wireframe
+
+		vertex_program_ref myTerrainVertex{
+
+		}
+		fragment_program_ref myTerrainFragment{
+
+		}
+		
+			
+		}
+	}
+}

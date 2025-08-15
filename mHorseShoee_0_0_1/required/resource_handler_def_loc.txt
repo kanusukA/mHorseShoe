@@ -7,3 +7,6 @@ Collider_Mesh
 
 Mesh_Materials
 ..\assets\meshes\Materials
+
+Images
+..\assets\Images

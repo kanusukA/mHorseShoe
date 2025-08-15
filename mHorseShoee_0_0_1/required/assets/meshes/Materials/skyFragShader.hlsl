@@ -71,15 +71,19 @@ float4 mainPS
     float4 pos : SV_Position,
     float3 uv : TEXCOORD0,
 
-    uniform float time,
-    uniform float3 worldSpaceLightPos,
+    //uniform float time,
+    uniform float2 moonPos,
 
     uniform float moonSize,
     uniform float4 moonCoreCol,
     uniform float4 moonSmoothCol,
+
+    uniform float moonPhaseSize,
+    uniform float moonPhasePos,
+    uniform float moonPhaseSmoothness
     
-    uniform float farFogOffset,
-    uniform float farFogSmoothness
+    //uniform float farFogOffset,
+    //uniform float farFogSmoothness
    
 ) : SV_Target
 {
@@ -87,21 +91,21 @@ float4 mainPS
     
     float2 cuv = float2( uv.x * (smoothstep(0, 0.5, uv.x) - smoothstep(0.5, 1, uv.x)), uv.y);
     
-    float moonSDF = distance(cuv, -worldSpaceLightPos.xy);
-    float moonPhaseSDF = distance(cuv.xy - float2(0.08, 0.1) * 0.16, -worldSpaceLightPos.xy);
+    float moonSDF = distance(cuv.xy, moonPos);
+    
+    float moonPhaseSDF = distance(cuv.xy - (float2(0.08, 0.1) * moonPhasePos), moonPos.xy);
     
     
-    float moon = smoothstep(moonSize + 0.01, moonSize, moonSDF) - smoothstep(moonSize + 0.01, moonSize, moonPhaseSDF);
-   // moon += step(moonSDF, moonSize - 0.005) - step(moonPhaseSDF, moonSize + 0.005);
+    float moon = (1 - smoothstep(moonSize - moonPhaseSmoothness, moonSize, moonSDF)) - (1 - smoothstep(moonPhaseSize - moonPhaseSmoothness, moonPhaseSize, moonPhaseSDF));
+    //moon += step(moonSDF, moonSize - 0.005) - step(moonPhaseSDF, moonSize + 0.005);
    
-    float4 moonCol = lerp(moonSmoothCol, moonCoreCol, moon);
+   float4 moonCol = lerp(moonSmoothCol, moonCoreCol, moon);
     
     //moon = saturate(moon * -worldSpaceLightPos.y);
     
-    float4 col = lerp(float4(0, 0, 0, 0), moonCol, moon);
+    float4 col = lerp(float4(0, 0, 0, 0), moonCoreCol, moon);
     
    
-    
     //float4 fog = tex2D(farFogTex, cuv);
     
     //float fOffset = smoothstep(farFogOffset, farFogOffset + farFogSmoothness, uv.x);
