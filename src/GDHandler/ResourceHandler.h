@@ -13,6 +13,8 @@
 #include <filesystem>
 #include <list>
 
+#include "SimpleIni.h"
+
 
 
 namespace fs = std::filesystem;
@@ -24,6 +26,40 @@ namespace fs = std::filesystem;
 #define COLLIDER_MESH_LOC "Collider_Mesh"
 #define MESH_MATERIAL_LOC "Mesh_Materials"
 #define IMAGES_LOC "Images"
+
+#define DYNAMIC_NODES_LOC "./Scenes/Dynamic/"
+#define DYNAMIC_NODES_FILE "dynamicNodes.ini"
+
+#define STATIC_NODES_LOC "./Scenes/Static/"
+#define STATIC_NODES_FILE "StaticNodes.ini"
+
+#define MESH_NODES_LOC "./Scenes/Mesh/"
+#define MESH_NODES_FILE "MeshNodes.ini"
+
+#define SECTION_SCENE "SCENE"
+
+#define NODEKEY_RENDERMESH "RENDER_MESH"
+#define NODEKEY_COLLIDERMESH "COLLIDER_MESH"
+#define NODEKEY_PHYSXTYPE "PHYSXTYPE"
+#define NODEKEY_MASS "MASS"
+#define NODEKEY_POSITION "POSITION"
+#define NODEKEY_ROTATION "ROTATION"
+#define NODEKEY_CASTSHADOW "CAST_SHADOW"
+#define NODEKEY_RECEIVESHADOW "RECEIVE_SHADOW"
+#define NODEKEY_MATERIAL "MATERIAL"
+
+struct SceneObject {
+	std::string name = "";
+	std::string RenderMesh = "";
+	std::string ColliderMesh = "";
+	std::string PhysXType = "";
+	std::string mass = "";
+	std::string position = "";
+	std::string rotation = "";
+	std::string castShadow = "";
+	std::string receiveShadow = "";
+	std::string material = "";
+};
 
 
 // Types of resources
@@ -52,6 +88,8 @@ private:
 
 	ResourceHandlerType _getResourceLocationGroup(std::string groupStr);
 
+	CSimpleIniA ini;
+
 
 	// default locations
 
@@ -72,6 +110,9 @@ private:
 
 	std::filesystem::path _getSaveFileLoc(std::string filename);
 	void _readShaderFile(std::vector<std::string>* shaderVar, std::filesystem::path path);
+
+	// Loads ini file in ini obj. Creates the file if it does not exists
+	void _LoadIniFile(std::string filename);
 
 	// Hide the constructor and destructor of the class
 protected:
@@ -132,6 +173,9 @@ public:
 	std::string readFromFile(std::string key, std::string filename);
 
 	std::filesystem::path getSourceDir();
+
+	void saveScene(std::string scnName, std::string Filename, int scnType);
+	void saveSceneObject(std::string filename, SceneObject obj, int scnType);
 
 };
 

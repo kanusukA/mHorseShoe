@@ -6,6 +6,9 @@
 #include <monster/Monster.h>
 #include <kint/Kint.h>
 
+
+
+
 using namespace physx;
 
 enum StuffType {
@@ -50,7 +53,13 @@ public:
 
 class StuffStatic : public Stuff
 {
+private:
+
+	std::string colliderMesh;
+
 public:
+
+
 
 	StuffStatic() {
 		this->type = STUFF_STATIC;
@@ -65,11 +74,20 @@ public:
 
 	void moveStuffBy(Ogre::Vector3 addPos) override;
 
+	// used by scene manager
+	std::string _getColliderMesh() { return colliderMesh; }
+	void _setColliderMesh(std::string colMesh) { colliderMesh = colMesh; }
+
 };
 
 // SET POSITION AND ROTATION FOR ALL
 class StuffDynamic :public Stuff
 {
+
+private:
+
+	std::string colliderMesh;
+	int mass;
 
 public:
 
@@ -89,6 +107,12 @@ public:
 	void moveStuffBy(Ogre::Vector3 addPos) override; // move object from arrow keys!!!
 
 	void getColliderData();
+
+	// used by scene manager
+	std::string _getColliderMesh() { return colliderMesh; }
+	int _getMass() { return mass; }
+	void _setColliderMesh(std::string colMesh) { colliderMesh = colMesh; }
+	void _setMass(int m) { mass = m; }
 
 };
 
@@ -117,6 +141,7 @@ PxQuat mtkOrientation(Ogre::Quaternion quat);
 // test
 struct LastObject
 {
+	std::string scnNodeName;
 	std::string objName;
 	std::string meshName;
 	std::string colliderName;
@@ -164,13 +189,17 @@ private:
 	Monster* monster = nullptr;
 	Kint* kint = nullptr;
 
-	void _addObject(std::string objName, 
+	void _addObject(
+		std::string scnNodeName,
+		std::string objName, 
 		std::string meshName, 
 		Ogre::Vector3 position, 
 		Ogre::Vector3 rotation,
 		bool castShadows
 	);
-	void _addObjectDynamic(std::string objName,
+	void _addObjectDynamic(
+		std::string scnNodeName,
+		std::string objName,
 		std::string meshName,
 		std::string colliderName,
 		Ogre::Vector3 position,
@@ -179,7 +208,9 @@ private:
 		float mass,
 		Ogre::Vector3 colliderSize
 	);
-	void _addObjectStatic(std::string objName,
+	void _addObjectStatic(
+		std::string scnNodeName,
+		std::string objName,
 		std::string meshName,
 		std::string colliderName,
 		Ogre::Vector3 position,
@@ -200,7 +231,9 @@ public:
 		debugScnNode = monster->oScnManager->getRootSceneNode()->createChildSceneNode("Gizomo");
 	}
 
-	void addObject(std::string objName,
+	void addObject(
+		std::string scnNodeName,
+		std::string objName,
 		std::string meshName,
 		std::string colliderName,
 		Ogre::Vector3 position,
@@ -234,6 +267,7 @@ public:
 	// TERRAIN
 	void createTerrain(Ogre::String materialStr, int terrainSize, int blocks);
 	void createHeightmapTerrain(Ogre::String heightMap, Ogre::String materialStr, int terrainSize, int blocks, float displacement, float scale);
+	
 
 	// debug
 	void showDebugPhysxMeshes();
@@ -245,6 +279,71 @@ public:
 	GuiSelectableObject* getSelectedObj() { return this->selectedObj; }
 
 	void deleteSelectedObj();
+
+};
+
+
+// SCENE HANDLER -------------------------------------------------------------------------------------------
+
+struct Scene {
+	std::vector<std::string*> nodes =  std::vector<std::string*>();
+};
+
+enum SceneType {
+	STATIC,
+	DYNAMIC,
+	MESH
+};
+
+
+class SceneHandler {
+private:
+
+	// Multi-Thread Shit
+	static SceneHandler* pinstance_;
+	static std::mutex mutex_;
+
+	Ogre::SceneManager* oScnManager;
+
+	std::vector<Ogre::SceneNode*> StaticScenes = std::vector<Ogre::SceneNode*>();
+	std::vector<Ogre::SceneNode*> DynamicScenes = std::vector<Ogre::SceneNode*>();
+	std::vector<Ogre::SceneNode*> MeshScenes = std::vector<Ogre::SceneNode*>();
+
+	void _travSceneNode(Ogre::SceneNode* node, int pos,std::vector<Ogre::SceneNode*>* sceNodes,int scnType);
+
+	void _saveObject(std::string scnName, SceneObject obj);
+	void _saveScene(Ogre::SceneNode* scn);
+
+protected:
+
+	SceneHandler() {};
+	~SceneHandler() {};
+
+public:
+
+	std::vector<Ogre::SceneNode*>* getStaticScenes() { return &StaticScenes; }
+	std::vector<Ogre::SceneNode*>* getDynamicScenes() { return &DynamicScenes; }
+	std::vector<Ogre::SceneNode*>* getMeshScenes() { return &MeshScenes; }
+
+
+	// Creates 3 Main Scene Nodes
+	void setSceneManager(Ogre::SceneManager* scnManager);
+	
+	void loadScenes();
+
+	void saveScene(std::string scnName);
+
+	void CreateScene(SceneType typ, std::string scnName);
+
+	// Class should not be clonable
+	SceneHandler(SceneHandler& copy) = delete;
+
+	// Class should not be assignable
+	void operator=(const SceneHandler&) = delete;
+
+	static SceneHandler* GetInstance();
+
+
 
 };
 

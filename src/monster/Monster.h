@@ -30,7 +30,11 @@ const Ogre::String TRAY_SYSTEM_NAME = "Default_Tray_Man";
 #define SKY_SPHERE_NAME "sky_sphere"
 #define SKY_BOX_NAME "sky_high_box"
 #define WORLD_GRID_NAME "world_grid"
-#define MAIN_DIRECTIONAL_LIGHT_NAME "root_scene_directional_light"
+#define MAIN_DIRECTIONAL_LIGHT_NAME "directional_light"
+
+#define DYNAMIC_SCN_NODE "Dynamic"
+#define STATIC_SCN_NODE "Static"
+#define MESH_SCN_NODE "Mesh"
 
 
 struct MainDirectionalLight
@@ -205,8 +209,9 @@ public:
 
 	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::String scnNodeName, Ogre::Entity* ent);
 	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::Entity* ent);
-	Ogre::SceneNode* loadMeshScnNode(Ogre::String scnNodeName, Ogre::String meshName, Ogre::String groupName = "Render_Mesh", bool castShadow = true);
+	Ogre::SceneNode* loadMeshScnNode(Ogre::String scnNodeType,Ogre::String scnNodeName, Ogre::String objectname, Ogre::String meshName, Ogre::String groupName = "Render_Mesh", bool castShadow = true);
 	Ogre::SceneNode* loadMeshScnNode(
+		Ogre::String scnNodeType,
 		Ogre::String scnNodeName,
 		Ogre::String meshName,
 		size_t& vertex_count,

@@ -155,14 +155,14 @@ void StuffHandler::updateVisualDebug()
 }
 
 // Add StuffMesh Object
-void StuffHandler::_addObject(std::string objName, std::string meshName, Ogre::Vector3 position, Ogre::Vector3 rotation, bool castShadows)
+void StuffHandler::_addObject(std::string scnNodeName, std::string objName, std::string meshName, Ogre::Vector3 position, Ogre::Vector3 rotation, bool castShadows)
 {
 
 	// Doesn't have physx as its mesh only
 	StuffMesh* stuffMesh = new StuffMesh();
 
 	// Add Resource in Ogre and Add to Stuff
-	Ogre::SceneNode* monsterNode = this->monster->loadMeshScnNode(objName, meshName,"Render_Mesh",castShadows);
+	Ogre::SceneNode* monsterNode = this->monster->loadMeshScnNode(MESH_SCN_NODE, scnNodeName,objName, meshName,"Render_Mesh",castShadows);
 	monsterNode->getUserObjectBindings().setUserAny(stuffMesh);
 
 	
@@ -181,11 +181,13 @@ void StuffHandler::_addObject(std::string objName, std::string meshName, Ogre::V
 
 }
 
-void StuffHandler::_addObjectDynamic(std::string objName, std::string meshName, std::string colliderName, Ogre::Vector3 position, Ogre::Vector3 rotation, StuffType physicsType, float mass, Ogre::Vector3 colliderSize)
+void StuffHandler::_addObjectDynamic(std::string scnNodeName,std::string objName, std::string meshName, std::string colliderName, Ogre::Vector3 position, Ogre::Vector3 rotation, StuffType physicsType, float mass, Ogre::Vector3 colliderSize)
 {
 
 	// Create StuffDynamic
 	StuffDynamic* stuffDynamic = new StuffDynamic();
+	stuffDynamic->_setColliderMesh(colliderName);
+	stuffDynamic->_setMass(mass);
 
 	PxGeometry* geo;
 
@@ -193,7 +195,7 @@ void StuffHandler::_addObjectDynamic(std::string objName, std::string meshName, 
 	Ogre::Vector3* vertices;
 	unsigned long* indices;
 
-	Ogre::SceneNode* monsterNode = this->monster->loadMeshScnNode(objName, meshName);
+	Ogre::SceneNode* monsterNode = this->monster->loadMeshScnNode(DYNAMIC_SCN_NODE,scnNodeName,objName, meshName);
 	monsterNode->getUserObjectBindings().setUserAny(stuffDynamic);
 
 	if (colliderName == "box") {
@@ -236,11 +238,12 @@ void StuffHandler::_addObjectDynamic(std::string objName, std::string meshName, 
 
 }
 
-void StuffHandler::_addObjectStatic(std::string objName, std::string meshName, std::string colliderName, Ogre::Vector3 position, Ogre::Vector3 rotation, StuffType physicsType, Ogre::Vector3 colliderSize)
+void StuffHandler::_addObjectStatic(std::string scnNodeName, std::string objName, std::string meshName, std::string colliderName, Ogre::Vector3 position, Ogre::Vector3 rotation, StuffType physicsType, Ogre::Vector3 colliderSize)
 {
 
 	StuffStatic* stuffStatic = new StuffStatic();
-	Ogre::SceneNode* monsterNode = this->monster->loadMeshScnNode(objName, meshName);
+	stuffStatic->_setColliderMesh(colliderName);
+	Ogre::SceneNode* monsterNode = this->monster->loadMeshScnNode(STATIC_SCN_NODE, scnNodeName,objName, meshName);
 	monsterNode->getUserObjectBindings().setUserAny(stuffStatic);
 
 	PxGeometry* geo;
@@ -311,7 +314,9 @@ void StuffHandler::deleteObj(Stuff* stuff)
 }
 
 
-void StuffHandler::addObject(std::string objName, 
+void StuffHandler::addObject(
+	std::string scnNodeName,
+	std::string objName, 
 	std::string meshName, 
 	std::string colliderName,
 	Ogre::Vector3 position, 
@@ -326,6 +331,7 @@ void StuffHandler::addObject(std::string objName,
 	if (!duplicate) {
 		lastObject->objName = objName;
 	}
+	lastObject->scnNodeName = scnNodeName;
 	lastObject->meshName = meshName;
 	lastObject->colliderName = colliderName;
 	lastObject->position = position;
@@ -337,13 +343,13 @@ void StuffHandler::addObject(std::string objName,
 	switch (physicsType)
 	{
 	case STUFF_DYNAMIC:
-		this->_addObjectDynamic(objName, meshName, colliderName, position, rotation, physicsType, mass, colliderSize);
+		this->_addObjectDynamic(scnNodeName,objName, meshName, colliderName, position, rotation, physicsType, mass, colliderSize);
 		break;
 	case STUFF_STATIC:
-		this->_addObjectStatic(objName, meshName, colliderName, position, rotation, physicsType, colliderSize);
+		this->_addObjectStatic(scnNodeName,objName, meshName, colliderName, position, rotation, physicsType, colliderSize);
 		break;
 	case STUFF_MESH_ONLY:
-		this->_addObject(objName, meshName, position, rotation,castShadows);
+		this->_addObject(scnNodeName,objName, meshName, position, rotation,castShadows);
 		break;
 	default:
 		break;
@@ -361,8 +367,8 @@ void StuffHandler::addGrass(Ogre::Real numOfGrass)
 	{
 		for (int j = 0; j < numOfGrass; j++)
 		{
-			Ogre::SceneNode* parentNode = monster->loadMeshScnNode("Grass " + std::to_string(ref),"Grass.mesh");
-			parentNode->setPosition(i, 2, j + j);
+			//Ogre::SceneNode* parentNode = monster->loadMeshScnNode("Grass " + std::to_string(ref),"Grass.mesh");
+			//parentNode->setPosition(i, 2, j + j);
 			ref += 1;
 		}
 	}
@@ -378,6 +384,7 @@ void StuffHandler::addLastObject()
 
 	if(lastObject){
 		this->addObject(
+			lastObject->scnNodeName,
 			name,
 			lastObject->meshName,
 			lastObject->colliderName,

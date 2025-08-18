@@ -119,6 +119,18 @@ struct RSUSParam
 	RSUShader* rsusObj;
 };
 
+struct SceneTab {
+	std::vector<Ogre::SceneNode*>* StaticScenes;
+	std::vector<Ogre::SceneNode*>* DynamicScenes;
+	std::vector<Ogre::SceneNode*>* MeshScenes;
+
+	std::vector<Ogre::SceneNode*>* selectedScenes = StaticScenes;
+	int selectedScenePos = 0;
+
+	std::string CreateSceneNode = "";
+
+};
+
 class GuiComponent : public MediatorComponent {
 private:
 
@@ -134,12 +146,15 @@ private:
 	// selectableObj
 	GuiSelectableObject* selectedObj;
 
+
 public:
 
 	GuiObjectTab* objParam = new GuiObjectTab();
 	LightTab* lightTab = new LightTab();
 	HeightMapTab* heightMapTab = new HeightMapTab();
 	TerrainTab* terrainTab = new TerrainTab();
+
+	SceneTab* sceneTab = new SceneTab();
 
 	// Set Stuff Objects
 	void setStuffObjects(std::vector<StuffDynamic*>* dyn, std::vector<StuffMesh*>* mesh, std::vector<StuffStatic*>* stat) {

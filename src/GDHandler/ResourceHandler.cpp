@@ -173,6 +173,16 @@ void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::
 
 }
 
+void ResourceHandler::_LoadIniFile(std::string filename)
+{
+	SI_Error rc = ini.LoadFile(filename.c_str());
+	if (rc < 0)
+	{
+		ini.SaveFile(filename.c_str());
+		ini.LoadFile(filename.c_str());
+	}
+}
+
 void ResourceHandler::findAll(std::string location, ResourceHandlerType type = ResourceHandlerType::GLOBAL) {
 
 	if (location.empty()) {
@@ -509,8 +519,11 @@ ResourceHandler* ResourceHandler::GetInstance() {
 	std::lock_guard<std::mutex> lock(mutex_);
 	if (pinstance_ == nullptr) {
 		pinstance_ = new ResourceHandler();
+		pinstance_->ini.SetUnicode();
+		
 	}
 	return pinstance_;
+
 
 }
 
@@ -655,3 +668,100 @@ std::filesystem::path ResourceHandler::getSourceDir()
 	return srcPath.remove_filename();
 
 }
+
+void ResourceHandler::saveScene(std::string scnName, std::string Filename, int scnType)
+{
+
+	std::string masterLoc;
+	
+	if (scnType == 0) {
+		masterLoc = DYNAMIC_NODES_LOC;
+	}
+	else if (scnType == 1)
+	{
+		masterLoc = STATIC_NODES_LOC;
+	}
+	else if (scnType == 2)
+	{
+		masterLoc = MESH_NODES_LOC;
+	}
+	else {
+		throw ResourceHandlerFileNotFound();
+	}
+
+	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
+	{
+		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
+	}
+
+	if (!std::filesystem::exists(SourceDir.string() + masterLoc))
+	{
+		std::filesystem::create_directory(SourceDir.string() + masterLoc);
+	}
+
+	std::string loc = masterLoc + Filename;
+
+	_LoadIniFile(loc);
+
+	ini.SetValue(SECTION_SCENE, scnName.c_str(), "");
+
+	ini.SaveFile(loc.c_str());
+
+	ini.Reset();
+
+
+}
+
+void ResourceHandler::saveSceneObject(std::string filename, SceneObject obj , int scnType)
+{
+
+
+	// Check if nodes folder exists
+	std::string masterLoc;
+
+	if (scnType == 0) {
+		masterLoc = DYNAMIC_NODES_LOC;
+	}
+	else if (scnType == 1)
+	{
+		masterLoc = STATIC_NODES_LOC;
+	}
+	else if (scnType == 2)
+	{
+		masterLoc = MESH_NODES_LOC;
+	}
+	else {
+		throw ResourceHandlerFileNotFound();
+	}
+
+	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
+	{
+		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
+	}
+
+	if (!std::filesystem::exists(SourceDir.string() + masterLoc))
+	{
+		std::filesystem::create_directory(SourceDir.string() + masterLoc);
+	}
+
+	std::string loc = masterLoc + filename;
+
+	_LoadIniFile(loc);
+
+	ini.SetValue(obj.name.c_str(), NODEKEY_RENDERMESH, obj.RenderMesh.c_str());
+	ini.SetValue(obj.name.c_str(), NODEKEY_COLLIDERMESH, obj.ColliderMesh.c_str());
+	ini.SetValue(obj.name.c_str(), NODEKEY_PHYSXTYPE, obj.PhysXType.c_str());
+	ini.SetValue(obj.name.c_str(), NODEKEY_MASS, obj.mass.c_str());
+	ini.SetValue(obj.name.c_str(), NODEKEY_MATERIAL, obj.material.c_str());
+	ini.SetValue(obj.name.c_str(), NODEKEY_CASTSHADOW, obj.castShadow.c_str());
+	ini.SetValue(obj.name.c_str(), NODEKEY_RECEIVESHADOW, obj.receiveShadow.c_str());
+	ini.SetValue(obj.name.c_str(), NODEKEY_ROTATION, obj.rotation.c_str());
+	ini.SetValue(obj.name.c_str(), NODEKEY_POSITION, obj.position.c_str());
+
+	ini.SaveFile(loc.c_str());
+
+	ini.Reset();
+
+}
+
+

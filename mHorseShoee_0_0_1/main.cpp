@@ -65,6 +65,9 @@ int main() {
 	monster->setSkyBox();
 	monster->setGrid();
 
+	SceneHandler::GetInstance()->setSceneManager(monster->oScnManager);
+	SceneHandler::GetInstance()->saveScene("Scene1");
+
 	//monster->_createGrassBlade(0.3, 1);
 
 	// MAIN LOOP

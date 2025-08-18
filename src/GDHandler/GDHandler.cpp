@@ -42,6 +42,11 @@ void GDHandler::preSetup()
 	// Resource 
 	ResourceHandler::GetInstance()->getAllResources();
 	ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
+	SceneObject obj = SceneObject();
+	obj.name = "Cube";
+	
+	//ResourceHandler::GetInstance()->saveSceneObject("Objects", obj);
+
 
 	//monster->createTerrain(Ogre::Vector2(50, 50), 1, 2);
 	//monster->createGrass();
@@ -215,6 +220,7 @@ void GDMediator::_addObject(GuiComponent* component) const
 	);
 
 	stuffHandler->addObject(
+		component->sceneTab->selectedScenes->at(component->sceneTab->selectedScenePos)->getName(),
 		*component->getObjectName(),
 		*component->getRenderMeshName(),
 		*component->getColliderMeshName(),

@@ -61,8 +61,10 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 
 	oScnManager->setShadowTextureCasterMaterial(casterMat);
 	oScnManager->setShadowTextureReceiverMaterial(receiverMat);
+
+	//oScnManager->setShadowTextureSelfShadow(true);
 	
-	oScnManager->setShowDebugShadows(true);
+	//oScnManager->setShowDebugShadows(true);
 
 	_setupRTShader();
 
@@ -152,24 +154,33 @@ Ogre::SceneNode* Monster::loadMeshScnNodeFromEnt(Ogre::Entity* ent)
 }
 
 
-Ogre::SceneNode* Monster::loadMeshScnNode(Ogre::String scnNodeName, Ogre::String meshName, Ogre::String groupName, bool castShadow)
+Ogre::SceneNode* Monster::loadMeshScnNode(
+	Ogre::String scnNodeType,
+	Ogre::String scnNodeName,
+	Ogre::String objectname, 
+	Ogre::String meshName, 
+	Ogre::String groupName, 
+	bool castShadow
+)
 {
-	// if mesh exists
-	std::cout << "mesh loading : " << meshName << std::endl;
-	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(meshName, groupName);
 	
-	std::cout << "has edgeList : " << msh.get()->isEdgeListBuilt() << std::endl;
+	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(meshName, groupName);
 
-	Ogre::SceneNode* scnNode = oScnManager->getRootSceneNode()->createChildSceneNode(scnNodeName);
-	Ogre::Entity* ent = oScnManager->createEntity(msh);
+	Ogre::SceneNode* scnNode;
+
+	scnNode = oScnManager->getSceneNode(scnNodeName);
+
+	Ogre::Entity* ent = oScnManager->createEntity(objectname, msh);
 	ent->setCastShadows(castShadow);
 	scnNode->attachObject(ent);
+	
 
 	return scnNode;
 }
 
 
 Ogre::SceneNode* Monster::loadMeshScnNode(
+	Ogre::String scnNodeType,
 	Ogre::String scnNodeName,
 	Ogre::String meshName,
 	size_t& vertex_count,
@@ -604,7 +615,7 @@ void Monster::setGrid()
 	gridObj->setQueryFlags(QueryMask::GRID);
 	gridObj->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_OVERLAY);
 
-	Ogre::SceneNode* gridNode = oScnManager->getRootSceneNode()->createChildSceneNode("GridScnNode");
+	Ogre::SceneNode* gridNode = oScnManager->getRootSceneNode()->createChildSceneNode("Grid");
 	gridNode->attachObject(gridObj);
 	
 	gridNode->setPosition(-5000, 0, -5000);

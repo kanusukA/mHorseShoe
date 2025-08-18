@@ -78,6 +78,7 @@ public:
 	void _RSUSTab();
 
 	void _terrainTab();
+	void _SceneTab();
 
 
 	void refreshResources() {

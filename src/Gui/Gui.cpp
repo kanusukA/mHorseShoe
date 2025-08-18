@@ -21,6 +21,10 @@ void Gui::initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* component) {
 
 	resourceHandler->updateOgreMaterials();
 
+	guiComponent->sceneTab->StaticScenes = SceneHandler::GetInstance()->getStaticScenes();
+	guiComponent->sceneTab->DynamicScenes = SceneHandler::GetInstance()->getDynamicScenes();
+	guiComponent->sceneTab->MeshScenes = SceneHandler::GetInstance()->getMeshScenes();
+
 }
 
 
@@ -68,6 +72,8 @@ void Gui::updateGui()
 		_heightMapTab();
 
 		_terrainTab();
+
+		_SceneTab();
 
 	}
 
@@ -291,6 +297,52 @@ void Gui::_addTab()
 	ImGui::Begin("ADD");
 	ImGui::InputText("Add Name",this->guiComponent->getObjectName());
 
+	//SceneNode
+	if (guiComponent->sceneTab->selectedScenes) {
+		if (guiComponent->sceneTab->selectedScenes->size() > 0)
+		{
+			if (ImGui::BeginCombo("Scene", guiComponent->sceneTab->selectedScenes->at(guiComponent->sceneTab->selectedScenePos)->getName().c_str())) {
+				for (int i = 0; i < guiComponent->sceneTab->selectedScenes->size(); i++)
+				{
+					if (ImGui::Selectable(guiComponent->sceneTab->selectedScenes->at(i)->getName().c_str(), i == guiComponent->sceneTab->selectedScenePos)) {
+						guiComponent->sceneTab->selectedScenePos = i;
+					}
+				}
+				ImGui::EndCombo();
+			}
+		}
+		else {
+			ImGui::Text("No Scene Node Found");
+		}
+	}
+	else {
+		ImGui::Text("No Scene Node Found");
+	}
+
+	ImGui::InputText("Scene Name", &guiComponent->sceneTab->CreateSceneNode);
+	if (ImGui::Button("Create Scene"))
+	{
+		if (this->guiComponent->getPhysicsType() == StuffType::STUFF_DYNAMIC)
+		{
+			SceneHandler::GetInstance()->CreateScene(SceneType::DYNAMIC, guiComponent->sceneTab->CreateSceneNode);
+			guiComponent->sceneTab->selectedScenes = guiComponent->sceneTab->DynamicScenes;
+		}
+		if (this->guiComponent->getPhysicsType() == StuffType::STUFF_STATIC)
+		{
+			SceneHandler::GetInstance()->CreateScene(SceneType::STATIC, guiComponent->sceneTab->CreateSceneNode);
+			guiComponent->sceneTab->selectedScenes = guiComponent->sceneTab->StaticScenes;
+		}
+		if (this->guiComponent->getPhysicsType() == StuffType::STUFF_MESH_ONLY)
+		{
+			SceneHandler::GetInstance()->CreateScene(SceneType::MESH, guiComponent->sceneTab->CreateSceneNode);
+			guiComponent->sceneTab->selectedScenes = guiComponent->sceneTab->MeshScenes;
+		}
+		guiComponent->sceneTab->selectedScenePos = 0;
+		
+	}
+
+
+
 	//Null Check
 	if(resourceHandler->ogreRenderMeshes) {
 		// size check
@@ -336,14 +388,20 @@ void Gui::_addTab()
 	if (ImGui::RadioButton("DYNAMIC", this->guiComponent->getPhysicsType() == StuffType::STUFF_DYNAMIC))
 	{
 		this->guiComponent->setPhysicsType(StuffType::STUFF_DYNAMIC);
+		guiComponent->sceneTab->selectedScenes = guiComponent->sceneTab->DynamicScenes;
+		guiComponent->sceneTab->selectedScenePos = 0;
 	}
 	if (ImGui::RadioButton("STATIC", this->guiComponent->getPhysicsType() == StuffType::STUFF_STATIC))
 	{
 		this->guiComponent->setPhysicsType(StuffType::STUFF_STATIC);
+		guiComponent->sceneTab->selectedScenes = guiComponent->sceneTab->StaticScenes;
+		guiComponent->sceneTab->selectedScenePos = 0;
 	}
 	if (ImGui::RadioButton("MESH", this->guiComponent->getPhysicsType() == StuffType::STUFF_MESH_ONLY))
 	{
 		this->guiComponent->setPhysicsType(StuffType::STUFF_MESH_ONLY);
+		guiComponent->sceneTab->selectedScenes = guiComponent->sceneTab->MeshScenes;
+		guiComponent->sceneTab->selectedScenePos = 0;
 	}
 
 	if (this->guiComponent->getPhysicsType() == StuffType::STUFF_DYNAMIC) {
@@ -360,8 +418,15 @@ void Gui::_addTab()
 	ImGui::InputInt3("Rotation", this->guiComponent->getRotation());
 
 	if (ImGui::Button("ADD")) {
-		this->guiComponent->setRenderMeshName(resourceHandler->ogreRenderMeshes.get()->at(renderMeshesPosition));
-		this->guiComponent->addObject();
+		if (guiComponent->sceneTab->selectedScenes) {
+			if (guiComponent->sceneTab->selectedScenes->size() > 0) {
+				this->guiComponent->setRenderMeshName(resourceHandler->ogreRenderMeshes.get()->at(renderMeshesPosition));
+				this->guiComponent->addObject();
+			}
+		}
+		else {
+			std::cout << "Error creating Object" << std::endl;
+		}
 	}
 
 	ImGui::End();
@@ -389,10 +454,23 @@ void Gui::_objectsPanel()
 	ImGui::Text("Dynamic");
 	ImGui::Spacing();
 
-	if (guiComponent->objParam->stuffDyn) {
-		for (int i = 0; i < guiComponent->objParam->stuffDyn->size(); i++)
-		{
-			ImGui::Text(guiComponent->objParam->stuffDyn->at(i)->name.c_str());
+	if (guiComponent->sceneTab->DynamicScenes) {
+		if (guiComponent->sceneTab->DynamicScenes->size() > 0) {
+			for (int i = 0; i < guiComponent->sceneTab->DynamicScenes->size(); i++)
+			{
+				ImGui::Text("  ");
+				ImGui::SameLine();
+				ImGui::Text(guiComponent->sceneTab->DynamicScenes->at(i)->getName().c_str());
+				if (guiComponent->sceneTab->DynamicScenes->at(i)->getAttachedObjects().size() > 0) {
+					for (int j = 0; j < guiComponent->sceneTab->DynamicScenes->at(i)->getAttachedObjects().size(); j++)
+					{
+						ImGui::Text("    ");
+						ImGui::SameLine();
+						ImGui::Text(guiComponent->sceneTab->DynamicScenes->at(i)->getAttachedObjects().at(j)->getName().c_str());
+					}
+
+				}
+			}
 		}
 	}
 
@@ -400,10 +478,23 @@ void Gui::_objectsPanel()
 	ImGui::Text("Static");
 	ImGui::Spacing();
 
-	if (guiComponent->objParam->stuffStatic) {
-		for (int i = 0; i < guiComponent->objParam->stuffStatic->size(); i++)
-		{
-			ImGui::BulletText(guiComponent->objParam->stuffStatic->at(i)->name.c_str());
+	if (guiComponent->sceneTab->StaticScenes) {
+		if (guiComponent->sceneTab->StaticScenes->size() > 0) {
+			for (int i = 0; i < guiComponent->sceneTab->StaticScenes->size(); i++)
+			{
+				ImGui::Text("  ");
+				ImGui::SameLine();
+				ImGui::Text(guiComponent->sceneTab->StaticScenes->at(i)->getName().c_str());
+				if (guiComponent->sceneTab->StaticScenes->at(i)->getAttachedObjects().size() > 0) {
+					for (int j = 0; j < guiComponent->sceneTab->StaticScenes->at(i)->getAttachedObjects().size(); j++)
+					{
+						ImGui::Text("    ");
+						ImGui::SameLine();
+						ImGui::Text(guiComponent->sceneTab->StaticScenes->at(i)->getAttachedObjects().at(j)->getName().c_str());
+					}
+
+				}
+			}
 		}
 	}
 
@@ -411,10 +502,23 @@ void Gui::_objectsPanel()
 	ImGui::Text("Mesh");
 	ImGui::Spacing();
 
-	if (guiComponent->objParam->stuffMesh) {
-		for (int i = 0; i < guiComponent->objParam->stuffMesh->size(); i++)
-		{
-			ImGui::Text(guiComponent->objParam->stuffMesh->at(i)->name.c_str());
+	if (guiComponent->sceneTab->MeshScenes) {
+		if(guiComponent->sceneTab->MeshScenes->size() > 0){
+			for (int i = 0; i < guiComponent->sceneTab->MeshScenes->size(); ++i)
+			{
+				ImGui::Text("  ");
+				ImGui::SameLine();
+				ImGui::Text(guiComponent->sceneTab->MeshScenes->at(i)->getName().c_str());
+				if (guiComponent->sceneTab->MeshScenes->at(i)->getAttachedObjects().size() > 0) {
+					for (int j = 0; j < guiComponent->sceneTab->MeshScenes->at(i)->getAttachedObjects().size(); j++)
+					{
+						ImGui::Text("    ");
+						ImGui::SameLine();
+						ImGui::Text(guiComponent->sceneTab->MeshScenes->at(i)->getAttachedObjects().at(j)->getName().c_str());
+					}
+
+				}
+			}
 		}
 	}
 
