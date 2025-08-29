@@ -11,6 +11,7 @@ vertex_program myVertex glslang
 		param_named_auto time time
 		param_named_auto worldViewProj worldviewproj_matrix
 		param_named_auto modelView world_matrix
+	
 		
 	}
 	//uses_vertex_texture_fetch true

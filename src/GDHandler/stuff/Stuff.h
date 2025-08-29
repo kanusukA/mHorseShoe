@@ -38,6 +38,7 @@ public:
 
 	void setCastShadow(bool value);
 
+
 	virtual void setPxRigidDynamic(PxRigidDynamic* dynActor) {};
 	virtual void setPxRigidStatic(PxRigidStatic* staActor) {};
 
@@ -219,6 +220,8 @@ private:
 		Ogre::Vector3 colliderSize
 	);
 
+	
+
 	void deleteObj(Stuff* stuff);
 
 public:
@@ -261,6 +264,9 @@ public:
 
 	void setHeightMap(std::string loc, std::string grassMapLoc, float displacement, int vertSize, int grassDensity, float scale);
 
+	// Opens fragment shader parameter of selectedobject
+	void openFragmentShader();
+
 	void addMDRL(std::string name, Ogre::Vector3& direction, int powerScale);
 	void addLight(std::string name, Ogre::Vector3& position, Ogre::Vector3& direction, int powerScale, Ogre::Light::LightTypes type);
 
@@ -285,9 +291,6 @@ public:
 
 // SCENE HANDLER -------------------------------------------------------------------------------------------
 
-struct Scene {
-	std::vector<std::string*> nodes =  std::vector<std::string*>();
-};
 
 enum SceneType {
 	STATIC,
@@ -303,13 +306,20 @@ private:
 	static SceneHandler* pinstance_;
 	static std::mutex mutex_;
 
+	StuffHandler* stuffhandler;
 	Ogre::SceneManager* oScnManager;
 
 	std::vector<Ogre::SceneNode*> StaticScenes = std::vector<Ogre::SceneNode*>();
 	std::vector<Ogre::SceneNode*> DynamicScenes = std::vector<Ogre::SceneNode*>();
 	std::vector<Ogre::SceneNode*> MeshScenes = std::vector<Ogre::SceneNode*>();
 
+	Ogre::Vector3 objPosToVecPos(std::string pos);
+	Ogre::Vector4 objRotToVecRot(std::string orientation);
+
 	void _travSceneNode(Ogre::SceneNode* node, int pos,std::vector<Ogre::SceneNode*>* sceNodes,int scnType);
+	void _loadSceneNodes(Ogre::SceneNode* parNode, std::string scnNode, int scnType);
+	// scnNode - The object is added to this node
+	void _loadObject(SceneObject obj,std::string scnNode);
 
 	void _saveObject(std::string scnName, SceneObject obj);
 	void _saveScene(Ogre::SceneNode* scn);
@@ -327,7 +337,7 @@ public:
 
 
 	// Creates 3 Main Scene Nodes
-	void setSceneManager(Ogre::SceneManager* scnManager);
+	void setStuffHandler(StuffHandler* stuff);
 	
 	void loadScenes();
 

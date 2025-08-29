@@ -103,7 +103,7 @@ float4 mainPS
     
     //moon = saturate(moon * -worldSpaceLightPos.y);
     
-    float4 col = lerp(float4(0, 0, 0, 0), moonCoreCol, moon);
+    float4 col = lerp(float4(0, 0, 0, 0), moonCol, moon);
     
    
     //float4 fog = tex2D(farFogTex, cuv);

@@ -1,0 +1,104 @@
+
+vertex_program ShadowMapReceiverVP hlsl
+{
+    source shadowReceiver2.hlsl
+    entry_point mainVP
+    profiles arbvp1
+    target vs_4_0
+    // Similar to standard lighting but using the shadow map in addition
+   // compile_arguments -DSHADOW_MAP
+    
+    //default_params
+    //{
+        //param_named_auto worldviewproj worldviewproj_matrix
+        //param_named_auto world_mat world_matrix
+        //param_named_auto worldIT_mat inverse_transpose_world_matrix
+        //param_named_auto lightdirection light_direction 0
+		//param_named_auto lightposition light_position 0
+        //param_named_auto cameraWorldposition camera_position
+
+    //}
+
+    default_params
+    {
+        param_named_auto worldviewproj worldviewproj_matrix
+        param_named_auto worldview worldview_matrix
+        param_named_auto worldviewIT inverse_transpose_worldview_matrix
+        param_named_auto lightdirection light_direction_view_space 0
+        param_named_auto lightposition light_position_view_space 0
+    }
+}
+
+fragment_program ShadowMapReceiverFP hlsl
+{
+    source shadowReceiver2.hlsl
+    entry_point mainFP
+    profiles arbfp1
+    target ps_4_0
+    // Similar to standard lighting but using the shadow map in addition
+    //compile_arguments -DSHADOW_MAP
+    
+    //default_params
+    //{
+        //param_named_auto LightColor light_diffuse_colour 0
+        //param_named SpecularIntensity float 1
+        //param_named_auto LightPower light_power 0
+        //param_named_auto DiffuseColor surface_diffuse_colour
+        //param_named_auto AmbientColor surface_ambient_colour
+        //param_named skyIntensity float 0.15
+    //}
+
+    default_params
+    {
+        param_named DiffuseColor float4 0.0 0.0 0.0 0.0
+        param_named LightPower float 1.0
+        param_named skyIntensity float 0.2
+        param_named roughness float 0.3
+        param_named metallic float 0.9
+    }
+
+}
+
+
+
+
+
+material MyShadowReceiver
+{
+   // shadow_caster_material MyShadowCaster
+
+    technique default
+    {
+        pass ambient
+        {
+            ambient 1 1 1
+            diffuse 0.79 0.46 0.46 1.00
+            specular 0 0 0 0 
+
+           // depth_write off
+
+           // scene_blend alpha_blend
+
+            vertex_program_ref ShadowMapReceiverVP
+            {
+
+            }
+            fragment_program_ref ShadowMapReceiverFP
+            {
+
+            }
+
+           texture_unit 
+           {
+            
+                content_type shadow
+                tex_address_mode clamp
+                filtering none
+            }
+
+
+        }
+
+
+    }
+}

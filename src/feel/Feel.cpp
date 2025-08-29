@@ -72,7 +72,7 @@ void Feel::updateInput(float deltaTime) {
 		}
 		
 		// If Mouse is in game i.e. is being used
-		if(SDL_GetWindowMouseGrab(this->window)){
+		if(SDL_GetWindowMouseGrab(this->window) && mouseHidden){
 			if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
 
 				if (event.button.button == SDL_BUTTON_LEFT) {

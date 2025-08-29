@@ -7,6 +7,11 @@ void Gui::_SceneTab() {
 	{
 		SceneHandler::GetInstance()->saveScene("Example");
 	}
+	ImGui::Spacing();
+	if (ImGui::Button("Load Scene"))
+	{
+		SceneHandler::GetInstance()->loadScenes();
+	}
 
 	ImGui::End();
 }

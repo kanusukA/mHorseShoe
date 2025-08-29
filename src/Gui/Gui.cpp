@@ -615,6 +615,10 @@ void Gui::_objectTab()
 				ImGui::SameLine();
 				ImGui::Text(std::to_string(getObjRotation(guiComponent->getSelectedObject()->selectedStuff->scnNode).z).c_str());
 
+				if (ImGui::Button("GetFragShader")) {
+					guiComponent->getSelObjFrag();
+				}
+
 				if (ImGui::Checkbox("Cast Shadow", guiComponent->getSelectedObject()->shadowCasting)) {
 					guiComponent->getSelectedObject()->selectedStuff->setCastShadow(*guiComponent->getSelectedObject()->shadowCasting);
 				}

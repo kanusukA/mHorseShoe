@@ -37,7 +37,11 @@ namespace fs = std::filesystem;
 #define MESH_NODES_FILE "MeshNodes.ini"
 
 #define SECTION_SCENE "SCENE"
+#define SECTION_OBJECT "OBJECT"
+#define SECTION_PARENT_SCN "PARENT_NODE"
+#define KEY_PARENT_SCN "NODE"
 
+#define NODEKEY_NAME "NAME"
 #define NODEKEY_RENDERMESH "RENDER_MESH"
 #define NODEKEY_COLLIDERMESH "COLLIDER_MESH"
 #define NODEKEY_PHYSXTYPE "PHYSXTYPE"
@@ -59,6 +63,11 @@ struct SceneObject {
 	std::string castShadow = "";
 	std::string receiveShadow = "";
 	std::string material = "";
+};
+
+struct Scene {
+	std::string currentScene;
+	std::string parentScene;
 };
 
 
@@ -176,6 +185,12 @@ public:
 
 	void saveScene(std::string scnName, std::string Filename, int scnType);
 	void saveSceneObject(std::string filename, SceneObject obj, int scnType);
+	bool scnExists(std::string filename, int scnType);
+	bool objExists(std::string filename, int scnType);
+	
+
+	std::vector<std::string> loadScene(std::string filename, int scnType);
+	SceneObject loadObject(std::string filename, int scnType);
 
 };
 

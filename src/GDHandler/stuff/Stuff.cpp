@@ -291,6 +291,22 @@ void StuffHandler::_addObjectStatic(std::string scnNodeName, std::string objName
 
 }
 
+void StuffHandler::openFragmentShader()
+{
+	if (selectedObj->selectedStuff) {
+		Ogre::Entity* ent = monster->oScnManager->getEntity(selectedObj->selectedStuff->getEntity()->getName());
+		if (ent) {
+			Ogre::String mat = ent->getMesh().get()->getSubMesh(0)->getMaterialName();
+			RSUS::GetInstance()->readMaterial(mat);
+			
+		}
+		else {
+			std::cout << "Scene node has no entity!" << std::endl;
+		}
+	}
+
+}
+
 void StuffHandler::deleteObj(Stuff* stuff)
 {
 

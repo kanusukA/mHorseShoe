@@ -15,6 +15,8 @@ GDHandler::GDHandler(Monster* renderer, Kint* physics) {
 
 	this->stuffHandler = new StuffHandler(monster,physics);
 
+	SceneHandler::GetInstance()->setStuffHandler(stuffHandler);
+
 
 }
 
@@ -40,8 +42,7 @@ void GDHandler::initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* guiComp) {
 void GDHandler::preSetup()
 {
 	// Resource 
-	ResourceHandler::GetInstance()->getAllResources();
-	ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
+	
 	SceneObject obj = SceneObject();
 	obj.name = "Cube";
 	

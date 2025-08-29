@@ -19,6 +19,7 @@ SceneHandler* SceneHandler::GetInstance() {
 void loadScenes() {
 
 
+
 }
 
 std::string _nodeVectorToStr(Ogre::Vector3 pos) {
@@ -26,6 +27,52 @@ std::string _nodeVectorToStr(Ogre::Vector3 pos) {
 }
 std::string _nodeVectorToStr(Ogre::Vector4 pos) {
 	return  std::to_string(pos.w) + "," + std::to_string(pos.x) + "," + std::to_string(pos.y) + "," + std::to_string(pos.z);
+}
+
+Ogre::Vector3 SceneHandler::objPosToVecPos(std::string pos)
+{
+	std::string strPos = "";
+	Ogre::Vector3 vec = Ogre::Vector3();
+	int vecPos = 0;
+	for (int i = 0; i < pos.size(); i++)
+	{
+		if (pos.at(i) != ',')
+		{
+			strPos += pos.at(i);
+		}
+		else {
+			// Fix this
+			//remove ending zeros
+			
+			vec[vecPos] = std::stof(strPos);
+			strPos = "";
+			vecPos++;
+		}
+	}
+	
+	return vec;
+}
+
+Ogre::Vector4 SceneHandler::objRotToVecRot(std::string orientation)
+{
+	const char* strPos = "";
+	Ogre::Vector4 vec = Ogre::Vector4();
+	int vecPos = 0;
+	for (int i = 0; i < orientation.size(); i++)
+	{
+		if (orientation.at(i) != ',')
+		{
+			strPos += orientation.at(i);
+		}
+		else {
+			vec[vecPos] = std::stof(strPos);
+			strPos = "";
+			vecPos++;
+			
+		}
+	}
+
+	return vec;
 }
 
 // pos - the current position of scnNodes being traversed
@@ -82,16 +129,82 @@ void SceneHandler::_travSceneNode(Ogre::SceneNode* node,int pos ,std::vector<Ogr
 		scnNodes->erase(scnNodes->begin() + pos);
 	}
 
+}
+
+void SceneHandler::_loadSceneNodes(Ogre::SceneNode* parNode, std::string scnNode , int scnType)
+{
+	Ogre::SceneNode* parentNode = parNode;
+
+	if (oScnManager->hasSceneNode(scnNode)) {
+		return;
+	}
+	
+	// Load this scn
+	CreateScene(SceneType(scnType), scnNode);
+	// Does it contain object
+	if (ResourceHandler::GetInstance()->objExists(scnNode + ".ini",scnType))
+	{
+		SceneObject obj = ResourceHandler::GetInstance()->loadObject(scnNode + ".ini", scnType);
+		_loadObject(obj, scnNode);
+	}
+	// Does it contain scene
+	if (ResourceHandler::GetInstance()->scnExists(scnNode + ".ini",scnType))
+	{
+		// recursize Find
+		// for future
+
+	}
 
 }
 
-void SceneHandler::setSceneManager(Ogre::SceneManager* scnManager)
+void SceneHandler::_loadObject(SceneObject obj,std::string scnNode)
+{
+	
+	stuffhandler->addObject(
+		scnNode,
+		obj.name,
+		obj.RenderMesh,
+		obj.ColliderMesh,
+		objPosToVecPos(obj.position),
+		Ogre::Vector3(),//TODO FIX QUATERNION ROTATION SYSTEM
+		StuffType(std::stoi(obj.PhysXType)),
+		1,
+		Ogre::Vector3()
+	);
+}
+
+void SceneHandler::setStuffHandler(StuffHandler* stuff)
 {
 
-	oScnManager = scnManager;
+	stuffhandler = stuff;
+	oScnManager = stuffhandler->getMonsterRef()->oScnManager;
 	oScnManager->getRootSceneNode()->createChildSceneNode(STATIC_SCN_NODE);
 	oScnManager->getRootSceneNode()->createChildSceneNode(DYNAMIC_SCN_NODE);
 	oScnManager->getRootSceneNode()->createChildSceneNode(MESH_SCN_NODE);
+
+}
+
+void SceneHandler::loadScenes()
+{
+	Ogre::StringVector scns;
+	//Dynamic
+	scns = ResourceHandler::GetInstance()->loadScene(DYNAMIC_NODES_FILE,0);
+	for (int i = 0; i < scns.size(); i++)
+	{
+		_loadSceneNodes(oScnManager->getSceneNode(DYNAMIC_SCN_NODE), scns.at(i),0);
+	}
+	
+	scns = ResourceHandler::GetInstance()->loadScene(STATIC_NODES_FILE, 1);
+	for (int i = 0; i < scns.size(); i++)
+	{
+		_loadSceneNodes(oScnManager->getSceneNode(STATIC_SCN_NODE), scns.at(i), 1);
+	}
+
+	scns = ResourceHandler::GetInstance()->loadScene(MESH_NODES_FILE, 2);
+	for (int i = 0; i < scns.size(); i++)
+	{
+		_loadSceneNodes(oScnManager->getSceneNode(MESH_SCN_NODE), scns.at(i), 2);
+	}
 
 }
 
@@ -145,7 +258,6 @@ void SceneHandler::saveScene(std::string scnName)
 			}
 		}
 	}
-
 
 }
 

@@ -122,6 +122,9 @@ public:
 			
 
 		}
+		else if (event == GDEVENT_GETSELECTEDOBJFRAGMENT) {
+			stuffHandler->openFragmentShader();
+		}
 
 	}
 

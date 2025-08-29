@@ -259,6 +259,13 @@ public:
 
 	void saveRsusObj();
 
+	void getSelObjFrag() {
+		this->_mediator->Notify(this, GDEVENT_GETSELECTEDOBJFRAGMENT);
+		
+		this->rsusParam->rsusObj = RSUS::GetInstance()->rsusObj;
+		
+	};
+
 	void sendMaterialRsus() {
 		RSUS::GetInstance()->readMaterial(ResourceHandler::GetInstance()->OgreMaterials->at(this->rsusParam->selectedMaterial));
 		this->rsusParam->rsusObj = RSUS::GetInstance()->rsusObj;

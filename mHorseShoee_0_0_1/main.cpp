@@ -24,6 +24,9 @@ int main() {
 
 	std::cout << "Ogre started : " << std::endl;
 
+	ResourceHandler::GetInstance()->getAllResources();
+	ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
+
 	// Ogre Overlay INIT
 	std::cout << "Initializing monster" << std::endl;
 	Monster* monster = new Monster(ctx.getRoot(),ctx.getRenderWindow(), ctx.getOverlaySystem());
@@ -39,7 +42,7 @@ int main() {
 	Ogre::ImGuiOverlay* imOverlay = ctx.initialiseImGui(); // initalizes imgui before InitMonster! else will pop errors in renderOneFrame in Loop.
 	ctx.addInputListener(ctx.getImGuiInputListener());
 
-	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.9, -0.5), 1);
+	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, -0.4), 2);
 
 	std::cout << "Setting up Kint" << std::endl;
 	// Physics INIT
@@ -47,8 +50,6 @@ int main() {
 	kint->InitPhysics();
 
 	//GDHANDLER
-
-
 	
 	GDHandler gdhandler = GDHandler(monster,kint);
 	gdhandler.preSetup();
@@ -65,8 +66,8 @@ int main() {
 	monster->setSkyBox();
 	monster->setGrid();
 
-	SceneHandler::GetInstance()->setSceneManager(monster->oScnManager);
-	SceneHandler::GetInstance()->saveScene("Scene1");
+	
+	
 
 	//monster->_createGrassBlade(0.3, 1);
 

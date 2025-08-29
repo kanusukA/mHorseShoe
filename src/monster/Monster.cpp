@@ -53,20 +53,28 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 
 	oScnManager = root->createSceneManager();
 
-	oScnManager->setAmbientLight(Ogre::ColourValue(0.53, 0.2, 0.12));
-	oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_MODULATIVE);
+	_setupRTShader();
 
-	Ogre::MaterialPtr casterMat = Ogre::MaterialManager::getSingleton().getByName("mShadowCast");
-	Ogre::MaterialPtr receiverMat = Ogre::MaterialManager::getSingleton().getByName("mShadowReciv");
+	oScnManager->setAmbientLight(Ogre::ColourValue(0.53, 0.2, 0.12));
+	oScnManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
+	
+
+	oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
+
+	Ogre::MaterialPtr casterMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowCaster");
+	Ogre::MaterialPtr receiverMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowReceiver");
 
 	oScnManager->setShadowTextureCasterMaterial(casterMat);
 	oScnManager->setShadowTextureReceiverMaterial(receiverMat);
-
-	//oScnManager->setShadowTextureSelfShadow(true);
+	//oScnManager->setShadowCasterRenderBackFaces(false);
+	
+	oScnManager->setShadowTextureSelfShadow(true);
+	
 	
 	//oScnManager->setShowDebugShadows(true);
 
-	_setupRTShader();
+	
 
 	oScnManager->addRenderQueueListener(overlay);
 	
@@ -163,14 +171,23 @@ Ogre::SceneNode* Monster::loadMeshScnNode(
 	bool castShadow
 )
 {
+
+	std::cout << "Mesh : " << meshName << std::endl;
 	
 	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(meshName, groupName);
 
 	Ogre::SceneNode* scnNode;
 
+	if (oScnManager->hasSceneNode(scnNodeName))
+	{
+		std::cout << "SceneNode Not found" << std::endl;
+		
+	}
+
 	scnNode = oScnManager->getSceneNode(scnNodeName);
 
 	Ogre::Entity* ent = oScnManager->createEntity(objectname, msh);
+	//ent->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("monke_blue"));
 	ent->setCastShadows(castShadow);
 	scnNode->attachObject(ent);
 	
@@ -235,27 +252,36 @@ void Monster::addMainDirectionalLight(std::string lightName, Ogre::Vector3 dir ,
 {
 
 	if (mdrl->directionalLight && mdrl->lightScnNode) {
+
 		mdrl->directionalLight->setPowerScale(power);
 		mdrl->lightScnNode->setDirection(dir);
+
 	}
 	else {
+
 		Ogre::Light* light = oScnManager->createLight(lightName);
-		light->setType(Ogre::Light::LT_DIRECTIONAL);
+
+		light->setType(Ogre::Light::LT_SPOTLIGHT);
 		light->setCastShadows(true);
 
 		light->setPowerScale(power);
+		
+
 		Ogre::SceneNode* mainLightScnNode = oScnManager->getRootSceneNode()->createChildSceneNode(lightName + "_scn");
+
 		mainLightScnNode->attachObject(light);
 		mainLightScnNode->setDirection(dir);
-		mainLightScnNode->setPosition(0, 0, 0);
+		mainLightScnNode->setPosition(0, 25, 0);
 
 		mdrl->directionalLight = light;
 		mdrl->lightScnNode = mainLightScnNode;
 	}
 
+	std::cout << "LIGHT DIRECTION : " << mdrl->directionalLight->getDerivedDirection().x << " " << mdrl->directionalLight->getDerivedDirection().y << " "
+		<< mdrl->directionalLight->getDerivedDirection().z << std::endl;
+
 	//RSUS::GetInstance()->readMaterial("mySky");
 	//RSUS::GetInstance()->updateFragParameterFloat3("worldSpaceLightPos", dir);
-
 
 }
 
@@ -552,6 +578,8 @@ void Monster::setSkyBox()
 
 	ent_high->setMaterial(skyHighMat);
 	ent_high->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_EARLY);
+	ent_high->setCastShadows(false);
+	
 	skyHighNode->attachObject(ent_high);
 	skyHighNode->setPosition(0, -2500, 0);
 	skyHighNode->setScale(Ogre::Vector3(9000));
@@ -1137,31 +1165,34 @@ void RSUS::readMaterial(Ogre::String matName)
 
 	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(matName);
 
+
 	Ogre::String fragProgramName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getName();
 	Ogre::String fragProgramFileName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();
 	Ogre::GpuProgramParametersPtr fragParam = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+
+
 
 	Ogre::String vertProgramName = mat.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getName();
 	Ogre::String vertProgramFileName = mat.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getSourceFile();
 	Ogre::GpuProgramParametersPtr vertParam = mat.get()->getTechnique(0)->getPass(0)->getVertexProgramParameters();
 	
-	std::cout << " Frag Program Name : " << fragProgramName << std::endl;
-	std::cout << " Frag Program File Name : " << fragProgramFileName << std::endl;
-	std::cout << " Vert Program Name : " << vertProgramName << std::endl;
-	std::cout << " Vert Program File Name : " << vertProgramFileName << std::endl;
+//	std::cout << " Frag Program Name : " << fragProgramName << std::endl;
+//	std::cout << " Frag Program File Name : " << fragProgramFileName << std::endl;
+//std::cout << " Vert Program Name : " << vertProgramName << std::endl;
+//	std::cout << " Vert Program File Name : " << vertProgramFileName << std::endl;
 
 	// Read the shader file
 	ResourceHandler::GetInstance()->readShaderFiles(mat);
 
 	std::vector<std::string>* fragshaderVar = ResourceHandler::GetInstance()->fragShaderVariables;
-	std::vector<std::string>* vertshaderVar = ResourceHandler::GetInstance()->vertShaderVariables;
+	//std::vector<std::string>* vertshaderVar = ResourceHandler::GetInstance()->vertShaderVariables;
 
 	rsusObj->fragVariables =  _initShaderValue(fragParam, fragshaderVar, fragProgramName);
-	rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
+	//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
 
 	
 	// file verified
-	std::cout << "file verified" << std::endl;
+	//std::cout << "file verified" << std::endl;
 
 	rsusObj->fragShaderName = fragProgramName;
 	rsusObj->fragShaderFileName = fragProgramFileName;
@@ -1302,13 +1333,13 @@ ShaderVar RSUS::_putShaderValue(std::string valueStr)
 	if (!valueStr.empty())
 	{
 		if (valueStr.at(0) == '0') {
-			std::cout << "value int : " << valueStr.substr(2, valueStr.size()) << std::endl;
+			//std::cout << "value int : " << valueStr.substr(2, valueStr.size()) << std::endl;
 			*var.varInt = std::stoi(valueStr.substr(2, valueStr.size()));
 			var.varType = ShaderVarType::INTEGER;
 		}
 		else if (valueStr.at(0) == '1') 
 		{
-			std::cout << "value float : " << valueStr.substr(2, valueStr.size()) << std::endl;
+			//std::cout << "value float : " << valueStr.substr(2, valueStr.size()) << std::endl;
 			*var.varFloat = std::stof(valueStr.substr(2, valueStr.size()));
 			var.varType = ShaderVarType::FLOAT0;
 		}
@@ -1320,13 +1351,13 @@ ShaderVar RSUS::_putShaderValue(std::string valueStr)
 					value += valueStr.at(i);
 				}
 				else {
-					std::cout << "value float2 : " << floatPos << " : " << value << std::endl;
+					//std::cout << "value float2 : " << floatPos << " : " << value << std::endl;
 					var.varFloat2[floatPos] = std::stof(value);
 					floatPos += 1;
 					value = "";
 				}
 			}
-			std::cout << "value float2 : " << floatPos << " : " << value << std::endl;
+			//std::cout << "value float2 : " << floatPos << " : " << value << std::endl;
 			var.varFloat2[floatPos] = std::stof(value);
 			var.varType = ShaderVarType::FLOAT2;
 		}
@@ -1338,13 +1369,13 @@ ShaderVar RSUS::_putShaderValue(std::string valueStr)
 					value += valueStr.at(i);
 				}
 				else {
-					std::cout << "value float3 : " << floatPos << " : " << value << std::endl;
+					//std::cout << "value float3 : " << floatPos << " : " << value << std::endl;
 					var.varFloat3[floatPos] = std::stof(value);
 					floatPos += 1;
 					value = "";
 				}
 			}
-			std::cout << "value float3 : " << floatPos << " : " << value << std::endl;
+			//std::cout << "value float3 : " << floatPos << " : " << value << std::endl;
 			var.varFloat3[floatPos] = std::stof(value);
 			var.varType = ShaderVarType::FLOAT3;
 		}
@@ -1356,13 +1387,13 @@ ShaderVar RSUS::_putShaderValue(std::string valueStr)
 					value += valueStr.at(i);
 				}
 				else {
-					std::cout << "value float4 : " << floatPos << " : " << value << std::endl;
+					//std::cout << "value float4 : " << floatPos << " : " << value << std::endl;
 					var.varFloat4[floatPos] = std::stof(value);
 					floatPos += 1;
 					value = "";
 				}
 			}
-			std::cout << "value float4 : " << floatPos << " : " << value << std::endl;
+			//std::cout << "value float4 : " << floatPos << " : " << value << std::endl;
 			var.varFloat4[floatPos] = std::stof(value);
 			var.varType = ShaderVarType::FLOAT4;
 		}
@@ -1390,7 +1421,7 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 	bool inSave = false;
 
 	for (int i = 0; i < vec->size(); i++) {
-		std::cout << "This :: " << vec->at(i) << std::endl;
+		//std::cout << "This :: " << vec->at(i) << std::endl;
 	}
 
 	std::cout << "Graphics File : " << filename << " Found : " << hasSave << std::endl;
@@ -1409,8 +1440,8 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 				// List if validated and correct 
 				// Cross Check variables with the Parameter file
 				vari = vec->at(i + 1);
-				std::cout <<"Output Type : " <<  vec->at(i) << std::endl;
-				std::cout << "Output name : " << vec->at(i + 1) << std::endl;
+				//std::cout <<"Output Type : " <<  vec->at(i) << std::endl;
+				//std::cout << "Output name : " << vec->at(i + 1) << std::endl;
 
 				if (vec->at(i + 1) == "cameraPos") {
 					continue;
@@ -1486,21 +1517,21 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 					{
 
 						if (vec->at(i) == "0") {
-							std::cout << "int" << std::endl;
+							//std::cout << "int" << std::endl;
 							params.get()->setNamedConstant(vari, 0);
 							var.varType = ShaderVarType::INTEGER;
 							var.varInt = new int(0);
 						}
 						else if (vec->at(i) == "1")
 						{
-							std::cout << "float" << std::endl;
+							//std::cout << "float" << std::endl;
 							params.get()->setNamedConstant(vari, 0.0f);
 							var.varType = ShaderVarType::FLOAT0;
 							var.varFloat = new float(0.0);
 						}
 						else if (vec->at(i) == "2")
 						{
-							std::cout << "float2" << std::endl;
+							//std::cout << "float2" << std::endl;
 							params.get()->setNamedConstant(vari, Ogre::Vector2(0.0, 0.0));
 
 							var.varType = ShaderVarType::FLOAT2;
@@ -1508,14 +1539,14 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 						}
 						else if (vec->at(i) == "3")
 						{
-							std::cout << "float3" << std::endl;
+							//std::cout << "float3" << std::endl;
 							params.get()->setNamedConstant(vari, Ogre::Vector3(0.0, 0.0, 0.0));
 							var.varType = ShaderVarType::FLOAT3;
 
 						}
 						else if (vec->at(i) == "4")
 						{
-							std::cout << "float4" << std::endl;
+							//std::cout << "float4" << std::endl;
 							params.get()->setNamedConstant(vari, Ogre::Vector4(0.0, 0.0, 0.0, 0.0));
 							var.varType = ShaderVarType::FLOAT4;
 

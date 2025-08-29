@@ -48,25 +48,25 @@ void ResourceHandler::addResource(std::filesystem::path filePath, ResourceHandle
 		break;
 	case RENDER_MESH:
 		if (!vectorContains(filePath.string(), renderMeshes)) {
-			std::cout << "Added render meshes " << filePath.string() << std::endl;
+			//std::cout << "Added render meshes " << filePath.string() << std::endl;
 			this->renderMeshes->push_back(filePath.string());
 		}
 		break;
 	case COLLIDER_MESH:
 		if (!vectorContains(filePath.string(), colliderMeshes)) {
-			std::cout << "Added collider meshes " << filePath.string() << std::endl;
+			//std::cout << "Added collider meshes " << filePath.string() << std::endl;
 			this->colliderMeshes->push_back(filePath.string());
 		}
 		break;
 	case MESH_MATERIALS:
 		if (!vectorContains(filePath.string(), meshMaterials)) {
-			std::cout << "Added mesh material " << filePath.string() << std::endl;
+			//std::cout << "Added mesh material " << filePath.string() << std::endl;
 			this->meshMaterials->push_back(filePath.string());
 		}
 		break;
 	case IMAGE:
 		if (!vectorContains(filePath.string(), images)) {
-			std::cout << "Added Image " << filePath.string() << std::endl;
+			//std::cout << "Added Image " << filePath.string() << std::endl;
 			this->images->push_back(filePath.string());
 		}
 		break;
@@ -95,6 +95,7 @@ void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::
 
 	bool uniFound = false;
 	bool uniName = false;
+	bool skip = false;
 	int type;
 
 	std::cout << "Variables : " << std::endl;
@@ -103,23 +104,43 @@ void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::
 		while (std::getline(in_stream, line))
 		{
 			//std::cout << line << std::endl;
+			if (line == "//SKIP")
+			{
+				skip = true;
+			}
+
+			//std::cout << "Line : " << line << std::endl;
+
+			if (skip)
+			{
+				if (line == "//!SKIP") {
+					skip = false;
+					//shaderVar->push_back(word);
+				}
+
+				continue;
+			}
 
 			// first check uniform keyword
 			for (int i = 0; i < line.size(); i++)
 			{
+			
+
 				if (line.at(i) != ' ' && line.at(i) != ',' && line.at(i) != ')') {
 					word += line.at(i);
 				}
+
 				else {
+					// skips the coming constants
 
 					if (word == "uniform") {
 
-						std::cout << "uniform" << std::endl;
+						//std::cout << "uniform" << std::endl;
 						uniFound = true;
 
 					}
 					else if (uniFound) {
-						std::cout << "type : ";
+						//std::cout << "type : ";
 
 						uniFound = false;
 						uniName = true;
@@ -158,7 +179,7 @@ void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::
 					else if (uniName)
 					{
 						shaderVar->push_back(word);
-						std::cout << "Word: " << word << std::endl;
+						//std::cout << "Word: " << word << std::endl;
 						uniName = false;
 					}
 					word = "";
@@ -191,7 +212,7 @@ void ResourceHandler::findAll(std::string location, ResourceHandlerType type = R
 
 	try {
 		for (const auto& entry : fs::directory_iterator(location)) {
-			std::cout << "Adding resource : " << entry.path().string() << std::endl;
+			//std::cout << "Adding resource : " << entry.path().string() << std::endl;
 			this->addResource(entry.path().string(),type);
 		}
 	}
@@ -202,7 +223,7 @@ void ResourceHandler::findAll(std::string location, ResourceHandlerType type = R
 
 std::filesystem::path ResourceHandler::find(std::string fileName, std::string location)
 {
-	std::cout << "Opening file " << fileName << std::endl;
+	//std::cout << "Opening file " << fileName << std::endl;
 
 	if (location.empty()) {
 		throw ResourceHandlerInvalidRequest();
@@ -288,11 +309,11 @@ void ResourceHandler::getAllResources()
 	if (in_stream.is_open()) {
 		while (std::getline(in_stream, line)) {
 			try {
-				std::cout << "Finding At : " << line << std::endl;
+				//std::cout << "Finding At : " << line << std::endl;
 				this->findAll(line,resourceType);
 			}
 			catch (const std::exception&e) {
-				std::cout << "Resource error " << e.what() << std::endl;
+				//std::cout << "Resource error " << e.what() << std::endl;
 				resourceType = this->_getResourceLocationGroup(line);
 			}
 
@@ -702,8 +723,9 @@ void ResourceHandler::saveScene(std::string scnName, std::string Filename, int s
 	std::string loc = masterLoc + Filename;
 
 	_LoadIniFile(loc);
-
+	
 	ini.SetValue(SECTION_SCENE, scnName.c_str(), "");
+	
 
 	ini.SaveFile(loc.c_str());
 
@@ -748,20 +770,148 @@ void ResourceHandler::saveSceneObject(std::string filename, SceneObject obj , in
 
 	_LoadIniFile(loc);
 
-	ini.SetValue(obj.name.c_str(), NODEKEY_RENDERMESH, obj.RenderMesh.c_str());
-	ini.SetValue(obj.name.c_str(), NODEKEY_COLLIDERMESH, obj.ColliderMesh.c_str());
-	ini.SetValue(obj.name.c_str(), NODEKEY_PHYSXTYPE, obj.PhysXType.c_str());
-	ini.SetValue(obj.name.c_str(), NODEKEY_MASS, obj.mass.c_str());
-	ini.SetValue(obj.name.c_str(), NODEKEY_MATERIAL, obj.material.c_str());
-	ini.SetValue(obj.name.c_str(), NODEKEY_CASTSHADOW, obj.castShadow.c_str());
-	ini.SetValue(obj.name.c_str(), NODEKEY_RECEIVESHADOW, obj.receiveShadow.c_str());
-	ini.SetValue(obj.name.c_str(), NODEKEY_ROTATION, obj.rotation.c_str());
-	ini.SetValue(obj.name.c_str(), NODEKEY_POSITION, obj.position.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_NAME, obj.name.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_RENDERMESH, obj.RenderMesh.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_COLLIDERMESH, obj.ColliderMesh.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_PHYSXTYPE, obj.PhysXType.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_MASS, obj.mass.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_MATERIAL, obj.material.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_CASTSHADOW, obj.castShadow.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_RECEIVESHADOW, obj.receiveShadow.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_ROTATION, obj.rotation.c_str());
+	ini.SetValue(SECTION_OBJECT, NODEKEY_POSITION, obj.position.c_str());
+
+	
 
 	ini.SaveFile(loc.c_str());
 
 	ini.Reset();
 
+}
+
+bool ResourceHandler::scnExists(std::string filename, int scnType)
+{
+	std::string loc = SourceDir.string();
+	if (scnType == 0) {
+		loc += DYNAMIC_NODES_LOC + filename;
+	}
+	else if (scnType == 1)
+	{
+		loc += STATIC_NODES_LOC + filename;
+	}
+	else {
+		loc += MESH_NODES_LOC + filename;
+	}
+	
+	ini.LoadFile(loc.c_str());
+	bool exists = ini.SectionExists(SECTION_SCENE);
+	ini.Reset();
+	return exists;
+}
+
+bool ResourceHandler::objExists(std::string filename , int scnType)
+{
+	std::string loc = SourceDir.string();
+	if (scnType == 0) {
+		loc += DYNAMIC_NODES_LOC + filename;
+	}
+	else if (scnType == 1)
+	{
+		loc += STATIC_NODES_LOC + filename;
+	}
+	else {
+		loc += MESH_NODES_LOC + filename;
+	}
+
+	ini.LoadFile(loc.c_str());
+	bool exists = ini.SectionExists(SECTION_OBJECT);
+	ini.Reset();
+	return exists;
+}
+
+std::vector<std::string> ResourceHandler::loadScene(std::string filename, int scnType)
+{
+	std::vector<std::string> scenes = std::vector<std::string>();
+
+	std::string loc = SourceDir.string();
+	if (scnType == 0) {
+		loc += DYNAMIC_NODES_LOC + filename;
+	}
+	else if (scnType == 1)
+	{
+		loc += STATIC_NODES_LOC + filename;
+	}
+	else {
+		loc += MESH_NODES_LOC + filename;
+	}
+
+
+	if (std::filesystem::exists(loc))
+	{
+		
+
+		CSimpleIniA::TNamesDepend keys;
+		_LoadIniFile(loc);
+
+		ini.GetAllKeys(SECTION_SCENE, keys);
+
+		if (keys.size() > 0)
+		{
+			for (const auto& entry : keys)
+			{
+				scenes.push_back(entry.pItem);
+			}
+		}
+
+
+		ini.Reset();
+		return scenes;
+
+	}
+
+	std::cout << "File : " << filename << " does not exists" << std::endl;
+	return scenes;
+
+
+}
+
+SceneObject ResourceHandler::loadObject(std::string filename, int scnType)
+{
+
+	SceneObject obj = SceneObject();
+
+	std::string loc = SourceDir.string();
+	if (scnType == 0) {
+		loc += DYNAMIC_NODES_LOC + filename;
+	}
+	else if (scnType == 1)
+	{
+		loc += STATIC_NODES_LOC + filename;
+	}
+	else {
+		loc += MESH_NODES_LOC + filename;
+	}
+
+	SI_Error rc = ini.LoadFile(loc.c_str());
+	if (rc < 0)
+	{
+		std::cout << "File not found" << std::endl;
+	}
+
+	obj.name = ini.GetValue(SECTION_OBJECT, NODEKEY_NAME);
+	obj.RenderMesh = ini.GetValue(SECTION_OBJECT, NODEKEY_RENDERMESH);
+	obj.ColliderMesh = ini.GetValue(SECTION_OBJECT, NODEKEY_COLLIDERMESH);
+	obj.PhysXType = ini.GetValue(SECTION_OBJECT, NODEKEY_PHYSXTYPE);
+	obj.mass = ini.GetValue(SECTION_OBJECT, NODEKEY_MASS);
+	obj.material = ini.GetValue(SECTION_OBJECT, NODEKEY_MATERIAL);
+	obj.castShadow = ini.GetValue(SECTION_OBJECT, NODEKEY_CASTSHADOW);
+	obj.receiveShadow = ini.GetValue(SECTION_OBJECT, NODEKEY_RECEIVESHADOW);
+	obj.rotation = ini.GetValue(SECTION_OBJECT, NODEKEY_ROTATION);
+	obj.position = ini.GetValue(SECTION_OBJECT, NODEKEY_POSITION);
+
+	//ini.Reset();
+
+	return obj;
 }
 
 

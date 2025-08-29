@@ -22,10 +22,12 @@ fragment_program skyHighFragProgram hlsl
 }
 
 material myskyHigh{
+	receive_shadows off
 	technique
 	{
 		pass
 		{
+			
 			depth_write off
 			lighting off
 			cull_hardware anticlockwise
