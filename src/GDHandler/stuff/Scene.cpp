@@ -100,6 +100,11 @@ void SceneHandler::_travSceneNode(Ogre::SceneNode* node,int pos ,std::vector<Ogr
 				obj.ColliderMesh = staObj->_getColliderMesh();
 			}
 
+			// the collider was not set by the user
+			if (obj.ColliderMesh == "Collider Mesh") {
+				obj.ColliderMesh = "box";
+			}
+
 			obj.name = objs.at(i)->getName();
 			obj.material = oScnManager->getEntity(obj.name)->getMesh().get()->getSubMesh(0)->getMaterialName();
 			obj.castShadow = objs.at(i)->getCastShadows()? "1" : "0";
@@ -159,6 +164,9 @@ void SceneHandler::_loadSceneNodes(Ogre::SceneNode* parNode, std::string scnNode
 
 void SceneHandler::_loadObject(SceneObject obj,std::string scnNode)
 {
+	if (obj.ColliderMesh.empty()) {
+		obj.ColliderMesh = "box";
+	}
 	
 	stuffhandler->addObject(
 		scnNode,
@@ -210,6 +218,10 @@ void SceneHandler::loadScenes()
 
 void SceneHandler::saveScene(std::string scnName)
 {
+
+	// DELETE PREVIOUS
+	_clearPrevSave();
+
 	std::vector<Ogre::SceneNode*>* remainingScns = new std::vector<Ogre::SceneNode*>();
 	// DYNAMIC SCENES SAVE
 	if (this->DynamicScenes.size() > 0) {
@@ -263,19 +275,26 @@ void SceneHandler::saveScene(std::string scnName)
 
 void SceneHandler::CreateScene(SceneType typ, std::string scnName)
 {
+
+	if (oScnManager->hasSceneNode(scnName)) {
+		std::cout << "Scene Node exists" << std::endl;
+		return;
+	}
+
 	Ogre::SceneNode* scnNode;
 	Ogre::SceneNode* objNode;
 	switch (typ)
 	{
-	case STATIC:
-		scnNode = oScnManager->getSceneNode(STATIC_SCN_NODE);
-		objNode = scnNode->createChildSceneNode(scnName);
-		this->StaticScenes.push_back(objNode);
-		break;
 	case DYNAMIC:
 		scnNode = oScnManager->getSceneNode(DYNAMIC_SCN_NODE);
-		objNode =  scnNode->createChildSceneNode(scnName);
+		objNode = scnNode->createChildSceneNode(scnName);
 		this->DynamicScenes.push_back(objNode);
+		break;
+	case STATIC:
+		scnNode = oScnManager->getSceneNode(STATIC_SCN_NODE);
+		objNode =  scnNode->createChildSceneNode(scnName);
+		this->StaticScenes.push_back(objNode);
+		
 		break;
 	case MESH:
 		scnNode = oScnManager->getSceneNode(MESH_SCN_NODE);

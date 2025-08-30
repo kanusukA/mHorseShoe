@@ -829,6 +829,13 @@ bool ResourceHandler::objExists(std::string filename , int scnType)
 	return exists;
 }
 
+void ResourceHandler::clearPrevSave()
+{
+	std::filesystem::remove_all(SourceDir.string() + DYNAMIC_NODES_LOC);
+	std::filesystem::remove_all(SourceDir.string() + STATIC_NODES_LOC);
+	std::filesystem::remove_all(SourceDir.string() + MESH_NODES_LOC);
+}
+
 std::vector<std::string> ResourceHandler::loadScene(std::string filename, int scnType)
 {
 	std::vector<std::string> scenes = std::vector<std::string>();

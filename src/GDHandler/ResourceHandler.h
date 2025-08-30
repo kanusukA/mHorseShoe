@@ -187,6 +187,7 @@ public:
 	void saveSceneObject(std::string filename, SceneObject obj, int scnType);
 	bool scnExists(std::string filename, int scnType);
 	bool objExists(std::string filename, int scnType);
+	void clearPrevSave();
 	
 
 	std::vector<std::string> loadScene(std::string filename, int scnType);

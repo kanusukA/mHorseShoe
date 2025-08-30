@@ -238,6 +238,11 @@ void Monster::addLight(
 	Ogre::Vector3 direction
 )
 {
+	if (oScnManager->hasLight(lightName)) {
+		std::cout << "Light exists" << std::endl;
+		return;
+	}
+
 	Ogre::Light* light = oScnManager->createLight(lightName);
 	light->setType(type);	
 	light->setPowerScale(powerScale);
@@ -245,6 +250,9 @@ void Monster::addLight(
 	Ogre::SceneNode* lightNode = oScnManager->getRootSceneNode()->createChildSceneNode(lightName + "_scn");
 	lightNode->attachObject(light);
 	lightNode->setDirection(direction);
+	std::cout << " position: " << position.x << " " << position.y << " " << position.z << std::endl;
+	std::cout << " direction: " << direction.x << " " << direction.y << " " << direction.z << std::endl;
+	std::cout << "type : " << (int)type << std::endl;
 
 }
 
@@ -271,7 +279,7 @@ void Monster::addMainDirectionalLight(std::string lightName, Ogre::Vector3 dir ,
 
 		mainLightScnNode->attachObject(light);
 		mainLightScnNode->setDirection(dir);
-		mainLightScnNode->setPosition(0, 25, 0);
+		mainLightScnNode->setPosition(0, 25, -10);
 
 		mdrl->directionalLight = light;
 		mdrl->lightScnNode = mainLightScnNode;

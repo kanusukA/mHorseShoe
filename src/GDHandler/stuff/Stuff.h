@@ -293,8 +293,8 @@ public:
 
 
 enum SceneType {
-	STATIC,
 	DYNAMIC,
+	STATIC,
 	MESH
 };
 
@@ -320,6 +320,10 @@ private:
 	void _loadSceneNodes(Ogre::SceneNode* parNode, std::string scnNode, int scnType);
 	// scnNode - The object is added to this node
 	void _loadObject(SceneObject obj,std::string scnNode);
+
+	void _clearPrevSave() {
+		ResourceHandler::GetInstance()->clearPrevSave();
+	}
 
 	void _saveObject(std::string scnName, SceneObject obj);
 	void _saveScene(Ogre::SceneNode* scn);

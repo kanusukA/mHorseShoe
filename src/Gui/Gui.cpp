@@ -550,7 +550,9 @@ void Gui::_lightTab()
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			ImGui::Selectable(guiComponent->lightTab->lightTypeNames[i], &guiComponent->lightTab->lightTypePos);
+			if (ImGui::Selectable(guiComponent->lightTab->lightTypeNames[i], guiComponent->lightTab->lightTypePos == i)) {
+				guiComponent->lightTab->lightTypePos = i;
+			}
 		}
 		ImGui::EndCombo();
 	}

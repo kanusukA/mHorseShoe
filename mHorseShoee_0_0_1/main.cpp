@@ -42,7 +42,7 @@ int main() {
 	Ogre::ImGuiOverlay* imOverlay = ctx.initialiseImGui(); // initalizes imgui before InitMonster! else will pop errors in renderOneFrame in Loop.
 	ctx.addInputListener(ctx.getImGuiInputListener());
 
-	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, -0.4), 2);
+	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, 0.4), 2);
 
 	std::cout << "Setting up Kint" << std::endl;
 	// Physics INIT
