@@ -196,6 +196,7 @@ void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::
 
 void ResourceHandler::_LoadIniFile(std::string filename)
 {
+	ini.Reset();
 	SI_Error rc = ini.LoadFile(filename.c_str());
 	if (rc < 0)
 	{
@@ -593,28 +594,30 @@ void ResourceHandler::readShaderFiles(Ogre::MaterialPtr mat)
 
 }
 
-void ResourceHandler::writeToFile(std::string key, std::string value, std::string filename)
+
+// single value
+void ResourceHandler::writeToFile(std::string key, std::string value , std::string section, std::string filename)
 {
-	std::filesystem::path cur_path = std::filesystem::current_path();
-	cur_path += "/save";
+	_LoadIniFile(_getSaveFileLoc(filename).string());
 
-	if (!std::filesystem::exists(cur_path)) {
-		std::filesystem::create_directories(cur_path);
+	ini.SetValue(section.c_str(), key.c_str(), value.c_str());
+
+	ini.SaveFile(_getSaveFileLoc(filename).string().c_str());
+
+
+
+}
+
+void ResourceHandler::writeToFile(std::vector<SaveData>* data, std::string filename)
+{
+	_LoadIniFile(_getSaveFileLoc(filename).string());
+
+	for (int i = 0; i < data->size(); i++)
+	{
+		ini.SetValue(data->at(i).section.c_str(), data->at(i).key.c_str(), data->at(i).value.c_str());
 	}
-
-	cur_path += "/" + filename + ".txt";
-
-	std::ofstream outStream(cur_path, std::ios::app | std::ios::out);
-
-	outStream << key + "|" + value << "\n";
-	
-	
-
-	outStream.close();
-
-
-
-
+	ini.SaveFile(_getSaveFileLoc(filename).string().c_str());
+	ini.Reset();
 }
 
 void ResourceHandler::clearFile(std::string filename)
@@ -634,43 +637,17 @@ bool ResourceHandler::fileExists(std::string filename)
 
 
 
-std::string ResourceHandler::readFromFile(std::string key, std::string filename)
+std::string ResourceHandler::readFromFile(std::string key, std::string section, std::string filename)
 {
+	_LoadIniFile(_getSaveFileLoc(filename).string());
 
-	std::ifstream inStream(_getSaveFileLoc(filename));
-	std::string line;
+	const char* value = ini.GetValue(section.c_str(), key.c_str());
 
-	std::string word = "";
-
-	if (inStream.is_open()) {
-		while (std::getline(inStream,line))
-		{
-			word = "";
-			for (int i = 0; i < line.size(); i++)
-			{
-
-				if (line.at(i) != '|') {
-					word += line.at(i);
-				}
-				else {
-					if (word == key) {
-						inStream.close();
-						return line.substr(i + 1, line.size());
-					}
-					else {
-						word = "";
-						continue;
-					}
-					
-					
-				}
-
-			}
-		}
+	if (value) {
+		return value;
 	}
-	inStream.close();
+	
 	return "";
-
 
 }
 
@@ -688,6 +665,13 @@ std::filesystem::path ResourceHandler::getSourceDir()
 	
 	return srcPath.remove_filename();
 
+}
+
+bool ResourceHandler::materialSaved(Ogre::String objectName, Ogre::String Material)
+{
+	
+	return std::filesystem::exists(_getSaveFileLoc(objectName));
+	
 }
 
 void ResourceHandler::saveScene(std::string scnName, std::string Filename, int scnType)
@@ -807,6 +791,7 @@ bool ResourceHandler::scnExists(std::string filename, int scnType)
 	bool exists = ini.SectionExists(SECTION_SCENE);
 	ini.Reset();
 	return exists;
+
 }
 
 bool ResourceHandler::objExists(std::string filename , int scnType)

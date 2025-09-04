@@ -36,6 +36,11 @@ const Ogre::String TRAY_SYSTEM_NAME = "Default_Tray_Man";
 #define STATIC_SCN_NODE "Static"
 #define MESH_SCN_NODE "Mesh"
 
+#define DIFFUSE_TEX_NAME "Diffuse"
+#define ROUGH_TEX_NAME "Roughness"
+#define NORMAL_TEX_NAME "NormalMap"
+#define PARALLAX_TEX_NAME "DisplacementMap"
+
 
 struct MainDirectionalLight
 {
@@ -83,6 +88,13 @@ struct ShaderVar {
 
 };
 
+struct RSUSShaderTextures {
+	Ogre::TextureUnitState* Diffuse;
+	Ogre::TextureUnitState* Normal;
+	Ogre::TextureUnitState* Roughness;
+	Ogre::TextureUnitState* Parallax;
+};
+
 struct RSUShader
 {
 	std::string materialName;
@@ -97,7 +109,11 @@ struct RSUShader
 	std::vector<ShaderVar> fragVariables;
 	std::vector<ShaderVar> vertVariables;
 
+	RSUSShaderTextures* textures = new RSUSShaderTextures();
+
 };
+
+
 
 // Singleton Class
 class RSUS
@@ -106,7 +122,11 @@ public:
 
 	RSUShader* rsusObj = new RSUShader();
 
-	void readMaterial(Ogre::String matName);
+	// Object name is provided to get or set Objects material as all obj share the same material
+	// but has different textures and parameters
+	void readMaterial(Ogre::String matName , Ogre::String objectName = "");
+
+	
 
 	void updateFragParameterInt(Ogre::String parameterName, int val);
 	void updateFragParameterFloat(Ogre::String parameterName, float* val);
@@ -129,6 +149,12 @@ public:
 	// Only way to initalize the class
 	static RSUS* GetInstance();
 
+
+	void setDiffuseTexture(Ogre::Texture* texture);
+	void setNormalTexture(Ogre::Texture* texture);
+	void setRoughnessTexture(Ogre::Texture* texture);
+	void setParallaxTexture(Ogre::Texture* texture);
+
 	
 
 	// Hide the constructor and destructor of the class
@@ -138,13 +164,16 @@ protected:
 
 private:
 
+	void readTextures(Ogre::MaterialPtr mat);
+
 	// to be used with ResourceHandler Save
 	ShaderVar _putShaderValue(std::string valueStr);
-	std::vector<ShaderVar> _initShaderValue(Ogre::GpuProgramParametersPtr params, Ogre::StringVector* vec, Ogre::String filename);
+	std::vector<ShaderVar> _initShaderValue(Ogre::GpuProgramParametersPtr params, Ogre::StringVector* vec, Ogre::String filename , Ogre::String Section);
 
 	// Multi-Thread Shit
 	static RSUS* pinstance_;
 	static std::mutex mutex_;
+	
 };
 
 

@@ -54,6 +54,13 @@ private:
 
 	int* fps = new int(0);
 
+	void _textureComponent(
+		Ogre::String name,
+		Ogre::TextureUnitState* textureState,
+		Ogre::TexturePtr& texture,
+		int* selectedIndex
+	);
+
 public:
 
 	void setPlayerObserver(PlayerObserver* pObserver);
@@ -76,6 +83,8 @@ public:
 	void _HUD();
 	void _diegnos();
 	void _RSUSTab();
+
+	
 
 	void _terrainTab();
 	void _SceneTab();

@@ -41,6 +41,11 @@ namespace fs = std::filesystem;
 #define SECTION_PARENT_SCN "PARENT_NODE"
 #define KEY_PARENT_SCN "NODE"
 
+#define SECTION_MATERIAL "Material"
+#define SECTION_VERTEX_SHADER "Vertex Param"
+#define SECTION_FRAGMNET_SHADER "Fragment Param"
+#define SECTION_TEXTURE "Textures"
+
 #define NODEKEY_NAME "NAME"
 #define NODEKEY_RENDERMESH "RENDER_MESH"
 #define NODEKEY_COLLIDERMESH "COLLIDER_MESH"
@@ -51,6 +56,12 @@ namespace fs = std::filesystem;
 #define NODEKEY_CASTSHADOW "CAST_SHADOW"
 #define NODEKEY_RECEIVESHADOW "RECEIVE_SHADOW"
 #define NODEKEY_MATERIAL "MATERIAL"
+
+struct SaveData {
+	std::string key;
+	std::string value;
+	std::string section;
+};
 
 struct SceneObject {
 	std::string name = "";
@@ -176,12 +187,16 @@ public:
 
 	void readShaderFiles(Ogre::MaterialPtr mat);
 
-	void writeToFile(std::string key, std::string value, std::string filename);
+	void writeToFile(std::string key, std::string value,std::string section, std::string filename);
+	void writeToFile(std::vector<SaveData>* data, std::string filename);
 	void clearFile(std::string filename);
 	bool fileExists(std::string filename);
-	std::string readFromFile(std::string key, std::string filename);
+	std::string readFromFile(std::string key, std::string section, std::string filename);
 
 	std::filesystem::path getSourceDir();
+
+	bool materialSaved(Ogre::String objectName, Ogre::String Material = "");
+
 
 	void saveScene(std::string scnName, std::string Filename, int scnType);
 	void saveSceneObject(std::string filename, SceneObject obj, int scnType);

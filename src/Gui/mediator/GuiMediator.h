@@ -116,6 +116,17 @@ struct TerrainTab {
 struct RSUSParam
 {
 	int selectedMaterial = 0;
+	int selectedTextureDiffuseImage = 0;
+	int selectedTextureNormalImage = 0;
+	int selectedTextureRoughnessImage = 0;
+	int selectedTextureParallaxImage = 0;
+
+	Ogre::TexturePtr Diffuse;
+	Ogre::TexturePtr Normal;
+	Ogre::TexturePtr Roughness;
+	Ogre::TexturePtr Parallax;
+
+
 	RSUShader* rsusObj;
 };
 
@@ -258,6 +269,8 @@ public:
 	}
 
 	void saveRsusObj();
+
+	void setTextures();
 
 	void getSelObjFrag() {
 		this->_mediator->Notify(this, GDEVENT_GETSELECTEDOBJFRAGMENT);

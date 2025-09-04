@@ -176,6 +176,14 @@ Ogre::SceneNode* Monster::loadMeshScnNode(
 	
 	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(meshName, groupName);
 
+	// material exists
+	if (ResourceHandler::GetInstance()->materialSaved(objectname))
+	{
+		RSUS::GetInstance()->readMaterial(msh.get()->getSubMesh(0)->getMaterialName(), objectname);
+	}
+
+	//msh.get()->buildTangentVectors();
+
 	Ogre::SceneNode* scnNode;
 
 	if (oScnManager->hasSceneNode(scnNodeName))
@@ -1167,7 +1175,7 @@ Ogre::Vector3 getObjRotation(Ogre::SceneNode* scnNode) {
 	);
 }
 
-void RSUS::readMaterial(Ogre::String matName)
+void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 {
 
 
@@ -1178,11 +1186,11 @@ void RSUS::readMaterial(Ogre::String matName)
 	Ogre::String fragProgramFileName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();
 	Ogre::GpuProgramParametersPtr fragParam = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 
-
-
 	Ogre::String vertProgramName = mat.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getName();
 	Ogre::String vertProgramFileName = mat.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getSourceFile();
 	Ogre::GpuProgramParametersPtr vertParam = mat.get()->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+
+	readTextures(mat);
 	
 //	std::cout << " Frag Program Name : " << fragProgramName << std::endl;
 //	std::cout << " Frag Program File Name : " << fragProgramFileName << std::endl;
@@ -1195,8 +1203,16 @@ void RSUS::readMaterial(Ogre::String matName)
 	std::vector<std::string>* fragshaderVar = ResourceHandler::GetInstance()->fragShaderVariables;
 	//std::vector<std::string>* vertshaderVar = ResourceHandler::GetInstance()->vertShaderVariables;
 
-	rsusObj->fragVariables =  _initShaderValue(fragParam, fragshaderVar, fragProgramName);
-	//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
+	// sets values from save file
+	if (objectName.empty()) {
+		rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, fragProgramFileName, SECTION_FRAGMNET_SHADER);
+		//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
+	}
+	else {
+		rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, objectName, SECTION_FRAGMNET_SHADER);
+		//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
+	}
+	
 
 	
 	// file verified
@@ -1328,6 +1344,89 @@ RSUS* RSUS::GetInstance()
 	return pinstance_;
 }
 
+void RSUS::setDiffuseTexture(Ogre::Texture* texture)
+{
+	if (texture->getName() == rsusObj->textures->Diffuse->getTextureName()) {
+		std::cout << "Texture is applied!" << std::endl;
+		return;
+	}
+
+	if (rsusObj->textures->Diffuse)
+	{
+		rsusObj->textures->Diffuse->setTexture(Ogre::TexturePtr(texture));
+	}
+
+}
+
+void RSUS::setNormalTexture(Ogre::Texture* texture)
+{
+
+	if (texture->getName() == rsusObj->textures->Normal->getTextureName()) {
+		std::cout << "Texture is applied!" << std::endl;
+		return;
+	}
+
+	if (rsusObj->textures->Normal)
+	{
+		rsusObj->textures->Normal->setTexture(Ogre::TexturePtr(texture));
+	}
+}
+
+void RSUS::setRoughnessTexture(Ogre::Texture* texture)
+{
+
+	if (texture->getName() == rsusObj->textures->Roughness->getTextureName()) {
+		std::cout << "Texture is applied!" << std::endl;
+		return;
+	}
+
+	if (rsusObj->textures->Roughness)
+	{
+		rsusObj->textures->Roughness->setTexture(Ogre::TexturePtr(texture));
+	}
+}
+
+void RSUS::setParallaxTexture(Ogre::Texture* texture)
+{
+	if (texture->getName() == rsusObj->textures->Parallax->getTextureName()) {
+		std::cout << "Texture is applied!" << std::endl;
+		return;
+	}
+
+	if (rsusObj->textures->Parallax)
+	{
+		rsusObj->textures->Parallax->setTexture(Ogre::TexturePtr(texture));
+	}
+}
+
+void RSUS::readTextures(Ogre::MaterialPtr mat)
+{
+
+	Ogre::Pass::TextureUnitStates textures = mat.get()->getTechnique(0)->getPass(0)->getTextureUnitStates();
+
+	if (!textures.empty()) {
+		for (int i = 0; i < textures.size(); i++)
+		{
+			
+			if (textures.at(i)->getName() == NORMAL_TEX_NAME) {
+				rsusObj->textures->Normal = textures.at(i);
+			}
+			if (textures.at(i)->getName() == DIFFUSE_TEX_NAME) {
+				rsusObj->textures->Diffuse = textures.at(i);
+			}
+			if (textures.at(i)->getName() == ROUGH_TEX_NAME) {
+				rsusObj->textures->Roughness = textures.at(i);
+			}
+			if (textures.at(i)->getName() == PARALLAX_TEX_NAME) {
+				rsusObj->textures->Parallax = textures.at(i);
+			}
+			
+
+		}
+	}
+
+}
+
 ShaderVar RSUS::_putShaderValue(std::string valueStr)
 {
 
@@ -1419,7 +1518,7 @@ ShaderVar RSUS::_putShaderValue(std::string valueStr)
 	
 }
 
-std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr params, Ogre::StringVector* vec , Ogre::String filename)
+std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr params, Ogre::StringVector* vec , Ogre::String filename, Ogre::String Section)
 {
 
 	std::vector<ShaderVar> variables = std::vector<ShaderVar>();
@@ -1433,7 +1532,6 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 	}
 
 	std::cout << "Graphics File : " << filename << " Found : " << hasSave << std::endl;
-
 	
 
 	//Validate output
@@ -1458,9 +1556,10 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 				//std::cout << "Output :: " << vari << std::endl;
 				ShaderVar var = ShaderVar();
 				
+				// Get Shader value from file
 				try
 				{
-					var = _putShaderValue(ResourceHandler::GetInstance()->readFromFile(vari, filename));
+					var = _putShaderValue(ResourceHandler::GetInstance()->readFromFile(vari, Section ,filename ));
 				}
 				catch (const std::exception &e)
 				{
@@ -1483,7 +1582,6 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 						case ShaderVarType::INTEGER:
 
 							params.get()->setNamedConstant(vari, *var.varInt);
-
 
 							break;
 						case ShaderVarType::FLOAT0:
