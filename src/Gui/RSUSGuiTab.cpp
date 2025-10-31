@@ -14,17 +14,25 @@ void Gui::_textureComponent(
 			if (ImGui::BeginCombo(texturename.c_str(),
 				resourceHandler->images->at(*selectedIndex).filename().string().c_str())) {
 
+				
+
 				for (int i = 0; i < resourceHandler->images->size(); i++)
 				{
-					if (ImGui::Selectable(resourceHandler->images->at(i).filename().string().c_str(),
-						i == *selectedIndex))
+					// Load Image to Textures in Ogre in memory safe fashion
+					Ogre::TexturePtr previewImg = Ogre::TextureManager::getSingleton().getByName(resourceHandler->images->at(i).filename().string().c_str(), "Images");
+					if (previewImg)
+					{
+						ImGui::Image((ImTextureID)previewImg.get()->getHandle(), ImVec2(25, 25));
+						ImGui::SameLine();
+					}
+
+					
+					if (ImGui::Selectable(resourceHandler->images->at(i).filename().string().c_str(),i == *selectedIndex))
 					{
 						*selectedIndex = i;
 
-
-						
-
 						if (Ogre::TextureManager::getSingleton().load(resourceHandler->images->at(i).filename().string().c_str(), "Images")) {
+
 							texture = Ogre::TextureManager::getSingleton().getByName(resourceHandler->images->at(i).filename().string().c_str(), "Images");
 							std::cout << "Texture" << texture.get()->getName() << std::endl;
 						}
@@ -32,8 +40,6 @@ void Gui::_textureComponent(
 							std::cout << "unable to load texture" << std::endl;
 						}
 						
-						
-
 						std::cout << "End" << std::endl;
 
 					}
@@ -49,6 +55,7 @@ void Gui::_textureComponent(
 
 }
 
+// Shaders Tab
 void Gui::_RSUSTab()
 {
 	ImGui::Begin("Shaders");
@@ -257,11 +264,20 @@ void Gui::_RSUSTab()
 		}
 
 		ImGui::Spacing();
-		if (ImGui::Button("Save")) {
+		if (ImGui::Button("Save Params")) {
 			guiComponent->saveRsusObj();
 		}
 
+		ImGui::Spacing();
+		
+		if (ImGui::Button("Update Shader"))
+		{
+			guiComponent->updateShader();
+		}
+
 	}
+
+
 
 	ImGui::End();
 

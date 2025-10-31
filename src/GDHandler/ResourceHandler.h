@@ -208,6 +208,10 @@ public:
 	std::vector<std::string> loadScene(std::string filename, int scnType);
 	SceneObject loadObject(std::string filename, int scnType);
 
+	// IMAGES / TEXTURE
+	void loadImgToTex();
+
+
 };
 
 

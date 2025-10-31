@@ -169,6 +169,10 @@ void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::
 							shaderVar->push_back("4");
 							std::cout << "float4" << std::endl;
 						}
+						else if (word == "bool") {
+							shaderVar->push_back("5");
+							std::cout << "bool" << std::endl;
+						}
 						else {
 							std::cout << "invalid type" << std::endl;
 							uniName = false;
@@ -904,6 +908,15 @@ SceneObject ResourceHandler::loadObject(std::string filename, int scnType)
 	//ini.Reset();
 
 	return obj;
+}
+
+void ResourceHandler::loadImgToTex()
+{
+	for (int i = 0; i < images->size(); i++)
+	{
+		Ogre::TextureManager::getSingleton().load(images->at(i).filename().string().c_str(), "Images");
+	}
+
 }
 
 

@@ -619,6 +619,7 @@ void Gui::_objectTab()
 
 				if (ImGui::Button("GetFragShader")) {
 					guiComponent->getSelObjFrag();
+					resourceHandler->loadImgToTex();
 				}
 
 				if (ImGui::Checkbox("Cast Shadow", guiComponent->getSelectedObject()->shadowCasting)) {

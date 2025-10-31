@@ -283,6 +283,11 @@ public:
 		RSUS::GetInstance()->readMaterial(ResourceHandler::GetInstance()->OgreMaterials->at(this->rsusParam->selectedMaterial));
 		this->rsusParam->rsusObj = RSUS::GetInstance()->rsusObj;
 	}
+
+	void updateShader() {
+		RSUS::GetInstance()->readMaterial(this->rsusParam->rsusObj->materialName);
+	}
+
 	void updateFragRsusInt(std::string varName, int val) {
 		RSUS::GetInstance()->updateFragParameterInt(varName, val);
 	}

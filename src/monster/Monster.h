@@ -66,7 +66,8 @@ enum ShaderVarType
 	FLOAT0,
 	FLOAT2,
 	FLOAT3,
-	FLOAT4
+	FLOAT4,
+	BOOL
 };
 
 enum QueryMask
@@ -85,6 +86,8 @@ struct ShaderVar {
 	float varFloat2[2] = { 0.0,0.0 };
 	float varFloat3[3] = { 0.0, 0.0, 0.0 };
 	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };
+
+	bool varBool = false;
 
 };
 
@@ -122,8 +125,7 @@ public:
 
 	RSUShader* rsusObj = new RSUShader();
 
-	// Object name is provided to get or set Objects material as all obj share the same material
-	// but has different textures and parameters
+	
 	void readMaterial(Ogre::String matName , Ogre::String objectName = "");
 
 	
@@ -133,12 +135,14 @@ public:
 	void updateFragParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val);
 	void updateFragParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val);
 	void updateFragParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
+	void updateFragParameterBool(Ogre::String parameteName, bool val);
 
 	void updateVertParameterInt(Ogre::String parameterName, int val);
 	void updateVertParameterFloat(Ogre::String parameterName, float* val);
 	void updateVertParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val);
 	void updateVertParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val);
 	void updateVertParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
+	void updateVertParameterBool(Ogre::String parameterName, bool val);
 
 	// Class should not be clonable
 	RSUS(RSUS& copy) = delete;

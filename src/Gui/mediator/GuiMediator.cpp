@@ -203,6 +203,40 @@ void GuiComponent::saveRsusObj()
 	savedata->clear();
 
 
+	// saveing textures
+	// only object specific to PBR shader textures
+	if (this->rsusParam->Diffuse) {
+		ResourceHandler::GetInstance()->writeToFile(DIFFUSE_TEX_NAME,
+			ResourceHandler::GetInstance()->images->at(this->rsusParam->selectedTextureDiffuseImage).string(),
+			SECTION_TEXTURE,
+			filename
+		);
+	}
+
+	if (this->rsusParam->Normal) {
+		ResourceHandler::GetInstance()->writeToFile(NORMAL_TEX_NAME,
+			ResourceHandler::GetInstance()->images->at(this->rsusParam->selectedTextureNormalImage).string(),
+			SECTION_TEXTURE,
+			filename
+		);
+	}
+
+	if (this->rsusParam->Roughness) {
+		ResourceHandler::GetInstance()->writeToFile(ROUGH_TEX_NAME,
+			ResourceHandler::GetInstance()->images->at(this->rsusParam->selectedTextureRoughnessImage).string(),
+			SECTION_TEXTURE,
+			filename
+		);
+	}
+
+	if (this->rsusParam->Parallax) {
+		ResourceHandler::GetInstance()->writeToFile(PARALLAX_TEX_NAME,
+			ResourceHandler::GetInstance()->images->at(this->rsusParam->selectedTextureParallaxImage).string(),
+			SECTION_TEXTURE,
+			filename
+		);
+	}
+
 
 }
 

@@ -1203,7 +1203,7 @@ void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 	std::vector<std::string>* fragshaderVar = ResourceHandler::GetInstance()->fragShaderVariables;
 	//std::vector<std::string>* vertshaderVar = ResourceHandler::GetInstance()->vertShaderVariables;
 
-	// sets values from save file
+	//if save file exists
 	if (objectName.empty()) {
 		rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, fragProgramFileName, SECTION_FRAGMNET_SHADER);
 		//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
@@ -1225,6 +1225,9 @@ void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 	rsusObj->materialName = matName;
 	rsusObj->fragProgramPtr = fragParam;
 	rsusObj->vertProgramPtr = vertParam;
+
+	//Textures
+
 	
 
 	
@@ -1284,6 +1287,16 @@ void RSUS::updateFragParameterFloat4(Ogre::String parameterName, Ogre::Vector4 v
 	
 }
 
+void RSUS::updateFragParameterBool(Ogre::String parameterName, bool val)
+{
+	try {
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+	}
+	catch (...) {
+		std::cout << "Invalid Bool Input For : " << parameterName << " Value : " << val << std::endl;
+	}
+}
+
 void RSUS::updateVertParameterInt(Ogre::String parameterName, int val)
 {
 	try {
@@ -1331,6 +1344,16 @@ void RSUS::updateVertParameterFloat4(Ogre::String parameterName, Ogre::Vector4 v
 	}
 	catch (...) {
 		std::cout << "Invalid Float4 Input For : " << parameterName << " Value : " << val << std::endl;
+	}
+}
+
+void RSUS::updateVertParameterBool(Ogre::String parameterName, bool val)
+{
+	try {
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+	}
+	catch (...) {
+		std::cout << "Invalid Bool Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 }
 
@@ -1504,6 +1527,15 @@ ShaderVar RSUS::_putShaderValue(std::string valueStr)
 			var.varFloat4[floatPos] = std::stof(value);
 			var.varType = ShaderVarType::FLOAT4;
 		}
+		else if (valueStr.at(0) == '5') {
+			if (valueStr.at(1) == '0')
+			{
+				var.varBool = false;
+			}
+			else {
+				var.varBool = true;
+			}
+		}
 		else {
 			std::cout << "Unknown Type in Save file" << std::endl;
 		}
@@ -1604,6 +1636,9 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 									var.varFloat4[2],
 									var.varFloat4[3]
 								));
+							break;
+						case ShaderVarType::BOOL:
+							params.get()->setNamedConstant(vari,var.)
 							break;
 						default:
 							std::cout << "Invalid type found" << std::endl;
