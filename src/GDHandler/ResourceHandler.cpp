@@ -145,9 +145,9 @@ void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::
 						uniFound = false;
 						uniName = true;
 
-						if (word == "int") {
+						if (word == "int" || word == "bool") {
 							shaderVar->push_back("0");
-							std::cout << "int" << std::endl;
+							std::cout << word << std::endl;
 						}
 						else if (word == "float")
 						{
@@ -168,10 +168,6 @@ void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::
 						{
 							shaderVar->push_back("4");
 							std::cout << "float4" << std::endl;
-						}
-						else if (word == "bool") {
-							shaderVar->push_back("5");
-							std::cout << "bool" << std::endl;
 						}
 						else {
 							std::cout << "invalid type" << std::endl;

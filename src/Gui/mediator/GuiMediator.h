@@ -303,6 +303,9 @@ public:
 	void updateFragRsusFloat4(std::string varName, Ogre::Vector4 val) {
 		RSUS::GetInstance()->updateFragParameterFloat4(varName, val);
 	}
+	void updateFragRsusBool(std::string varName, bool val) {
+		RSUS::GetInstance()->updateFragParameterBool(varName, val);
+	}
 	void updateVertRsusInt(std::string varName, int val) {
 		RSUS::GetInstance()->updateVertParameterInt(varName, val);
 	}
@@ -317,6 +320,9 @@ public:
 	}
 	void updateVertRsusFloat4(std::string varName, Ogre::Vector4 val) {
 		RSUS::GetInstance()->updateVertParameterFloat4(varName, val);
+	}
+	void updateVertRsusBool(std::string varName, bool val) {
+		RSUS::GetInstance()->updateVertParameterBool(varName, val);
 	}
 	
 };

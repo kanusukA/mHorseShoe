@@ -1197,13 +1197,16 @@ void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 //std::cout << " Vert Program Name : " << vertProgramName << std::endl;
 //	std::cout << " Vert Program File Name : " << vertProgramFileName << std::endl;
 
-	// Read the shader file
+	// Reads the shader file
+	// Gets the filenames and paths and the shader variables are prepared
 	ResourceHandler::GetInstance()->readShaderFiles(mat);
 
+	// collects the read shader variables
 	std::vector<std::string>* fragshaderVar = ResourceHandler::GetInstance()->fragShaderVariables;
 	//std::vector<std::string>* vertshaderVar = ResourceHandler::GetInstance()->vertShaderVariables;
 
 	//if save file exists
+	//initializes the values of shader
 	if (objectName.empty()) {
 		rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, fragProgramFileName, SECTION_FRAGMNET_SHADER);
 		//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
@@ -1239,7 +1242,7 @@ void RSUS::updateFragParameterInt(Ogre::String parameterName, int val)
 		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
 	}
 	catch (...) {
-		std::cout << "Invalid Float Input For : " << parameterName << " Value : " << val << std::endl;
+		std::cout << "Invalid Int Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 }
 
@@ -1527,15 +1530,6 @@ ShaderVar RSUS::_putShaderValue(std::string valueStr)
 			var.varFloat4[floatPos] = std::stof(value);
 			var.varType = ShaderVarType::FLOAT4;
 		}
-		else if (valueStr.at(0) == '5') {
-			if (valueStr.at(1) == '0')
-			{
-				var.varBool = false;
-			}
-			else {
-				var.varBool = true;
-			}
-		}
 		else {
 			std::cout << "Unknown Type in Save file" << std::endl;
 		}
@@ -1564,7 +1558,7 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 	}
 
 	std::cout << "Graphics File : " << filename << " Found : " << hasSave << std::endl;
-	
+
 
 	//Validate output
 	// must be not null
@@ -1637,9 +1631,6 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 									var.varFloat4[3]
 								));
 							break;
-						case ShaderVarType::BOOL:
-							params.get()->setNamedConstant(vari,var.)
-							break;
 						default:
 							std::cout << "Invalid type found" << std::endl;
 							break;
@@ -1652,7 +1643,7 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 
 
 				}
-
+				// TODO ADD DEFAULT VALUE FROM THE SHADER FILE, IF THEY EXIST.
 				else {
 					try
 					{
@@ -1661,7 +1652,7 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 							//std::cout << "int" << std::endl;
 							params.get()->setNamedConstant(vari, 0);
 							var.varType = ShaderVarType::INTEGER;
-							var.varInt = new int(0);
+							*var.varInt = 0;
 						}
 						else if (vec->at(i) == "1")
 						{
@@ -1692,6 +1683,7 @@ std::vector<ShaderVar> RSUS::_initShaderValue(Ogre::GpuProgramParametersPtr para
 							var.varType = ShaderVarType::FLOAT4;
 
 						}
+						
 					}
 
 					catch (const std::exception& e)

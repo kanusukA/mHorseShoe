@@ -108,11 +108,15 @@ void Gui::_RSUSTab()
 		{
 
 			ShaderVarType type = shade->fragVariables.at(i).varType;
-
+			// Convert bool type to IntegerType
 			switch (type)
 			{
 			case INTEGER:
-				ImGui::InputInt(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varInt);
+				if (ImGui::InputInt(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varInt))
+				{
+					guiComponent->updateFragRsusInt(shade->fragVariables.at(i).varName, *shade->fragVariables.at(i).varInt);
+				}
+				
 				break;
 			case FLOAT0:
 				if (ImGui::SliderFloat(shade->fragVariables.at(i).varName.c_str(), shade->fragVariables.at(i).varFloat, -1.0f, 1.0f)) {
@@ -135,6 +139,7 @@ void Gui::_RSUSTab()
 					guiComponent->updateFragRsusFloat4(shade->fragVariables.at(i).varName, slid);
 				}
 				break;
+			
 			default:
 				ImGui::Text("Invalid Type : ");
 				ImGui::SameLine();

@@ -20,9 +20,6 @@
 #include <random>
 
 
-
-
-
 const Ogre::String TRAY_SYSTEM_NAME = "Default_Tray_Man";
 
 #define MAIN_CAMERA_NAME "main_camera_name"
@@ -67,7 +64,7 @@ enum ShaderVarType
 	FLOAT2,
 	FLOAT3,
 	FLOAT4,
-	BOOL
+	RBOOL
 };
 
 enum QueryMask
@@ -81,13 +78,13 @@ struct ShaderVar {
 	std::string varName;
 	ShaderVarType varType;
 
-	int* varInt;
+	int* varInt = new int(0);
 	float* varFloat = new float(0.0);
 	float varFloat2[2] = { 0.0,0.0 };
 	float varFloat3[3] = { 0.0, 0.0, 0.0 };
 	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };
 
-	bool varBool = false;
+	
 
 };
 
