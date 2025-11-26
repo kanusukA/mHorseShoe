@@ -38,11 +38,7 @@ void SceneTabComponent::refresh() {
 
 }
 
-void SceneTabComponent::saveCase() {
 
-
-
-}
 
 void SceneTabComponent::loadCase() {
 
