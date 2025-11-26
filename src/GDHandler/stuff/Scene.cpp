@@ -75,6 +75,11 @@ Ogre::Vector4 SceneHandler::objRotToVecRot(std::string orientation)
 	return vec;
 }
 
+void SceneHandler::_getCases()
+{
+	ResourceHandler::GetInstance()->getCases(&this->Cases);
+}
+
 // pos - the current position of scnNodes being traversed
 // scnNodes - output is stored
 void SceneHandler::_travSceneNode(Ogre::SceneNode* node,int pos ,std::vector<Ogre::SceneNode*>* scnNodes, int scnType)
@@ -118,7 +123,7 @@ void SceneHandler::_travSceneNode(Ogre::SceneNode* node,int pos ,std::vector<Ogr
 			);
 			obj.PhysXType = std::to_string(scnType);
 
-			ResourceHandler::GetInstance()->saveSceneObject(node->getName() + ".ini", obj, scnType);
+			ResourceHandler::GetInstance()->saveSceneObject(node->getName() + ".ini",caseName, obj, scnType);
 
 		}
 	}
@@ -126,7 +131,7 @@ void SceneHandler::_travSceneNode(Ogre::SceneNode* node,int pos ,std::vector<Ogr
 	{
 		for (int j = 0; j < nodes.size(); j++)
 		{
-			ResourceHandler::GetInstance()->saveScene(nodes.at(j)->getName(), node->getName() + ".ini",scnType);
+			ResourceHandler::GetInstance()->saveScene(nodes.at(j)->getName(),caseName, node->getName() + ".ini",scnType);
 			scnNodes->insert(scnNodes->begin() + pos + 1, oScnManager->getSceneNode(nodes.at(j)->getName()));
 		}
 	}
@@ -228,7 +233,7 @@ void SceneHandler::saveScene(std::string scnName)
 		for (int i = 0; i < DynamicScenes.size(); i++)
 		{
 
-			ResourceHandler::GetInstance()->saveScene(DynamicScenes.at(i)->getName(), DYNAMIC_NODES_FILE, 0);
+			ResourceHandler::GetInstance()->saveScene(DynamicScenes.at(i)->getName(),caseName, DYNAMIC_NODES_FILE, 0);
 			remainingScns->push_back(DynamicScenes.at(i));
 
 
@@ -243,7 +248,7 @@ void SceneHandler::saveScene(std::string scnName)
 		for (int i = 0; i < StaticScenes.size(); i++)
 		{
 
-			ResourceHandler::GetInstance()->saveScene(StaticScenes.at(i)->getName(), STATIC_NODES_FILE, 1);
+			ResourceHandler::GetInstance()->saveScene(StaticScenes.at(i)->getName(),caseName, STATIC_NODES_FILE, 1);
 			remainingScns->push_back(StaticScenes.at(i));
 
 			for (int j = 0; j < remainingScns->size(); j++)
@@ -260,7 +265,7 @@ void SceneHandler::saveScene(std::string scnName)
 		for (int i = 0; i < MeshScenes.size(); i++)
 		{
 
-			ResourceHandler::GetInstance()->saveScene(MeshScenes.at(i)->getName(), MESH_NODES_FILE, 2);
+			ResourceHandler::GetInstance()->saveScene(MeshScenes.at(i)->getName(),caseName, MESH_NODES_FILE, 2);
 			remainingScns->push_back(MeshScenes.at(i));
 
 

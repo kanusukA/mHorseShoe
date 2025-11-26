@@ -549,6 +549,22 @@ ResourceHandler* ResourceHandler::GetInstance() {
 
 }
 
+void ResourceHandler::getCases(std::vector<Ogre::String>* outputVec)
+{
+	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
+	{
+		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
+	}
+
+	for (const auto &entry : std::filesystem::directory_iterator(SourceDir.string() + "/Scenes"))
+	{
+		if (std::filesystem::is_directory(entry.status())) {
+			outputVec->push_back(entry.path().filename().string());
+		}
+	}
+
+}
+
 void ResourceHandler::readShaderFiles(Ogre::MaterialPtr mat)
 {
 	Ogre::String fragFileName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();
@@ -674,7 +690,7 @@ bool ResourceHandler::materialSaved(Ogre::String objectName, Ogre::String Materi
 	
 }
 
-void ResourceHandler::saveScene(std::string scnName, std::string Filename, int scnType)
+void ResourceHandler::saveScene(std::string scnName, std::string caseName, std::string Filename, int scnType)
 {
 
 	std::string masterLoc;
@@ -699,6 +715,11 @@ void ResourceHandler::saveScene(std::string scnName, std::string Filename, int s
 		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
 	}
 
+	if (!std::filesystem::exists(SourceDir.string() + "/Scenes/" + caseName))
+	{
+		std::filesystem::create_directory(SourceDir.string() + "/Scenes/" + caseName);
+	}
+
 	if (!std::filesystem::exists(SourceDir.string() + masterLoc))
 	{
 		std::filesystem::create_directory(SourceDir.string() + masterLoc);
@@ -718,7 +739,7 @@ void ResourceHandler::saveScene(std::string scnName, std::string Filename, int s
 
 }
 
-void ResourceHandler::saveSceneObject(std::string filename, SceneObject obj , int scnType)
+void ResourceHandler::saveSceneObject(std::string filename, std::string caseName, SceneObject obj , int scnType)
 {
 
 
@@ -743,6 +764,11 @@ void ResourceHandler::saveSceneObject(std::string filename, SceneObject obj , in
 	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
 	{
 		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
+	}
+
+	if (!std::filesystem::exists(SourceDir.string() + "/Scenes/" + caseName))
+	{
+		std::filesystem::create_directory(SourceDir.string() + "/Scenes/" + caseName);
 	}
 
 	if (!std::filesystem::exists(SourceDir.string() + masterLoc))

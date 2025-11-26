@@ -185,6 +185,11 @@ public:
 	// Only way to initalize the class
 	static ResourceHandler* GetInstance();
 
+	// SAVE/LOAD FUNCTIONS
+
+	// Gets saved Cases Name
+	void getCases(std::vector<Ogre::String> *outputVec);
+
 	void readShaderFiles(Ogre::MaterialPtr mat);
 
 	void writeToFile(std::string key, std::string value,std::string section, std::string filename);
@@ -198,8 +203,8 @@ public:
 	bool materialSaved(Ogre::String objectName, Ogre::String Material = "");
 
 
-	void saveScene(std::string scnName, std::string Filename, int scnType);
-	void saveSceneObject(std::string filename, SceneObject obj, int scnType);
+	void saveScene(std::string scnName, std::string caseName, std::string Filename, int scnType);
+	void saveSceneObject(std::string filename, std::string caseName, SceneObject obj, int scnType);
 	bool scnExists(std::string filename, int scnType);
 	bool objExists(std::string filename, int scnType);
 	void clearPrevSave();

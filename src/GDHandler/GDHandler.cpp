@@ -30,11 +30,15 @@ void GDHandler::initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* guiComp) {
 	// As Such it requires both monster and kint reference.
 	GDMediator* gdMediator = new GDMediator(stuffHandler);
 	guiComp->setMediator(gdMediator);
+	gdMediator->initGuiComponents(guiComp, InitEvents::SCENE_TAB_COMP_CASES);
 	std::cout << "setup mediator" << std::endl;
 	// setup objects
 	guiComp->setStuffObjects(stuffHandler->getStuffDynamicVec(), stuffHandler->getStuffMeshVec(), stuffHandler->getStuffStaticVec());
 	guiComp->setSelectableObject(stuffHandler->getSelectedObj());
 	std::cout << "setup objects" << std::endl;
+
+
+
 	this->guiComponent = guiComp;
 }
 

@@ -312,9 +312,12 @@ private:
 	std::vector<Ogre::SceneNode*> StaticScenes = std::vector<Ogre::SceneNode*>();
 	std::vector<Ogre::SceneNode*> DynamicScenes = std::vector<Ogre::SceneNode*>();
 	std::vector<Ogre::SceneNode*> MeshScenes = std::vector<Ogre::SceneNode*>();
+	std::vector<Ogre::String> Cases = std::vector<Ogre::String>();
 
 	Ogre::Vector3 objPosToVecPos(std::string pos);
 	Ogre::Vector4 objRotToVecRot(std::string orientation);
+
+	void _getCases();
 
 	void _travSceneNode(Ogre::SceneNode* node, int pos,std::vector<Ogre::SceneNode*>* sceNodes,int scnType);
 	void _loadSceneNodes(Ogre::SceneNode* parNode, std::string scnNode, int scnType);
@@ -335,10 +338,14 @@ protected:
 
 public:
 
+
+
 	std::vector<Ogre::SceneNode*>* getStaticScenes() { return &StaticScenes; }
 	std::vector<Ogre::SceneNode*>* getDynamicScenes() { return &DynamicScenes; }
 	std::vector<Ogre::SceneNode*>* getMeshScenes() { return &MeshScenes; }
+	std::vector<Ogre::String>* getCases() { return &Cases; }
 
+	std::string caseName = "Test case 1";
 
 	// Creates 3 Main Scene Nodes
 	void setStuffHandler(StuffHandler* stuff);

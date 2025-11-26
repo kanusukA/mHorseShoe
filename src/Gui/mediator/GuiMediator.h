@@ -6,6 +6,7 @@
 
 #include<Gui/GuiTabs.h>
 #include <base/Mediator.h>
+#include <Gui/mediator/mediatorEvents.h>
 
 #include <OgreImGuiOverlay.h>
 #include <GDHandler/stuff/Stuff.h>
@@ -145,6 +146,8 @@ struct SceneTab {
 class GuiComponent : public MediatorComponent {
 private:
 
+
+
 	Diegnostics* diegnos;
 
 	AddParam* addParam = new AddParam();
@@ -159,6 +162,12 @@ private:
 
 
 public:
+
+	// Better View functions object
+	SceneTabComponent scnComponent;
+
+
+	// Older approach
 
 	GuiObjectTab* objParam = new GuiObjectTab();
 	LightTab* lightTab = new LightTab();
@@ -325,6 +334,32 @@ public:
 		RSUS::GetInstance()->updateVertParameterBool(varName, val);
 	}
 	
+};
+
+
+
+class SceneTabComponent{
+
+private:
+	SceneTabComponent();
+	GuiComponent* guiComponent;
+
+public:
+
+	std::vector<Ogre::String>* CasesNames;
+
+	SceneTabComponent(GuiComponent* guicomp) {
+		guiComponent = guicomp;
+	};
+	
+	void View();
+
+	// Buttons
+	void refresh();
+	void saveCase();
+	void loadCase();
+	
+
 };
 
 #endif // !GUIMEDIATOR_H

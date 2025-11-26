@@ -66,6 +66,9 @@ public:
 		stuffHandler = stuff;
 	}
 
+	// Initalises GuiComponents and there values
+	void initGuiComponents(MediatorComponent* component,InitEvents events);
+
 	void Notify(MediatorComponent* component, std::string event) const override {
 		GuiComponent* guiComp = static_cast<GuiComponent*>(component);
 		if (event == GDEVENT_ADD_OBJECT) {
