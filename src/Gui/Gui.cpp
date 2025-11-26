@@ -73,7 +73,7 @@ void Gui::updateGui()
 
 		_terrainTab();
 
-		guiComponent->scnComponent.View();
+		guiComponent->scnComponent->view();
 
 	}
 

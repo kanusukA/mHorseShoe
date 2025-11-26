@@ -77,7 +77,9 @@ Ogre::Vector4 SceneHandler::objRotToVecRot(std::string orientation)
 
 void SceneHandler::_getCases()
 {
-	ResourceHandler::GetInstance()->getCases(&this->Cases);
+	
+	this->Cases->clear();
+	ResourceHandler::GetInstance()->getCases(this->Cases);
 }
 
 // pos - the current position of scnNodes being traversed

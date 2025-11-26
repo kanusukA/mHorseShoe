@@ -4,6 +4,23 @@
 #define MEDIATOR_H
 
 #include <string>
+
+// MAIN EVENT ENUM - CONTAINS ALL THE VIEW COMPONENETS
+enum InitEvents
+{
+	SCENE_TAB_COMP
+
+};
+
+// COMPONENETS ENUMS - CONTAINS ENUM SPECIFIC FUNCTIONS
+enum SceneTabComp
+{
+	REFRESH,
+	SAVE_CASE,
+	LOAD_CASE
+};
+
+
 // GUI -> GDHandler
 // GDMediator Events
 #define GDEVENT_ADD_OBJECT "gd_event_add_object"
@@ -24,6 +41,7 @@ class Mediator {
 
 public:
 	virtual void Notify(MediatorComponent* component, std::string event) const = 0;
+	virtual void NotifyView(InitEvents componentType, int compFuncEvent) const = 0;
 };
 
 class MediatorComponent {

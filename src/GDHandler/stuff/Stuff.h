@@ -312,7 +312,7 @@ private:
 	std::vector<Ogre::SceneNode*> StaticScenes = std::vector<Ogre::SceneNode*>();
 	std::vector<Ogre::SceneNode*> DynamicScenes = std::vector<Ogre::SceneNode*>();
 	std::vector<Ogre::SceneNode*> MeshScenes = std::vector<Ogre::SceneNode*>();
-	std::vector<Ogre::String> Cases = std::vector<Ogre::String>();
+	std::vector<Ogre::String>* Cases = new std::vector<Ogre::String>();
 
 	Ogre::Vector3 objPosToVecPos(std::string pos);
 	Ogre::Vector4 objRotToVecRot(std::string orientation);
@@ -343,7 +343,7 @@ public:
 	std::vector<Ogre::SceneNode*>* getStaticScenes() { return &StaticScenes; }
 	std::vector<Ogre::SceneNode*>* getDynamicScenes() { return &DynamicScenes; }
 	std::vector<Ogre::SceneNode*>* getMeshScenes() { return &MeshScenes; }
-	std::vector<Ogre::String>* getCases() { return &Cases; }
+	std::vector<Ogre::String>* getCases() { return Cases; }
 
 	std::string caseName = "Test case 1";
 
@@ -355,6 +355,10 @@ public:
 	void saveScene(std::string scnName);
 
 	void CreateScene(SceneType typ, std::string scnName);
+
+	void loadCases() {
+		_getCases();
+	}
 
 	// Class should not be clonable
 	SceneHandler(SceneHandler& copy) = delete;

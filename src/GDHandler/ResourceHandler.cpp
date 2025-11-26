@@ -551,6 +551,7 @@ ResourceHandler* ResourceHandler::GetInstance() {
 
 void ResourceHandler::getCases(std::vector<Ogre::String>* outputVec)
 {
+	std::cout << "getcases run" << std::endl;
 	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
 	{
 		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
@@ -560,6 +561,7 @@ void ResourceHandler::getCases(std::vector<Ogre::String>* outputVec)
 	{
 		if (std::filesystem::is_directory(entry.status())) {
 			outputVec->push_back(entry.path().filename().string());
+			std::cout << "Case file : " << entry.path().filename().string() << std::endl;
 		}
 	}
 

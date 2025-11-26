@@ -1,7 +1,7 @@
 #include <Gui/mediator/GuiMediator.h>
 
-void SceneTabComponent::View() {
-
+void SceneTabComponent::view()
+{
 	ImGui::Begin("Cases");
 
 	if (ImGui::Button("refresh")) {
@@ -14,7 +14,7 @@ void SceneTabComponent::View() {
 		SceneHandler::GetInstance()->saveScene("Example");
 	}
 	ImGui::Spacing();
-	
+
 	//NULL CHECK CASES
 	if (this->CasesNames)
 	{
@@ -28,9 +28,24 @@ void SceneTabComponent::View() {
 	}
 
 	ImGui::End();
-
 }
+
+// BUTTON FUNCTIONS
 
 void SceneTabComponent::refresh() {
 	
+	SceneHandler::GetInstance()->loadCases();
+
+}
+
+void SceneTabComponent::saveCase() {
+
+
+
+}
+
+void SceneTabComponent::loadCase() {
+
+
+
 }

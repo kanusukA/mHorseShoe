@@ -12,6 +12,39 @@
 #include <GDHandler/stuff/Stuff.h>
 
 
+class GuiComponent;
+
+class ViewComponent {
+protected:
+	GuiComponent* guiComponent;
+public:
+	
+	virtual void view() {};
+};
+
+
+class SceneTabComponent : public ViewComponent {
+
+private:
+	SceneTabComponent();
+
+public:
+
+	std::vector<Ogre::String>* CasesNames;
+
+	SceneTabComponent(GuiComponent* guicomp) {
+		this->guiComponent = guicomp;
+	};
+
+	void view() override;
+
+	// Buttons
+	void refresh();
+	void saveCase();
+	void loadCase();
+
+
+};
 
 struct GuiParam {
 	// VISUAL PARAM
@@ -164,7 +197,7 @@ private:
 public:
 
 	// Better View functions object
-	SceneTabComponent scnComponent;
+	SceneTabComponent* scnComponent = new SceneTabComponent(this);
 
 
 	// Older approach
@@ -334,32 +367,6 @@ public:
 		RSUS::GetInstance()->updateVertParameterBool(varName, val);
 	}
 	
-};
-
-
-
-class SceneTabComponent{
-
-private:
-	SceneTabComponent();
-	GuiComponent* guiComponent;
-
-public:
-
-	std::vector<Ogre::String>* CasesNames;
-
-	SceneTabComponent(GuiComponent* guicomp) {
-		guiComponent = guicomp;
-	};
-	
-	void View();
-
-	// Buttons
-	void refresh();
-	void saveCase();
-	void loadCase();
-	
-
 };
 
 #endif // !GUIMEDIATOR_H
