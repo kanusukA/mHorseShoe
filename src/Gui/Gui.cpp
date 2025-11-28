@@ -25,6 +25,8 @@ void Gui::initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* component) {
 	guiComponent->sceneTab->DynamicScenes = SceneHandler::GetInstance()->getDynamicScenes();
 	guiComponent->sceneTab->MeshScenes = SceneHandler::GetInstance()->getMeshScenes();
 
+	this->initGuiComponents();
+
 }
 
 
@@ -73,7 +75,7 @@ void Gui::updateGui()
 
 		_terrainTab();
 
-		guiComponent->scnComponent->view();
+		updateGuiComponents();
 
 	}
 
@@ -714,6 +716,22 @@ void Gui::GuiInput()
 	
 }
 
+// NEW FRAMEWORK
+void Gui::initGuiComponents()
+{
+	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab");
+
+	this->addViewComponent(scnTab);
+
+}
+
+void Gui::updateGuiComponents()
+{
+	for (int i = 0; i < Views.size(); i++)
+	{
+		Views.at(i)->view();
+	}
+}
 
 void Gui::setWindowGrabPoints(int WIDTH, int HEIGHT)
 {

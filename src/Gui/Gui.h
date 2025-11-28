@@ -5,7 +5,7 @@
 #define GUI_H
 
 #include <Gui/mediator/GuiMediator.h>
-#include <GDHandler/ResourceHandler.h>
+//#include <GDHandler/ResourceHandler.h>
 #include <feel/playerMovement.h>
 
 #include <imgui_stdlib.h>
@@ -29,9 +29,12 @@ struct GUI_WINDOW_POS {
 
 // Initalize from the Ogre::ApplicationContext -> initImGuiOverlay()
 // Add imGui input listner to context input listner.
-class Gui
+class Gui : public GuiFramework
 {
+
+
 private:
+
 
 	Ogre::ImGuiOverlay* imOverlay = nullptr;
 
@@ -61,12 +64,33 @@ private:
 		int* selectedIndex
 	);
 
+	void addViewComponent(ViewComponent* viewComponent) override {
+		viewComponent->setFramework(this);
+		Views.push_back(viewComponent);
+	}
+
+	void addModelComponent(ModelComponent* modelComponent) override {
+		modelComponent->setFramework(this);
+		modelComponent->setSource(this);
+		Models.push_back(modelComponent);
+	}
+
 public:
+
+	Gui(SceneHandler* scnhan, StuffHandler* stuffhan) : GuiFramework(scnhan, stuffhan) {}
 
 	void setPlayerObserver(PlayerObserver* pObserver);
 
 	// INIT
 	void initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* component);
+
+	// NEW FRAMEWORK
+	// Add ViewComponents / ModelComponents in this function
+	// Components not init here will not render and will not enter the GuiFramework
+	// View Component that require Model Component must have the specified Model Component initialized before the View Component.
+	void initGuiComponents();
+	void updateGuiComponents();
+
 	void setWindowGrabPoints(int WIDTH, int HEIGHT);
 	void updateGui(); // updates visibility of gui tabs
 	void shutdown();

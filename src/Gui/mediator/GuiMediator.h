@@ -5,46 +5,10 @@
 
 
 #include<Gui/GuiTabs.h>
-#include <base/Mediator.h>
-#include <Gui/mediator/mediatorEvents.h>
 
-#include <OgreImGuiOverlay.h>
-#include <GDHandler/stuff/Stuff.h>
+// COMPONENTS
+#include<Gui/GuiComponents/_SceneTabComponent.h>
 
-
-class GuiComponent;
-
-class ViewComponent {
-protected:
-	GuiComponent* guiComponent;
-public:
-	
-	virtual void view() {};
-};
-
-
-class SceneTabComponent : public ViewComponent {
-
-private:
-	SceneTabComponent();
-
-public:
-
-	std::vector<Ogre::String>* CasesNames;
-
-	SceneTabComponent(GuiComponent* guicomp) {
-		this->guiComponent = guicomp;
-	};
-
-	void view() override;
-
-	// Buttons
-	void refresh();
-	void saveCase();
-	void loadCase();
-
-
-};
 
 struct GuiParam {
 	// VISUAL PARAM
@@ -195,9 +159,6 @@ private:
 
 
 public:
-
-	// Better View functions object
-	SceneTabComponent* scnComponent = new SceneTabComponent(this);
 
 
 	// Older approach

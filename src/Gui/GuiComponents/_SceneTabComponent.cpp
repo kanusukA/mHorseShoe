@@ -1,4 +1,4 @@
-#include <Gui/mediator/GuiMediator.h>
+#include <Gui/GuiComponents/_SceneTabComponent.h>
 
 void SceneTabComponent::view()
 {
@@ -11,30 +11,22 @@ void SceneTabComponent::view()
 	if (ImGui::Button("Save Case"))
 	{
 		saveCase();
-		SceneHandler::GetInstance()->saveScene("Example");
 	}
 	ImGui::Spacing();
 
-	//NULL CHECK CASES
-	if (this->CasesNames)
-	{
-		for (int i = 0; i < CasesNames->size(); i++)
-		{
-			ImGui::Text(CasesNames->at(i).c_str());
-		}
-	}
-	else {
-		ImGui::Text("No Case Found!");
-	}
 
 	ImGui::End();
 }
+
+
+
+
 
 // BUTTON FUNCTIONS
 
 void SceneTabComponent::refresh() {
 	
-	SceneHandler::GetInstance()->loadCases();
+	
 
 }
 

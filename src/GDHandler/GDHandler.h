@@ -18,7 +18,7 @@ public:
 
 	Monster* monster;
 	GuiComponent* guiComponent;
-	Gui* gui = new Gui();
+	Gui* gui;
 
 	PlayerSubject* playerSubject = nullptr;
 

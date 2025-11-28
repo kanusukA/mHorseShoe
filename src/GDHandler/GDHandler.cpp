@@ -17,6 +17,8 @@ GDHandler::GDHandler(Monster* renderer, Kint* physics) {
 
 	SceneHandler::GetInstance()->setStuffHandler(stuffHandler);
 
+	gui = new Gui(SceneHandler::GetInstance(), this->stuffHandler);
+
 
 }
 
@@ -30,7 +32,6 @@ void GDHandler::initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* guiComp) {
 	// As Such it requires both monster and kint reference.
 	GDMediator* gdMediator = new GDMediator(stuffHandler);
 	guiComp->setMediator(gdMediator);
-	gdMediator->initGuiComponents(guiComp, InitEvents::SCENE_TAB_COMP);
 	std::cout << "setup mediator" << std::endl;
 	// setup objects
 	guiComp->setStuffObjects(stuffHandler->getStuffDynamicVec(), stuffHandler->getStuffMeshVec(), stuffHandler->getStuffStaticVec());
