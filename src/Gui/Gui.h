@@ -72,6 +72,7 @@ private:
 	void addModelComponent(ModelComponent* modelComponent) override {
 		modelComponent->setFramework(this);
 		modelComponent->setSource(this);
+		modelComponent->init();
 		Models.push_back(modelComponent);
 	}
 
@@ -119,7 +120,7 @@ public:
 	}
 
 	// EXTERNAL
-	void GuiInput(); // reads keyinputs for guitabs update
+	void GuiInput(); // reads keyInputs for guitabs update
 	void setDiagnosticStats(Diegnostics* die) { guiComponent->setDiegnostics(die); }
 
 

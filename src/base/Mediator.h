@@ -21,9 +21,10 @@ class GDSource {
 private:
 	GDSource() {};
 
+	
+protected:
 	SceneHandler* scnHandler = nullptr;
 	StuffHandler* stuffHandler = nullptr;
-	//Feel* feel = nullptr;
 
 public:
 	GDSource(SceneHandler* scnhan, StuffHandler* stuffhan) {
@@ -31,6 +32,15 @@ public:
 		this->stuffHandler = stuffhan;
 		//this->feel = feelhan;
 	};
+
+	SceneHandler* getSceneHandler() {
+		return scnHandler;
+	}
+
+	StuffHandler* getStuffHandler() {
+		return stuffHandler;
+	}
+
 };
 
 
@@ -97,6 +107,8 @@ protected:
 	GuiFramework* guiFramework;
 	GDSource* gdSource;
 
+	const char* name;
+
 public:
 
 	void setFramework(GuiFramework* framework) {
@@ -106,6 +118,9 @@ public:
 		gdSource = source;
 	}
 	
+	// USED TO INITALIZE PREDEFINED DATA AND VARIABLE OF THE COMPONENT
+	// USE THIS INSTED OF CONSTRUCTOR AS GDSOURCE IS INITALIZED AFTER THE OBJECT IS CREATED
+	virtual void init() {};
 
 };
 

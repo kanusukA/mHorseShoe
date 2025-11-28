@@ -4,13 +4,23 @@ void SceneTabComponent::view()
 {
 	ImGui::Begin("Cases");
 
+	if (scnTabModel->cases)
+	{
+		for (int i = 0; i < scnTabModel->cases->size(); i++)
+		{
+			ImGui::Text(scnTabModel->cases->at(i).c_str());
+		}
+	}
+
+	ImGui::Spacing();
+
 	if (ImGui::Button("refresh")) {
-		refresh();
+		scnTabModel->refresh();
 	}
 
 	if (ImGui::Button("Save Case"))
 	{
-		saveCase();
+		scnTabModel->saveCase();
 	}
 	ImGui::Spacing();
 
@@ -23,21 +33,15 @@ void SceneTabComponent::view()
 
 
 // BUTTON FUNCTIONS
+void SceneTabModelComponent::refresh() {
+	this->gdSource->getSceneHandler()->loadCases();
+}
 
-void SceneTabComponent::refresh() {
-	
-	
+void SceneTabModelComponent::saveCase() {
 
 }
 
-void SceneTabComponent::saveCase() {
-
-
-
-}
-
-void SceneTabComponent::loadCase() {
-
+void SceneTabModelComponent::loadCase() {
 
 
 }

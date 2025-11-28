@@ -719,7 +719,12 @@ void Gui::GuiInput()
 // NEW FRAMEWORK
 void Gui::initGuiComponents()
 {
-	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab");
+	// Models
+	SceneTabModelComponent* scnTabModel = new SceneTabModelComponent("Scene tab Model");
+	this->addModelComponent(scnTabModel);
+
+	// Views
+	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab",scnTabModel);
 
 	this->addViewComponent(scnTab);
 
