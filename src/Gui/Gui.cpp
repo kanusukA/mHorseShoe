@@ -53,7 +53,7 @@ void Gui::updateGui()
 			_addTab();
 		}
 		if (inputKeys->RESOURCE_TAB_KEY_T) {
-			_resourceTab();
+			//_resourceTab();
 		}
 		if (inputKeys->LIGHT_TAB_KEY_T) {
 			_lightTab();
@@ -723,10 +723,15 @@ void Gui::initGuiComponents()
 	SceneTabModelComponent* scnTabModel = new SceneTabModelComponent("Scene tab Model");
 	this->addModelComponent(scnTabModel);
 
+	ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent("Resource Tab Model");
+	this->addModelComponent(resourceTabModel);
+
 	// Views
 	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab",scnTabModel);
-
 	this->addViewComponent(scnTab);
+
+	ResourceTabComponent* resourceTab = new ResourceTabComponent("Resource Tab", resourceTabModel);
+	this->addViewComponent(resourceTab);
 
 }
 

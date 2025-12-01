@@ -10,6 +10,9 @@
 
 #include <imgui_stdlib.h>
 
+// Components
+
+
 
 struct GUI_WINDOW_POS {
 	ImVec2 TOP_LEFT;
@@ -78,7 +81,8 @@ private:
 
 public:
 
-	Gui(SceneHandler* scnhan, StuffHandler* stuffhan) : GuiFramework(scnhan, stuffhan) {}
+	Gui(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan) : 
+		GuiFramework(scnhan, stuffhan,resourcehan) {}
 
 	void setPlayerObserver(PlayerObserver* pObserver);
 

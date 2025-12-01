@@ -6,6 +6,8 @@
 #include <string>
 #include <GDHandler/stuff/Stuff.h>
 
+// CODE CLEAN UP SHIFT TO NEW GUI FRAMEWORK!!
+
 // GuiFRAMEWORK IMPLEMENTATION
 // HERE ARE THE CLASS USED TO CREATE VIEW AND MODEL COMPONENTS FOR THE GUI
 
@@ -25,11 +27,13 @@ private:
 protected:
 	SceneHandler* scnHandler = nullptr;
 	StuffHandler* stuffHandler = nullptr;
+	ResourceHandler* resourceHandler = nullptr;
 
 public:
-	GDSource(SceneHandler* scnhan, StuffHandler* stuffhan) {
+	GDSource(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourceHan) {
 		this->scnHandler = scnhan;
 		this->stuffHandler = stuffhan;
+		this->resourceHandler = resourceHan;
 		//this->feel = feelhan;
 	};
 
@@ -39,6 +43,10 @@ public:
 
 	StuffHandler* getStuffHandler() {
 		return stuffHandler;
+	}
+
+	ResourceHandler* getResourceHandler() {
+		return resourceHandler;
 	}
 
 };
@@ -60,7 +68,8 @@ protected:
 
 public:
 
-	GuiFramework(SceneHandler* scnhan, StuffHandler* stuffhan) : GDSource(scnhan, stuffhan) {}
+	GuiFramework(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan) : 
+		GDSource(scnhan, stuffhan,resourcehan) {}
 
 	// RUNS AT INIT, USED DURING THE CREATION OF VIEW COMPONENTS
 	// MUST NOT BE RUN FROM OUTSIDE
@@ -79,6 +88,9 @@ public:
 // name/id are used to access the derived class from the main Gui class
 // use the view function to write renderable ImGui Functions
 class ViewComponent {
+private:
+	ViewComponent();
+
 protected:
 
 	GuiFramework* guiFramework;
@@ -89,6 +101,10 @@ protected:
 	// Set type
 
 public:
+
+	ViewComponent(const char* name_p) {
+		name = name_p;
+	}
 
 	// FRAMEWORK METHOD! NOT TO BE USED OUTSIDE
 	void setFramework(GuiFramework* framework) {
@@ -103,6 +119,9 @@ public:
 // A single ViewComponent may have multiple ModelComponents and ModelComponents can be shared among ViewComponents to provide
 // data consistancy.
 class ModelComponent {
+private:
+	ModelComponent();
+
 protected:
 	GuiFramework* guiFramework;
 	GDSource* gdSource;
@@ -110,6 +129,10 @@ protected:
 	const char* name;
 
 public:
+
+	ModelComponent(const char* name_p) {
+		name = name_p;
+	}
 
 	void setFramework(GuiFramework* framework) {
 		guiFramework = framework;

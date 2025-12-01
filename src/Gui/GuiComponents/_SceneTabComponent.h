@@ -2,6 +2,7 @@
 #include <OgreImGuiOverlay.h>
 
 class SceneTabModelComponent : public ModelComponent {
+
 private:
 	SceneTabModelComponent();
 
@@ -9,14 +10,14 @@ public:
 	
 	std::vector<std::string>* cases = nullptr;
 
-	SceneTabModelComponent(const char* name_p) : ModelComponent() {
-		this->name = name_p;
+	SceneTabModelComponent(const char* name_p) : ModelComponent(name_p) {
 		
 	}
 
 	void init() override {
 		cases = this->gdSource->getSceneHandler()->getCases();
 	}
+
 
 
 	// Button functions
@@ -38,8 +39,7 @@ public:
 
 	SceneTabComponent(const char* name_p,
 		SceneTabModelComponent* sceneTabComponent
-		) : ViewComponent(){
-		this->name = name_p;
+		) : ViewComponent(name_p){
 		scnTabModel = sceneTabComponent;
 	};
 

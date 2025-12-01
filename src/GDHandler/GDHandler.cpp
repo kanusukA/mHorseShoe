@@ -17,7 +17,7 @@ GDHandler::GDHandler(Monster* renderer, Kint* physics) {
 
 	SceneHandler::GetInstance()->setStuffHandler(stuffHandler);
 
-	gui = new Gui(SceneHandler::GetInstance(), this->stuffHandler);
+	gui = new Gui(SceneHandler::GetInstance(), this->stuffHandler,ResourceHandler::GetInstance());
 
 
 }

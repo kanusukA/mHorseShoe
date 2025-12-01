@@ -8,7 +8,7 @@
 
 // COMPONENTS
 #include<Gui/GuiComponents/_SceneTabComponent.h>
-
+#include<Gui/GuiComponents/ReourceTabComponent.h>
 
 struct GuiParam {
 	// VISUAL PARAM
@@ -239,11 +239,11 @@ public:
 	}
 
 	void setUpMainDirectionalLight() {
-		return this->_mediator->Notify(this, GDEVENT_ADD_MDRL);
+		//return this->_mediator->Notify(this, GDEVENT_ADD_MDRL);
 	}
 
 	void setUpLight() {
-		return this->_mediator->Notify(this, GDEVENT_ADD_LIGHT);
+		//return this->_mediator->Notify(this, GDEVENT_ADD_LIGHT);
 	}
 
 	// Gui Param functions
@@ -262,7 +262,7 @@ public:
 
 	// Terrain
 	void createTerrain() {
-		this->_mediator->Notify(this, GDEVENT_GENERATE_TERRAIN);
+		//this->_mediator->Notify(this, GDEVENT_GENERATE_TERRAIN);
 	}
 
 
@@ -276,7 +276,7 @@ public:
 	void setTextures();
 
 	void getSelObjFrag() {
-		this->_mediator->Notify(this, GDEVENT_GETSELECTEDOBJFRAGMENT);
+		//this->_mediator->Notify(this, GDEVENT_GETSELECTEDOBJFRAGMENT);
 		
 		this->rsusParam->rsusObj = RSUS::GetInstance()->rsusObj;
 		
