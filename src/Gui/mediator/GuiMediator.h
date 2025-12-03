@@ -9,6 +9,8 @@
 // COMPONENTS
 #include<Gui/GuiComponents/_SceneTabComponent.h>
 #include<Gui/GuiComponents/ReourceTabComponent.h>
+#include<Gui/GuiComponents/StatusTabComponent.h>
+#include<Gui/GuiComponents/AddTabComponent.h>
 
 struct GuiParam {
 	// VISUAL PARAM

@@ -181,7 +181,7 @@ void SceneHandler::_loadObject(SceneObject obj,std::string scnNode)
 		obj.RenderMesh,
 		obj.ColliderMesh,
 		objPosToVecPos(obj.position),
-		Ogre::Vector3(),//TODO FIX QUATERNION ROTATION SYSTEM
+		Ogre::Quaternion(),//TODO FIX QUATERNION ROTATION SYSTEM
 		StuffType(std::stoi(obj.PhysXType)),
 		1,
 		Ogre::Vector3()

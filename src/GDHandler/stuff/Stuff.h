@@ -3,6 +3,7 @@
 #ifndef STUFF_H
 #define STUFF_H
 
+
 #include <monster/Monster.h>
 #include <kint/Kint.h>
 
@@ -44,6 +45,7 @@ public:
 
 	virtual void setPosition(Ogre::Vector3 position) {};
 	virtual void setRotation(Ogre::Vector3 rotation) {};
+	virtual void setOrientation(Ogre::Quaternion quaternion) {};
 
 	virtual void moveStuffBy(Ogre::Vector3 addPosition); // adds vector to the current position of the stuff
 
@@ -72,6 +74,7 @@ public:
 
 	void setRotation(Ogre::Vector3 rot) override;
 	void setPosition(Ogre::Vector3 pos) override;
+	void setOrientation(Ogre::Quaternion quaternion) override;
 
 	void moveStuffBy(Ogre::Vector3 addPos) override;
 
@@ -104,6 +107,7 @@ public:
 
 	void setRotation(Ogre::Vector3 rot) override;
 	void setPosition(Ogre::Vector3 pos) override;
+	void setOrientation(Ogre::Quaternion quaternion) override;
 
 	void moveStuffBy(Ogre::Vector3 addPos) override; // move object from arrow keys!!!
 
@@ -127,6 +131,7 @@ public:
 
 	void setRotation(Ogre::Vector3 rot) override;
 	void setPosition(Ogre::Vector3 pos) override; 
+	void setOrientation(Ogre::Quaternion quaternion) override;
 
 	void moveStuffBy(Ogre::Vector3 addPos) override;
 
@@ -147,7 +152,7 @@ struct LastObject
 	std::string meshName;
 	std::string colliderName;
 	Ogre::Vector3 position;
-	Ogre::Vector3 rotation;
+	Ogre::Quaternion rotation;
 	StuffType physicsType;
 	float mass;
 	Ogre::Vector3 colliderSize;
@@ -195,7 +200,7 @@ private:
 		std::string objName, 
 		std::string meshName, 
 		Ogre::Vector3 position, 
-		Ogre::Vector3 rotation,
+		Ogre::Quaternion rotation,
 		bool castShadows
 	);
 	void _addObjectDynamic(
@@ -204,7 +209,7 @@ private:
 		std::string meshName,
 		std::string colliderName,
 		Ogre::Vector3 position,
-		Ogre::Vector3 rotation,
+		Ogre::Quaternion rotation,
 		StuffType physicsType,
 		float mass,
 		Ogre::Vector3 colliderSize
@@ -215,7 +220,7 @@ private:
 		std::string meshName,
 		std::string colliderName,
 		Ogre::Vector3 position,
-		Ogre::Vector3 rotation,
+		Ogre::Quaternion rotation,
 		StuffType physicsType,
 		Ogre::Vector3 colliderSize
 	);
@@ -240,7 +245,7 @@ public:
 		std::string meshName,
 		std::string colliderName,
 		Ogre::Vector3 position,
-		Ogre::Vector3 rotation,
+		Ogre::Quaternion rotation,
 		StuffType physicsType,
 		float mass,
 		Ogre::Vector3 colliderSize,

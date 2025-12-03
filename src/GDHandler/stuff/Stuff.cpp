@@ -84,6 +84,13 @@ void StuffStatic::setPosition(Ogre::Vector3 pos)
 	this->scnNode->setPosition(pos);
 }
 
+void StuffStatic::setOrientation(Ogre::Quaternion quaternion)
+{
+	this->scnNode->setOrientation(quaternion);
+	this->sActor->setGlobalPose(PxTransform(mtkOrientation(this->scnNode->getOrientation())));
+	
+}
+
 void StuffStatic::moveStuffBy(Ogre::Vector3 addPos)
 {
 	this->setPosition(this->scnNode->getPosition() + addPos);
@@ -113,6 +120,13 @@ void StuffDynamic::setPosition(Ogre::Vector3 pos)
 	this->update(0.1f);
 }
 
+void StuffDynamic::setOrientation(Ogre::Quaternion quaternion)
+{
+	this->sActor->setGlobalPose(PxTransform(this->sActor->getGlobalPose().p, mtkOrientation(quaternion)));
+	this->update(0.1f);
+
+}
+
 void StuffDynamic::moveStuffBy(Ogre::Vector3 addPos)
 {
 	this->setPosition(this->scnNode->getPosition() + addPos);
@@ -126,6 +140,11 @@ void StuffMesh::setRotation(Ogre::Vector3 rot)
 void StuffMesh::setPosition(Ogre::Vector3 pos)
 {
 	this->scnNode->setPosition(pos);
+}
+
+void StuffMesh::setOrientation(Ogre::Quaternion quaternion)
+{
+	this->scnNode->setOrientation(quaternion);
 }
 
 void StuffMesh::moveStuffBy(Ogre::Vector3 addPos)
@@ -155,7 +174,7 @@ void StuffHandler::updateVisualDebug()
 }
 
 // Add StuffMesh Object
-void StuffHandler::_addObject(std::string scnNodeName, std::string objName, std::string meshName, Ogre::Vector3 position, Ogre::Vector3 rotation, bool castShadows)
+void StuffHandler::_addObject(std::string scnNodeName, std::string objName, std::string meshName, Ogre::Vector3 position, Ogre::Quaternion rotation, bool castShadows)
 {
 
 	// Doesn't have physx as its mesh only
@@ -171,7 +190,7 @@ void StuffHandler::_addObject(std::string scnNodeName, std::string objName, std:
 	stuffMesh->showRenderer(true);
 
 	stuffMesh->setPosition(position);
-	stuffMesh->setRotation(rotation);
+	stuffMesh->setOrientation(rotation);
 
 	stuffMesh->setName(objName);
 
@@ -181,7 +200,7 @@ void StuffHandler::_addObject(std::string scnNodeName, std::string objName, std:
 
 }
 
-void StuffHandler::_addObjectDynamic(std::string scnNodeName,std::string objName, std::string meshName, std::string colliderName, Ogre::Vector3 position, Ogre::Vector3 rotation, StuffType physicsType, float mass, Ogre::Vector3 colliderSize)
+void StuffHandler::_addObjectDynamic(std::string scnNodeName,std::string objName, std::string meshName, std::string colliderName, Ogre::Vector3 position, Ogre::Quaternion rotation, StuffType physicsType, float mass, Ogre::Vector3 colliderSize)
 {
 
 	// Create StuffDynamic
@@ -227,7 +246,7 @@ void StuffHandler::_addObjectDynamic(std::string scnNodeName,std::string objName
 	stuffDynamic->setPxRigidDynamic(dynamic);
 
 	stuffDynamic->setPosition(position);
-	stuffDynamic->setRotation(rotation);
+	stuffDynamic->setOrientation(rotation);
 
 	stuffDynamic->setName(objName);
 
@@ -238,7 +257,7 @@ void StuffHandler::_addObjectDynamic(std::string scnNodeName,std::string objName
 
 }
 
-void StuffHandler::_addObjectStatic(std::string scnNodeName, std::string objName, std::string meshName, std::string colliderName, Ogre::Vector3 position, Ogre::Vector3 rotation, StuffType physicsType, Ogre::Vector3 colliderSize)
+void StuffHandler::_addObjectStatic(std::string scnNodeName, std::string objName, std::string meshName, std::string colliderName, Ogre::Vector3 position, Ogre::Quaternion rotation, StuffType physicsType, Ogre::Vector3 colliderSize)
 {
 
 	StuffStatic* stuffStatic = new StuffStatic();
@@ -278,7 +297,7 @@ void StuffHandler::_addObjectStatic(std::string scnNodeName, std::string objName
 	stuffStatic->setSceneNode(monsterNode);
 
 	stuffStatic->setPosition(position);
-	stuffStatic->setRotation(rotation);
+	stuffStatic->setOrientation(rotation);
 
 	stuffStatic->setName(objName);
 
@@ -336,7 +355,7 @@ void StuffHandler::addObject(
 	std::string meshName, 
 	std::string colliderName,
 	Ogre::Vector3 position, 
-	Ogre::Vector3 rotation, 
+	Ogre::Quaternion rotation,
 	StuffType physicsType, 
 	float mass, 
 	Ogre::Vector3 colliderSize,

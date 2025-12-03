@@ -29,12 +29,15 @@ void Gui::initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* component) {
 
 }
 
-
+/*
 void Gui::setPlayerObserver(PlayerObserver* pObserver)
 {
-	this->playerObserver = pObserver;
-}
+	// NEW FRAMEWORK
+	this->setPlayerObserver(pObserver);
 
+	//this->playerObserver = pObserver;
+}
+*/
 
 void Gui::updateGui()
 {
@@ -47,10 +50,10 @@ void Gui::updateGui()
 
 	if(inputKeys->ALL_TAB_KEY_T){
 		if (inputKeys->STATUS_TAB_KEY_T) {
-			_statusTab();
+			//_statusTab();
 		}
 		if (inputKeys->ADD_OBJECT_KEY_T) {
-			_addTab();
+			//_addTab();
 		}
 		if (inputKeys->RESOURCE_TAB_KEY_T) {
 			//_resourceTab();
@@ -726,12 +729,24 @@ void Gui::initGuiComponents()
 	ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent("Resource Tab Model");
 	this->addModelComponent(resourceTabModel);
 
+	StatusTabModelComponent* statusModel = new StatusTabModelComponent("Status tab Model");
+	this->addModelComponent(statusModel);
+
+	AddTabModelComponent* addModel = new AddTabModelComponent("Add tab Model");
+	this->addModelComponent(addModel);
+
 	// Views
 	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab",scnTabModel);
 	this->addViewComponent(scnTab);
 
 	ResourceTabComponent* resourceTab = new ResourceTabComponent("Resource Tab", resourceTabModel);
 	this->addViewComponent(resourceTab);
+
+	StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
+	this->addViewComponent(statusTab);
+
+	AddTabComponent* addTab = new AddTabComponent("Add Tab", addModel);
+	this->addViewComponent(addTab);
 
 }
 

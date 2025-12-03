@@ -19,6 +19,13 @@ GDHandler::GDHandler(Monster* renderer, Kint* physics) {
 
 	gui = new Gui(SceneHandler::GetInstance(), this->stuffHandler,ResourceHandler::GetInstance());
 
+	if (this->playerSubject == nullptr) {
+		this->playerSubject = new PlayerSubject(monster->getPlayerSceneNode(), monster->getCamera());
+	}
+
+	PlayerObserver* playerObserver = new PlayerObserver(this->playerSubject);
+	// Show Gui Player info
+	gui->setPlayerObserver(playerObserver);
 
 }
 
@@ -88,14 +95,14 @@ void GDHandler::preSetup()
 
 void GDHandler::addPlayerNode()
 {
-	if (this->playerSubject == nullptr) {
+	/*if (this->playerSubject == nullptr) {
 		this->playerSubject = new PlayerSubject(monster->getPlayerSceneNode(),monster->getCamera());
 	}
 	
 	PlayerObserver* playerObserver = new PlayerObserver(this->playerSubject);
 	// Show Gui Player info
 	gui->setPlayerObserver(playerObserver);
-
+	*/
 
 	
 }
@@ -225,7 +232,8 @@ void GDMediator::_addObject(GuiComponent* component) const
 		component->getRotation()[2]
 	);
 
-	stuffHandler->addObject(
+	// DEPRICATED BY NEW GUIFRAMEWORK
+	/*stuffHandler->addObject(
 		component->sceneTab->selectedScenes->at(component->sceneTab->selectedScenePos)->getName(),
 		*component->getObjectName(),
 		*component->getRenderMeshName(),
@@ -235,7 +243,7 @@ void GDMediator::_addObject(GuiComponent* component) const
 		component->getPhysicsType(),
 		*component->getMass(),
 		collider
-	);
+	);*/
 
 }
 

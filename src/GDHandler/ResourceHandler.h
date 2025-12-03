@@ -138,6 +138,7 @@ private:
 protected:
 	ResourceHandler() {
 		this->SourceDir = getSourceDir();
+		this->colliderMeshes->push_back("box");
 	};
 	~ResourceHandler() {};
 

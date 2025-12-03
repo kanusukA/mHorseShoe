@@ -5,6 +5,8 @@
 
 #include <string>
 #include <GDHandler/stuff/Stuff.h>
+#include <feel/playerMovement.h>
+
 
 // CODE CLEAN UP SHIFT TO NEW GUI FRAMEWORK!!
 
@@ -29,6 +31,8 @@ protected:
 	StuffHandler* stuffHandler = nullptr;
 	ResourceHandler* resourceHandler = nullptr;
 
+	PlayerObserver* playerObserver = nullptr;
+
 public:
 	GDSource(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourceHan) {
 		this->scnHandler = scnhan;
@@ -36,6 +40,10 @@ public:
 		this->resourceHandler = resourceHan;
 		//this->feel = feelhan;
 	};
+
+	void setPlayerObserver(PlayerObserver* playerOb) {
+		playerObserver = playerOb;
+	}
 
 	SceneHandler* getSceneHandler() {
 		return scnHandler;
@@ -47,6 +55,10 @@ public:
 
 	ResourceHandler* getResourceHandler() {
 		return resourceHandler;
+	}
+
+	PlayerObserver* getPlayerObserver() {
+		return playerObserver;
 	}
 
 };

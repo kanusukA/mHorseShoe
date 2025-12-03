@@ -56,7 +56,7 @@ int main() {
 	std::cout << "GDHandler setup!" << std::endl;
 	gdhandler.initGui(imOverlay, guiComponent); // initaliz Gui Seperately from monster as it conflicts with Stuff
 	std::cout << "Gui Initialized !" << std::endl;
-	gdhandler.addPlayerNode();
+	//gdhandler.addPlayerNode(); // NEW FRAME WORK FOR GUI. THE FUNCTION IS NO LONGER REQUIRED
 	std::cout << "Player initialized!" << std::endl;
 	
 

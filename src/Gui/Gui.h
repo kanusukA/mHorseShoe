@@ -6,9 +6,9 @@
 
 #include <Gui/mediator/GuiMediator.h>
 //#include <GDHandler/ResourceHandler.h>
-#include <feel/playerMovement.h>
 
-#include <imgui_stdlib.h>
+
+
 
 // Components
 
@@ -84,7 +84,7 @@ public:
 	Gui(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan) : 
 		GuiFramework(scnhan, stuffhan,resourcehan) {}
 
-	void setPlayerObserver(PlayerObserver* pObserver);
+	//void setPlayerObserver(PlayerObserver* pObserver);
 
 	// INIT
 	void initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* component);
