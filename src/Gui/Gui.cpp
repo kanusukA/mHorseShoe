@@ -59,24 +59,24 @@ void Gui::updateGui()
 			//_resourceTab();
 		}
 		if (inputKeys->LIGHT_TAB_KEY_T) {
-			_lightTab();
+			//_lightTab();
 		}
 
-		_RSUSTab();
+		//_RSUSTab();
 
-		_diegnos();
+		//_diegnos();
 
-		_objectTab();
+		//_objectTab();
 
-		_HUD();
+		//_HUD();
 
-		_debugTab();
+		//_debugTab();
 
-		_objectsPanel();
+		//_objectsPanel();
 
-		_heightMapTab();
+		//_heightMapTab();
 
-		_terrainTab();
+		//_terrainTab();
 
 		updateGuiComponents();
 
@@ -735,6 +735,15 @@ void Gui::initGuiComponents()
 	AddTabModelComponent* addModel = new AddTabModelComponent("Add tab Model");
 	this->addModelComponent(addModel);
 
+	ObjectTabModelComponent* objectModel = new ObjectTabModelComponent("Object tab Model");
+	this->addModelComponent(objectModel);
+
+	ScenePanelTabModelComponent* scenePanelModel = new ScenePanelTabModelComponent("Scene Panel tab Model");
+	this->addModelComponent(scenePanelModel);
+
+	RSUSTabModelComponent* rsusModel = new RSUSTabModelComponent("Rsus tab Model");
+	this->addModelComponent(rsusModel);
+
 	// Views
 	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab",scnTabModel);
 	this->addViewComponent(scnTab);
@@ -747,6 +756,15 @@ void Gui::initGuiComponents()
 
 	AddTabComponent* addTab = new AddTabComponent("Add Tab", addModel);
 	this->addViewComponent(addTab);
+
+	ObjectTabComponent* objectTab = new ObjectTabComponent("Object Tab", objectModel);
+	this->addViewComponent(objectTab);
+
+	ScenePanelTabComponent* scenePanelTab = new ScenePanelTabComponent("Scene Panel Tab", scenePanelModel);
+	this->addViewComponent(scenePanelTab);
+
+	RSUSTabComponent* rsusTab = new RSUSTabComponent("RSUS tab", rsusModel);
+	this->addViewComponent(rsusTab);
 
 }
 

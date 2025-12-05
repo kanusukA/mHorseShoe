@@ -81,8 +81,8 @@ private:
 
 public:
 
-	Gui(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan) : 
-		GuiFramework(scnhan, stuffhan,resourcehan) {}
+	Gui(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan,RSUS* rsus) : 
+		GuiFramework(scnhan, stuffhan,resourcehan, rsus) {}
 
 	//void setPlayerObserver(PlayerObserver* pObserver);
 

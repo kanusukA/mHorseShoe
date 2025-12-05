@@ -30,15 +30,19 @@ protected:
 	SceneHandler* scnHandler = nullptr;
 	StuffHandler* stuffHandler = nullptr;
 	ResourceHandler* resourceHandler = nullptr;
+	RSUS* shaderHandler = nullptr;
 
 	PlayerObserver* playerObserver = nullptr;
 
 public:
-	GDSource(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourceHan) {
+	GDSource(SceneHandler* scnhan, StuffHandler* stuffhan, 
+		ResourceHandler* resourceHan,
+		RSUS* rsus) {
 		this->scnHandler = scnhan;
 		this->stuffHandler = stuffhan;
 		this->resourceHandler = resourceHan;
 		//this->feel = feelhan;
+		this->shaderHandler = rsus;
 	};
 
 	void setPlayerObserver(PlayerObserver* playerOb) {
@@ -61,6 +65,10 @@ public:
 		return playerObserver;
 	}
 
+	RSUS* getShaderHandler() {
+		return shaderHandler;
+	}
+
 };
 
 
@@ -80,8 +88,8 @@ protected:
 
 public:
 
-	GuiFramework(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan) : 
-		GDSource(scnhan, stuffhan,resourcehan) {}
+	GuiFramework(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
+		GDSource(scnhan, stuffhan,resourcehan,rsus) {}
 
 	// RUNS AT INIT, USED DURING THE CREATION OF VIEW COMPONENTS
 	// MUST NOT BE RUN FROM OUTSIDE

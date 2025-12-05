@@ -17,7 +17,7 @@ GDHandler::GDHandler(Monster* renderer, Kint* physics) {
 
 	SceneHandler::GetInstance()->setStuffHandler(stuffHandler);
 
-	gui = new Gui(SceneHandler::GetInstance(), this->stuffHandler,ResourceHandler::GetInstance());
+	gui = new Gui(SceneHandler::GetInstance(), this->stuffHandler,ResourceHandler::GetInstance(),RSUS::GetInstance());
 
 	if (this->playerSubject == nullptr) {
 		this->playerSubject = new PlayerSubject(monster->getPlayerSceneNode(), monster->getCamera());
