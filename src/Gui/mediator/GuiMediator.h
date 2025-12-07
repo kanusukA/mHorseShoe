@@ -14,6 +14,7 @@
 #include<Gui/GuiComponents/ObjectTabComponent.h>
 #include<Gui/GuiComponents/ScenePanel.h>
 #include<Gui/GuiComponents/RSUSTabComponent.h>
+#include<Gui/GuiComponents/HUD.cpp>
 
 struct GuiParam {
 	// VISUAL PARAM

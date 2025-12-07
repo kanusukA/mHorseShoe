@@ -21,6 +21,8 @@ public:
 
 	void getFragShader() {
 		// INTIGRATE AFTER SETTING RSUS
+		
+		this->gdSource->getResourceHandler()->loadImgToTex();
 	}
 
 	void deleteObject() {

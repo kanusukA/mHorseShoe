@@ -766,6 +766,9 @@ void Gui::initGuiComponents()
 	RSUSTabComponent* rsusTab = new RSUSTabComponent("RSUS tab", rsusModel);
 	this->addViewComponent(rsusTab);
 
+	HUDComponent* hudTab = new HUDComponent("Hud tab");
+	this->addViewComponent(hudTab);
+
 }
 
 void Gui::updateGuiComponents()

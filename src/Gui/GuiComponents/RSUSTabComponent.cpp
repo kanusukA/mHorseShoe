@@ -9,13 +9,13 @@ void textureViewComponent(
 	RSUSTabModelComponent* model
 ) {
 	Ogre::String texturename = name + "Tex";
+
 	if (textureState) {
+
 		ImGui::Text(name.c_str());
 		if (model->images->size() > 0) {
-			if (ImGui::BeginCombo(texturename.c_str(),
-				model->images->at(*selectedIndex).filename().string().c_str())) {
 
-
+			if (ImGui::BeginCombo(texturename.c_str(), model->images->at(*selectedIndex).filename().string().c_str())) {
 
 				for (int i = 0; i < model->images->size(); i++)
 				{
@@ -272,21 +272,21 @@ void RSUSTabComponent::view()
 
 		if (ImGui::Button("Set Texture"))
 		{
-			
+			RSUSModel->setTexture();
 		}
 
 		ImGui::Spacing();
 
 		if (ImGui::Button("Save Parameters"))
 		{
-
+			// TODO CREATE A BETTER RSUS SAVE AND LOAD SYSTEM!!
 		}
 
 		ImGui::Spacing();
 
 		if (ImGui::Button("update shader"))
 		{
-
+			RSUSModel->updateShader();
 		}
 	}
 
