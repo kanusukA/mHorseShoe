@@ -17,14 +17,11 @@ public:
 	StuffHandler* stuffHandler;
 
 	Monster* monster;
-	GuiComponent* guiComponent;
 	Gui* gui;
 
 	PlayerSubject* playerSubject = nullptr;
 
-	void addPlayerNode();
-
-	void initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* guiComp);
+	void initGui(Ogre::ImGuiOverlay* overlay);
 
 	// Sets up ground and resource handler and stuff
 	void preSetup();
@@ -45,7 +42,6 @@ public:
 	//void addVisualShape();
 
 	void _updatePlayerPrameters(float deltaTime);
-	void _updateStuffs(float deltaTime);
 
 };
 
@@ -54,11 +50,6 @@ public:
 class GDMediator : public Mediator {
 private:
 	StuffHandler* stuffHandler = nullptr;
-
-	void _addObject(GuiComponent* component) const; // Contains the conversion from GuiComponent to Stuff Object.
-	void _addMDRL(GuiComponent* component) const;
-	void _addLight(GuiComponent* component) const;
-	void _addHeightMap(GuiComponent* component) const;
 
 public:
 
@@ -74,64 +65,6 @@ public:
 	}
 
 	void Notify(MediatorComponent* component, std::string event) const override {
-		GuiComponent* guiComp = static_cast<GuiComponent*>(component);
-		if (event == GDEVENT_ADD_OBJECT) {
-			try {
-				
-				this->_addObject(guiComp);
-			}
-			catch (const std::exception &e) {
-				std::cout << "Error in GDMediator type conversion" << std::endl;
-				std::cout << e.what() << std::endl;
-			}
-		}
-		else if (event == GDEVENT_SHOW_RENDERING) {
-			stuffHandler->showOgreRendering();
-		}
-		else if (event == GDEVENT_SHOW_PHYSX_VISUAL_DEBUG) {
-			stuffHandler->showDebugPhysxMeshes();
-		}
-		else if (event == GDEVENT_ADD_MDRL) {
-			
-			this->_addMDRL(guiComp);
-		}
-		else if (event == GDEVENT_ADD_LIGHT) {
-			
-			this->_addLight(guiComp);
-		}
-		else if (event == GDEVENT_SET_HEIGHTMAP){
-			
-			this->_addHeightMap(guiComp);
-		}
-		else if (event == GDEVENT_DELETE_SELECTED_OBJ) {
-			stuffHandler->deleteSelectedObj();
-		}
-		else if (event == GDEVENT_GENERATE_TERRAIN) {
-
-			if (guiComp->terrainTab->selectedHeightMap > -1) {
-				stuffHandler->createHeightmapTerrain(
-					ResourceHandler::GetInstance()->images->at(guiComp->terrainTab->selectedHeightMap).filename().string().c_str(),
-					ResourceHandler::GetInstance()->OgreMaterials->at(guiComp->terrainTab->selectedMaterial),
-					guiComp->terrainTab->terrainSize,
-					guiComp->terrainTab->blocks,
-					guiComp->terrainTab->displacement,
-					guiComp->terrainTab->scale
-
-				);
-			}
-			else {
-				stuffHandler->createTerrain(
-					ResourceHandler::GetInstance()->OgreMaterials->at(guiComp->terrainTab->selectedMaterial),
-					guiComp->terrainTab->terrainSize,
-					guiComp->terrainTab->blocks
-				);
-			}
-			
-
-		}
-		else if (event == GDEVENT_GETSELECTEDOBJFRAGMENT) {
-			stuffHandler->openFragmentShader();
-		}
 
 	}
 

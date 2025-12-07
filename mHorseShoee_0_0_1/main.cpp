@@ -17,8 +17,6 @@ int main() {
 
 	std::cout << "Start : " << std::endl;
 
-	Diegnostics* diegnos = new Diegnostics();
-
 	OgreBites::ApplicationContext ctx(INSTANCE_NAME);
 	ctx.initApp();
 
@@ -38,7 +36,6 @@ int main() {
 
 	// Ogre AND ImGui
 	std::cout << "Setting up ImGui" << std::endl;
-	GuiComponent* guiComponent = new GuiComponent();
 	Ogre::ImGuiOverlay* imOverlay = ctx.initialiseImGui(); // initalizes imgui before InitMonster! else will pop errors in renderOneFrame in Loop.
 	ctx.addInputListener(ctx.getImGuiInputListener());
 
@@ -54,13 +51,12 @@ int main() {
 	GDHandler gdhandler = GDHandler(monster,kint);
 	gdhandler.preSetup();
 	std::cout << "GDHandler setup!" << std::endl;
-	gdhandler.initGui(imOverlay, guiComponent); // initaliz Gui Seperately from monster as it conflicts with Stuff
+	gdhandler.initGui(imOverlay); // initaliz Gui Seperately from monster as it conflicts with Stuff
 	std::cout << "Gui Initialized !" << std::endl;
 	//gdhandler.addPlayerNode(); // NEW FRAME WORK FOR GUI. THE FUNCTION IS NO LONGER REQUIRED
 	std::cout << "Player initialized!" << std::endl;
 	
 
-	guiComponent->setDiegnostics(diegnos);
 
 	std::cout << "Setting up Skybox" << std::endl;
 	monster->setSkyBox();
@@ -102,10 +98,7 @@ int main() {
 		oRoot->renderOneFrame();
 		monster->updateMonster();
 
-		*diegnos->renderFrameTime = getCurrentTime() - renderTime;
 
-		*diegnos->fps = 1000/(getCurrentTime() - startTime);
-		*diegnos->TotalFrameTime = getCurrentTime() - startTime;
 
 		lastTime = startTime;
 

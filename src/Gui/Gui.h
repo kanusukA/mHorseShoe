@@ -4,10 +4,16 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include <Gui/mediator/GuiMediator.h>
-//#include <GDHandler/ResourceHandler.h>
+#include<Gui/GuiTabs.h>
 
-
+#include<Gui/GuiComponents/_SceneTabComponent.h>
+#include<Gui/GuiComponents/ReourceTabComponent.h>
+#include<Gui/GuiComponents/StatusTabComponent.h>
+#include<Gui/GuiComponents/AddTabComponent.h>
+#include<Gui/GuiComponents/ObjectTabComponent.h>
+#include<Gui/GuiComponents/ScenePanel.h>
+#include<Gui/GuiComponents/RSUSTabComponent.h>
+#include<Gui/GuiComponents/HUD.cpp>
 
 
 // Components
@@ -43,30 +49,6 @@ private:
 
 	GUI_WINDOW_POS* guiWPos = new GUI_WINDOW_POS();
 
-	ImGuiViewport* viewport;
-
-	GuiComponent* guiComponent;
-
-	ResourceHandler* resourceHandler = ResourceHandler::GetInstance();
-
-	PlayerObserver* playerObserver = nullptr;
-
-	// Add Variable
-	int renderMeshesPosition = 0;
-	int colliderMeshesPosition = 0;
-	Ogre::ResourceHandle hdl;
-	Ogre::ResourceHandle grassHdl;
-
-
-	int* fps = new int(0);
-
-	void _textureComponent(
-		Ogre::String name,
-		Ogre::TextureUnitState* textureState,
-		Ogre::TexturePtr& texture,
-		int* selectedIndex
-	);
-
 	void addViewComponent(ViewComponent* viewComponent) override {
 		viewComponent->setFramework(this);
 		Views.push_back(viewComponent);
@@ -79,15 +61,18 @@ private:
 		Models.push_back(modelComponent);
 	}
 
+	Gui();
+
 public:
 
 	Gui(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan,RSUS* rsus) : 
 		GuiFramework(scnhan, stuffhan,resourcehan, rsus) {}
 
 	//void setPlayerObserver(PlayerObserver* pObserver);
+	ImGuiViewport* viewport;
 
 	// INIT
-	void initGui(Ogre::ImGuiOverlay* overlay, GuiComponent* component);
+	void initGui(Ogre::ImGuiOverlay* overlay);
 
 	// NEW FRAMEWORK
 	// Add ViewComponents / ModelComponents in this function
@@ -99,34 +84,6 @@ public:
 	void setWindowGrabPoints(int WIDTH, int HEIGHT);
 	void updateGui(); // updates visibility of gui tabs
 	void shutdown();
-
-	// INTERNAL
-	void _resourceTab();
-	void _statusTab();
-	void _heightMapTab();
-	void _addTab();
-	void _debugTab();
-	void _objectsPanel();
-	void _lightTab();
-	void _objectTab();
-	void _HUD();
-	void _diegnos();
-	void _RSUSTab();
-
-	
-
-	void _terrainTab();
-	void _SceneTab();
-
-
-	void refreshResources() {
-		ResourceHandler::GetInstance()->getAllResources();
-	}
-
-	// EXTERNAL
-	void GuiInput(); // reads keyInputs for guitabs update
-	void setDiagnosticStats(Diegnostics* die) { guiComponent->setDiegnostics(die); }
-
 
 
 };
