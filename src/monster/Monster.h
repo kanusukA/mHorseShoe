@@ -75,6 +75,7 @@ enum QueryMask
 };
 
 struct ShaderVar {
+
 	std::string varName;
 	ShaderVarType varType;
 
@@ -83,8 +84,6 @@ struct ShaderVar {
 	float varFloat2[2] = { 0.0,0.0 };
 	float varFloat3[3] = { 0.0, 0.0, 0.0 };
 	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };
-
-	
 
 };
 
@@ -124,7 +123,6 @@ public:
 
 	
 	void readMaterial(Ogre::String matName , Ogre::String objectName = "");
-
 	
 
 	void updateFragParameterInt(Ogre::String parameterName, int val);

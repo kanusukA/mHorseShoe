@@ -57,6 +57,8 @@ namespace fs = std::filesystem;
 #define NODEKEY_RECEIVESHADOW "RECEIVE_SHADOW"
 #define NODEKEY_MATERIAL "MATERIAL"
 
+typedef unsigned long long ResID;
+
 struct SaveData {
 	std::string key;
 	std::string value;
@@ -91,6 +93,328 @@ enum ResourceHandlerType
 	MESH_MATERIALS,
 	IMAGE
 };
+
+
+class ResourceHandlerIDError : public std::exception {
+private:
+	const char* cause;
+public:
+	ResourceHandlerIDError(const char* cause_p) {
+		cause = cause_p;
+	};
+	char* what() {
+		std::cout << std::endl << cause << std::endl;
+	}
+
+};
+
+
+
+class Resource {
+protected:
+	ResID _id;
+	virtual void setId(int index) {};
+public:
+
+	
+
+	ResID getId() { return _id; };
+
+};
+
+class CaseResource : public Resource {
+private:
+
+	const char* caseName;
+
+	std::vector<ResID>* Scenes = new std::vector<ResID>();
+
+	void setId(int index) override {
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10000000000 + index;
+	}
+
+public:
+
+	CaseResource(int IdIndex, const char* caseName_p) : Resource() {
+		setId(IdIndex);
+		caseName = caseName_p;
+	}
+
+	std::vector<ResID>* getScenesInCase() {
+		return Scenes;
+	}
+
+	void addSceneToCase(ResID sceneID) {
+		if (sceneID >= 10100000000 && sceneID < 10200000000) {
+			Scenes->push_back(sceneID);
+		}
+		else {
+			throw ResourceHandlerIDError(("Invalid ID Entered. required : SceneResourceID , entered : " + std::to_string(sceneID)).c_str());
+		}
+	}
+
+	void removeSceneByID(ResID sceneID) {
+		for (int i = 0; i < Scenes->size(); i++)
+		{
+			if (Scenes->at(i) == sceneID)
+			{
+				Scenes->erase(Scenes->begin() + i);
+				break;
+			}
+		}
+	}
+
+	void removeSceneByIndex(int index) {
+		Scenes->erase(Scenes->begin() + index);
+	}
+	
+};
+
+class SceneResource : Resource
+{
+private:
+	void setId(int index) override {
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10100000000 + index;
+	}
+
+	const char* name;
+
+	int scnType;
+
+	Ogre::Vector3 position;
+	Ogre::Vector4 orientation;
+	Ogre::Vector3 scale;
+
+
+	std::vector<ResID>* objects = new std::vector<ResID>();
+
+public:
+
+	SceneResource(int Index, const char* name_p, int SceneType, Ogre::Vector3 position_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) {
+		setId(Index);
+		_id += 10000000 * SceneType;
+		name = name_p;
+		scnType = SceneType;
+		position = position_p;
+		orientation = orientation_p;
+		scale = scale_p;
+	};
+
+	void addObject(ResID objectID) {
+		if (objectID >= 10200000000 && objectID < 10300000000)
+		{
+			objects->push_back(objectID);
+		}
+		else {
+			throw ResourceHandlerIDError(("Invalid ID Entered. required : SceneResourceID , entered : " + std::to_string(objectID)).c_str());
+		}
+	}
+
+	void removeObjectById(ResID objectID) {
+		for (int i = 0; i < objects->size(); i++)
+		{
+			if (objects->at(i) == objectID)
+			{
+				objects->erase(objects->begin() + i);
+				break;
+			}
+		}
+	}
+
+	void removeObjectByIndex(int index) {
+		objects->erase(objects->begin() + index);
+	}
+
+	std::vector<ResID>* getObjects() {
+		return objects;
+	}
+
+};
+
+class ObjectResource : public Resource
+{
+
+private:
+
+	const char* name;
+	float mass;
+	int physXType;
+
+	ResID renderMeshID;
+	ResID colliderMeshID;
+
+	void setId(int index) override{
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10200000000 + index;
+	}
+
+
+public:
+	ObjectResource(const char* name_p, int index, int objectType, ResID material_p, ResID renderMesh_p, ResID colliderMesh_p, float mass_p) {
+		setId(index);
+		name = name_p;
+		
+		_id += 10000000 * objectType;
+
+		physXType = objectType;
+		renderMeshID = renderMesh_p;
+		colliderMeshID = colliderMesh_p;
+		mass = mass_p;
+
+	}
+
+};
+
+class MaterialResource : public Resource
+{
+
+private:
+	const char* materialName;
+
+	const char* VertexShaderName;
+	const char* FragmentShaderName;
+
+	ResID DiffuseTexture;
+	ResID RoughnessTexture;
+	ResID NormalTexture;
+	ResID ParallaxTexture;
+
+	std::vector<ResID>* Textures = new std::vector<ResID>();
+
+	// These Parameters contain presaved values of Material and must be cross checked with Ogre Material's parameters for consistancy
+	std::vector<ShaderVar>* VertexParameters = new std::vector<ShaderVar>();
+	std::vector<ShaderVar>* FragmentParameters = new std::vector<ShaderVar>();
+
+	void setId(int index) override {
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10700000000 + index;
+	}
+
+public:
+
+	MaterialResource(const char* name_p,
+		int index,
+		const char* vertex_name_p,
+		const char* fragment_name_p ) 
+	{
+		setId(index);
+		VertexShaderName = vertex_name_p;
+		FragmentShaderName = fragment_name_p;
+	}
+
+	void addVertexShaderVar(ShaderVar vertexShaderVar) {
+		VertexParameters->push_back(vertexShaderVar);
+	}
+
+	void addFragmentShaderVar(ShaderVar fragmentShaderVar) {
+		FragmentParameters->push_back(fragmentShaderVar);
+	}
+
+	void addDiffuseTexture(ResID Diffuse_p) {
+		DiffuseTexture = Diffuse_p;
+	}
+	void addRoughnessTexture(ResID Roughness_p) {
+		RoughnessTexture = Roughness_p;
+	}
+	void addParallaxTexture(ResID Parallax_p) {
+		ParallaxTexture = Parallax_p;
+	}
+	void addNormalTexture(ResID Normal_p) {
+		NormalTexture = Normal_p;
+	}
+
+	void addTexture(ResID Texture) {
+		Textures->push_back(Texture);
+	}
+
+	void removeTextureByID(ResID Texture) {
+		for (int i = 0; i < Textures->size(); i++)
+		{
+			if (Textures->at(i) == Texture)
+			{
+				Textures->erase(Textures->begin() + i);
+				break;
+			}
+		}
+	}
+
+	void removeTextureByIndex(int index) {
+		Textures->erase(Textures->begin() + index);
+	}
+
+
+};
+
+class ImageResource : public Resource
+{
+private:
+
+	std::filesystem::path imagePath;
+
+	void setId(int index) override {
+	
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10600000000 + index;
+		
+	}
+
+public:
+
+	ImageResource(int index, std::filesystem::path imagePath_p) {
+		setId(index);
+		imagePath = imagePath_p;
+	}
+
+};
+
+class RenderMeshResource : public Resource
+{
+private:
+
+	const char* name;
+
+	ResID Material;
+
+	void setId(int index) override {
+
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10300000000 + index;
+
+	}
+public:
+	
+	RenderMeshResource(const char* name_p, int index) {
+		setId(index);
+		name = name_p;
+	}
+
+};
+
+
+
+
+
+
 
 // Integrate it into gdhandler with Ogre 
 
