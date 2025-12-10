@@ -14,11 +14,10 @@
 #include<Gui/GuiComponents/ScenePanel.h>
 #include<Gui/GuiComponents/RSUSTabComponent.h>
 #include<Gui/GuiComponents/HUD.cpp>
+#include<Gui/GuiComponents/TestingTab.h>
 
 
 // Components
-
-
 
 struct GUI_WINDOW_POS {
 	ImVec2 TOP_LEFT;

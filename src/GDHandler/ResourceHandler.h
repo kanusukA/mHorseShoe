@@ -2,6 +2,7 @@
 
 #ifndef RESOURCEHANDLER_H
 #define RESOURCEHANDLER_H
+
 #include<Windows.h>
 #include <Ogre.h>
 
@@ -57,7 +58,7 @@ namespace fs = std::filesystem;
 #define NODEKEY_RECEIVESHADOW "RECEIVE_SHADOW"
 #define NODEKEY_MATERIAL "MATERIAL"
 
-typedef unsigned long long ResID;
+
 
 struct SaveData {
 	std::string key;
@@ -95,6 +96,9 @@ enum ResourceHandlerType
 };
 
 
+
+typedef unsigned long long ResID;
+
 class ResourceHandlerIDError : public std::exception {
 private:
 	const char* cause;
@@ -109,18 +113,67 @@ public:
 };
 
 
+class CaseResource;
+
+// MASTER RESOURCE CLASS. HANDLES STORAGE OF RESOURCE IDS and RESOURCES
+class ResourceHandlerBuilderContext {
+private:
+	std::vector<ResID>* masterList = new std::vector<ResID>();
+
+
+protected:
+
+	std::vector<CaseResource*>* caseRes = new std::vector<CaseResource*>();
+
+	void AddIndexToMaster(ResID id) {
+		for (int i = 0; i < masterList->size(); i++)
+		{
+			if (masterList->at(i) == id)
+			{
+				throw ResourceHandlerIDError("Duplicate ID begin Created!");
+			}
+		}
+		masterList->push_back(id);
+	}
+
+	int getCaseIndex() {
+		return caseRes->size();
+	}
+
+	void addCaseRes(CaseResource* case_p) {
+		caseRes->push_back(case_p);
+	}
+
+public:
+
+	std::vector<ResID>* getMasterList() { return masterList; };
+
+	// CASE RESOURCE
+
+	// Not a suggested method to fetch few cases. Try using getByID() insted. This method is only for GUI applications!
+	std::vector<CaseResource*>* getAllCase() { return caseRes; };
+
+	// Initalizes CaseResource with resource handler and sets id and name!
+	virtual void createCase(CaseResource* case_p) {};
+
+};
+
 
 class Resource {
 protected:
+	bool init = false;
 	ResID _id;
 	virtual void setId(int index) {};
 public:
 
-	
+	virtual void build(ResourceHandlerBuilderContext* context) {}
+
 
 	ResID getId() { return _id; };
 
 };
+
+
 
 class CaseResource : public Resource {
 private:
@@ -128,6 +181,11 @@ private:
 	const char* caseName;
 
 	std::vector<ResID>* Scenes = new std::vector<ResID>();
+
+
+public:
+
+	// RESOURCE SPECIFIC FUNCTIONS
 
 	void setId(int index) override {
 		if (index > 99999)
@@ -137,12 +195,28 @@ private:
 		_id = 10000000000 + index;
 	}
 
-public:
-
-	CaseResource(int IdIndex, const char* caseName_p) : Resource() {
-		setId(IdIndex);
-		caseName = caseName_p;
+	void setName(const char* name_p) {
+		caseName = name_p;
 	}
+
+	const char* getName() {
+		return caseName;
+	}
+
+	CaseResource(const char* name_p) {
+		this->setName(name_p);
+	};
+
+	CaseResource(ResourceHandlerBuilderContext* context, const char* name_p) {
+		build(context, name_p);
+	}
+
+	void build(ResourceHandlerBuilderContext* context, const char* name_p) {
+		this->setName(name_p);
+		context->createCase(this);
+	}
+
+	// CASE METHODS
 
 	std::vector<ResID>* getScenesInCase() {
 		return Scenes;
@@ -171,7 +245,7 @@ public:
 	void removeSceneByIndex(int index) {
 		Scenes->erase(Scenes->begin() + index);
 	}
-	
+
 };
 
 class SceneResource : Resource
@@ -251,7 +325,7 @@ private:
 	ResID renderMeshID;
 	ResID colliderMeshID;
 
-	void setId(int index) override{
+	void setId(int index) override {
 		if (index > 99999)
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
@@ -264,7 +338,7 @@ public:
 	ObjectResource(const char* name_p, int index, int objectType, ResID material_p, ResID renderMesh_p, ResID colliderMesh_p, float mass_p) {
 		setId(index);
 		name = name_p;
-		
+
 		_id += 10000000 * objectType;
 
 		physXType = objectType;
@@ -273,6 +347,29 @@ public:
 		mass = mass_p;
 
 	}
+
+};
+
+enum ShaderVarType
+{
+	INTEGER,
+	FLOAT0,
+	FLOAT2,
+	FLOAT3,
+	FLOAT4,
+	RBOOL
+};
+
+struct ShaderVar {
+
+	std::string varName;
+	ShaderVarType varType;
+
+	int* varInt = new int(0);
+	float* varFloat = new float(0.0);
+	float varFloat2[2] = { 0.0,0.0 };
+	float varFloat3[3] = { 0.0, 0.0, 0.0 };
+	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };
 
 };
 
@@ -309,7 +406,7 @@ public:
 	MaterialResource(const char* name_p,
 		int index,
 		const char* vertex_name_p,
-		const char* fragment_name_p ) 
+		const char* fragment_name_p)
 	{
 		setId(index);
 		VertexShaderName = vertex_name_p;
@@ -356,8 +453,9 @@ public:
 		Textures->erase(Textures->begin() + index);
 	}
 
-
 };
+
+
 
 class ImageResource : public Resource
 {
@@ -366,13 +464,13 @@ private:
 	std::filesystem::path imagePath;
 
 	void setId(int index) override {
-	
+
 		if (index > 99999)
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
 		}
 		_id = 10600000000 + index;
-		
+
 	}
 
 public:
@@ -402,11 +500,69 @@ private:
 
 	}
 public:
-	
+
 	RenderMeshResource(const char* name_p, int index) {
 		setId(index);
 		name = name_p;
 	}
+
+	virtual void setMaterial(ResID material_p) {}
+
+};
+
+class ColliderMeshResource : public Resource
+{
+private:
+
+	const char* name;
+
+	ResID Material;
+
+	void setId(int index) override {
+
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10400000000 + index;
+
+	}
+public:
+
+	ColliderMeshResource(const char* name_p, int index) {
+		setId(index);
+		name = name_p;
+	}
+
+	virtual void setMaterial(ResID material_p) {}
+
+};
+
+class MeshResource : public Resource
+{
+private:
+
+	const char* name;
+
+	ResID Material;
+
+	void setId(int index) override {
+
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10500000000 + index;
+
+	}
+public:
+
+	MeshResource(const char* name_p, int index) {
+		setId(index);
+		name = name_p;
+	}
+
+	virtual void setMaterial(ResID material_p) {}
 
 };
 
@@ -415,10 +571,9 @@ public:
 
 
 
-
 // Integrate it into gdhandler with Ogre 
 
-class ResourceHandler
+class ResourceHandler : public ResourceHandlerBuilderContext
 {
 
 private:
@@ -434,6 +589,14 @@ private:
 
 	CSimpleIniA ini;
 
+
+	// RESOURCES BUILDER
+	void createCase(CaseResource* case_p) override {
+		case_p->setId(this->getCaseIndex());
+		this->addCaseRes(case_p);
+		this->AddIndexToMaster(case_p->getId());
+		
+	}
 
 	// default locations
 

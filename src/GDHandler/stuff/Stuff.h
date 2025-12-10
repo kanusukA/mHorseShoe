@@ -9,7 +9,6 @@
 
 
 
-
 using namespace physx;
 
 enum StuffType {
@@ -19,6 +18,17 @@ enum StuffType {
 };
 
 PxVec3* mtkVectors(Ogre::Vector3* vec);
+
+
+class Case : public CaseResource {
+	
+public:
+
+	Case(const char* name_p ,ResourceHandlerBuilderContext* context) : CaseResource(context,name_p) {
+
+	}
+	
+};
 
 class Stuff
 {
@@ -166,8 +176,11 @@ struct  GuiSelectableObject {
 	bool* shadowCasting = new bool(true);
 };
 
+// Objects / Ogre::Entity Class manager
 class StuffHandler {
 private:
+
+
 
 	// Kint
 	bool showingOgreRendering = true;

@@ -66,6 +66,9 @@ void Gui::initGuiComponents()
 	RSUSTabModelComponent* rsusModel = new RSUSTabModelComponent("Rsus tab Model");
 	this->addModelComponent(rsusModel);
 
+	TestingTabModelComponent* testModel = new TestingTabModelComponent("Testing tab model");
+	this->addModelComponent(testModel);
+
 	// Views
 	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab",scnTabModel);
 	this->addViewComponent(scnTab);
@@ -90,6 +93,9 @@ void Gui::initGuiComponents()
 
 	HUDComponent* hudTab = new HUDComponent("Hud tab");
 	this->addViewComponent(hudTab);
+
+	TestingTabComponent* testingTab = new TestingTabComponent("Test tab", testModel);
+	this->addViewComponent(testingTab);
 
 }
 

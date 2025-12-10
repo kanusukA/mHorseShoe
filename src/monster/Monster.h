@@ -57,15 +57,7 @@ struct WindowProperties {
 };
 
 
-enum ShaderVarType
-{
-	INTEGER,
-	FLOAT0,
-	FLOAT2,
-	FLOAT3,
-	FLOAT4,
-	RBOOL
-};
+
 
 enum QueryMask
 {
@@ -74,18 +66,7 @@ enum QueryMask
 
 };
 
-struct ShaderVar {
 
-	std::string varName;
-	ShaderVarType varType;
-
-	int* varInt = new int(0);
-	float* varFloat = new float(0.0);
-	float varFloat2[2] = { 0.0,0.0 };
-	float varFloat3[3] = { 0.0, 0.0, 0.0 };
-	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };
-
-};
 
 struct RSUSShaderTextures {
 	Ogre::TextureUnitState* Diffuse;

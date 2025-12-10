@@ -31,6 +31,7 @@ ResourceHandlerType ResourceHandler::_getResourceLocationGroup(std::string group
 
 }
 
+
 void ResourceHandler::read()
 {
 
