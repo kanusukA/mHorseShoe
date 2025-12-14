@@ -91,6 +91,38 @@ public:
 	GuiFramework(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
 		GDSource(scnhan, stuffhan,resourcehan,rsus) {}
 
+	// GUI FUNCTIONS
+	
+	// CONVERTING OGRE::VECTORS TO FLOAT* 
+	float* convertOgreVec2(Ogre::Vector2 vec2_p) {
+		float float2[2] = {vec2_p[0],vec2_p[1]};
+		return float2;
+	}
+	float* convertOgreVec3(Ogre::Vector3 vec3_p) {
+		float float3[3] = { vec3_p[0],vec3_p[1],vec3_p[2]};
+		return float3;
+	}
+	float* convertOgreVec4(Ogre::Vector4 vec4_p) {
+		float float4[4] = { vec4_p[0],vec4_p[1],vec4_p[2],vec4_p[3]};
+		return float4;
+	}
+	// SET OGRE::VECTOR VALUE TO FLOAT*
+	void setOgreVec2(float* float2,Ogre::Vector2 vec2_p) {
+		float2[0] = vec2_p[0];
+		float2[1] = vec2_p[1];
+	}
+	void setOgreVec3(float* float3,Ogre::Vector3 vec3_p) {
+		float3[0] = vec3_p[0];
+		float3[1] = vec3_p[1];
+		float3[2] = vec3_p[2];
+	}
+	void setOgreVec4(float* float4,Ogre::Vector4 vec4_p) {
+		float4[0] = vec4_p[0];
+		float4[1] = vec4_p[1];
+		float4[2] = vec4_p[2];
+		float4[3] = vec4_p[3];
+	}
+
 	// RUNS AT INIT, USED DURING THE CREATION OF VIEW COMPONENTS
 	// MUST NOT BE RUN FROM OUTSIDE
 	// VIEW COMPONENTS MUST BE ADDED TO BE RENDERED!

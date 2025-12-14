@@ -79,10 +79,6 @@ struct SceneObject {
 	std::string material = "";
 };
 
-struct Scene {
-	std::string currentScene;
-	std::string parentScene;
-};
 
 
 // Types of resources
@@ -114,18 +110,22 @@ public:
 
 
 class CaseResource;
+class SceneResource;
+
 
 // MASTER RESOURCE CLASS. HANDLES STORAGE OF RESOURCE IDS and RESOURCES
 class ResourceHandlerBuilderContext {
+
 private:
 	std::vector<ResID>* masterList = new std::vector<ResID>();
 
-
 protected:
 
-	std::vector<CaseResource*>* caseRes = new std::vector<CaseResource*>();
+	std::vector<CaseResource>* caseRes = new std::vector<CaseResource>();
+	std::vector<SceneResource>* scnRes = new std::vector<SceneResource>();
 
 	void AddIndexToMaster(ResID id) {
+
 		for (int i = 0; i < masterList->size(); i++)
 		{
 			if (masterList->at(i) == id)
@@ -134,14 +134,22 @@ protected:
 			}
 		}
 		masterList->push_back(id);
+
 	}
 
 	int getCaseIndex() {
 		return caseRes->size();
 	}
+	int getSceneIndex() {
+		return scnRes->size();
+	}
 
 	void addCaseRes(CaseResource* case_p) {
-		caseRes->push_back(case_p);
+		caseRes->push_back(*case_p);
+	}
+
+	void addSceneRes(SceneResource* scn_p) {
+		scnRes->push_back(*scn_p);
 	}
 
 public:
@@ -151,10 +159,18 @@ public:
 	// CASE RESOURCE
 
 	// Not a suggested method to fetch few cases. Try using getByID() insted. This method is only for GUI applications!
-	std::vector<CaseResource*>* getAllCase() { return caseRes; };
+	std::vector<CaseResource>* getAllCase() { return caseRes; };
+	std::vector<SceneResource>* getAllScenes() { return scnRes; };
+
+	SceneResource* fetchSceneResourceByID(ResID id) {
+		return &scnRes->at(id - 10100000000);
+	}
 
 	// Initalizes CaseResource with resource handler and sets id and name!
 	virtual void createCase(CaseResource* case_p) {};
+
+	virtual void createScene(SceneResource* scn_p) {};
+
 
 };
 
@@ -164,9 +180,20 @@ protected:
 	bool init = false;
 	ResID _id;
 	virtual void setId(int index) {};
+
+	std::string name;
+
 public:
 
 	virtual void build(ResourceHandlerBuilderContext* context) {}
+
+	void setName(std::string name_p) {
+		name = name_p;
+	}
+
+	std::string getName() {
+		return name;
+	}
 
 
 	ResID getId() { return _id; };
@@ -177,8 +204,6 @@ public:
 
 class CaseResource : public Resource {
 private:
-
-	const char* caseName;
 
 	std::vector<ResID>* Scenes = new std::vector<ResID>();
 
@@ -195,13 +220,6 @@ public:
 		_id = 10000000000 + index;
 	}
 
-	void setName(const char* name_p) {
-		caseName = name_p;
-	}
-
-	const char* getName() {
-		return caseName;
-	}
 
 	CaseResource(const char* name_p) {
 		this->setName(name_p);
@@ -248,18 +266,9 @@ public:
 
 };
 
-class SceneResource : Resource
+class SceneResource : public Resource
 {
-private:
-	void setId(int index) override {
-		if (index > 99999)
-		{
-			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
-		}
-		_id = 10100000000 + index;
-	}
-
-	const char* name;
+protected:
 
 	int scnType;
 
@@ -272,14 +281,25 @@ private:
 
 public:
 
-	SceneResource(int Index, const char* name_p, int SceneType, Ogre::Vector3 position_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) {
-		setId(Index);
-		_id += 10000000 * SceneType;
-		name = name_p;
+	void setId(int index) override {
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10100000000 + index;
+	}
+
+	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, int SceneType, Ogre::Vector3 position_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) {
+
 		scnType = SceneType;
 		position = position_p;
 		orientation = orientation_p;
 		scale = scale_p;
+
+		this->setName(name_p);
+		
+		context->createScene(this);
+
 	};
 
 	void addObject(ResID objectID) {
@@ -595,7 +615,12 @@ private:
 		case_p->setId(this->getCaseIndex());
 		this->addCaseRes(case_p);
 		this->AddIndexToMaster(case_p->getId());
-		
+	}
+
+	void createScene(SceneResource* scn_p) override {
+		scn_p->setId(this->getSceneIndex());
+		this->addSceneRes(scn_p);
+		this->AddIndexToMaster(scn_p->getId());
 	}
 
 	// default locations

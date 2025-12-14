@@ -25,9 +25,22 @@ class Case : public CaseResource {
 public:
 
 	Case(const char* name_p ,ResourceHandlerBuilderContext* context) : CaseResource(context,name_p) {
-
+		
 	}
 	
+};
+
+class Scene : public SceneResource {
+public:
+	Scene(ResourceHandlerBuilderContext* context, std::string name_p, int scnType,
+		Ogre::Vector3 position_p, Ogre::Vector3 scale_p, Ogre::Vector4 Orientation_p) : SceneResource(context, name_p, scnType, position_p, Orientation_p, scale_p) {
+
+	}
+
+	Ogre::Vector3 getScnPosition() { return this->position; }
+	Ogre::Vector3 getScnScale() { return this->scale; }
+	Ogre::Vector4 getScnOrientation() { return this->orientation; }
+	int getScnType() { return this->scnType; }
 };
 
 class Stuff
