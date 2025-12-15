@@ -28,6 +28,30 @@ void TestingTabComponent::view()
 			ImGui::Text(testModel->caseResources->at(i).getName().c_str()); // Why this is coming in as null!! fix this
 			ImGui::SameLine();
 			ImGui::Text((" : " + std::to_string(testModel->caseResources->at(i).getId())).c_str());
+
+			ImGui::SameLine();
+			if (ImGui::Button(("Scenes##" + std::to_string(i)).c_str()))
+			{
+				testModel->getScenesInCase(testModel->caseResources->at(i).getId());
+			}
+		}
+	}
+
+	if (testModel->scnInCaseResource)
+	{
+		if (testModel->scnInCaseResource->size() > 0)
+		{
+			if (ImGui::BeginCombo("Scenes In Case","Click to see Ids"))
+			{
+				for (int i = 0; i < testModel->scnInCaseResource->size(); i++)
+				{
+					ImGui::Text(std::to_string(testModel->scnInCaseResource->at(i)).c_str());
+				}
+				ImGui::EndCombo();
+			}
+		}
+		else {
+			ImGui::Text("Case has No Scenes Attached!");
 		}
 	}
 
@@ -91,6 +115,34 @@ void TestingTabComponent::view()
 	if (ImGui::Button("Add Scene"))
 	{
 		testModel->addScene();
+	}
+
+	if (testModel->caseResources)
+	{
+		if (testModel->caseResources->size() > 0)
+		{
+			if (ImGui::BeginCombo("Put in Case",testModel->caseResources->at(testModel->selectedCaseInSceneTab).getName().c_str()))
+			{
+				for (int i = 0; i < testModel->caseResources->size(); i++)
+				{
+					if (ImGui::Selectable(testModel->caseResources->at(i).getName().c_str(),i == testModel->selectedCaseInSceneTab))
+					{
+						testModel->selectedCaseInSceneTab = i;
+					}
+				}
+				ImGui::EndCombo();
+			}
+		}
+	}
+
+	if (ImGui::Button("Add Scene to Case"))
+	{
+		if (testModel->selectedScnID)
+		{
+			testModel->AddSceneToCase(testModel->caseResources->at(testModel->selectedCaseInSceneTab).getId());
+		}
+		
+		
 	}
 
 	ImGui::End();

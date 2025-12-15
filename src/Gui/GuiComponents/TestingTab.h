@@ -10,9 +10,15 @@ public:
 
 	std::vector<ResID>* masterList;
 	std::vector<CaseResource>* caseResources;
+	std::vector<ResID>* scnInCaseResource;
+
 	std::vector<SceneResource>* sceneResources;
 
 	std::string* caseName = new std::string("");
+
+
+	// SCENE
+	ResID selectedScnID;
 
 	std::string scnName = " ";
 
@@ -24,22 +30,38 @@ public:
 
 	SceneType scnType;
 
+	int selectedCaseInSceneTab = 0;
+
+
 	TestingTabModelComponent(const char* name_p) : ModelComponent(name_p){
 
 	}
-
+	// Scene are not being added to Case
 	void init() override {
 		masterList = this->gdSource->getResourceHandler()->getMasterList();
 		caseResources = this->gdSource->getResourceHandler()->getAllCase();
 		sceneResources = this->gdSource->getResourceHandler()->getAllScenes();
 	}
 	
+	// CASE
 	void addCase() {
 
 		Case myCase = Case(caseName->c_str(), this->gdSource->getResourceHandler());
 		
 	}
 
+	void AddSceneToCase(ResID caseID) {
+		CaseResource* caseRes = this->gdSource->getResourceHandler()->fetchCaseResourceByID(caseID);
+		caseRes->addSceneToCase(selectedScnID);
+	}
+
+	void getScenesInCase(ResID caseID) {
+		CaseResource* caseRes = this->gdSource->getResourceHandler()->fetchCaseResourceByID(caseID);
+
+		scnInCaseResource = caseRes->getScenesInCase();
+	}
+
+	// SCENE
 	void getSceneDetails(ResID id) {
 		SceneResource* scnRes = this->gdSource->getResourceHandler()->fetchSceneResourceByID(id);
 
@@ -52,6 +74,8 @@ public:
 		this->guiFramework->setOgreVec4(scn_orientation, scnCast->getScnOrientation());
 		
 		scnType = SceneType(scnCast->getScnType());
+
+		selectedScnID = id;
 
 	}
 

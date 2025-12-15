@@ -95,6 +95,12 @@ enum ResourceHandlerType
 
 typedef unsigned long long ResID;
 
+enum PhysXType {
+	Static,
+	Dynamic,
+	Kinematic
+};
+
 class ResourceHandlerIDError : public std::exception {
 private:
 	const char* cause;
@@ -111,6 +117,9 @@ public:
 
 class CaseResource;
 class SceneResource;
+class ObjectResource;
+class ShaderResource;
+class MaterialResource;
 
 
 // MASTER RESOURCE CLASS. HANDLES STORAGE OF RESOURCE IDS and RESOURCES
@@ -123,6 +132,9 @@ protected:
 
 	std::vector<CaseResource>* caseRes = new std::vector<CaseResource>();
 	std::vector<SceneResource>* scnRes = new std::vector<SceneResource>();
+	std::vector<ObjectResource>* objRes = new std::vector<ObjectResource>();
+	std::vector<ShaderResource>* shaderRes = new std::vector<ShaderResource>();
+	std::vector<MaterialResource>* matRes = new std::vector<MaterialResource>();
 
 	void AddIndexToMaster(ResID id) {
 
@@ -143,13 +155,39 @@ protected:
 	int getSceneIndex() {
 		return scnRes->size();
 	}
+	int getObjectIndex() {
+		return objRes->size();
+	}
+	int getMaterialIndex() {
+		return matRes->size();
+	}
+	int getShaderIndex() {
+		return shaderRes->size();
+	}
 
 	void addCaseRes(CaseResource* case_p) {
+		AddIndexToMaster(case_p->getId());
 		caseRes->push_back(*case_p);
 	}
 
 	void addSceneRes(SceneResource* scn_p) {
+		AddIndexToMaster(scn_p->getId());
 		scnRes->push_back(*scn_p);
+	}
+
+	void addObjectRes(ObjectResource* obj_p) {
+		AddIndexToMaster(obj_p->getId());
+		objRes->push_back(*obj_p);
+	}
+
+	void addShaderRes(ShaderResource* shader_p) {
+		AddIndexToMaster(shader_p->getId());
+		shaderRes->push_back(*shader_p);
+	}
+
+	void addMaterialRes(MaterialResource* mat_p) {
+		AddIndexToMaster(mat_p->getId());
+		matRes->push_back(*mat_p);
 	}
 
 public:
@@ -165,11 +203,27 @@ public:
 	SceneResource* fetchSceneResourceByID(ResID id) {
 		return &scnRes->at(id - 10100000000);
 	}
+	CaseResource* fetchCaseResourceByID(ResID id) {
+		return &caseRes->at(id - 10000000000);
+	}
+
+	bool resourceExists(ResID id) {
+		for (int i = 0; i < masterList->size(); i++)
+		{
+			if (masterList->at(i) == id)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
 	// Initalizes CaseResource with resource handler and sets id and name!
 	virtual void createCase(CaseResource* case_p) {};
-
 	virtual void createScene(SceneResource* scn_p) {};
+	virtual void createObject(ObjectResource* obj_p) {};
+	virtual void createMaterial(MaterialResource* mat_p) {};
+	virtual void createShader(ShaderResource* shader_p) {};
 
 
 };
@@ -182,6 +236,8 @@ protected:
 	virtual void setId(int index) {};
 
 	std::string name;
+
+	ResourceHandlerBuilderContext* resourceHandlerCxt;
 
 public:
 
@@ -207,6 +263,19 @@ private:
 
 	std::vector<ResID>* Scenes = new std::vector<ResID>();
 
+protected: 
+	// Scene cannot be duplicate in a Case.
+	bool checkSceneDuplicate(ResID id) {
+		for (int i = 0; i < Scenes->size(); i++)
+		{
+			if (Scenes->at(i) == id)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 public:
 
@@ -226,6 +295,7 @@ public:
 	};
 
 	CaseResource(ResourceHandlerBuilderContext* context, const char* name_p) {
+		this->resourceHandlerCxt = context;
 		build(context, name_p);
 	}
 
@@ -241,12 +311,20 @@ public:
 	}
 
 	void addSceneToCase(ResID sceneID) {
-		if (sceneID >= 10100000000 && sceneID < 10200000000) {
-			Scenes->push_back(sceneID);
+
+		if (checkSceneDuplicate(sceneID))
+		{
+			throw ResourceHandlerIDError("Duplicate ID Not Supported");
 		}
 		else {
-			throw ResourceHandlerIDError(("Invalid ID Entered. required : SceneResourceID , entered : " + std::to_string(sceneID)).c_str());
+			if (sceneID >= 10100000000 && sceneID < 10200000000) {
+				Scenes->push_back(sceneID);
+			}
+			else {
+				throw ResourceHandlerIDError(("Invalid ID Entered. required : SceneResourceID , entered : " + std::to_string(sceneID)).c_str());
+			}
 		}
+
 	}
 
 	void removeSceneByID(ResID sceneID) {
@@ -268,9 +346,12 @@ public:
 
 class SceneResource : public Resource
 {
-protected:
 
-	int scnType;
+private:
+	int scnType; // Scene Type cannot change after being initalized.
+
+protected:
+	
 
 	Ogre::Vector3 position;
 	Ogre::Vector4 orientation;
@@ -286,10 +367,11 @@ public:
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
 		}
-		_id = 10100000000 + index;
+		_id = 10100000000 + index + ((this->scnType-1) * 100000000); //  Assigns ID Based on SceneType
 	}
 
 	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, int SceneType, Ogre::Vector3 position_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) {
+		this->resourceHandlerCxt = context;
 
 		scnType = SceneType;
 		position = position_p;
@@ -333,40 +415,67 @@ public:
 
 };
 
+
 class ObjectResource : public Resource
 {
 
 private:
-
-	const char* name;
-	float mass;
 	int physXType;
+
+protected:
+
+	float mass;
 
 	ResID renderMeshID;
 	ResID colliderMeshID;
+
+public:
 
 	void setId(int index) override {
 		if (index > 99999)
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
 		}
-		_id = 10200000000 + index;
+		_id = 10200000000 + index + (this->physXType * 100000000);
 	}
-
-
-public:
-	ObjectResource(const char* name_p, int index, int objectType, ResID material_p, ResID renderMesh_p, ResID colliderMesh_p, float mass_p) {
-		setId(index);
-		name = name_p;
-
-		_id += 10000000 * objectType;
-
+	
+	ObjectResource(ResourceHandlerBuilderContext* context,std::string name_p, int objectType ) {
+		this->resourceHandlerCxt = context;
 		physXType = objectType;
-		renderMeshID = renderMesh_p;
-		colliderMeshID = colliderMesh_p;
-		mass = mass_p;
+		this->setName(name_p);
 
+		context->createObject(this);
 	}
+
+	void setRenderMesh(ResID id) {
+		if (10300000000 >= id && id < 10400000000)
+		{
+			if (this->resourceHandlerCxt->resourceExists(id)) {
+				renderMeshID = id;
+			}
+			else {
+				throw ResourceHandlerIDError("Resource is not init with Master List!");
+			}
+		}
+	}
+	void setColliderMesh(ResID id) {
+		if (10400000000 >= id && id < 10500000000)
+		{
+			if (this->resourceHandlerCxt->resourceExists(id)) {
+				colliderMeshID = id;
+			}
+			else {
+				throw ResourceHandlerIDError("Resource is not init with Master List!");
+			}
+		}
+	}
+
+	void setMass(float mass_p) {
+		mass = mass_p;
+	}
+
+	ResID getRenderMesh() { return renderMeshID; }
+	ResID getColliderMesh() { return colliderMeshID; }
 
 };
 
@@ -393,26 +502,34 @@ struct ShaderVar {
 
 };
 
-class MaterialResource : public Resource
+enum ShaderType {
+	Vertex,
+	Fragment
+};
+
+struct ShaderTexture
 {
+	std::string textureName;
+	ResID texture;
+	int texturePosition; // Position of texture in Shader
 
-private:
-	const char* materialName;
+	ShaderTexture(ResID textureImgID) {
+		texture = textureImgID;
+	}
+};
 
-	const char* VertexShaderName;
-	const char* FragmentShaderName;
+class ShaderResource : public Resource {
+protected:
+	std::string VertexShaderName; // file name of vertex shader
+	std::string FragmentShaderName; // file name of fragment shader
 
-	ResID DiffuseTexture;
-	ResID RoughnessTexture;
-	ResID NormalTexture;
-	ResID ParallaxTexture;
+	ShaderType shaderType;
 
-	std::vector<ResID>* Textures = new std::vector<ResID>();
-
-	// These Parameters contain presaved values of Material and must be cross checked with Ogre Material's parameters for consistancy
+	// These Parameters contain pre-saved values of Material and must be cross checked with Ogre's Shader parameters for consistancy
 	std::vector<ShaderVar>* VertexParameters = new std::vector<ShaderVar>();
 	std::vector<ShaderVar>* FragmentParameters = new std::vector<ShaderVar>();
 
+public:
 	void setId(int index) override {
 		if (index > 99999)
 		{
@@ -421,37 +538,88 @@ private:
 		_id = 10700000000 + index;
 	}
 
+	ShaderResource(ResourceHandlerBuilderContext* context, std::string name_p) {
+		this->setName(name_p);
+		this->resourceHandlerCxt = context;
+
+		context->createShader(this);
+	}
+
+
+};
+
+class MaterialResource : public Resource
+{
+
+protected:
+	std::string materialName; // file name of material
+
+	ResID VertexShaderResource; 
+	ResID FragmentShaderResource; 
+	
+	// textures are stored in material and sent to ShaderResource for application
+	std::vector<ShaderTexture>* Textures = new std::vector<ShaderTexture>(4);
+
+
 public:
 
-	MaterialResource(const char* name_p,
-		int index,
-		const char* vertex_name_p,
-		const char* fragment_name_p)
+	void setId(int index) override {
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10800000000 + index;
+	}
+
+	MaterialResource(ResourceHandlerBuilderContext* context,std::string name_p)
 	{
-		setId(index);
-		VertexShaderName = vertex_name_p;
-		FragmentShaderName = fragment_name_p;
+		this->setName(name_p);
+		this->resourceHandlerCxt = context;
+
+		context->createMaterial(this);
 	}
 
-	void addVertexShaderVar(ShaderVar vertexShaderVar) {
-		VertexParameters->push_back(vertexShaderVar);
+	void addVertexShader(ResID id) {
+		if (id >= 10700000000 && id < 10710000000)
+		{
+			if (this->resourceHandlerCxt->resourceExists(id)) {
+				VertexShaderResource = id;
+			}
+			else {
+				throw ResourceHandlerIDError("ID does not exists in Master List");
+			}
+		}
+		else {
+			throw ResourceHandlerIDError("Invalid ID");
+		}
 	}
 
-	void addFragmentShaderVar(ShaderVar fragmentShaderVar) {
-		FragmentParameters->push_back(fragmentShaderVar);
+	void addFragmentShader(ResID id) {
+		if (id >= 10710000000 && id < 10720000000)
+		{
+			if (this->resourceHandlerCxt->resourceExists(id)) {
+				FragmentShaderResource = id;
+			}
+			else {
+				throw ResourceHandlerIDError("ID does not exists in Master List");
+			}
+		}
+		else {
+			throw ResourceHandlerIDError("Invalid ID");
+		}
 	}
 
-	void addDiffuseTexture(ResID Diffuse_p) {
-		DiffuseTexture = Diffuse_p;
+	void addDiffuseTexture(ShaderTexture diffuse_p) {
+		Textures->at(0) = diffuse_p;
 	}
-	void addRoughnessTexture(ResID Roughness_p) {
-		RoughnessTexture = Roughness_p;
+	void addRoughnessTexture(ShaderTexture roughness_p) {
+		Textures->at(1) = roughness_p;
 	}
-	void addParallaxTexture(ResID Parallax_p) {
-		ParallaxTexture = Parallax_p;
+	void addParallaxTexture(ShaderTexture parallax_p) {
+		Textures->at(2) = parallax_p;
 	}
-	void addNormalTexture(ResID Normal_p) {
-		NormalTexture = Normal_p;
+	void addNormalTexture(ShaderTexture normal_p) {
+		Textures->at(3) = normal_p;
 	}
 
 	void addTexture(ResID Texture) {
@@ -461,7 +629,7 @@ public:
 	void removeTextureByID(ResID Texture) {
 		for (int i = 0; i < Textures->size(); i++)
 		{
-			if (Textures->at(i) == Texture)
+			if (Textures->at(i).texture == Texture)
 			{
 				Textures->erase(Textures->begin() + i);
 				break;
@@ -614,13 +782,26 @@ private:
 	void createCase(CaseResource* case_p) override {
 		case_p->setId(this->getCaseIndex());
 		this->addCaseRes(case_p);
-		this->AddIndexToMaster(case_p->getId());
 	}
 
 	void createScene(SceneResource* scn_p) override {
 		scn_p->setId(this->getSceneIndex());
 		this->addSceneRes(scn_p);
-		this->AddIndexToMaster(scn_p->getId());
+	}
+
+	void createObject(ObjectResource* obj_p) override {
+		obj_p->setId(this->getObjectIndex());
+		this->addObjectRes(obj_p);
+	}
+
+	void createMaterial(MaterialResource* mat_p) override {
+		mat_p->setId(this->getMaterialIndex());
+		this->addMaterialRes(mat_p);
+	}
+
+	void createShader(ShaderResource* shader_p) override {
+		shader_p->setId(this->getShaderIndex());
+		this->addShaderRes(shader_p);
 	}
 
 	// default locations
