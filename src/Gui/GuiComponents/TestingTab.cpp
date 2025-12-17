@@ -25,14 +25,14 @@ void TestingTabComponent::view()
 	{
 		for (int i = 0; i < testModel->caseResources->size(); i++)
 		{
-			ImGui::Text(testModel->caseResources->at(i).getName().c_str()); // Why this is coming in as null!! fix this
+			ImGui::Text(testModel->caseResources->at(i)->getName().c_str()); // Why this is coming in as null!! fix this
 			ImGui::SameLine();
-			ImGui::Text((" : " + std::to_string(testModel->caseResources->at(i).getId())).c_str());
+			ImGui::Text((" : " + std::to_string(testModel->caseResources->at(i)->getId())).c_str());
 
 			ImGui::SameLine();
 			if (ImGui::Button(("Scenes##" + std::to_string(i)).c_str()))
 			{
-				testModel->getScenesInCase(testModel->caseResources->at(i).getId());
+				testModel->getScenesInCase(testModel->caseResources->at(i)->getId());
 			}
 		}
 	}
@@ -74,14 +74,14 @@ void TestingTabComponent::view()
 	{
 		for (int i = 0; i < testModel->sceneResources->size(); i++)
 		{
-			ImGui::Text(testModel->sceneResources->at(i).getName().c_str()); // Why this is coming in as null!! fix this
+			ImGui::Text(testModel->sceneResources->at(i)->getName().c_str()); // Why this is coming in as null!! fix this
 			ImGui::SameLine();
-			ImGui::Text((" : " + std::to_string(testModel->sceneResources->at(i).getId())).c_str());
+			ImGui::Text((" : " + std::to_string(testModel->sceneResources->at(i)->getId())).c_str());
 			ImGui::SameLine();
 			
 			if (ImGui::SmallButton(("see##" + std::to_string(i)).c_str()))// Fix Id issue
 			{
-				testModel->getSceneDetails(testModel->sceneResources->at(i).getId());
+				testModel->getSceneDetails(testModel->sceneResources->at(i)->getId());
 			}
 		}
 	}
@@ -100,7 +100,7 @@ void TestingTabComponent::view()
 
 	ImGui::Text("Scene Type");
 
-	if (ImGui::RadioButton("Static", testModel->scnType == SceneType::STATIC)) {
+	if (ImGui::RadioButton("Static##1", testModel->scnType == SceneType::STATIC)) {
 		testModel->scnType = SceneType::STATIC;
 	}
 
@@ -121,11 +121,11 @@ void TestingTabComponent::view()
 	{
 		if (testModel->caseResources->size() > 0)
 		{
-			if (ImGui::BeginCombo("Put in Case",testModel->caseResources->at(testModel->selectedCaseInSceneTab).getName().c_str()))
+			if (ImGui::BeginCombo("Put in Case",testModel->caseResources->at(testModel->selectedCaseInSceneTab)->getName().c_str()))
 			{
 				for (int i = 0; i < testModel->caseResources->size(); i++)
 				{
-					if (ImGui::Selectable(testModel->caseResources->at(i).getName().c_str(),i == testModel->selectedCaseInSceneTab))
+					if (ImGui::Selectable(testModel->caseResources->at(i)->getName().c_str(),i == testModel->selectedCaseInSceneTab))
 					{
 						testModel->selectedCaseInSceneTab = i;
 					}
@@ -139,11 +139,155 @@ void TestingTabComponent::view()
 	{
 		if (testModel->selectedScnID)
 		{
-			testModel->AddSceneToCase(testModel->caseResources->at(testModel->selectedCaseInSceneTab).getId());
+			testModel->AddSceneToCase(testModel->caseResources->at(testModel->selectedCaseInSceneTab)->getId());
 		}
 		
 		
 	}
+
+	// Shader
+	ImGui::Spacing();
+
+	ImGui::Text("Shader");
+
+	if (testModel->shaderResources)
+	{
+		for (int i = 0; i < testModel->shaderResources->size(); i++)
+		{
+			ImGui::Text(testModel->shaderResources->at(i)->getName().c_str());
+			ImGui::SameLine();
+			ImGui::Text((" : " + std::to_string(testModel->shaderResources->at(i)->getId())).c_str());
+		}
+	}
+
+	ImGui::InputText("ShaderName", testModel->shaderName);
+
+	ImGui::InputText("ShaderFileName", testModel->shaderFileName);
+
+	ImGui::Text("Shader Type");
+
+	if (ImGui::RadioButton("Vertex", testModel->shaderType == ShaderType::Vertex)) {
+		testModel->shaderType = ShaderType::Vertex;
+	}
+
+	if (ImGui::RadioButton("Fragment", testModel->shaderType == ShaderType::Fragment)) {
+		testModel->shaderType = ShaderType::Fragment;
+	}
+	// test parameters
+
+	ImGui::Spacing();
+
+	ImGui::InputText("VarName", &testModel->shadervar->varName);
+
+
+	if (ImGui::Button("Add Shader"))
+	{
+		testModel->addShader();
+	}
+
+
+
+	// Objects
+	ImGui::Spacing();
+
+	ImGui::Text("Objects");
+
+	if (testModel->objectResources)
+	{
+		for (int i = 0; i < testModel->objectResources->size(); i++)
+		{
+			ImGui::Text(testModel->objectResources->at(i)->getName().c_str());
+			ImGui::SameLine();
+			ImGui::Text((" : " + std::to_string(testModel->objectResources->at(i)->getId())).c_str());
+		}
+	}
+
+	ImGui::Spacing();
+
+	ImGui::InputText("Object Name", testModel->objName);
+
+	if (ImGui::RadioButton("Static", testModel->physXType == PhysXType::Static)) {
+		testModel->physXType = PhysXType::Static;
+	}
+
+	if (ImGui::RadioButton("Dynamic##2", testModel->physXType == PhysXType::Dynamic)) {
+		testModel->physXType = PhysXType::Dynamic;
+	}
+
+	if (ImGui::RadioButton("Kinematic", testModel->physXType == PhysXType::Kinematic)) {
+		testModel->physXType = PhysXType::Kinematic;
+	}
+
+	ImGui::InputFloat("Mass", &testModel->mass);
+
+	if (ImGui::Button("add Object"))
+	{
+		testModel->addObject();
+	}
+
+	ImGui::Spacing();
+
+	ImGui::Text("Render");
+
+	if (testModel->renderResource)
+	{
+		for (int i = 0; i < testModel->renderResource->size(); i++)
+		{
+			ImGui::Text(testModel->renderResource->at(i)->getName().c_str());
+			ImGui::SameLine();
+			ImGui::Text((" : " + std::to_string(testModel->renderResource->at(i)->getId())).c_str());
+		}
+	}
+
+	ImGui::InputText("Render name", testModel->renderName);
+
+	if (ImGui::Button("Add render mesh"))
+	{
+		testModel->addRender();
+	}
+
+	ImGui::Spacing();
+
+	ImGui::Text("Collider");
+
+	if (testModel->colliderResource)
+	{
+		for (int i = 0; i < testModel->colliderResource->size(); i++)
+		{
+			ImGui::Text(testModel->colliderResource->at(i)->getName().c_str());
+			ImGui::SameLine();
+			ImGui::Text((" : " + std::to_string(testModel->colliderResource->at(i)->getId())).c_str());
+		}
+	}
+
+	ImGui::InputText("Collider name", testModel->colliderName);
+
+	if (ImGui::Button("Add Collider mesh"))
+	{
+		testModel->addCollider();
+	}
+
+
+	ImGui::Spacing();
+
+	ImGui::Text("Image");
+
+	if (testModel->imageResource)
+	{
+		for (int i = 0; i < testModel->imageResource->size(); i++)
+		{
+			ImGui::Text(testModel->imageResource->at(i)->getName().c_str());
+			ImGui::SameLine();
+			ImGui::Text((" : " + std::to_string(testModel->imageResource->at(i)->getId())).c_str());
+		}
+	}
+
+
+	if (ImGui::Button("Add Image mesh"))
+	{
+		testModel->addImage();
+	}
+
 
 	ImGui::End();
 

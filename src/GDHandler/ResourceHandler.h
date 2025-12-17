@@ -120,6 +120,10 @@ class SceneResource;
 class ObjectResource;
 class ShaderResource;
 class MaterialResource;
+class RenderMeshResource;
+class ColliderMeshResource;
+class ImageResource;
+
 
 
 // MASTER RESOURCE CLASS. HANDLES STORAGE OF RESOURCE IDS and RESOURCES
@@ -130,12 +134,16 @@ private:
 
 protected:
 
-	std::vector<CaseResource>* caseRes = new std::vector<CaseResource>();
-	std::vector<SceneResource>* scnRes = new std::vector<SceneResource>();
-	std::vector<ObjectResource>* objRes = new std::vector<ObjectResource>();
-	std::vector<ShaderResource>* shaderRes = new std::vector<ShaderResource>();
-	std::vector<MaterialResource>* matRes = new std::vector<MaterialResource>();
+	std::vector<CaseResource*>* caseRes = new std::vector<CaseResource*>();
+	std::vector<SceneResource*>* scnRes = new std::vector<SceneResource*>();
+	std::vector<ObjectResource*>* objRes = new std::vector<ObjectResource*>();
+	std::vector<ShaderResource*>* shaderRes = new std::vector<ShaderResource*>();
+	std::vector<MaterialResource*>* matRes = new std::vector<MaterialResource*>();
+	std::vector<RenderMeshResource*>* renderRes = new std::vector<RenderMeshResource*>();
+	std::vector<ColliderMeshResource*>* colRes = new std::vector<ColliderMeshResource*>();
+	std::vector<ImageResource*>* imageRes = new std::vector<ImageResource*>();
 
+	// Items Must be added to the Master List before Their respective add Function!
 	void AddIndexToMaster(ResID id) {
 
 		for (int i = 0; i < masterList->size(); i++)
@@ -147,6 +155,15 @@ protected:
 		}
 		masterList->push_back(id);
 
+	}
+
+	void validateMasterList() {
+		unsigned long long totalItems = caseRes->size() + scnRes->size() + objRes->size() + 
+			shaderRes->size() + matRes->size() + renderRes->size() + colRes->size() + imageRes->size();
+		if (totalItems != masterList->size())
+		{
+			throw ResourceHandlerIDError("Master List is not valid!");
+		}
 	}
 
 	int getCaseIndex() {
@@ -164,30 +181,58 @@ protected:
 	int getShaderIndex() {
 		return shaderRes->size();
 	}
+	int getRenderMeshIndex() {
+		return renderRes->size();
+	}
+	int getColliderMeshIndex() {
+		return colRes->size();
+	}
+	int getImageIndex() {
+		return imageRes->size();
+	}
 
 	void addCaseRes(CaseResource* case_p) {
-		AddIndexToMaster(case_p->getId());
-		caseRes->push_back(*case_p);
+		caseRes->push_back(case_p);
+		validateMasterList();
 	}
 
 	void addSceneRes(SceneResource* scn_p) {
-		AddIndexToMaster(scn_p->getId());
-		scnRes->push_back(*scn_p);
+		
+		scnRes->push_back(scn_p);
+		validateMasterList();
 	}
 
 	void addObjectRes(ObjectResource* obj_p) {
-		AddIndexToMaster(obj_p->getId());
-		objRes->push_back(*obj_p);
+		
+		objRes->push_back(obj_p);
+		validateMasterList();
 	}
 
 	void addShaderRes(ShaderResource* shader_p) {
-		AddIndexToMaster(shader_p->getId());
-		shaderRes->push_back(*shader_p);
+		
+		shaderRes->push_back(shader_p);
+		validateMasterList();
 	}
 
 	void addMaterialRes(MaterialResource* mat_p) {
-		AddIndexToMaster(mat_p->getId());
-		matRes->push_back(*mat_p);
+		
+		matRes->push_back(mat_p);
+		validateMasterList();
+	}
+
+	void addRenderMeshRes(RenderMeshResource* render_p) {
+		renderRes->push_back(render_p);
+		validateMasterList();
+	}
+
+	void addColliderMeshRes(ColliderMeshResource* collider_p) {
+		colRes->push_back(collider_p);
+		validateMasterList();
+	}
+
+	void addImageRes(ImageResource* image_p) {
+		imageRes->push_back(image_p);
+		validateMasterList();
 	}
 
 public:
@@ -197,14 +242,127 @@ public:
 	// CASE RESOURCE
 
 	// Not a suggested method to fetch few cases. Try using getByID() insted. This method is only for GUI applications!
-	std::vector<CaseResource>* getAllCase() { return caseRes; };
-	std::vector<SceneResource>* getAllScenes() { return scnRes; };
+	std::vector<CaseResource*>* getAllCase() { return caseRes; };
+	std::vector<SceneResource*>* getAllScenes() { return scnRes; };
+	std::vector<ObjectResource*>* getAllObjects() { return objRes; };
+	std::vector<MaterialResource*>* getAllMaterial(){ return matRes; };
+	std::vector<ShaderResource*>* getAllShader() { return shaderRes; };
+	std::vector<RenderMeshResource*>* getAllRenderMesh() { return renderRes; };
+	std::vector<ColliderMeshResource*>* getAllColliderMesh() { return colRes; };
+	std::vector<ImageResource*>* getAllImages() { return imageRes; };
 
 	SceneResource* fetchSceneResourceByID(ResID id) {
-		return &scnRes->at(id - 10100000000);
+		try{
+			if (id < 10110000000)
+			{
+				return scnRes->at(id - 10100000000);
+			}
+			else if (id < 10120000000)
+			{
+				return scnRes->at(id - 10110000000);
+			}
+			else {
+				return scnRes->at(id - 10120000000);
+			}
+			
+		}
+		catch (...)
+		{
+			throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
+		}
+		
 	}
 	CaseResource* fetchCaseResourceByID(ResID id) {
-		return &caseRes->at(id - 10000000000);
+		try
+		{
+			return caseRes->at(id - 10000000000);
+		}
+		catch (...)
+		{
+			throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
+		}
+		
+	}
+	ShaderResource* fetchShaderResourceByID(ResID id) {
+		try
+		{
+			if (id < 10710000000)
+			{
+				return shaderRes->at(id - 10700000000);
+			}
+			else {
+				return shaderRes->at(id - 10710000000);
+			}
+		}
+		catch (...)
+		{
+			throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
+		}
+		
+	}
+	ObjectResource* fetchObjectResourceByID(ResID id) {
+		try
+		{
+			if (id < 10210000000)
+			{
+				return objRes->at(id - 10200000000);
+			}
+			else if (id < 10220000000) {
+				return objRes->at(id - 10210000000);
+			}
+			else {
+				return objRes->at(id - 10220000000);
+			}
+		}
+		catch (...)
+		{
+			throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
+		}
+		
+	}
+	MaterialResource* fetchMaterialResourceByID(ResID id) {
+		try
+		{
+			return matRes->at(id - 10800000000);
+		}
+		catch (const std::exception&)
+		{
+			throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
+		}
+		
+	}
+
+	RenderMeshResource* fetchRenderMeshResourceByID(ResID id) {
+		try
+		{
+			return renderRes->at(id - 10300000000);
+		}
+		catch (...)
+		{
+			throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
+		}
+	}
+
+	ColliderMeshResource* fetchColliderMeshResourceByID(ResID id) {
+		try
+		{
+			return colRes->at(id - 10400000000);
+		}
+		catch (...)
+		{
+			throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
+		}
+	}
+
+	ImageResource* fetchImageResourceByID(ResID id) {
+		try
+		{
+			return imageRes->at(id - 10600000000);
+		}
+		catch (const std::exception&)
+		{
+			throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
+		}
 	}
 
 	bool resourceExists(ResID id) {
@@ -224,6 +382,9 @@ public:
 	virtual void createObject(ObjectResource* obj_p) {};
 	virtual void createMaterial(MaterialResource* mat_p) {};
 	virtual void createShader(ShaderResource* shader_p) {};
+	virtual void createRenderMesh(RenderMeshResource* render_p) {};
+	virtual void createColliderMesh(ColliderMeshResource* collider_p) {};
+	virtual void createImage(ImageResource* image_p) {}
 
 
 };
@@ -290,20 +451,14 @@ public:
 	}
 
 
-	CaseResource(const char* name_p) {
-		this->setName(name_p);
-	};
-
-	CaseResource(ResourceHandlerBuilderContext* context, const char* name_p) {
+	CaseResource(ResourceHandlerBuilderContext* context, std::string name_p) {
 		this->resourceHandlerCxt = context;
-		build(context, name_p);
-	}
-
-	void build(ResourceHandlerBuilderContext* context, const char* name_p) {
 		this->setName(name_p);
+
 		context->createCase(this);
 	}
 
+	
 	// CASE METHODS
 
 	std::vector<ResID>* getScenesInCase() {
@@ -367,7 +522,7 @@ public:
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
 		}
-		_id = 10100000000 + index + ((this->scnType-1) * 100000000); //  Assigns ID Based on SceneType
+		_id = 10100000000 + index + ((this->scnType) * 10000000); //  Assigns ID Based on SceneType
 	}
 
 	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, int SceneType, Ogre::Vector3 position_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) {
@@ -413,6 +568,10 @@ public:
 		return objects;
 	}
 
+	int getSceneType() {
+		return scnType;
+	}
+
 };
 
 
@@ -420,7 +579,7 @@ class ObjectResource : public Resource
 {
 
 private:
-	int physXType;
+	PhysXType physXType;
 
 protected:
 
@@ -436,10 +595,10 @@ public:
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
 		}
-		_id = 10200000000 + index + (this->physXType * 100000000);
+		_id = 10200000000 + index + (this->physXType * 10000000);
 	}
 	
-	ObjectResource(ResourceHandlerBuilderContext* context,std::string name_p, int objectType ) {
+	ObjectResource(ResourceHandlerBuilderContext* context,std::string name_p, PhysXType objectType ) {
 		this->resourceHandlerCxt = context;
 		physXType = objectType;
 		this->setName(name_p);
@@ -513,6 +672,10 @@ struct ShaderTexture
 	ResID texture;
 	int texturePosition; // Position of texture in Shader
 
+	ShaderTexture() {
+
+	}
+
 	ShaderTexture(ResID textureImgID) {
 		texture = textureImgID;
 	}
@@ -535,16 +698,76 @@ public:
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
 		}
-		_id = 10700000000 + index;
+		_id = 10700000000 + index + (shaderType * 10000000);
 	}
 
-	ShaderResource(ResourceHandlerBuilderContext* context, std::string name_p) {
+	ShaderResource(ResourceHandlerBuilderContext* context, std::string name_p, ShaderType shaderType_p , std::string shaderFileName) {
 		this->setName(name_p);
 		this->resourceHandlerCxt = context;
+		shaderType = shaderType_p;
+		switch (shaderType)
+		{
+		case Vertex:
+			VertexShaderName = shaderFileName;
+			break;
+		case Fragment:
+			FragmentShaderName = shaderFileName;
+			break;
+		default:
+			break;
+		}
 
 		context->createShader(this);
 	}
 
+	void addShaderParameter(ShaderVar variable) {
+		switch (shaderType)
+		{
+		case Vertex:
+			VertexParameters->push_back(variable);
+			break;
+		case Fragment:
+			FragmentParameters->push_back(variable);
+			break;
+		default:
+			break;
+		}
+	}
+
+
+
+	std::vector<ShaderVar>* getShaderVars() {
+		switch (shaderType)
+		{
+		case Vertex:
+			return VertexParameters;
+			break;
+		case Fragment:
+			return FragmentParameters;
+			break;
+		default:
+			break;
+		}
+	}
+
+
+	ShaderType getShaderType() {
+		return shaderType;
+	}
+	
+	std::string getShaderFileName() {
+		switch (shaderType)
+		{
+		case Vertex:
+			return VertexShaderName;
+			break;
+		case Fragment:
+			return FragmentShaderName;
+			break;
+		default:
+			break;
+		}
+	}
 
 };
 
@@ -553,7 +776,8 @@ class MaterialResource : public Resource
 
 protected:
 	std::string materialName; // file name of material
-
+	 
+	// Shader Resource ID
 	ResID VertexShaderResource; 
 	ResID FragmentShaderResource; 
 	
@@ -651,6 +875,10 @@ private:
 
 	std::filesystem::path imagePath;
 
+
+	
+public:
+
 	void setId(int index) override {
 
 		if (index > 99999)
@@ -661,22 +889,28 @@ private:
 
 	}
 
-public:
-
-	ImageResource(int index, std::filesystem::path imagePath_p) {
-		setId(index);
+	ImageResource(ResourceHandlerBuilderContext* context, std::filesystem::path imagePath_p) {
 		imagePath = imagePath_p;
+
+		this->setName(imagePath.filename().string());
+
+		context->createImage(this);
 	}
 
 };
 
+
+
 class RenderMeshResource : public Resource
 {
-private:
 
-	const char* name;
+protected:
+	ResID material;
 
-	ResID Material;
+	std::string meshName;
+	std::string meshFileName;
+	
+public:
 
 	void setId(int index) override {
 
@@ -687,24 +921,51 @@ private:
 		_id = 10300000000 + index;
 
 	}
-public:
 
-	RenderMeshResource(const char* name_p, int index) {
-		setId(index);
-		name = name_p;
+	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string name_p, std::string meshName_p, std::string meshFileName_p) {
+		this->resourceHandlerCxt = context;
+		this->setName(name_p);
+
+		meshFileName = meshFileName_p;
+		meshName = meshName_p;
+
+		context->createRenderMesh(this);
 	}
 
-	virtual void setMaterial(ResID material_p) {}
+	std::string getMeshName() {
+		return meshName;
+	}
+
+	std::string getMeshFileName() {
+		return meshFileName;
+	}
+
+	MaterialResource* getMaterialResource() {
+		return this->resourceHandlerCxt->fetchMaterialResourceByID(material);
+	}
+
+	ResID getMaterialID() {
+		return material;
+	}
+
+	void setMaterial(ResID material_p) {
+		material = material_p;
+	}
+
+
 
 };
 
 class ColliderMeshResource : public Resource
 {
-private:
 
-	const char* name;
+protected:
+	ResID material;
 
-	ResID Material;
+	std::string meshName;
+	std::string meshFileName;
+	
+public:
 
 	void setId(int index) override {
 
@@ -715,44 +976,42 @@ private:
 		_id = 10400000000 + index;
 
 	}
-public:
 
-	ColliderMeshResource(const char* name_p, int index) {
-		setId(index);
-		name = name_p;
+	ColliderMeshResource(ResourceHandlerBuilderContext* context, std::string name_p, std::string meshName_p, std::string meshFileName_p){
+		this->resourceHandlerCxt = context;
+		this->setName(name_p);
+
+		meshName = meshName_p;
+		meshFileName = meshFileName_p;
+
+		context->createColliderMesh(this);
+
 	}
 
-	virtual void setMaterial(ResID material_p) {}
+	std::string getMeshName() {
+		return meshName;
+	}
+
+	std::string getMeshFileName() {
+		return meshFileName;
+	}
+
+	MaterialResource* getMaterialResource() {
+		return this->resourceHandlerCxt->fetchMaterialResourceByID(material);
+	}
+
+	ResID getMaterialID() {
+		return material;
+	}
+
+	void setMaterial(ResID material_p) {
+		material = material_p;
+	}
+
 
 };
 
-class MeshResource : public Resource
-{
-private:
 
-	const char* name;
-
-	ResID Material;
-
-	void setId(int index) override {
-
-		if (index > 99999)
-		{
-			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
-		}
-		_id = 10500000000 + index;
-
-	}
-public:
-
-	MeshResource(const char* name_p, int index) {
-		setId(index);
-		name = name_p;
-	}
-
-	virtual void setMaterial(ResID material_p) {}
-
-};
 
 
 
@@ -781,27 +1040,50 @@ private:
 	// RESOURCES BUILDER
 	void createCase(CaseResource* case_p) override {
 		case_p->setId(this->getCaseIndex());
+		AddIndexToMaster(case_p->getId());
 		this->addCaseRes(case_p);
 	}
 
 	void createScene(SceneResource* scn_p) override {
 		scn_p->setId(this->getSceneIndex());
+		AddIndexToMaster(scn_p->getId());
 		this->addSceneRes(scn_p);
 	}
 
 	void createObject(ObjectResource* obj_p) override {
 		obj_p->setId(this->getObjectIndex());
+		AddIndexToMaster(obj_p->getId());
 		this->addObjectRes(obj_p);
 	}
 
 	void createMaterial(MaterialResource* mat_p) override {
 		mat_p->setId(this->getMaterialIndex());
+		AddIndexToMaster(mat_p->getId());
 		this->addMaterialRes(mat_p);
 	}
 
 	void createShader(ShaderResource* shader_p) override {
 		shader_p->setId(this->getShaderIndex());
+		AddIndexToMaster(shader_p->getId());
 		this->addShaderRes(shader_p);
+	}
+
+	void createRenderMesh(RenderMeshResource* render_p) override {
+		render_p->setId(this->getRenderMeshIndex());
+		AddIndexToMaster(render_p->getId());
+		this->addRenderMeshRes(render_p);
+	}
+
+	void createColliderMesh(ColliderMeshResource* col_p) override {
+		col_p->setId(this->getColliderMeshIndex());
+		AddIndexToMaster(col_p->getId());
+		this->addColliderMeshRes(col_p);
+	}
+
+	void createImage(ImageResource* image_p) override {
+		image_p->setId(this->getImageIndex());
+		AddIndexToMaster(image_p->getId());
+		this->addImageRes(image_p);
 	}
 
 	// default locations

@@ -24,7 +24,7 @@ class Case : public CaseResource {
 	
 public:
 
-	Case(const char* name_p ,ResourceHandlerBuilderContext* context) : CaseResource(context,name_p) {
+	Case(std::string name_p ,ResourceHandlerBuilderContext* context) : CaseResource(context,name_p) {
 		
 	}
 	
@@ -40,7 +40,7 @@ public:
 	Ogre::Vector3 getScnPosition() { return this->position; }
 	Ogre::Vector3 getScnScale() { return this->scale; }
 	Ogre::Vector4 getScnOrientation() { return this->orientation; }
-	int getScnType() { return this->scnType; }
+
 };
 
 class Stuff
@@ -324,8 +324,8 @@ public:
 
 
 enum SceneType {
-	DYNAMIC,
 	STATIC,
+	DYNAMIC,
 	MESH
 };
 
