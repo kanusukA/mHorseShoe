@@ -874,8 +874,6 @@ class ImageResource : public Resource
 private:
 
 	std::filesystem::path imagePath;
-
-
 	
 public:
 
