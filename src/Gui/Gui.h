@@ -16,6 +16,8 @@
 #include<Gui/GuiComponents/HUD.cpp>
 #include<Gui/GuiComponents/TestingTab.h>
 
+#include<Gui/GuiComponents/ToastTabComponent.h>
+
 
 // Components
 
@@ -39,8 +41,6 @@ struct GUI_WINDOW_POS {
 // Add imGui input listner to context input listner.
 class Gui : public GuiFramework
 {
-
-
 private:
 
 
@@ -64,7 +64,7 @@ private:
 
 public:
 
-	Gui(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan,RSUS* rsus) : 
+	Gui(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
 		GuiFramework(scnhan, stuffhan,resourcehan, rsus) {}
 
 	//void setPlayerObserver(PlayerObserver* pObserver);

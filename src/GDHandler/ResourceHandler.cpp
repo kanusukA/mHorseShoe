@@ -538,13 +538,16 @@ void ResourceHandler::readFile(std::string filename)
 
 ResourceHandler* ResourceHandler::GetInstance() {
 
+	ToastComponent::GetInstance()->addMessage("Starting Resource Handler");
+
 	// locks storage 
 	std::lock_guard<std::mutex> lock(mutex_);
 	if (pinstance_ == nullptr) {
 		pinstance_ = new ResourceHandler();
 		pinstance_->ini.SetUnicode();
-		
+
 	}
+	mutex_.unlock();
 	return pinstance_;
 
 

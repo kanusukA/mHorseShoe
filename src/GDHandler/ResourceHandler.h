@@ -3,10 +3,11 @@
 #ifndef RESOURCEHANDLER_H
 #define RESOURCEHANDLER_H
 
+#include <Gui/GuiComponents/ToastComponent.h>
+
 #include<Windows.h>
 #include <Ogre.h>
 
-#include <mutex>
 #include <fstream>
 #include <iostream>
 #include <string>

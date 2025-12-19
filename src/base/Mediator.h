@@ -7,6 +7,8 @@
 #include <GDHandler/stuff/Stuff.h>
 #include <feel/playerMovement.h>
 
+#include <Gui/GuiComponents/ToastComponent.h>
+
 
 // CODE CLEAN UP SHIFT TO NEW GUI FRAMEWORK!!
 
@@ -72,7 +74,7 @@ public:
 };
 
 
-class GuiFramework :public GDSource {
+class GuiFramework : public GDSource {
 	
 protected:
 
