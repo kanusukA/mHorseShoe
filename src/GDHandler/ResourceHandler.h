@@ -4,6 +4,7 @@
 #define RESOURCEHANDLER_H
 
 #include <Gui/GuiComponents/ToastComponent.h>
+#include <GDHandler/ResourcePaths.h>
 
 #include<Windows.h>
 #include <Ogre.h>
@@ -1108,16 +1109,22 @@ private:
 	// Loads ini file in ini obj. Creates the file if it does not exists
 	void _LoadIniFile(std::string filename);
 
+	// OVERHAUL PROJECT
+	void createFolder(std::filesystem::path path);
+	void createFile(std::filesystem::path path);
+
+
 	// Hide the constructor and destructor of the class
 protected:
-	ResourceHandler() {
-		this->SourceDir = getSourceDir();
-		this->colliderMeshes->push_back("box");
-	};
+	ResourceHandler();
 	~ResourceHandler() {};
 
 
 public:
+
+	// OVERHAUL FUNCTIONS
+	// Checks if the folder structure and required files exists for Resource Tasks
+	void checkFileStructure();
 
 	// Resources
 	// RenderMeshes
