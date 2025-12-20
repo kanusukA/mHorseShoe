@@ -35,6 +35,45 @@
 #define OBJECT_INI_LOC OBJECT_DIRECTORY + "/Objects.ini"
 
 
+#define RESOURCE_DEFAULT_LOC "resource_handler_def_loc.txt"
+#define GENERAL_RESOURCE_LOC "General_Resource_Loc"
+#define RENDER_MESH_LOC "Render_Mesh"
+#define COLLIDER_MESH_LOC "Collider_Mesh"
+#define MESH_MATERIAL_LOC "Mesh_Materials"
+#define IMAGES_LOC "Images"
+
+#define DYNAMIC_NODES_LOC "./Scenes/Dynamic/"
+#define DYNAMIC_NODES_FILE "dynamicNodes.ini"
+
+#define STATIC_NODES_LOC "./Scenes/Static/"
+#define STATIC_NODES_FILE "StaticNodes.ini"
+
+#define MESH_NODES_LOC "./Scenes/Mesh/"
+#define MESH_NODES_FILE "MeshNodes.ini"
+
+#define SECTION_SCENE "SCENE"
+#define SECTION_OBJECT "OBJECT"
+#define SECTION_PARENT_SCN "PARENT_NODE"
+#define KEY_PARENT_SCN "NODE"
+
+#define SECTION_MATERIAL "Material"
+#define SECTION_VERTEX_SHADER "Vertex Param"
+#define SECTION_FRAGMNET_SHADER "Fragment Param"
+#define SECTION_TEXTURE "Textures"
+
+#define NODEKEY_NAME "NAME"
+#define NODEKEY_RENDERMESH "RENDER_MESH"
+#define NODEKEY_COLLIDERMESH "COLLIDER_MESH"
+#define NODEKEY_PHYSXTYPE "PHYSXTYPE"
+#define NODEKEY_MASS "MASS"
+#define NODEKEY_POSITION "POSITION"
+#define NODEKEY_ROTATION "ROTATION"
+#define NODEKEY_CASTSHADOW "CAST_SHADOW"
+#define NODEKEY_RECEIVESHADOW "RECEIVE_SHADOW"
+#define NODEKEY_MATERIAL "MATERIAL"
+
+
+
 
 
 
