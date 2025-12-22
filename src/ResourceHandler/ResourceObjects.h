@@ -564,6 +564,8 @@ public:
 
 	ResID getRenderMesh() { return renderMeshID; }
 	ResID getColliderMesh() { return colliderMeshID; }
+	PhysXType getPhysxType() { return physXType; }
+	float getMass() { return mass; }
 
 };
 
@@ -786,6 +788,10 @@ public:
 		Textures->push_back(Texture);
 	}
 
+	std::vector<ShaderTexture>* getTextures() {
+		return Textures;
+	}
+
 	void removeTextureByID(ResID Texture) {
 		for (int i = 0; i < Textures->size(); i++)
 		{
@@ -829,6 +835,10 @@ public:
 		this->setName(imagePath.filename().string());
 
 		context->createImage(this);
+	}
+
+	std::filesystem::path getImagePath() {
+		return imagePath;
 	}
 
 };
@@ -975,7 +985,7 @@ std::string convertVec4ToString(Ogre::Vector4 vec4) {
 	return std::to_string(vec4[0]) + "|" + std::to_string(vec4[1]) + "|" + std::to_string(vec4[2]);
 }
 
-Ogre::Vector3 convertStringToVec4(std::string str) {
+Ogre::Vector4 convertStringToVec4(std::string str) {
 	std::string value = "";
 	int count = 0;
 	Ogre::Vector4 vec4 = Ogre::Vector4();
@@ -994,3 +1004,26 @@ Ogre::Vector3 convertStringToVec4(std::string str) {
 	return vec4;
 }
 
+std::string convertShaderVarValueToStr(ShaderVar variable) {
+	switch (variable.varType)
+	{
+	case ShaderVarType::FLOAT0:
+		return std::to_string(*variable.varFloat);
+		break;
+	case ShaderVarType::FLOAT2:
+		return std::to_string(variable.varFloat2[0]) + "|" + std::to_string(variable.varFloat2[0]) + "|";
+		break;
+	case ShaderVarType::FLOAT3:
+		return std::to_string(variable.varFloat3[0]) + "|" + std::to_string(variable.varFloat3[0]) + "|" + std::to_string(variable.varFloat3[2]) + "|";
+		break;
+	case ShaderVarType::FLOAT4:
+		return std::to_string(variable.varFloat4[0]) + "|" + std::to_string(variable.varFloat4[0]) + "|" + std::to_string(variable.varFloat4[2]) + "|" + std::to_string(variable.varFloat4[3]) + "|";
+		break;
+	case ShaderVarType::INTEGER:
+		return std::to_string(*variable.varInt);
+		break;
+	default:
+		// TODO Add resource handler Error
+		break;
+	}
+}
