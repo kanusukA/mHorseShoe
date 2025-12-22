@@ -151,6 +151,9 @@ private:
 	void createFolder(std::filesystem::path path);
 	void createFile(std::filesystem::path path);
 
+	
+	std::vector<std::string>* paths = new std::vector<std::string>(13);
+
 
 	// Hide the constructor and destructor of the class
 protected:
@@ -163,6 +166,33 @@ public:
 	// OVERHAUL FUNCTIONS
 	// Checks if the folder structure and required files exists for Resource Tasks
 	void checkFileStructure();
+
+	//PATHS
+	void setPath(std::string path, ResourcePaths pathOf) {
+		if (std::filesystem::exists(path))
+		{
+			paths->at(pathOf) = path;
+		}
+		else {
+			throw ResourceHandlerIDError(("Invalid Path - " + path).c_str());
+		}
+		
+	}
+	void setPath(std::string path, int pathPos) {
+		if (std::filesystem::exists(path))
+		{
+			paths->at(pathPos) = path;
+		}
+		else {
+			throw ResourceHandlerIDError(("Invalid Path - " + path).c_str());
+		}
+	}
+	std::string* getPath(ResourcePaths pathOf) {
+		return &paths->at(pathOf);
+	}
+	std::vector<std::string>* getPaths() {
+		return paths;
+	}
 
 	// Resources
 	// RenderMeshes

@@ -226,17 +226,28 @@ void ResourceHandler::checkFileStructure()
 		std::filesystem::create_directory(this->SourceDir.string() + DATA_DIRECTORY);
 	}
 
+	if (!std::filesystem::exists(this->SourceDir.string() + MASTERLIST_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("Maste list does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + MASTERLIST_LOC);
+	}
+	this->setPath(this->SourceDir.string() + MASTERLIST_LOC, ResourcePaths::MasterList);
+	
+
 	if (!std::filesystem::exists(this->SourceDir.string() + CASE_DIRECTORY))
 	{
 		ToastComponent::GetInstance()->addMessage("Case Directory does not exists. Creating");
 		std::filesystem::create_directory(this->SourceDir.string() + CASE_DIRECTORY);
 	}
 
+
 	if (!std::filesystem::exists(this->SourceDir.string() + CASE_INI_LOC))
 	{
 		ToastComponent::GetInstance()->addMessage("Cases.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + CASE_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + CASE_INI_LOC, ResourcePaths::Cases);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + SCENE_DIRECTORY))
 	{
@@ -256,11 +267,16 @@ void ResourceHandler::checkFileStructure()
 		_LoadIniFile(this->SourceDir.string() + SCENE_INI_LOC);
 	}
 
+	
+	this->setPath(this->SourceDir.string() + SCENE_INI_LOC, ResourcePaths::Scenes);
+
 	if (!std::filesystem::exists(this->SourceDir.string() + SCENEOBJ_INI_LOC))
 	{
 		ToastComponent::GetInstance()->addMessage("ScenesObj.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + SCENEOBJ_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + SCENEOBJ_INI_LOC, ResourcePaths::ScnObj);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + MATERIAL_DIRECTORY))
 	{
@@ -278,11 +294,16 @@ void ResourceHandler::checkFileStructure()
 		ToastComponent::GetInstance()->addMessage("Materials.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + MATERIAL_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + MATERIAL_INI_LOC, ResourcePaths::Material);
+
 	if (!std::filesystem::exists(this->SourceDir.string() + MATERIALTEXTURE_INI_LOC))
 	{
 		ToastComponent::GetInstance()->addMessage("MaterialTextures.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + MATERIALTEXTURE_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + MATERIALTEXTURE_INI_LOC, ResourcePaths::MaterialTexture);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + RENDERMESH_DIRECTORY))
 	{
@@ -294,6 +315,9 @@ void ResourceHandler::checkFileStructure()
 		ToastComponent::GetInstance()->addMessage("RenderMeshes.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + RENDERMESH_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + RENDERMESH_INI_LOC, ResourcePaths::RenderMesh);
+
 	if (!std::filesystem::exists(this->SourceDir.string() + COLLIDERMESH_DIRECTORY))
 	{
 		ToastComponent::GetInstance()->addMessage("ColliderMesh Directory does not exists. Creating");
@@ -305,6 +329,8 @@ void ResourceHandler::checkFileStructure()
 		ToastComponent::GetInstance()->addMessage("ColliderMeshes.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + COLLIDERMESH_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + COLLIDERMESH_INI_LOC, ResourcePaths::ColliderMesh);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + SHADER_DIRECTORY))
 	{
@@ -322,16 +348,25 @@ void ResourceHandler::checkFileStructure()
 		ToastComponent::GetInstance()->addMessage("Shaders.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + SHADER_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + SHADER_INI_LOC, ResourcePaths::Shaders);
+
+
 	if (!std::filesystem::exists(this->SourceDir.string() + SHADERVARS_INI_LOC))
 	{
 		ToastComponent::GetInstance()->addMessage("ShaderVars.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + SHADERVARS_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + SHADERVARS_INI_LOC, ResourcePaths::ShaderVars);
+
 	if (!std::filesystem::exists(this->SourceDir.string() + SHADERVALUES_INI_LOC))
 	{
 		ToastComponent::GetInstance()->addMessage("ShaderValues.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + SHADERVALUES_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + SHADERVALUES_INI_LOC, ResourcePaths::ShaderValues);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + IMAGE_DIRECTORY))
 	{
@@ -345,6 +380,7 @@ void ResourceHandler::checkFileStructure()
 		_LoadIniFile(this->SourceDir.string() + IMAGE_INI_LOC);
 	}
 
+	this->setPath(this->SourceDir.string() + IMAGE_INI_LOC, ResourcePaths::Image);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + OBJECT_DIRECTORY))
 	{
@@ -357,6 +393,8 @@ void ResourceHandler::checkFileStructure()
 		ToastComponent::GetInstance()->addMessage("Objects.ini does not exsits. Creating");
 		_LoadIniFile(this->SourceDir.string() + OBJECT_INI_LOC);
 	}
+
+	this->setPath(this->SourceDir.string() + OBJECT_INI_LOC, ResourcePaths::Objects);
 
 
 }

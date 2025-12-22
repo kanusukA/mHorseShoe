@@ -1,8 +1,47 @@
 #include "ReourceTabComponent.h"
 
+
+void pathViewComponent(
+	ResourceTabModelComponent* model
+) {
+
+	if (ImGui::CollapsingHeader("Paths")) {
+
+		
+
+		for (int i = 0; i < model->paths->size(); i++)
+		{
+			if (model->edit == i)
+			{
+				if (ImGui::InputText("", model->inputPath, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue)) {
+					model->setPath();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Set"))
+				{
+					model->setPath();
+				}
+			}
+			else {
+				ImGui::Text(model->paths->at(i).c_str(), 500.0);
+				ImGui::SameLine();
+				if (ImGui::Button(("Edit##" + std::to_string(i)).c_str()))
+				{
+					model->editPath(i);
+				}
+			}
+
+			
+		}
+	}
+
+}
+
 void ResourceTabComponent::view()
 {
 	ImGui::Begin("Resources");
+
+	pathViewComponent(resourceTabModel);
 
 	ImGui::Columns(2);
 

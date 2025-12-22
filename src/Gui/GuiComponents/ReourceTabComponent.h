@@ -3,6 +3,8 @@
 #include <base/Mediator.h>
 #include <OgreImGuiOverlay.h>
 
+#include <imgui_stdlib.h>
+
 class ResourceTabModelComponent : public ModelComponent {
 public:
 
@@ -11,6 +13,13 @@ public:
 	std::vector<std::filesystem::path>* meshMaterials;
 	std::vector<std::filesystem::path>* images;
 	Ogre::StringVectorPtr ogreMeshes;
+
+	// PATHS
+	std::vector<std::string>* paths;
+
+	std::string* inputPath = new std::string("");
+
+	int edit = -1;
 
 	ResourceTabModelComponent(const char* name_p) : ModelComponent(name_p) {
 
@@ -23,6 +32,8 @@ public:
 		images = gdSource->getResourceHandler()->images;
 		ogreMeshes = gdSource->getResourceHandler()->ogreRenderMeshes;
 
+		paths = gdSource->getResourceHandler()->getPaths();
+
 	}
 
 	void RenderMeshToOgreBtn() {
@@ -31,6 +42,23 @@ public:
 
 	void FetchAllResourcesBtn() {
 		gdSource->getResourceHandler()->getAllResources();
+	}
+
+	void editPath(int pathPos) {
+		*inputPath = paths->at(pathPos);
+		edit = pathPos;
+	}
+	void setPath() {
+		try
+		{
+			this->gdSource->getResourceHandler()->setPath(*inputPath, edit);
+		}
+		catch (...)
+		{
+			ToastComponent::GetInstance()->addMessage("Invalid path - " + *inputPath);
+		}
+		
+		edit = -1;
 	}
 
 

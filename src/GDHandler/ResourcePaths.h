@@ -1,5 +1,22 @@
 #pragma once
 
+
+enum ResourcePaths {
+	MasterList,
+	Cases,
+	Scenes,
+	ScnObj,
+	Objects,
+	Shaders,
+	ShaderVars,
+	ShaderValues,
+	Material,
+	MaterialTexture,
+	RenderMesh,
+	ColliderMesh,
+	Image
+};
+
 #define DATA_DIRECTORY "/Data"
 #define MASTERLIST_LOC DATA_DIRECTORY + "/MasterList.ini"
 
