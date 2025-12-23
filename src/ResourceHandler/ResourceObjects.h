@@ -3,6 +3,8 @@
 
 #include <filesystem>
 
+#include <Gui/GuiRegen.h>
+
 #include <Ogre.h>
 
 #include <iostream>
@@ -18,6 +20,13 @@ enum PhysXType {
 	Static,
 	Dynamic,
 	Kinematic
+};
+
+
+enum SceneType {
+	STATIC,
+	DYNAMIC,
+	MESH
 };
 
 class ResourceHandlerIDError : public std::exception {
@@ -49,6 +58,7 @@ class ImageResource;
 class ResourceHandlerBuilderContext {
 
 private:
+	GuiRegen* guiRegen; // used to update Gui Resources
 	std::vector<ResID>* masterList = new std::vector<ResID>();
 
 protected:
@@ -73,6 +83,11 @@ protected:
 			}
 		}
 		masterList->push_back(id);
+
+		if (guiRegen)
+		{
+			guiRegen->regenScenes();
+		}
 
 	}
 
@@ -111,6 +126,7 @@ protected:
 	}
 
 	void addCaseRes(CaseResource* case_p) {
+		
 		caseRes->push_back(case_p);
 		validateMasterList();
 	}
@@ -119,6 +135,11 @@ protected:
 
 		scnRes->push_back(scn_p);
 		validateMasterList();
+
+		if (guiRegen)
+		{
+			guiRegen->regenScenes();
+		}
 	}
 
 	void addObjectRes(ObjectResource* obj_p) {
@@ -155,6 +176,11 @@ protected:
 	}
 
 public:
+
+	// Set GuiRegen to recieve updates on resource being added/changed/removed.
+	void setGuiRegen(GuiRegen* guiRegen_p) {
+		guiRegen = guiRegen_p;
+	}
 
 	std::vector<ResID>* getMasterList() { return masterList; };
 
@@ -315,7 +341,7 @@ protected:
 	ResID _id;
 	virtual void setId(int index) {};
 
-	std::string name;
+	std::string name = "";
 
 	ResourceHandlerBuilderContext* resourceHandlerCxt;
 
@@ -380,7 +406,7 @@ public:
 
 	// CASE METHODS
 
-	std::vector<ResID>* getScenesInCase() {
+	std::vector<ResID>* getScenesIdInCase() {
 		return Scenes;
 	}
 
@@ -454,10 +480,10 @@ public:
 		_id = 10100000000 + index + ((this->scnType) * 10000000); //  Assigns ID Based on SceneType
 	}
 
-	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, int SceneType, Ogre::Vector3 position_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) {
+	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, SceneType sceneType, Ogre::Vector3 position_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) {
 		this->resourceHandlerCxt = context;
 
-		scnType = SceneType;
+		scnType = sceneType;
 		position = position_p;
 		orientation = orientation_p;
 		scale = scale_p;

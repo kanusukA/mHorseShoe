@@ -3,6 +3,8 @@
 #ifndef RESOURCEHANDLER_H
 #define RESOURCEHANDLER_H
 
+
+
 #include <Gui/GuiComponents/ToastComponent.h>
 #include <GDHandler/ResourcePaths.h>
 
@@ -82,6 +84,7 @@ private:
 		case_p->setId(this->getCaseIndex());
 		AddIndexToMaster(case_p->getId());
 		this->addCaseRes(case_p);
+		std::cout << "case added - " << case_p->getName() << case_p->getId() << std::endl;
 	}
 
 	void createScene(SceneResource* scn_p) override {

@@ -76,7 +76,7 @@ public:
 	// CASE
 	void addCase() {
 
-		Case* myCase = new Case(*caseName, this->gdSource->getResourceHandler());
+		Case* myCase = new Case(*caseName);
 		
 	}
 
@@ -85,10 +85,10 @@ public:
 		caseRes->addSceneToCase(selectedScnID);
 	}
 
-	void getScenesInCase(ResID caseID) {
+	void getScenesIdInCase(ResID caseID) {
 		CaseResource* caseRes = this->gdSource->getResourceHandler()->fetchCaseResourceByID(caseID);
 
-		scnInCaseResource = caseRes->getScenesInCase();
+		scnInCaseResource = caseRes->getScenesIdInCase();
 	}
 
 	// SCENE
@@ -99,9 +99,9 @@ public:
 
 		scnName = scnCast->getName();
 
-		this->guiFramework->setOgreVec3(scn_pos,scnCast->getScnPosition());
-		this->guiFramework->setOgreVec3(scn_scale, scnCast->getScnScale());
-		this->guiFramework->setOgreVec4(scn_orientation, scnCast->getScnOrientation());
+		this->guiFramework->setOgreVec3(scn_pos,scnCast->getPosition());
+		this->guiFramework->setOgreVec3(scn_scale, scnCast->getScale());
+		this->guiFramework->setOgreVec4(scn_orientation, scnCast->getOrientation());
 		
 		scnType = SceneType(scnCast->getSceneType());
 
@@ -111,10 +111,10 @@ public:
 
 	void addScene() {
 		
-		Scene* myScene = new Scene(this->gdSource->getResourceHandler(), scnName, scnType,
+		Scene* myScene = new Scene(scnType, scnName,
 			Ogre::Vector3(scn_pos[0], scn_pos[1], scn_pos[2]),
-			Ogre::Vector3(scn_scale[0], scn_scale[1], scn_scale[2]),
-			Ogre::Vector4(scn_orientation[0], scn_orientation[1], scn_orientation[2], scn_orientation[3])
+			Ogre::Vector4(scn_orientation[0], scn_orientation[1], scn_orientation[2], scn_orientation[3]),
+			Ogre::Vector3(scn_scale[0], scn_scale[1], scn_scale[2])
 			);
 
 		

@@ -64,8 +64,11 @@ private:
 
 public:
 
-	Gui(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
-		GuiFramework(scnhan, stuffhan,resourcehan, rsus) {}
+	Gui(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
+		GuiFramework(casehan, stuffhan,resourcehan, rsus) 
+	{
+			
+	}
 
 	//void setPlayerObserver(PlayerObserver* pObserver);
 	ImGuiViewport* viewport;

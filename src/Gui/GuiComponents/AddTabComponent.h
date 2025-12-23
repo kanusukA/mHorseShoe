@@ -16,12 +16,6 @@ public:
 
 	std::string* objectName = new std::string("");
 
-	std::vector<Ogre::SceneNode*>* StaticScenes;
-	std::vector<Ogre::SceneNode*>* DynamicScenes;
-	std::vector<Ogre::SceneNode*>* MeshScenes;
-	std::vector<Ogre::SceneNode*>* selectedScenes;
-
-
 	Ogre::StringVectorPtr RenderMeshes;
 	std::vector<std::filesystem::path>* ColliderMeshes;
 
@@ -45,15 +39,16 @@ public:
 	}
 
 	void init() override {
-		MeshScenes = this->gdSource->getSceneHandler()->getMeshScenes();
-		StaticScenes = this->gdSource->getSceneHandler()->getStaticScenes();
-		DynamicScenes = this->gdSource->getSceneHandler()->getDynamicScenes();
-		MeshScenes = this->gdSource->getSceneHandler()->getMeshScenes();
+		// TODO ADD SCENES IN ADD TAB
+		/*MeshScenes = this->gdSource->getCaseHandler()->getMeshScenes();
+		StaticScenes = this->gdSource->getCaseHandler()->getStaticScenes();
+		DynamicScenes = this->gdSource->getCaseHandler()->getDynamicScenes();
+		MeshScenes = this->gdSource->getCaseHandler()->getMeshScenes();*/
 
 		RenderMeshes = this->gdSource->getResourceHandler()->ogreRenderMeshes;
 		ColliderMeshes = this->gdSource->getResourceHandler()->colliderMeshes;
 
-		selectedScenes = StaticScenes;
+		
 	}
 
 	void normalizeRot() {
@@ -94,55 +89,21 @@ public:
 		switch (SelectedStuffType)
 		{
 		case STUFF_DYNAMIC:
-			gdSource->getSceneHandler()->CreateScene(SceneType::DYNAMIC, *CreateSceneNode);
+			gdSource->getCaseHandler()->CreateScene(SceneType::DYNAMIC, *CreateSceneNode);
 			break;
 		case STUFF_STATIC:
-			gdSource->getSceneHandler()->CreateScene(SceneType::STATIC, *CreateSceneNode);
+			gdSource->getCaseHandler()->CreateScene(SceneType::STATIC, *CreateSceneNode);
 			break;
 		case STUFF_MESH_ONLY:
-			gdSource->getSceneHandler()->CreateScene(SceneType::MESH, *CreateSceneNode);
+			gdSource->getCaseHandler()->CreateScene(SceneType::MESH, *CreateSceneNode);
 			break;
 		default:
 			break;
 		}
 	}
 
-	void selectedStuffTypeDyn() {
-		SelectedStuffType = StuffType::STUFF_DYNAMIC;
-		selectedScenes = DynamicScenes;
-		selectedScenePos = 0;
-	}
-	void selectedStuffTypeStat() {
-		SelectedStuffType = StuffType::STUFF_STATIC;
-		selectedScenes = StaticScenes;
-		selectedScenePos = 0;
-	}
-	void selectedStuffTypeMesh() {
-		SelectedStuffType = StuffType::STUFF_MESH_ONLY;
-		selectedScenes = MeshScenes;
-		selectedScenePos = 0;
-	}
-
 	void add() {
-		if (selectedScenes)
-		{
-			this->gdSource->getStuffHandler()->addObject(
-				selectedScenes->at(selectedScenePos)->getName(),
-				*objectName,
-				RenderMeshes.get()->at(renderMeshesPos),
-				ColliderMeshes->at(colliderMeshesPos).filename().string(),
-				Ogre::Vector3(pos),
-				*normalizer,
-				SelectedStuffType,
-				*mass,
-				Ogre::Vector3(colSize)
-
-			);
-		}
-		else {
-			// CREATE A NOTIFICATION SYSTEM THAT IS UNIVERSALLY ACCESSABLE
-			std::cout << "Object Creation failed" << std::endl;
-		}
+		// TODO add stuffHandler Object creation
 	}
 
 

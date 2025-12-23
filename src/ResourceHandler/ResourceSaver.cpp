@@ -60,9 +60,9 @@ void ResourceSaver::saveCase(CaseResource* case_p)
 
 	ini->SetValue(sectionName, case_p->getName().c_str(),NULL);
 
-	for (int i = 0; i < case_p->getScenesInCase()->size(); i++)
+	for (int i = 0; i < case_p->getScenesIdInCase()->size(); i++)
 	{
-		ini->SetValue(sectionName, std::to_string(case_p->getScenesInCase()->at(i)).c_str(), NULL);
+		ini->SetValue(sectionName, std::to_string(case_p->getScenesIdInCase()->at(i)).c_str(), NULL);
 	}
 
 }

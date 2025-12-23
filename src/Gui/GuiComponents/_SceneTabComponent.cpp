@@ -4,15 +4,41 @@ void SceneTabComponent::view()
 {
 	ImGui::Begin("Cases");
 
-	if (scnTabModel->cases)
-	{
-		for (int i = 0; i < scnTabModel->cases->size(); i++)
-		{
-			ImGui::Text(scnTabModel->cases->at(i).c_str());
-		}
-	}
+	ImGui::Text("Current Case : ");
+	ImGui::SameLine();
+	ImGui::Text(this->scnTabModel->currentCase->getName().c_str());
 
 	ImGui::Spacing();
+
+	ImGui::Text("Scenes");
+
+	if (ImGui::BeginTable("scene_table", 3)) {
+		for (int i = 0; i < scnTabModel->currentCase->getSceneCount(); i++)
+		{
+			SceneResource* scnResource = scnTabModel->getCaseScene(scnTabModel->currentCase->getScenesIdInCase()->at(i));
+			switch (scnResource->getSceneType())
+			{
+			case SceneType::STATIC :
+				ImGui::TableSetColumnIndex(0);
+				break;
+			case SceneType::DYNAMIC :
+				ImGui::TableSetColumnIndex(1);
+				break;
+			case SceneType::MESH :
+				ImGui::TableSetColumnIndex(2);
+				break;
+			default:
+				break;
+			}
+
+			ImGui::Text(scnResource->getName().c_str());
+
+			ImGui::TableNextRow();
+		
+		}ImGui::EndTable();
+	}
+
+
 
 	if (ImGui::Button("refresh")) {
 		scnTabModel->refresh();
@@ -34,7 +60,7 @@ void SceneTabComponent::view()
 
 // BUTTON FUNCTIONS
 void SceneTabModelComponent::refresh() {
-	this->gdSource->getSceneHandler()->loadCases();
+	//TODO Implement button after creating resource Handler Loader class
 }
 
 void SceneTabModelComponent::saveCase() {

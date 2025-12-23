@@ -32,7 +32,7 @@ void TestingTabComponent::view()
 			ImGui::SameLine();
 			if (ImGui::Button(("Scenes##" + std::to_string(i)).c_str()))
 			{
-				testModel->getScenesInCase(testModel->caseResources->at(i)->getId());
+				testModel->getScenesIdInCase(testModel->caseResources->at(i)->getId());
 			}
 		}
 	}

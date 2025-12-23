@@ -14,7 +14,9 @@ public:
 
 	GDHandler(Monster* renderer, Kint* physics);
 
+	CaseHandler* caseHandler;
 	StuffHandler* stuffHandler;
+
 
 	Monster* monster;
 	Gui* gui;

@@ -6,13 +6,13 @@
 
 class ScenePanelTabModelComponent : public ModelComponent
 {
+private:
 
+	
 
 public:
 
-	std::vector<Ogre::SceneNode*>* DynamicScenes;
-	std::vector<Ogre::SceneNode*>* StaticScenes;
-	std::vector<Ogre::SceneNode*>* MeshScenes;
+	std::vector<SceneResource*>* scenes;
 
 	ScenePanelTabModelComponent(const char* name_p) : ModelComponent(name_p)
 	{
@@ -20,9 +20,7 @@ public:
 	}
 
 	void init() override {
-		DynamicScenes = this->gdSource->getSceneHandler()->getDynamicScenes();
-		StaticScenes = this->gdSource->getSceneHandler()->getStaticScenes();
-		MeshScenes = this->gdSource->getSceneHandler()->getMeshScenes();
+		scenes = this->gdSource->getResourceHandler()->getAllScenes();
 	}
 };
 
