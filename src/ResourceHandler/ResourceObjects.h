@@ -1,16 +1,16 @@
 #pragma once
 
-
-#include <filesystem>
-
+//Local
 #include <Gui/GuiRegen.h>
 
+// Third-party Headers
 #include <Ogre.h>
 
+// STL Headers
+#include <filesystem>
 #include <iostream>
 #include <stdio.h>
 #include <string>
-
 #include <vector>
 
 

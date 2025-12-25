@@ -35,5 +35,5 @@ void CaseHandler::checkIntegrity()
 
 Scene* CaseHandler::CreateScene(SceneType scnType, std::string scnName)
 {
-	return new Scene(scnType, scnName);
+	//return new Scene(scnType, scnName);
 }

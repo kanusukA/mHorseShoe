@@ -4,29 +4,36 @@
 #ifndef GDHANDLER_H
 #define GDHANDLER_H
 
-#include <Gui/Gui.h>
-#include <feel/Feel.h>
+#include <GDHandler/StartPlatinum.h>
 
-
-class GDHandler : public Feel
+class GDHandler : public GDBuilderContext
 {
 public:
-
-	GDHandler(Monster* renderer, Kint* physics);
 
 	CaseHandler* caseHandler;
 	StuffHandler* stuffHandler;
 
+	//PlayerSubject* playerSubject = nullptr;
 
-	Monster* monster;
 	Gui* gui;
 
-	PlayerSubject* playerSubject = nullptr;
+	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Kint* physics, Feel* feel_p) : GDBuilderContext(resourceHan_p, renderer, physics, feel_p) {
 
-	void initGui(Ogre::ImGuiOverlay* overlay);
 
-	// Sets up ground and resource handler and stuff
-	void preSetup();
+		gui = new Gui(caseHandler, this->stuffHandler, ResourceHandler::GetInstance(), RSUS::GetInstance());
+
+		gui->initGui(this->monster->imguiOverlay);
+
+		//if (this->playerSubject == nullptr) {
+		//	this->playerSubject = new PlayerSubject(renderer->getPlayerSceneNode(), renderer->getCamera());
+		//}
+
+		//PlayerObserver* playerObserver = new PlayerObserver(this->playerSubject);
+		//// Show Gui Player info
+		//gui->setPlayerObserver(playerObserver);
+
+	};
+
 
 
 	// Creates SceneNode Based on the name and Mesh.
@@ -38,12 +45,12 @@ public:
 	void createStuffRigidStatic(std::string name, Ogre::String meshName, PxTransform position, PxGeometry* geo) {};
 	void createStuffRigidStatic(std::string name, Ogre::SceneNode* sNode, PxTransform position, PxGeometry* geo) {};
 
-	void updateGDHandler(float deltaTime);
+	void update(float deltatime) override;
+
 
 	// GDHANDLER (KINT) -> MONSTER STORAGE OF DATA
 	//void addVisualShape();
 
-	void _updatePlayerPrameters(float deltaTime);
 
 };
 

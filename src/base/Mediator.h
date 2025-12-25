@@ -3,11 +3,18 @@
 #ifndef MEDIATOR_H
 #define MEDIATOR_H
 
-#include <string>
-#include <CaseHandler/CaseHandler.h>
-#include <feel/playerMovement.h>
-
+//Local
+#include <GDHandler/Connector/MasterB.h>
 #include <Gui/GuiComponents/ToastComponent.h>
+
+//Third
+
+//STL
+#include <string>
+
+
+
+
 
 
 // CODE CLEAN UP SHIFT TO NEW GUI FRAMEWORK!!
@@ -102,7 +109,7 @@ protected:
 	ResourceHandler* resourceHandler = nullptr;
 	RSUS* shaderHandler = nullptr;
 
-	PlayerObserver* playerObserver = nullptr;
+	//PlayerObserver* playerObserver = nullptr;
 
 public:
 	GDSource(CaseHandler* casehan, StuffHandler* stuffhan, 
@@ -115,9 +122,11 @@ public:
 		this->shaderHandler = rsus;
 	};
 
-	void setPlayerObserver(PlayerObserver* playerOb) {
+	/*void setPlayerObserver(PlayerObserver* playerOb) {
 		playerObserver = playerOb;
-	}
+	}*/
+
+	// TODO Add player Observer directly to GUI system
 
 	CaseHandler* getCaseHandler() {
 		return scnHandler;
@@ -131,9 +140,9 @@ public:
 		return resourceHandler;
 	}
 
-	PlayerObserver* getPlayerObserver() {
+	/*PlayerObserver* getPlayerObserver() {
 		return playerObserver;
-	}
+	}*/
 
 	RSUS* getShaderHandler() {
 		return shaderHandler;

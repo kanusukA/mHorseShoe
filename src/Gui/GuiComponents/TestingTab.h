@@ -76,7 +76,7 @@ public:
 	// CASE
 	void addCase() {
 
-		Case* myCase = new Case(*caseName);
+		//Case* myCase = new Case(*caseName);
 		
 	}
 
@@ -111,11 +111,11 @@ public:
 
 	void addScene() {
 		
-		Scene* myScene = new Scene(scnType, scnName,
+		/*Scene* myScene = new Scene(scnType, scnName,
 			Ogre::Vector3(scn_pos[0], scn_pos[1], scn_pos[2]),
 			Ogre::Vector4(scn_orientation[0], scn_orientation[1], scn_orientation[2], scn_orientation[3]),
 			Ogre::Vector3(scn_scale[0], scn_scale[1], scn_scale[2])
-			);
+			);*/
 
 		
 	}

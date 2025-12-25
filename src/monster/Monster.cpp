@@ -45,7 +45,7 @@ std::mutex RSUS::mutex_;
 	}
 }
 
-Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay)
+Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay,Ogre::ImGuiOverlay* imguiOverlay_p)
 {
 	oRoot = root;
 	
@@ -86,6 +86,8 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	
 
 	inputkeys = InputHandler::GetInstance()->getInputKeys();
+
+	imguiOverlay = imguiOverlay_p;
 
 	
 	
@@ -990,6 +992,8 @@ HWND* Monster::getHWND()
 
 void Monster::updateMonster()
 {
+	oRoot->renderOneFrame();
+
 	if (skySphere) {
 		skySphere->setPosition(CameraNode->getPosition().x,CameraNode->getPosition().y - 2500, CameraNode->getPosition().z);
 		

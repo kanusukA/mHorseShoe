@@ -3,13 +3,16 @@
 #ifndef FEEL_H
 #define FEEL_H
 
-#include <string>
+// Local
 #include "KeyHandler.h"
-#include <Windows.h>
-#include <iostream>
 
+// Third
 #include<imgui.h>
 
+//STL
+#include <string>
+#include <Windows.h>
+#include <iostream>
 #include <stdio.h>
 
 

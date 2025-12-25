@@ -3,20 +3,21 @@
 #ifndef MONSTER_H
 #define MONSTER_H
 
-
-#include <monster/terrain.h>
-
+//  IMPORT THIS BEFORE OGRE.H !!!!!!!!!!!
 #include <OgreApplicationContext.h>
 #include <OgreTrays.h>
 
+// Local Headers
+#include <monster/terrain.h>
+#include <feel/KeyHandler.h>
 #include <GDHandler/ResourceHandler.h>
 
-#include <feel/KeyHandler.h>
+// Third-party header
+
 #include <PxPhysicsAPI.h>
 
-#include <SDL3/SDL.h>
+// STL headers
 #include <Windows.h>
-
 #include <random>
 
 
@@ -177,9 +178,11 @@ public:
 
 	WindowProperties* windowProp = new WindowProperties();
 
+	Ogre::ImGuiOverlay* imguiOverlay;
+
 	// INITIALIZE OGRE3D AND CREATE A RENDERWINDOW
 	// name  -  NAME OF THE RENDERWINDOW
-	Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay);
+	Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p);
 
 	// INITIALISES SDL3 WINDOW / ADDS DEFAULT CAMERAMAN / GUI SYSTEM
 	void InitMonster();

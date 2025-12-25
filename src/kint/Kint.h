@@ -3,9 +3,14 @@
 #ifndef KINT_H
 #define KINT_H
 
+// Local
+
+// Third
 #include <PxPhysicsAPI.h>
 #include <PxPhysics.h>
 #include <cooking/PxCooking.h>
+
+// STL
 #include <stdio.h>
 #include <iostream>
 
