@@ -130,22 +130,36 @@ Ogre::SceneNode* Monster::addCamera(Ogre::String camName, Ogre::Vector3 startPos
 	return camNode;
 }
 
-Ogre::Entity* Monster::getMeshEntity(Ogre::String mshname, Ogre::String groupName)
+Ogre::Entity* Monster::createMeshEntity(Ogre::String mshname, Ogre::String groupName)
 {
 	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(mshname, groupName);
 	return oScnManager->createEntity(msh);
 }
 
-Ogre::Entity* Monster::getMeshEntity(Ogre::String entityname, Ogre::String mshname, Ogre::String groupName)
+Ogre::Entity* Monster::createMeshEntity(Ogre::String entityname, Ogre::String mshname, Ogre::String groupName)
 {
 	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(mshname, groupName);
 	return oScnManager->createEntity(entityname,msh);
 }
 
+Ogre::Entity* Monster::createEntity(Ogre::String entityName_p)
+{
+	return oScnManager->createEntity(entityName_p);
+}
+
+Ogre::Mesh* Monster::getMesh(Ogre::String meshName, Ogre::String groupName)
+{
+	return Ogre::MeshManager::getSingleton().load(meshName, groupName).get();
+}
+Ogre::Mesh* Monster::getColliderMesh(Ogre::String meshName, Ogre::String groupName)
+{
+	return Ogre::MeshManager::getSingleton().load(meshName, groupName).get();
+}
+
 Ogre::SceneNode* Monster::addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode)
 {
 	Ogre::SceneNode* scnNode = toScnNode->createChildSceneNode();
-	scnNode->attachObject(getMeshEntity(meshName));
+	scnNode->attachObject(createMeshEntity(meshName));
 	return scnNode;
 }
 
@@ -564,7 +578,7 @@ void Monster::setSkyBox()
 
 	param.get()->setNamedConstant("worldSpaceLightPos", Ogre::Vector3(-0.14,-0.6,0));*/
 	
-	Ogre::Entity* cloudsEnt = this->getMeshEntity("Plane.mesh");
+	Ogre::Entity* cloudsEnt = this->createMeshEntity("Plane.mesh");
 	Ogre::MaterialPtr cloudsMat = Ogre::MaterialManager::getSingleton().getByName("clouds_material", "Mesh_Materials");
 	Ogre::GpuProgramParametersPtr cloudsParam = cloudsMat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 
@@ -592,7 +606,7 @@ void Monster::setSkyBox()
 	skyHighNode = oScnManager->getRootSceneNode()->createChildSceneNode(SKY_BOX_NAME);
 
 	
-	Ogre::Entity* ent_high = this->getMeshEntity("sky_box_mesh", "Sphere_up.mesh", "Render_Mesh");
+	Ogre::Entity* ent_high = this->createMeshEntity("sky_box_mesh", "Sphere_up.mesh", "Render_Mesh");
 
 	ent_high->setMaterial(skyHighMat);
 	ent_high->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_EARLY);
@@ -604,7 +618,7 @@ void Monster::setSkyBox()
 
 	skySphere = oScnManager->getRootSceneNode()->createChildSceneNode(SKY_SPHERE_NAME);
 
-	Ogre::Entity* ent_sky = this->getMeshEntity("sky_sphere_mesh", "Sphere.mesh", "Render_Mesh");
+	Ogre::Entity* ent_sky = this->createMeshEntity("sky_sphere_mesh", "Sphere.mesh", "Render_Mesh");
 
 	ent_sky->setMaterial(skyMat);
 	ent_sky->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_LATE);
@@ -683,7 +697,7 @@ void Monster::createTerrain(Ogre::Vector2 size,unsigned int vertSize, unsigned i
 	Ogre::StaticGeometry* mField = oScnManager->createStaticGeometry("stat_geo");
 	//mField->setOrigin(Ogre::Vector3(0, 1, 0));
 
-	Ogre::Entity* ent = this->getMeshEntity("Blade2mesh.mesh");
+	Ogre::Entity* ent = this->createMeshEntity("Blade2mesh.mesh");
 	ent->setCastShadows(true);
 	
 	Ogre::MaterialPtr ent_mat = Ogre::MaterialManager::getSingleton().getByName("Blade_mat");
@@ -796,7 +810,7 @@ void Monster::setHeightMap(Ogre::String heightMapImg, Ogre::String grassMapImg, 
 	std::cout << "Size : " << imgManager->getWidth() << " " << imgManager->getWidth() << std::endl;
 
 	// Grass repositioning setup
-	Ogre::Entity* ent = this->getMeshEntity("Grass.mesh");
+	Ogre::Entity* ent = this->createMeshEntity("Grass.mesh");
 	Ogre::StaticGeometry* mField = oScnManager->getStaticGeometry("stat_geo");
 	mField->reset();
 	int numberOfGrasses = 0;
@@ -945,7 +959,7 @@ void Monster::createGrass()
 	Ogre::StaticGeometry* mField = oScnManager->createStaticGeometry("stat_geo");
 	mField->setOrigin(Ogre::Vector3(0, 1, 0));
 
-	Ogre::Entity* ent = this->getMeshEntity("Grass.mesh");
+	Ogre::Entity* ent = this->createMeshEntity("Grass.mesh");
 	//Ogre::Entity* ent = oScnManager->createEntity("grass");
 
 	// get Terrain positions

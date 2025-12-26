@@ -462,16 +462,6 @@ protected:
 
 public:
 
-	Ogre::Vector3 getPosition() {
-		return position;
-	}
-	Ogre::Vector3 getScale() {
-		return scale;
-	}
-	Ogre::Vector4 getOrientation() {
-		return orientation;
-	}
-
 	void setId(int index) override {
 		if (index > 99999)
 		{

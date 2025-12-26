@@ -394,7 +394,7 @@ void StuffHandler::addObject(
 void StuffHandler::addGrass(Ogre::Real numOfGrass)
 {
 	StuffMesh* stuffMesh = new StuffMesh;
-	Ogre::Entity* ent = monster->getMeshEntity("Grass.mesh");
+	Ogre::Entity* ent = monster->createMeshEntity("Grass.mesh");
 	ent->setMaterial(Ogre::MaterialManager::getSingleton().getByName("GrasssMaterial"));
 	int ref = 0;
 	

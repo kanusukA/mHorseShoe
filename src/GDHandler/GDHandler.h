@@ -19,26 +19,25 @@ public:
 
 	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Kint* physics, Feel* feel_p) : GDBuilderContext(resourceHan_p, renderer, physics, feel_p) {
 
+		stuffHandler = new StuffHandler(renderer, physics);
+
+		caseHandler = new CaseHandler(this,stuffHandler, renderer->oScnManager);
 
 		gui = new Gui(caseHandler, this->stuffHandler, ResourceHandler::GetInstance(), RSUS::GetInstance());
 
 		gui->initGui(this->monster->imguiOverlay);
 
-		//if (this->playerSubject == nullptr) {
-		//	this->playerSubject = new PlayerSubject(renderer->getPlayerSceneNode(), renderer->getCamera());
-		//}
-
-		//PlayerObserver* playerObserver = new PlayerObserver(this->playerSubject);
-		//// Show Gui Player info
-		//gui->setPlayerObserver(playerObserver);
-
 	};
 
 
+	Ogre::SceneNode* createScene(std::string name_p) override;
+	Ogre::Entity* createObject(std::string name_p) override;
+	Ogre::Mesh* createRenderMesh(std::string meshName) override;
 
 	// Creates SceneNode Based on the name and Mesh.
 	// If PhysicsType : eRIGID_DYNAMIC the same mesh is used for collision.
 	// NOTE : SHAPE IS NOT CONSIDERED IN THE INFO.
+	// OLD COMPONENTS DO NOT USE
 	void createStuffRigidDynamic(std::string name, Ogre::String meshName, PxTransform position, PxReal mass, PxGeometry* geo) {};
 	void createStuffRigidDynamic(std::string name, Ogre::SceneNode* sNode, PxTransform position, PxReal mass, PxGeometry* geo) {};
 

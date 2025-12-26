@@ -45,20 +45,32 @@ public:
 
 	virtual void update(float deltaTime) {}
 
-	// Create Objects
-	virtual Scene* createScene() { return nullptr; }
-	virtual Case* createCase() { return nullptr; }
+	PxRigidDynamic* getPxRigidDynamic(std::string name_p, PxTransform transform, PxGeometry* geometry, float mass);
+	PxRigidStatic* getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry);
+	
+	// Create Scene
+	virtual Ogre::SceneNode* createScene(std::string name_p) { return nullptr; }
+	virtual Ogre::Entity* createObject(std::string name_p) { return nullptr; }
+	virtual Ogre::Mesh* createRenderMesh(std::string meshName) { return nullptr; }
 
 };
 
-class GDBuilderImpli {
-private:
-	GDBuilderContext* builderCxt;
-public:
-	GDBuilderImpli(GDBuilderContext* builderCxt_p) {
-		builderCxt = builderCxt_p;
-	}
-};
+//class GDBuilderImpli {
+//private:
+//	GDBuilderContext* builderCxt;
+//public:
+//	GDBuilderImpli(GDBuilderContext* builderCxt_p) {
+//		builderCxt = builderCxt_p;
+//	}
+//};
 
 
 
+// function
+
+Ogre::Quaternion Vec4toQuaternion(Ogre::Vector4 orientation) {
+	return Ogre::Quaternion(orientation.w, orientation.x, orientation.y, orientation.z);
+}
+Ogre::Vector4 QuaternionToVec4(Ogre::Quaternion quat) {
+	return Ogre::Vector4(quat.w,quat.x,quat.y,quat.z);
+}

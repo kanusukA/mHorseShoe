@@ -13,3 +13,13 @@ void GDBuilderContext::startEngine()
 
 
 }
+
+PxRigidDynamic* GDBuilderContext::getPxRigidDynamic(std::string name_p,PxTransform transform, PxGeometry* geometry, float mass)
+{
+	return kint->createRigidBody(name_p, transform, mass, geometry);
+}
+
+PxRigidStatic* GDBuilderContext::getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry)
+{
+	return kint->createStaticBody(name_p, transform, geometry);
+}

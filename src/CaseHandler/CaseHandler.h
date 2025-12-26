@@ -10,7 +10,7 @@
 class CaseHandler {
 
 private:
-
+	GDBuilderContext* builderCxt;
 	StuffHandler* stuffHandler;
 	Ogre::SceneManager* oScnManager;
 
@@ -28,12 +28,15 @@ public:
 
 	// CASE FUNCTIONS
 
-	CaseHandler(StuffHandler* stuffHandler_p, Ogre::SceneManager* oScnManager_p) {
-
+	CaseHandler(GDBuilderContext* builderCxt_p,StuffHandler* stuffHandler_p, Ogre::SceneManager* oScnManager_p) {
+		builderCxt = builderCxt_p;
 		stuffHandler = stuffHandler_p;
 		oScnManager = oScnManager_p;
 
-		//currentCase = new Case("Unnamed Case");
+		// Set Case manually
+		
+		// TODO Check Resource Loader for case
+		currentCase = new Case(builderCxt_p,"Unnamed Case");
 
 	};
 	// Used to start CaseHandler with a predefined case as the program starts
