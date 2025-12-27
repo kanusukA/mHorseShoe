@@ -462,6 +462,18 @@ protected:
 
 public:
 
+	virtual Ogre::Vector3 getPosition() {
+		return position;
+	}
+
+	virtual Ogre::Quaternion getOrientation() {
+		return Ogre::Quaternion(orientation[0], orientation[1],orientation[2],orientation[3]);
+	}
+
+	virtual Ogre::Vector3 getScale() {
+		return scale;
+	}
+
 	void setId(int index) override {
 		if (index > 99999)
 		{
@@ -528,10 +540,10 @@ private:
 
 protected:
 
-	float mass;
+	float mass = 0;
 
-	ResID renderMeshID;
-	ResID colliderMeshID;
+	ResID renderMeshID = 0;
+	ResID colliderMeshID = 0;
 
 public:
 
@@ -640,6 +652,7 @@ protected:
 	std::vector<ShaderVar>* FragmentParameters = new std::vector<ShaderVar>();
 
 public:
+
 	void setId(int index) override {
 		if (index > 99999)
 		{
@@ -649,6 +662,7 @@ public:
 	}
 
 	ShaderResource(ResourceHandlerBuilderContext* context, std::string name_p, ShaderType shaderType_p, std::string shaderFileName) {
+
 		this->setName(name_p);
 		this->resourceHandlerCxt = context;
 		shaderType = shaderType_p;
@@ -665,6 +679,7 @@ public:
 		}
 
 		context->createShader(this);
+
 	}
 
 	void addShaderParameter(ShaderVar variable) {
@@ -684,6 +699,7 @@ public:
 
 
 	std::vector<ShaderVar>* getShaderVars() {
+
 		switch (shaderType)
 		{
 		case Vertex:
@@ -695,6 +711,7 @@ public:
 		default:
 			break;
 		}
+
 	}
 
 
@@ -755,6 +772,7 @@ public:
 		this->resourceHandlerCxt = context;
 
 		context->createMaterial(this);
+
 	}
 
 	void addVertexShader(ResID id) {
@@ -867,9 +885,6 @@ class RenderMeshResource : public Resource
 protected:
 	ResID material;
 
-	std::string meshName;
-	std::string meshFileName;
-
 public:
 
 	void setId(int index) override {
@@ -882,22 +897,12 @@ public:
 
 	}
 
-	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string name_p, std::string meshName_p, std::string meshFileName_p) {
+	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p) {
 		this->resourceHandlerCxt = context;
-		this->setName(name_p);
+		this->setName(meshName_p);
 
-		meshFileName = meshFileName_p;
-		meshName = meshName_p;
 
 		context->createRenderMesh(this);
-	}
-
-	std::string getMeshName() {
-		return meshName;
-	}
-
-	std::string getMeshFileName() {
-		return meshFileName;
 	}
 
 	MaterialResource* getMaterialResource() {
@@ -908,9 +913,7 @@ public:
 		return material;
 	}
 
-	void setMaterial(ResID material_p) {
-		material = material_p;
-	}
+	virtual void setMaterial(ResID material_p, Ogre::MaterialPtr mat_p) {};
 
 
 
@@ -921,9 +924,6 @@ class ColliderMeshResource : public Resource
 
 protected:
 	ResID material;
-
-	std::string meshName;
-	std::string meshFileName;
 
 public:
 
@@ -937,23 +937,12 @@ public:
 
 	}
 
-	ColliderMeshResource(ResourceHandlerBuilderContext* context, std::string name_p, std::string meshName_p, std::string meshFileName_p) {
+	ColliderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p) {
 		this->resourceHandlerCxt = context;
-		this->setName(name_p);
-
-		meshName = meshName_p;
-		meshFileName = meshFileName_p;
+		this->setName(meshName_p);
 
 		context->createColliderMesh(this);
 
-	}
-
-	std::string getMeshName() {
-		return meshName;
-	}
-
-	std::string getMeshFileName() {
-		return meshFileName;
 	}
 
 	MaterialResource* getMaterialResource() {
@@ -964,9 +953,7 @@ public:
 		return material;
 	}
 
-	void setMaterial(ResID material_p) {
-		material = material_p;
-	}
+	virtual void setMaterial(ResID material_p, Ogre::MaterialPtr mat_p) {};
 
 
 };

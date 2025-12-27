@@ -1,12 +1,12 @@
 #include "Feel.h"
 
 
-void Feel::initFeel(SDL_Window* sdlWindow)
+void Feel::initFeel(SDL_Window* sdlWindow, KeyHandler* keyHandler_p)
 {
 	window = sdlWindow;
 	SDL_SetWindowMouseGrab(window, true);
 
-	keyHandler = new KeyHandler();
+	keyHandler = keyHandler_p;
 }
 
 void Feel::hideMouse() {

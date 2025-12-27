@@ -39,3 +39,39 @@ Scene* CaseHandler::CreateScene(SceneType scnType, std::string scnName)
 	return new_scn;
 	//return new Scene(scnType, scnName);
 }
+
+Object* CaseHandler::CreateObject(std::string objectName_p, PhysXType type)
+{
+	Object* new_obj = new Object(this->builderCxt,objectName_p,type);
+	return new_obj;
+}
+
+RenderMesh* CaseHandler::CreateRenderMesh(std::string meshName_p)
+{
+	RenderMesh* new_msh = new RenderMesh(this->builderCxt, meshName_p);
+	return new_msh;
+}
+
+ColliderMesh* CaseHandler::CreateColliderMesh(std::string MeshName_p)
+{
+	ColliderMesh* new_msh = new ColliderMesh(this->builderCxt, MeshName_p);
+	return new_msh;
+}
+
+Shader* CaseHandler::CreateShader(Ogre::MaterialPtr mat_p, ShaderType type)
+{
+	Shader* new_shader = new Shader(this->builderCxt, mat_p, type);
+	return new_shader;
+}
+
+Material* CaseHandler::CreateMaterial(std::string materialName_p)
+{
+	Material* new_mat = new Material(this->builderCxt, materialName_p);
+	return new_mat;
+}
+
+Image* CaseHandler::CreateImage(std::filesystem::path filePath_p)
+{
+	Image* new_img = new Image(filePath_p);
+	return new_img;
+}

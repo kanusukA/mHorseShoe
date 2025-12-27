@@ -23,7 +23,7 @@ class Feel
 {
 public:
 	// INITIALIZES INPUT HANDLER. CREATES NEW BINDINGS.
-	void initFeel(SDL_Window* sdlWindow);
+	void initFeel(SDL_Window* sdlWindow,KeyHandler* keyhandler_p);
 
 	KeyHandler* keyHandler;
 	SDL_Window* window = NULL;

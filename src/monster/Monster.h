@@ -220,6 +220,7 @@ public:
 	Ogre::Entity* createEntity(Ogre::String entityName_p);
 	Ogre::Mesh* getMesh(Ogre::String meshName, Ogre::String groupName = "Render_Mesh");
 	Ogre::Mesh* getColliderMesh(Ogre::String meshName, Ogre::String groupName = "Collider_Mesh");
+	Ogre::MaterialPtr getMaterial(Ogre::String matName_p);
 	Ogre::SceneNode* addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode);
 
 	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::String scnNodeName, Ogre::Entity* ent);

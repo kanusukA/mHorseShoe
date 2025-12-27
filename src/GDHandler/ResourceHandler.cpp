@@ -295,7 +295,7 @@ void ResourceHandler::checkFileStructure()
 		_LoadIniFile(this->SourceDir.string() + MATERIAL_INI_LOC);
 	}
 
-	this->setPath(this->SourceDir.string() + MATERIAL_INI_LOC, ResourcePaths::Material);
+	this->setPath(this->SourceDir.string() + MATERIAL_INI_LOC, ResourcePaths::MaterialPath);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + MATERIALTEXTURE_INI_LOC))
 	{
@@ -316,7 +316,7 @@ void ResourceHandler::checkFileStructure()
 		_LoadIniFile(this->SourceDir.string() + RENDERMESH_INI_LOC);
 	}
 
-	this->setPath(this->SourceDir.string() + RENDERMESH_INI_LOC, ResourcePaths::RenderMesh);
+	this->setPath(this->SourceDir.string() + RENDERMESH_INI_LOC, ResourcePaths::RenderMeshPath);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + COLLIDERMESH_DIRECTORY))
 	{
@@ -330,7 +330,7 @@ void ResourceHandler::checkFileStructure()
 		_LoadIniFile(this->SourceDir.string() + COLLIDERMESH_INI_LOC);
 	}
 
-	this->setPath(this->SourceDir.string() + COLLIDERMESH_INI_LOC, ResourcePaths::ColliderMesh);
+	this->setPath(this->SourceDir.string() + COLLIDERMESH_INI_LOC, ResourcePaths::ColliderMeshPath);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + SHADER_DIRECTORY))
 	{
@@ -380,7 +380,7 @@ void ResourceHandler::checkFileStructure()
 		_LoadIniFile(this->SourceDir.string() + IMAGE_INI_LOC);
 	}
 
-	this->setPath(this->SourceDir.string() + IMAGE_INI_LOC, ResourcePaths::Image);
+	this->setPath(this->SourceDir.string() + IMAGE_INI_LOC, ResourcePaths::ImagePath);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + OBJECT_DIRECTORY))
 	{
@@ -806,6 +806,43 @@ void ResourceHandler::readShaderFiles(Ogre::MaterialPtr mat)
 	
 
 
+}
+
+void ResourceHandler::readShaderFiles(Ogre::GpuProgramPtr program)
+{
+	Ogre::ParameterList programParameters = program.get()->getParameters();
+
+
+
+	if (!fragShaderVariables) {
+		fragShaderVariables = new std::vector<std::string>();
+	}
+	else {
+		fragShaderVariables->clear();
+	}
+	if (!vertShaderVariables) {
+		vertShaderVariables = new std::vector<std::string>();
+	}
+	else {
+		vertShaderVariables->clear();
+	}
+
+	std::filesystem::path vertfilepath;
+	std::filesystem::path fragfilepath;
+
+	for (int i = 0; i < meshMaterials->size(); i++)
+	{
+		/*if (meshMaterials->at(i).filename().string() == vertFileName)
+		{
+			
+		}*/
+		
+	}
+
+	std::cout << "vert File loc : " << vertfilepath.relative_path().string() << std::endl;
+	std::cout << "frag File loc : " << fragfilepath.relative_path().string() << std::endl;
+	_readShaderFile(fragShaderVariables, fragfilepath);
+	_readShaderFile(vertShaderVariables, vertfilepath);
 }
 
 

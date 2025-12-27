@@ -32,7 +32,14 @@ public:
 
 	Ogre::SceneNode* createScene(std::string name_p) override;
 	Ogre::Entity* createObject(std::string name_p) override;
-	Ogre::Mesh* createRenderMesh(std::string meshName) override;
+	Ogre::Mesh* createMesh(std::string meshName) override;
+	Ogre::MaterialPtr createMaterial(std::string materialName_p) override;
+
+
+	ResID addMaterial(std::string matname_p) override;
+	ResID addShader(Ogre::MaterialPtr mat_p, ShaderType type) override;
+
+	void setShaderVars(Shader* shader) override;
 
 	// Creates SceneNode Based on the name and Mesh.
 	// If PhysicsType : eRIGID_DYNAMIC the same mesh is used for collision.

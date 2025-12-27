@@ -63,11 +63,16 @@ public:
 	}
 
 	Scene* CreateScene(SceneType scnType, std::string scnName);
+	Object* CreateObject(std::string objectName_p, PhysXType type);
+	RenderMesh* CreateRenderMesh(std::string meshName_p);
+	ColliderMesh* CreateColliderMesh(std::string MeshName_p);
+	Shader* CreateShader(Ogre::MaterialPtr mat_p, ShaderType type);
+	Material* CreateMaterial(std::string materialName_p);
+	Image* CreateImage(std::filesystem::path filePath_p);
+
 
 
 };
-
-
 
 class CaseErrorHandler : public std::exception {
 

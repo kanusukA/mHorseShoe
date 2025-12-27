@@ -240,6 +240,7 @@ public:
 	void getCases(std::vector<Ogre::String> *outputVec);
 
 	void readShaderFiles(Ogre::MaterialPtr mat);
+	void readShaderFiles(Ogre::GpuProgramPtr program);
 
 	void writeToFile(std::string key, std::string value,std::string section, std::string filename);
 	void writeToFile(std::vector<SaveData>* data, std::string filename);

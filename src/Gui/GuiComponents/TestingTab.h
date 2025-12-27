@@ -101,7 +101,7 @@ public:
 
 		this->guiFramework->setOgreVec3(scn_pos,scnCast->getPosition());
 		this->guiFramework->setOgreVec3(scn_scale, scnCast->getScale());
-		this->guiFramework->setOgreVec4(scn_orientation, scnCast->getOrientation());
+		//this->guiFramework->setOgreVec4(scn_orientation, scnCast->getOrientation());
 		
 		scnType = SceneType(scnCast->getSceneType());
 
@@ -141,12 +141,12 @@ public:
 	}
 
 	void addCollider() {
-		ColliderMeshResource* colRes = new ColliderMeshResource(this->gdSource->getResourceHandler(), *colliderName, "test", "test");
+		//ColliderMeshResource* colRes = new ColliderMeshResource(this->gdSource->getResourceHandler(), *colliderName, "test", "test");
 
 	}
 
 	void addRender() {
-		RenderMeshResource* renderMesh = new RenderMeshResource(this->gdSource->getResourceHandler(), *renderName, "test", "test");
+		//RenderMeshResource* renderMesh = new RenderMeshResource(this->gdSource->getResourceHandler(), *renderName, "test", "test");
 
 	}
 

@@ -7,8 +7,8 @@ private:
 	GDBuilderContext* builderCxt;
 
 	Ogre::Entity* entity;
-	PxRigidDynamic* rigidDyn;
-	PxRigidStatic* rigidStatic;
+	/*PxRigidDynamic* rigidDyn = nullptr;
+	PxRigidStatic* rigidStatic = nullptr;*/
 
 public:
 
@@ -19,7 +19,7 @@ public:
 	}
 
 	void setPxRigidBody() {
-
+		// TODO set object physx
 	}
 
 	

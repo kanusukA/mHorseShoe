@@ -12,6 +12,8 @@
 
 class Scene;
 class Case;
+class Shader;
+class Object;
 
 class ResourceHandler;
 class Monster;
@@ -22,7 +24,7 @@ class Feel;
 
 // Primary Class.
 // Used to build object with all required contexts and initializations
-class GDBuilderContext
+class GDBuilderContext : public KeyHandler
 {	
 protected:
 
@@ -41,17 +43,28 @@ public:
 		monster = monster_p;
 		kint = kint_p;
 		feel = feel_p;
+
+		startEngine();
+		
 	}
 
-	virtual void update(float deltaTime) {}
+	virtual void update(float deltaTime) {};
 
 	PxRigidDynamic* getPxRigidDynamic(std::string name_p, PxTransform transform, PxGeometry* geometry, float mass);
 	PxRigidStatic* getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry);
 	
-	// Create Scene
+	// Create Functions
 	virtual Ogre::SceneNode* createScene(std::string name_p) { return nullptr; }
 	virtual Ogre::Entity* createObject(std::string name_p) { return nullptr; }
-	virtual Ogre::Mesh* createRenderMesh(std::string meshName) { return nullptr; }
+	virtual Ogre::Mesh* createMesh(std::string meshName_p) { return nullptr; }
+	virtual Ogre::MaterialPtr createMaterial(std::string materialName_p) { return nullptr; }
+	virtual void setShaderVars(Shader* shader) {};
+
+	// CaseHandler Functions
+	virtual ResID addMaterial(std::string matname_p) { return NULL; }
+	virtual ResID addShader(Ogre::MaterialPtr mat_p, ShaderType type) { return NULL; }
+
+
 
 };
 
@@ -66,11 +79,6 @@ public:
 
 
 
-// function
+Ogre::Quaternion Vec4toQuaternion(Ogre::Vector4 orientation);
 
-Ogre::Quaternion Vec4toQuaternion(Ogre::Vector4 orientation) {
-	return Ogre::Quaternion(orientation.w, orientation.x, orientation.y, orientation.z);
-}
-Ogre::Vector4 QuaternionToVec4(Ogre::Quaternion quat) {
-	return Ogre::Vector4(quat.w,quat.x,quat.y,quat.z);
-}
+Ogre::Vector4 QuaternionToVec4(Ogre::Quaternion quat);

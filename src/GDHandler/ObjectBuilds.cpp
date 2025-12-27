@@ -9,7 +9,28 @@ Ogre::Entity* GDHandler::createObject(std::string name_p)
 	return monster->createEntity(name_p);
 }
 
-Ogre::Mesh* GDHandler::createRenderMesh(std::string meshName)
+Ogre::MaterialPtr GDHandler::createMaterial(std::string materialName_p)
 {
-	return 
+	return monster->getMaterial(materialName_p);
+}
+
+ResID GDHandler::addMaterial(std::string matname_p)
+{
+	return caseHandler->CreateMaterial(matname_p)->getId();
+}
+
+ResID GDHandler::addShader(Ogre::MaterialPtr mat_p, ShaderType type)
+{
+	return caseHandler->CreateShader(mat_p,type)->getId();
+}
+
+void GDHandler::setShaderVars(Shader* shader)
+{
+	// TODO IMPLEMENT NEW RSUS METHOD
+	
+}
+
+Ogre::Mesh* GDHandler::createMesh(std::string meshName)
+{
+	return monster->getMesh(meshName);
 }

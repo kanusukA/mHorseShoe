@@ -75,7 +75,7 @@ void ResourceSaver::saveScene(SceneResource* scene_p)
 
 	ini->SetValue(sectionName, "position", convertVec3ToString(scene_p->getPosition()).c_str());
 	ini->SetValue(sectionName, "scale", convertVec3ToString(scene_p->getScale()).c_str());
-	ini->SetValue(sectionName, "rotation", convertVec4ToString(scene_p->getOrientation()).c_str());
+	ini->SetValue(sectionName, "rotation", convertVec4ToString(Ogre::Vector4(scene_p->getOrientation()[0], scene_p->getOrientation()[1], scene_p->getOrientation()[2], scene_p->getOrientation()[3])).c_str());
 
 	for (int i = 0; i < scene_p->getObjects()->size(); i++)
 	{
@@ -109,7 +109,8 @@ void ResourceSaver::saveRenderMesh(RenderMeshResource* renderMesh_p)
 {
 	const char* section = std::to_string(renderMesh_p->getId()).c_str();
 	ini->SetValue(section, "meshName", renderMesh_p->getName().c_str());
-	ini->SetValue(section, "meshFileName", renderMesh_p->getMeshFileName().c_str());
+	// TODO FECTH LOCATION MANUALLY
+	//ini->SetValue(section, "meshFileName", renderMesh_p->getFileName().c_str());
 	ini->SetValue(section, "materialID", renderMesh_p->getName().c_str());
 
 }
@@ -118,7 +119,8 @@ void ResourceSaver::saveColliderMesh(ColliderMeshResource* colliderMesh_p)
 {
 	const char* section = std::to_string(colliderMesh_p->getId()).c_str();
 	ini->SetValue(section, "meshName", colliderMesh_p->getName().c_str());
-	ini->SetValue(section, "meshFileName", colliderMesh_p->getMeshFileName().c_str());
+	// TODO FETCH LOCATION MANUALLY
+	//ini->SetValue(section, "meshFileName", colliderMesh_p->getMeshFileName().c_str());
 	ini->SetValue(section, "materialID", colliderMesh_p->getName().c_str());
 }
 

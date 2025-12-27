@@ -156,6 +156,11 @@ Ogre::Mesh* Monster::getColliderMesh(Ogre::String meshName, Ogre::String groupNa
 	return Ogre::MeshManager::getSingleton().load(meshName, groupName).get();
 }
 
+Ogre::MaterialPtr Monster::getMaterial(Ogre::String matName_p)
+{
+	return Ogre::MaterialManager::getSingleton().getByName(matName_p);
+}
+
 Ogre::SceneNode* Monster::addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode)
 {
 	Ogre::SceneNode* scnNode = toScnNode->createChildSceneNode();

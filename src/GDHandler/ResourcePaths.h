@@ -10,11 +10,11 @@ enum ResourcePaths {
 	Shaders,
 	ShaderVars,
 	ShaderValues,
-	Material,
+	MaterialPath,
 	MaterialTexture,
-	RenderMesh,
-	ColliderMesh,
-	Image
+	RenderMeshPath,
+	ColliderMeshPath,
+	ImagePath
 };
 
 #define DATA_DIRECTORY "/Data"
