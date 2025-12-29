@@ -214,6 +214,14 @@ ResourceHandler::ResourceHandler()
 	this->colliderMeshes->push_back("box");
 
 	checkFileStructure();
+	
+	this->ini.SetUnicode();
+	this->initResourceSaver(&ini, this->SourceDir.string() + DATA_DIRECTORY);
+
+	this->initResourceLoader(&ini,this->SourceDir.string() + RESOURCELOADER_DATA);
+
+	this->loadResources();
+
 }
 
 void ResourceHandler::checkFileStructure()
@@ -229,9 +237,15 @@ void ResourceHandler::checkFileStructure()
 	if (!std::filesystem::exists(this->SourceDir.string() + MASTERLIST_LOC))
 	{
 		ToastComponent::GetInstance()->addMessage("Maste list does not exists. Creating");
-		std::filesystem::create_directory(this->SourceDir.string() + MASTERLIST_LOC);
+		_LoadIniFile(this->SourceDir.string() + MASTERLIST_LOC);
 	}
 	this->setPath(this->SourceDir.string() + MASTERLIST_LOC, ResourcePaths::MasterList);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + RESOURCELOADER_DATA))
+	{
+		ToastComponent::GetInstance()->addMessage("Maste list does not exists. Creating");
+		_LoadIniFile(this->SourceDir.string() + RESOURCELOADER_DATA);
+	}
 	
 
 	if (!std::filesystem::exists(this->SourceDir.string() + CASE_DIRECTORY))
@@ -396,6 +410,17 @@ void ResourceHandler::checkFileStructure()
 
 	this->setPath(this->SourceDir.string() + OBJECT_INI_LOC, ResourcePaths::Objects);
 
+
+}
+
+void ResourceHandler::loadResources()
+{
+	this->loadMaterials(this->Materials, ".material", true, true);
+	this->loadShaders(this->Shaders, ".hlsl", true, true);
+	//this->loadShaders(this->Shaders, ".frag", true, true);
+	this->loadRenderMesh(this->RenderMesh);
+	this->loadColliderMesh(this->ColliderMesh);
+	this->loadTextures(this->Textures, ".png");
 
 }
 

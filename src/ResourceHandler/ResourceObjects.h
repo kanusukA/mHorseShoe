@@ -14,6 +14,37 @@
 #include <vector>
 
 
+// The Path storage in vectors are as follows
+enum ResourcePaths {
+	MasterList,
+	Cases,
+	Scenes,
+	ScnObj,
+	Objects,
+	Shaders,
+	ShaderVars,
+	ShaderValues,
+	MaterialPath,
+	MaterialTexture,
+	RenderMeshPath,
+	ColliderMeshPath,
+	ImagePath
+};
+
+namespace ResourceLoaderEnums {
+
+	enum ResourceLoadPaths {
+		Objects,
+		Shaders,
+		MaterialPath,
+		MaterialTexture,
+		RenderMeshPath,
+		ColliderMeshPath,
+		ImagePath
+	};
+
+}
+
 typedef unsigned long long ResID;
 
 enum PhysXType {

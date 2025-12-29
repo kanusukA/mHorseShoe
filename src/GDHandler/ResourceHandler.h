@@ -5,6 +5,7 @@
 
 //Local
 #include<ResourceHandler/ResourceSaver.h>
+#include<ResourceHandler/ResourceLoader.h>
 #include <GDHandler/ResourcePaths.h>
 #include <Gui/GuiComponents/ToastComponent.h>
 
@@ -52,14 +53,9 @@ enum ResourceHandlerType
 
 
 
-
-
-
-
-
 // Integrate it into gdhandler with Ogre 
 
-class ResourceHandler : public ResourceHandlerBuilderContext
+class ResourceHandler : public ResourceHandlerBuilderContext, public ResourceSaver , public ResourceLoader
 {
 
 private:
@@ -74,6 +70,14 @@ private:
 	ResourceHandlerType _getResourceLocationGroup(std::string groupStr);
 
 	CSimpleIniA ini;
+
+	// RESOURCES STORE
+	// HERE GENERAL RESOURCES ARE STORED.
+	std::vector<std::filesystem::path>* Materials = new std::vector<std::filesystem::path>();
+	std::vector<std::filesystem::path>* Shaders = new std::vector<std::filesystem::path>();
+	std::vector<std::filesystem::path>* Textures = new std::vector<std::filesystem::path>();
+	std::vector<std::filesystem::path>* RenderMesh = new std::vector<std::filesystem::path>();
+	std::vector<std::filesystem::path>* ColliderMesh = new std::vector<std::filesystem::path>();
 
 
 	// RESOURCES BUILDER
@@ -136,7 +140,6 @@ private:
 	std::filesystem::path findAllInLocation(std::string filename, ResourceHandlerType type);
 
 	
-
 	// Add Resource
 	void addResource(std::filesystem::path filePath, ResourceHandlerType type);
 
@@ -157,14 +160,24 @@ private:
 	// Hide the constructor and destructor of the class
 protected:
 	ResourceHandler();
-	~ResourceHandler() {};
-
+	~ResourceHandler() {
+		
+	};
 
 public:
 
 	// OVERHAUL FUNCTIONS
 	// Checks if the folder structure and required files exists for Resource Tasks
 	void checkFileStructure();
+
+	// Loads all the resources - Mesh, texture, Material, shader. Using the paths that are set on ResourceLoader.
+	void loadResources();
+
+	std::vector<std::filesystem::path>* getMaterialsLoaded() { return Materials; }
+	std::vector<std::filesystem::path>* getShadersLoaded() { return Shaders; }
+	std::vector<std::filesystem::path>* getTexturesLoaded() { return Textures; }
+	std::vector<std::filesystem::path>* getRenderMeshLoaded() { return RenderMesh; }
+	std::vector<std::filesystem::path>* getColliderMeshLoaded() { return ColliderMesh; }
 
 	//PATHS
 	void setPath(std::string path, ResourcePaths pathOf) {
@@ -231,7 +244,7 @@ public:
 	void updateOgreMaterials();
 
 
-	// Only way to initalize the class
+	// Only way to initialize the class
 	static ResourceHandler* GetInstance();
 
 	// SAVE/LOAD FUNCTIONS
@@ -266,7 +279,9 @@ public:
 	// IMAGES / TEXTURE
 	void loadImgToTex();
 
-
+	void shutdown() {
+		this->resource_loader_shutdown();
+	}
 };
 
 

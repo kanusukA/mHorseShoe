@@ -10,29 +10,36 @@ public:
 
 	std::vector<std::filesystem::path>* renderMeshes;
 	std::vector<std::filesystem::path>* colliderMeshes;
-	std::vector<std::filesystem::path>* meshMaterials;
+	std::vector<std::filesystem::path>* materials;
 	std::vector<std::filesystem::path>* images;
-	Ogre::StringVectorPtr ogreMeshes;
+	std::vector<std::filesystem::path>* shaders;
+
 
 	// PATHS
 	std::vector<std::string>* paths;
 
+	//Load paths
+	std::vector<std::string>* loadPaths;
+
 	std::string* inputPath = new std::string("");
 
 	int edit = -1;
+
+	int editLoadPathpos = -1;
 
 	ResourceTabModelComponent(const char* name_p) : ModelComponent(name_p) {
 
 	}
 
 	void init() override{
-		renderMeshes = gdSource->getResourceHandler()->renderMeshes;
-		colliderMeshes = gdSource->getResourceHandler()->colliderMeshes;
-		meshMaterials = gdSource->getResourceHandler()->meshMaterials;
-		images = gdSource->getResourceHandler()->images;
-		ogreMeshes = gdSource->getResourceHandler()->ogreRenderMeshes;
+		renderMeshes = gdSource->getResourceHandler()->getRenderMeshLoaded();
+		colliderMeshes = gdSource->getResourceHandler()->getColliderMeshLoaded();
+		materials = gdSource->getResourceHandler()->getMaterialsLoaded();
+		images = gdSource->getResourceHandler()->getTexturesLoaded();
+		shaders = gdSource->getResourceHandler()->getShadersLoaded();
 
 		paths = gdSource->getResourceHandler()->getPaths();
+		loadPaths = gdSource->getResourceHandler()->getLoadPaths();
 
 	}
 
@@ -48,6 +55,12 @@ public:
 		*inputPath = paths->at(pathPos);
 		edit = pathPos;
 	}
+
+	void editLoadPath(int pathPos) {
+		*inputPath = loadPaths->at(pathPos);
+		editLoadPathpos = pathPos;
+	}
+
 	void setPath() {
 		try
 		{
@@ -59,6 +72,19 @@ public:
 		}
 		
 		edit = -1;
+	}
+
+	void setLoadPath() {
+		try
+		{
+			this->gdSource->getResourceHandler()->addLoadPath(ResourceLoaderEnums::ResourceLoadPaths(editLoadPathpos), *inputPath);
+		}
+		catch (...)
+		{
+			ToastComponent::GetInstance()->addMessage("Invalid path - " + *inputPath);
+		}
+
+		editLoadPathpos = -1;
 	}
 
 

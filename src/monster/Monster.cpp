@@ -538,6 +538,9 @@ void Monster::getMeshVerticesInformation(
 
 void Monster::setSkyBox()
 {
+
+	//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("D:/source/repos/mHorseShoe_cmake/mHorseShoee_0_0_2/x64/assets/meshes/Materials/Shaders", "FileSystem", "Mesh_Materials");
+
 	//Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 	//oScnManager->setSkyBox(true, "mySky",300,true,Ogre::Quaternion::IDENTITY,"Render_Mesh");
 	
@@ -587,7 +590,12 @@ void Monster::setSkyBox()
 	Ogre::MaterialPtr cloudsMat = Ogre::MaterialManager::getSingleton().getByName("clouds_material", "Mesh_Materials");
 	Ogre::GpuProgramParametersPtr cloudsParam = cloudsMat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 
-	cloudsParam.get()->setNamedConstant("_cloudCol", Ogre::Vector4(0.18, 0.13, 0.24, 0.75));
+	std::cout << "Source file : " << cloudsMat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile() << std::endl;
+	std::cout << "Source : " << cloudsMat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSource() << std::endl;
+	
+
+	//cloudsParam.get()->setNamedConstant("_cloudCol", Ogre::Vector4(0.18, 0.13, 0.24, 0.75));
+	// Separate Material and their shader files in folders individually!!
 
 
 	cloudsEnt->setMaterial(cloudsMat);

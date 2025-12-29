@@ -37,87 +37,120 @@ void pathViewComponent(
 
 }
 
+void addLoadPath(ResourceTabModelComponent* model) {
+
+	if (ImGui::CollapsingHeader("Load Paths")) {
+
+
+		for (int i = 0; i < model->loadPaths->size(); i++)
+		{
+
+			switch (ResourceLoaderEnums::ResourceLoadPaths(i))
+			{
+			case ResourceLoaderEnums::Objects:
+				ImGui::Text("Objects : ");
+				break;
+			case ResourceLoaderEnums::Shaders:
+				ImGui::Text("Shaders : ");
+				break;
+			case ResourceLoaderEnums::MaterialPath:
+				ImGui::Text("Material : ");
+				break;
+			case ResourceLoaderEnums::MaterialTexture:
+				ImGui::Text("MaterialTexture : ");
+				break;
+			case ResourceLoaderEnums::RenderMeshPath:
+				ImGui::Text("RenderMeshPath : ");
+				break;
+			case ResourceLoaderEnums::ColliderMeshPath:
+				ImGui::Text("ColliderMeshPath : ");
+				break;
+			case ResourceLoaderEnums::ImagePath:
+				ImGui::Text("Images : ");
+				break;
+			default:
+				ImGui::Text(("Unknown : " + std::to_string(i)).c_str());
+				break;
+			}
+			ImGui::SameLine();
+
+			if (model->editLoadPathpos == i)
+			{
+
+				if (ImGui::InputText(("##" + std::to_string(i)).c_str(), model->inputPath, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue)) {
+					model->setLoadPath();
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Set"))
+				{
+					model->setLoadPath();
+				}
+			}
+			else {
+
+				ImGui::Text(model->loadPaths->at(i).c_str(), 500.0);
+
+				ImGui::SameLine();
+
+				if (ImGui::Button(("EditLoadPath##" + std::to_string(i)).c_str()))
+				{
+					model->editLoadPath(i);
+				}
+
+			}
+
+
+		}
+	}
+}
+
 void ResourceTabComponent::view()
 {
 	ImGui::Begin("Resources");
 
 	pathViewComponent(resourceTabModel);
 
-	ImGui::Columns(2);
+	addLoadPath(resourceTabModel);
 
-	if (ImGui::Button("Fetch All Resources"))
+
+	if (ImGui::CollapsingHeader("Materials"))
 	{
-		resourceTabModel->FetchAllResourcesBtn();
+		for (int i = 0; i < resourceTabModel->materials->size(); i++)
+		{
+			ImGui::Text(resourceTabModel->materials->at(i).filename().string().c_str());
+		}
 	}
-
-	ImGui::Spacing();
-
-	ImGui::Text("RENDER MESHES : ");
-
-	ImGui::Spacing();
-
-	// renderMeshes
-	if (resourceTabModel->renderMeshes)
+	if (ImGui::CollapsingHeader("Render Meshs"))
 	{
 		for (int i = 0; i < resourceTabModel->renderMeshes->size(); i++)
 		{
 			ImGui::Text(resourceTabModel->renderMeshes->at(i).filename().string().c_str());
 		}
 	}
-	else {
-		ImGui::Text("No Render Mesh Found!");
-	}
-
-	ImGui::Spacing();
-
-	// Collider Meshes
-	if (resourceTabModel->colliderMeshes)
+	if (ImGui::CollapsingHeader("Collider Meshs"))
 	{
 		for (int i = 0; i < resourceTabModel->colliderMeshes->size(); i++)
 		{
 			ImGui::Text(resourceTabModel->colliderMeshes->at(i).filename().string().c_str());
 		}
 	}
-	else {
-		ImGui::Text("No Collider Mesh Found!");
-	}
-
-	ImGui::Spacing();
-
-	// Materials
-	if (resourceTabModel->meshMaterials)
+	if (ImGui::CollapsingHeader("Images"))
 	{
-		for (int i = 0; i < resourceTabModel->meshMaterials->size(); i++)
+		for (int i = 0; i < resourceTabModel->images->size(); i++)
 		{
-			ImGui::Text(resourceTabModel->meshMaterials->at(i).filename().string().c_str());
+			ImGui::Text(resourceTabModel->images->at(i).filename().string().c_str());
 		}
 	}
-	else {
-		ImGui::Text("No Material Found!");
-	}
-
-	ImGui::Spacing();
-
-	ImGui::NextColumn();
-
-	if (ImGui::Button("Render Mesh To Ogre"))
+	if (ImGui::CollapsingHeader("Shaders"))
 	{
-		resourceTabModel->RenderMeshToOgreBtn();
-	}
-
-	ImGui::Spacing();
-
-	// Ogre meshes
-	if (resourceTabModel->ogreMeshes)
-	{
-		for (int i = 0; i < resourceTabModel->ogreMeshes->size(); i++)
+		for (int i = 0; i < resourceTabModel->shaders->size(); i++)
 		{
-			ImGui::Text(resourceTabModel->ogreMeshes->at(i).c_str());
+			ImGui::Text(resourceTabModel->shaders->at(i).filename().string().c_str());
 		}
 	}
-	else {
-		ImGui::Text("No Ogre Mesh Found!");
-	}
+	
 
 	ImGui::End();
 }

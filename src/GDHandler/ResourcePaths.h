@@ -1,24 +1,9 @@
 #pragma once
 
 
-enum ResourcePaths {
-	MasterList,
-	Cases,
-	Scenes,
-	ScnObj,
-	Objects,
-	Shaders,
-	ShaderVars,
-	ShaderValues,
-	MaterialPath,
-	MaterialTexture,
-	RenderMeshPath,
-	ColliderMeshPath,
-	ImagePath
-};
-
 #define DATA_DIRECTORY "/Data"
 #define MASTERLIST_LOC DATA_DIRECTORY + "/MasterList.ini"
+#define RESOURCELOADER_DATA DATA_DIRECTORY + "/ResourceLoad.ini"
 
 #define CASE_DIRECTORY DATA_DIRECTORY + "/Case"
 #define CASE_INI_LOC CASE_DIRECTORY + "/Cases.ini"

@@ -74,7 +74,7 @@ protected:
 
 public:
 
-	ResourceSaver(CSimpleIniA* ini_p, std::string savelocation_p) {
+	void initResourceSaver(CSimpleIniA* ini_p, std::string savelocation_p) {
 		saveLocation = savelocation_p;
 		ini = ini_p;
 	}

@@ -53,10 +53,10 @@ int main() {
 	GDHandler* gdHandler = new GDHandler(ResourceHandler::GetInstance(),monster,kint,feel); // TODO integrate Feel with GDHandler itself
 	
 
-
-	std::cout << "Setting up Skybox" << std::endl;
-	monster->setSkyBox();
-	monster->setGrid();
+	// TODO SETUP BETTER STARTUP
+	//std::cout << "Setting up Skybox" << std::endl;
+	//monster->setSkyBox();
+	//monster->setGrid();
 
 	//monster->_createGrassBlade(0.3, 1);
 
@@ -95,8 +95,10 @@ int main() {
 	std::cout << "loop ended : " << std::endl;
 
 	// Shutdown
-	kint->Shutdown();
+	//kint->Shutdown();
 	monster->Shutdown();
+
+	ResourceHandler::GetInstance()->shutdown();
 
 	std::cout << "HEllOS";
 
