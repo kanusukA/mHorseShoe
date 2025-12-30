@@ -9,11 +9,11 @@
 
 // Local Headers
 #include <monster/terrain.h>
-#include <feel/KeyHandler.h>
+//#include <feel/KeyHandler.h>
 #include <GDHandler/ResourceHandler.h>
 
 // Third-party header
-
+#include <SDL3/SDL.h>
 #include <PxPhysicsAPI.h>
 
 // STL headers
@@ -170,7 +170,7 @@ private:
 
 	Ogre::Vector3 result = Ogre::Vector3();
 
-	IKEYS* inputkeys;
+	//IKEYS* inputkeys;
 
 public:
 
@@ -217,8 +217,10 @@ public:
 	Ogre::SceneNode* addCamera(Ogre::String camName, Ogre::Vector3 startPos);
 	Ogre::Entity* createMeshEntity(Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
 	Ogre::Entity* createMeshEntity(Ogre::String entityname ,Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
-	Ogre::Entity* createEntity(Ogre::String entityName_p);
+	Ogre::Entity* createEntity(Ogre::String entityName_p, Ogre::String mshname);
 	Ogre::Mesh* getMesh(Ogre::String meshName, Ogre::String groupName = "Render_Mesh");
+	Ogre::SceneNode* createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node); // Creates a new scnNode and attches it to the given scnNode
+
 	Ogre::Mesh* getColliderMesh(Ogre::String meshName, Ogre::String groupName = "Collider_Mesh");
 	Ogre::MaterialPtr getMaterial(Ogre::String matName_p);
 	Ogre::SceneNode* addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode);

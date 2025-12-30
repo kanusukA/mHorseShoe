@@ -85,7 +85,7 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	mRayScnQuery->setQueryMask(~QueryMask::SKY & ~QueryMask::GRID);
 	
 
-	inputkeys = InputHandler::GetInstance()->getInputKeys();
+//	inputkeys = InputHandler::GetInstance()->getInputKeys();
 
 	imguiOverlay = imguiOverlay_p;
 
@@ -142,14 +142,19 @@ Ogre::Entity* Monster::createMeshEntity(Ogre::String entityname, Ogre::String ms
 	return oScnManager->createEntity(entityname,msh);
 }
 
-Ogre::Entity* Monster::createEntity(Ogre::String entityName_p)
+Ogre::Entity* Monster::createEntity(Ogre::String entityName_p, Ogre::String mshname)
 {
-	return oScnManager->createEntity(entityName_p);
+	return oScnManager->createEntity(entityName_p,mshname);
 }
 
 Ogre::Mesh* Monster::getMesh(Ogre::String meshName, Ogre::String groupName)
 {
 	return Ogre::MeshManager::getSingleton().load(meshName, groupName).get();
+}
+Ogre::SceneNode* Monster::createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node)
+{
+	Ogre::SceneNode* new_scnNode = node->createChildSceneNode(scnNodeName);
+	return new_scnNode;
 }
 Ogre::Mesh* Monster::getColliderMesh(Ogre::String meshName, Ogre::String groupName)
 {
@@ -1079,26 +1084,26 @@ void Monster::windowUpdate()
 {
 	// Fullscreen
 
-	if (inputkeys->ALT_L_KEY || inputkeys->ALT_R_KEY) {
-		if (inputkeys->ENTER_KEY) {
-			SDL_SetWindowFullscreen(sdlWindow, !window_fullScreen);
-		}
-	
-		
-	}
-	else {
-		// add full screen toggle
-		auto flag = SDL_GetWindowFlags(sdlWindow);
-		auto is_fullscreen = flag & SDL_WINDOW_FULLSCREEN;
-		if (is_fullscreen == SDL_WINDOW_FULLSCREEN) {
-			//is fullscreen
-			window_fullScreen = true;
-		}
-		else {
-			window_fullScreen = false;
-		}
+	//if (inputkeys->ALT_L_KEY || inputkeys->ALT_R_KEY) {
+	//	if (inputkeys->ENTER_KEY) {
+	//		SDL_SetWindowFullscreen(sdlWindow, !window_fullScreen);
+	//	}
+	//
+	//	
+	//}
+	//else {
+	//	// add full screen toggle
+	//	auto flag = SDL_GetWindowFlags(sdlWindow);
+	//	auto is_fullscreen = flag & SDL_WINDOW_FULLSCREEN;
+	//	if (is_fullscreen == SDL_WINDOW_FULLSCREEN) {
+	//		//is fullscreen
+	//		window_fullScreen = true;
+	//	}
+	//	else {
+	//		window_fullScreen = false;
+	//	}
 
-	}
+	//}
 	
 
 }

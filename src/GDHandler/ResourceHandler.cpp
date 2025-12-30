@@ -410,7 +410,6 @@ void ResourceHandler::checkFileStructure()
 
 	this->setPath(this->SourceDir.string() + OBJECT_INI_LOC, ResourcePaths::Objects);
 
-
 }
 
 void ResourceHandler::loadResources()

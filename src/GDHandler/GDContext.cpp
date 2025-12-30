@@ -4,9 +4,6 @@ void GDBuilderContext::startEngine()
 {
 	// Start Ogre Rendering engine and inits SdlWindow
 	monster->InitMonster();
-
-	// Starts Sdl Window for key, mouse and other inputs
-	feel->initFeel(monster->sdlWindow,this);
 	
 
 	// Start PhysX
@@ -23,6 +20,18 @@ PxRigidDynamic* GDBuilderContext::getPxRigidDynamic(std::string name_p,PxTransfo
 PxRigidStatic* GDBuilderContext::getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry)
 {
 	return kint->createStaticBody(name_p, transform, geometry);
+}
+
+bool GDBuilderContext::sceneExists(std::string scnName_p)
+{
+	return monster->oScnManager->hasSceneNode(scnName_p);
+}
+
+
+
+void GDBuilderContext::setFullScreen(bool fullScreen)
+{
+	SDL_SetWindowFullscreen(monster->sdlWindow, fullScreen);
 }
 
 

@@ -8,9 +8,11 @@
 #include <Gui/GuiComponents/ToastComponent.h>
 
 //Third
+#include <OgreImGuiOverlay.h>
+#include <imgui_stdlib.h>
 
 //STL
-#include <string>
+//#include <string>
 
 
 

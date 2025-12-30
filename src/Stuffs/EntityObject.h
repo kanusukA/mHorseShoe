@@ -12,9 +12,11 @@ private:
 
 public:
 
-	Object(GDBuilderContext* builderCxt_p, std::string name_p, PhysXType objType_p) : ObjectResource(ResourceHandler::GetInstance(), name_p, objType_p) {
+	Object(GDBuilderContext* builderCxt_p,ResID renderMeshID, std::string name_p, PhysXType objType_p) : ObjectResource(ResourceHandler::GetInstance(),this, name_p, objType_p) {
 		builderCxt = builderCxt_p;
-		entity = builderCxt->createObject(name_p);
+
+		//RenderMesh* renderMesh = ResourceHandler::GetInstance()->fetchRenderMeshResourceByID(renderMeshID).get;
+		//entity = builderCxt->createObject(name_p,);
 		
 	}
 

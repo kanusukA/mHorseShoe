@@ -1,6 +1,7 @@
 #pragma once
 
-#include <GDHandler/GDContext.h>
+#include <Stuffs/EntityObject.h>
+
 
 // The Scene class connects SceneResource with Ogre::SceneManager. As such using SceneResource to initalize is not recommened as it may lead to complications.
 class Scene : public SceneResource {
@@ -9,12 +10,10 @@ private:
 
 	Ogre::SceneNode* scene;
 
+	std::vector<Scene*>* attachedScenes;
+	std::vector<Object*>* attachedObject;
+
 public:
-	Scene(GDBuilderContext* builderCxt_p, SceneType scnType) :
-		SceneResource(ResourceHandler::GetInstance(), "", scnType, Ogre::Vector3(), Ogre::Vector4(), Ogre::Vector3()) {
-		builderCxt = builderCxt_p;
-		scene = builderCxt->createScene("");
-	}
 	Scene(GDBuilderContext* builderCxt_p,SceneType scnType, std::string name_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, Ogre::Vector3(), Ogre::Vector4(), Ogre::Vector3()) {
 		builderCxt = builderCxt_p;
@@ -29,6 +28,23 @@ public:
 		scene->setScale(scale_p);
 
 	}
+
+	// Object
+	void addObject(Object* obj_p);
+
+	void removeObjectById(ResID objId);
+
+	void removeObjectByIndex(int index);
+
+	
+	//Scene
+	void addScene(Scene* scene_p);
+
+	void removeSceneById(ResID sceneId);
+
+	void removeSceneByIndex(int index);
+
+
 
 	void setPosition(Ogre::Vector3 pos_p) {
 		this->position = pos_p;
@@ -59,6 +75,13 @@ public:
 	}
 
 
+	std::vector<Scene*>* getAttachedScenes() {
+		return attachedScenes;
+	}
+
+	std::vector<Object*>* getObjects() {
+		return attachedObject;
+	}
 
 	
 

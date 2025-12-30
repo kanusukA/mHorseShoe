@@ -8,25 +8,31 @@ private:
 
 public:
 	
-	std::vector<CaseResource*>* cases = nullptr;
+	std::vector<Case*>* cases;
 
 	Case* currentCase;
+
+	std::string* inputSceneName = new std::string("");
+	SceneType scnType = SceneType::STATIC;
 
 	SceneTabModelComponent(const char* name_p) : ModelComponent(name_p) {
 		
 	}
 
 	void init() override {
-		cases = this->gdSource->getResourceHandler()->getAllCase();
+		cases = this->gdSource->getCaseHandler()->getAllCases();
 		currentCase = this->gdSource->getCaseHandler()->getCurrentCase();
-
+		
 	}
+
 
 	std::string getCaseName() { return currentCase->getName(); }
 	
 	SceneResource* getCaseScene(ResID scnID) { return this->gdSource->getResourceHandler()->fetchSceneResourceByID(scnID); }
 
-
+	void addScene() {
+		this->gdSource->getCaseHandler()->CreateScene(scnType,*inputSceneName);
+	}
 
 	// Button functions
 	void refresh();

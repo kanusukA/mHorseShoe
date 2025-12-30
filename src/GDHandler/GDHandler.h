@@ -5,6 +5,7 @@
 #define GDHANDLER_H
 
 #include <GDHandler/StartPlatinum.h>
+#include <feel/Feel.h>
 
 class GDHandler : public GDBuilderContext
 {
@@ -12,12 +13,16 @@ public:
 
 	CaseHandler* caseHandler;
 	StuffHandler* stuffHandler;
+	Feel* feel;
 
 	//PlayerSubject* playerSubject = nullptr;
 
 	Gui* gui;
 
-	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Kint* physics, Feel* feel_p) : GDBuilderContext(resourceHan_p, renderer, physics, feel_p) {
+	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Kint* physics, Feel* feel_p) : GDBuilderContext(resourceHan_p, renderer, physics) {
+		feel = feel_p;
+		KeyHandler* keyHandler = new KeyHandler(this);
+		feel->initFeel(renderer->sdlWindow, keyHandler);
 
 		stuffHandler = new StuffHandler(renderer, physics);
 
@@ -27,11 +32,15 @@ public:
 
 		gui->initGui(this->monster->imguiOverlay);
 
+		feel = feel_p;
+		
+
+
 	};
 
 
 	Ogre::SceneNode* createScene(std::string name_p) override;
-	Ogre::Entity* createObject(std::string name_p) override;
+	Ogre::Entity* createObject(std::string name_p, std::string mshName_p) override;
 	Ogre::Mesh* createMesh(std::string meshName) override;
 	Ogre::MaterialPtr createMaterial(std::string materialName_p) override;
 

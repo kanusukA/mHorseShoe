@@ -3,7 +3,11 @@
 void AddTabComponent::view()
 {
 	ImGui::Begin("Add");
+
+
 	ImGui::InputText("Object Name", addModel->objectName);
+
+
 
 	// USER CAN SELECT A PREMADE SCENE / CASE(CASE SYSTEM HAS NOT BEEN FULLY IMPLEMENTED)
 	//if (addModel->selectedScenes)

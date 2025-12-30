@@ -51,6 +51,29 @@ void Feel::updateInput(float deltaTime) {
 
 	while (SDL_PollEvent(&event) != 0)
 	{
+		// NEW IMPLEMENTATION
+		if(event.type == SDL_EVENT_KEY_UP || event.type == SDL_EVENT_KEY_DOWN){
+			for (int i = 0; i < keyHandler->keys->size(); i++)
+			{
+				if(event.key.key == keyHandler->keys->at(i).getSDL_Key()){
+					std::cout << "event key pressed" << std::endl;
+					switch (keyHandler->keys->at(i).getEventType())
+					{
+					case SDL_EVENT_KEY_DOWN:
+						keyHandler->keys->at(i).click();
+						break;
+					case SDL_EVENT_KEY_UP:
+						keyHandler->keys->at(i).click();
+						break;
+
+					default:
+						break;
+					}
+
+				}
+			}
+		}
+
 		if (event.type == SDL_EVENT_WINDOW_RESIZED) {
 			SDL_GetWindowSize(window, &keyHandler->winUtils->WINDOW_WIDTH, &keyHandler->winUtils->WINDOW_HEIGHT);
 		}
@@ -135,7 +158,7 @@ void Feel::updateInput(float deltaTime) {
 			if (event.key.key == keyHandler->keyBinds->ENTER_KEY) {
 				keyHandler->inputKeys->ENTER_KEY = true;
 			}
-
+			
 
 
 
@@ -201,6 +224,10 @@ void Feel::updateInput(float deltaTime) {
 		// Key Up
 		if (event.type == SDL_EVENT_KEY_UP)
 		{
+			if (event.key.key == keyHandler->keyBinds->FULLSCREEN)
+			{
+				keyHandler->inputKeys->FULLSCREEN = !keyHandler->inputKeys->FULLSCREEN;
+			}
 			
 			if (event.key.key == keyHandler->keyBinds->CONSOL_KEY) {
 				keyHandler->inputKeys->CONSOL_KEY = true;

@@ -3,6 +3,9 @@
 #include <GDHandler/objects.h>
 
 
+
+
+
 // setup imports
 
 // Manages Case. i.e all the Scenes in a single save file
@@ -16,12 +19,13 @@ private:
 
 	Case* currentCase;
 
+	std::vector<Case*>* cases = new std::vector<Case*>();
+
 
 protected:
 
 	// Ogre::Scenes must remain consistant with ResourceHandler.
 	void checkIntegrity();
-
 
 
 public:
@@ -36,7 +40,9 @@ public:
 		// Set Case manually
 		
 		// TODO Check Resource Loader for case
-		currentCase = new Case(builderCxt_p,"Unnamed Case");
+		currentCase = CreateCase("Unnamed case");
+
+		
 
 	};
 	// Used to start CaseHandler with a predefined case as the program starts
@@ -55,13 +61,12 @@ public:
 	Case* getCurrentCase() {
 		return currentCase;
 	}
-	// Add an update method for converting ResID to sceneType!!
 
-	// SCENE FUNCTIONS
-	std::vector<SceneResource*> getDynamicScenes() {
-		
-	}
+	std::vector<Case*>* getAllCases() { return cases; }
 
+
+
+	Case* CreateCase(std::string caseName_p);
 	Scene* CreateScene(SceneType scnType, std::string scnName);
 	Object* CreateObject(std::string objectName_p, PhysXType type);
 	RenderMesh* CreateRenderMesh(std::string meshName_p);

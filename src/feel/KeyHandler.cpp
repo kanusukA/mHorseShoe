@@ -12,3 +12,8 @@ InputHandler* InputHandler::GetInstance()
 	return pInstance_;
 
 }
+
+KeyHandler::KeyHandler(GDBuilderContext* builderCxt_p)
+{
+	keys->push_back(FullScreenKey(builderCxt_p));
+}

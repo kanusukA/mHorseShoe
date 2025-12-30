@@ -168,8 +168,6 @@ struct  GuiSelectableObject {
 class StuffHandler {
 private:
 
-
-
 	// Kint
 	bool showingOgreRendering = true;
 	bool showingColliderDebug = false;
@@ -185,7 +183,7 @@ private:
 	// KEY STUFFS
 	Terrain* terrainStuff;
 
-	IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
+	//IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
 
 	// last object
 	LastObject* lastObject = new LastObject();

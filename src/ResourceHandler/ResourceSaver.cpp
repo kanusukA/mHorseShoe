@@ -69,6 +69,7 @@ void ResourceSaver::saveCase(CaseResource* case_p)
 
 void ResourceSaver::saveScene(SceneResource* scene_p)
 {
+
 	const char* sectionName = std::to_string(scene_p->getId()).c_str();
 
 	ini->SetValue(sectionName, scene_p->getName().c_str(), NULL);
@@ -77,9 +78,14 @@ void ResourceSaver::saveScene(SceneResource* scene_p)
 	ini->SetValue(sectionName, "scale", convertVec3ToString(scene_p->getScale()).c_str());
 	ini->SetValue(sectionName, "rotation", convertVec4ToString(Ogre::Vector4(scene_p->getOrientation()[0], scene_p->getOrientation()[1], scene_p->getOrientation()[2], scene_p->getOrientation()[3])).c_str());
 
-	for (int i = 0; i < scene_p->getObjects()->size(); i++)
+	for (int i = 0; i < scene_p->getAttachedScenesID()->size(); i++)
 	{
-		ini->SetValue(sectionName, "Scene", std::to_string(scene_p->getObjects()->at(i)).c_str());
+		ini->SetValue(sectionName, ("Scene" + std::to_string(i)).c_str(), std::to_string(scene_p->getAttachedScenesID()->at(i)).c_str());
+	}
+
+	for (int i = 0; i < scene_p->getObjectsID()->size(); i++)
+	{
+		ini->SetValue(sectionName, "Scene", std::to_string(scene_p->getObjectsID()->at(i)).c_str());
 	}
 
 }
@@ -194,9 +200,9 @@ void ResourceSaver::saveScenes(std::vector<SceneResource*>* scene_res, std::stri
 		this->saveScene(scene_res->at(i));
 		this->saveIni(scnInipath);
 		this->resetIni();
-		for (int j = 0; j < scene_res->at(i)->getObjects()->size(); j++)
+		for (int j = 0; j < scene_res->at(i)->getObjectsID()->size(); j++)
 		{
-			this->saveScnObj(std::to_string(scene_res->at(i)->getId()), scene_res->at(i)->getObjects()->at(j));
+			this->saveScnObj(std::to_string(scene_res->at(i)->getId()), scene_res->at(i)->getObjectsID()->at(j));
 		}
 		this->saveIni(scnObjInipath);
 			

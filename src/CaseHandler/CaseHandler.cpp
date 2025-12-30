@@ -33,17 +33,35 @@ void CaseHandler::checkIntegrity()
 }
 
 
+Case* CaseHandler::CreateCase(std::string caseName_p)
+{
+	Case* new_case = new Case(this->builderCxt,caseName_p);
+	this->cases->push_back(new_case);
+	this->currentCase = new_case;
+	return new_case;
+}
+
 Scene* CaseHandler::CreateScene(SceneType scnType, std::string scnName)
 {
-	Scene* new_scn = new Scene(this->builderCxt, scnType, scnName);
-	return new_scn;
+	if (builderCxt->sceneExists(scnName))
+	{
+		ToastComponent::GetInstance()->addMessage("Scene Already exists!!");
+		return nullptr;
+	}
+	else {
+		Scene* new_scn = new Scene(this->builderCxt, scnType, scnName);
+		this->currentCase->addSceneToCase(new_scn);
+		return new_scn;
+	}
+	
+	
 	//return new Scene(scnType, scnName);
 }
 
 Object* CaseHandler::CreateObject(std::string objectName_p, PhysXType type)
 {
-	Object* new_obj = new Object(this->builderCxt,objectName_p,type);
-	return new_obj;
+	//Object* new_obj = new Object(this->builderCxt,objectName_p,type);
+	//return new_obj;
 }
 
 RenderMesh* CaseHandler::CreateRenderMesh(std::string meshName_p)

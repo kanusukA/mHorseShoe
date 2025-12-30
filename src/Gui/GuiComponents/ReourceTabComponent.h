@@ -1,9 +1,9 @@
 #pragma once
 
 #include <base/Mediator.h>
-#include <OgreImGuiOverlay.h>
 
-#include <imgui_stdlib.h>
+
+//#include <imgui_stdlib.h>
 
 class ResourceTabModelComponent : public ModelComponent {
 public:

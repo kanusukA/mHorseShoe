@@ -394,10 +394,12 @@ public:
 };
 
 
+class Case;
 
 class CaseResource : public Resource {
 private:
 
+	Case* caseM;
 	std::vector<ResID>* Scenes = new std::vector<ResID>();
 
 protected:
@@ -413,35 +415,7 @@ protected:
 		return false;
 	}
 
-
-public:
-
-	// RESOURCE SPECIFIC FUNCTIONS
-
-	void setId(int index) override {
-		if (index > 99999)
-		{
-			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
-		}
-		_id = 10000000000 + index;
-	}
-
-
-	CaseResource(ResourceHandlerBuilderContext* context, std::string name_p) {
-		this->resourceHandlerCxt = context;
-		this->setName(name_p);
-
-		context->createCase(this);
-	}
-
-
-	// CASE METHODS
-
-	std::vector<ResID>* getScenesIdInCase() {
-		return Scenes;
-	}
-
-	void addSceneToCase(ResID sceneID) {
+	void _addSceneToCase(ResID sceneID) {
 
 		if (checkSceneDuplicate(sceneID))
 		{
@@ -458,7 +432,7 @@ public:
 
 	}
 
-	void removeSceneByID(ResID sceneID) {
+	void _removeSceneByID(ResID sceneID) {
 		for (int i = 0; i < Scenes->size(); i++)
 		{
 			if (Scenes->at(i) == sceneID)
@@ -469,9 +443,40 @@ public:
 		}
 	}
 
-	void removeSceneByIndex(int index) {
+	void _removeSceneByIndex(int index) {
 		Scenes->erase(Scenes->begin() + index);
 	}
+
+
+public:
+
+	// RESOURCE SPECIFIC FUNCTIONS
+
+	void setId(int index) override {
+		if (index > 99999)
+		{
+			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
+		}
+		_id = 10000000000 + index;
+	}
+
+
+	CaseResource(ResourceHandlerBuilderContext* context,Case* case_p, std::string name_p) {
+		caseM = case_p;
+		this->resourceHandlerCxt = context;
+		this->setName(name_p);
+
+		context->createCase(this);
+	}
+
+
+	// CASE METHODS
+
+	std::vector<ResID>* getScenesIdInCase() {
+		return Scenes;
+	}
+
+	
 
 };
 
@@ -488,8 +493,60 @@ protected:
 	Ogre::Vector4 orientation;
 	Ogre::Vector3 scale;
 
-
+	std::vector<ResID>* scenes = new std::vector<ResID>();
 	std::vector<ResID>* objects = new std::vector<ResID>();
+
+
+	void _addObject(ResID objectID) {
+		if (objectID >= 10200000000 && objectID < 10300000000)
+		{
+			objects->push_back(objectID);
+		}
+		else {
+			throw ResourceHandlerIDError(("Invalid ID Entered. required : SceneResourceID , entered : " + std::to_string(objectID)).c_str());
+		}
+	}
+
+	void _attachScene(ResID sceneID) {
+		if (sceneID >= 10100000000 && sceneID < 10200000000)
+		{
+			scenes->push_back(sceneID);
+		}
+		else {
+			throw ResourceHandlerIDError(("Invalid ID Entered. required : SceneResourceID , entered : " + std::to_string(sceneID)).c_str());
+		}
+	}
+
+	void _removeSceneById(ResID sceneID) {
+		for (int i = 0; i < scenes->size(); i++)
+		{
+			if (scenes->at(i) == sceneID)
+			{
+				scenes->erase(scenes->begin() + i);
+				break;
+			}
+		}
+	}
+
+	void _removeSceneByIndex(int index) {
+		scenes->erase(scenes->begin() + index);
+	}
+
+
+	void _removeObjectById(ResID objectID) {
+		for (int i = 0; i < objects->size(); i++)
+		{
+			if (objects->at(i) == objectID)
+			{
+				objects->erase(objects->begin() + i);
+				break;
+			}
+		}
+	}
+
+	void _removeObjectByIndex(int index) {
+		objects->erase(objects->begin() + index);
+	}
 
 public:
 
@@ -527,32 +584,13 @@ public:
 
 	};
 
-	void addObject(ResID objectID) {
-		if (objectID >= 10200000000 && objectID < 10300000000)
-		{
-			objects->push_back(objectID);
-		}
-		else {
-			throw ResourceHandlerIDError(("Invalid ID Entered. required : SceneResourceID , entered : " + std::to_string(objectID)).c_str());
-		}
+	
+
+	std::vector<ResID>* getAttachedScenesID() {
+		return scenes;
 	}
 
-	void removeObjectById(ResID objectID) {
-		for (int i = 0; i < objects->size(); i++)
-		{
-			if (objects->at(i) == objectID)
-			{
-				objects->erase(objects->begin() + i);
-				break;
-			}
-		}
-	}
-
-	void removeObjectByIndex(int index) {
-		objects->erase(objects->begin() + index);
-	}
-
-	std::vector<ResID>* getObjects() {
+	std::vector<ResID>* getObjectsID() {
 		return objects;
 	}
 
@@ -562,12 +600,15 @@ public:
 
 };
 
+class Object;
 
 class ObjectResource : public Resource
 {
 
 private:
 	PhysXType physXType;
+
+	Object* higherObj;
 
 protected:
 
@@ -578,12 +619,23 @@ protected:
 
 public:
 
+	Object* getHigherClass() { return higherObj; }
+
 	void setId(int index) override {
 		if (index > 99999)
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
 		}
 		_id = 10200000000 + index + (this->physXType * 10000000);
+	}
+
+	ObjectResource(ResourceHandlerBuilderContext* context,Object* obj_p, std::string name_p, PhysXType objectType) {
+		this->resourceHandlerCxt = context;
+		higherObj = obj_p;
+		physXType = objectType;
+		this->setName(name_p);
+
+		context->createObject(this);
 	}
 
 	ObjectResource(ResourceHandlerBuilderContext* context, std::string name_p, PhysXType objectType) {
@@ -908,7 +960,7 @@ public:
 
 };
 
-
+class RenderMesh;
 
 class RenderMeshResource : public Resource
 {
@@ -916,7 +968,11 @@ class RenderMeshResource : public Resource
 protected:
 	ResID material;
 
+	RenderMesh* renderMesh;
+
 public:
+
+	RenderMesh* getHigherClass() { return renderMesh; }
 
 	void setId(int index) override {
 
@@ -926,6 +982,14 @@ public:
 		}
 		_id = 10300000000 + index;
 
+	}
+	RenderMeshResource(ResourceHandlerBuilderContext* context,RenderMesh* renderMesh_p, std::string meshName_p) {
+		this->resourceHandlerCxt = context;
+		renderMesh = renderMesh_p;
+		this->setName(meshName_p);
+
+
+		context->createRenderMesh(this);
 	}
 
 	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p) {
@@ -943,6 +1007,9 @@ public:
 	ResID getMaterialID() {
 		return material;
 	}
+
+
+	std::string getMeshName() { return name; }
 
 	virtual void setMaterial(ResID material_p, Ogre::MaterialPtr mat_p) {};
 
@@ -983,6 +1050,8 @@ public:
 	ResID getMaterialID() {
 		return material;
 	}
+
+	std::string getMeshName() { return name; }
 
 	virtual void setMaterial(ResID material_p, Ogre::MaterialPtr mat_p) {};
 

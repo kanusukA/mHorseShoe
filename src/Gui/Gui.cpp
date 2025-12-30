@@ -23,15 +23,15 @@ void Gui::initGui(Ogre::ImGuiOverlay* overlay) {
 void Gui::updateGui()
 {
 
-	IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
+	//IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
 
 	imOverlay->NewFrame();
 
-	if(inputKeys->ALL_TAB_KEY_T){
+	
 
-		updateGuiComponents();
+	updateGuiComponents();
 
-	}
+	
 
 	ImGui::EndFrame();
 }
@@ -51,14 +51,14 @@ void Gui::initGuiComponents()
 	ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent("Resource Tab Model");
 	this->addModelComponent(resourceTabModel);
 
-	StatusTabModelComponent* statusModel = new StatusTabModelComponent("Status tab Model");
-	this->addModelComponent(statusModel);
+	/*StatusTabModelComponent* statusModel = new StatusTabModelComponent("Status tab Model");
+	this->addModelComponent(statusModel);*/
 
 	AddTabModelComponent* addModel = new AddTabModelComponent("Add tab Model");
 	this->addModelComponent(addModel);
 
-	ObjectTabModelComponent* objectModel = new ObjectTabModelComponent("Object tab Model");
-	this->addModelComponent(objectModel);
+	/*ObjectTabModelComponent* objectModel = new ObjectTabModelComponent("Object tab Model");
+	this->addModelComponent(objectModel);*/
 
 	ScenePanelTabModelComponent* scenePanelModel = new ScenePanelTabModelComponent("Scene Panel tab Model");
 	this->addModelComponent(scenePanelModel);
@@ -79,14 +79,14 @@ void Gui::initGuiComponents()
 	ResourceTabComponent* resourceTab = new ResourceTabComponent("Resource Tab", resourceTabModel);
 	this->addViewComponent(resourceTab);
 
-	StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
-	this->addViewComponent(statusTab);
+	/*StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
+	this->addViewComponent(statusTab);*/
 
 	AddTabComponent* addTab = new AddTabComponent("Add Tab", addModel);
 	this->addViewComponent(addTab);
 
-	ObjectTabComponent* objectTab = new ObjectTabComponent("Object Tab", objectModel);
-	this->addViewComponent(objectTab);
+	/*ObjectTabComponent* objectTab = new ObjectTabComponent("Object Tab", objectModel);
+	this->addViewComponent(objectTab);*/
 
 	ScenePanelTabComponent* scenePanelTab = new ScenePanelTabComponent("Scene Panel Tab", scenePanelModel);
 	this->addViewComponent(scenePanelTab);

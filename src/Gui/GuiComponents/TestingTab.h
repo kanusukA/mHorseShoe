@@ -82,7 +82,7 @@ public:
 
 	void AddSceneToCase(ResID caseID) {
 		CaseResource* caseRes = this->gdSource->getResourceHandler()->fetchCaseResourceByID(caseID);
-		caseRes->addSceneToCase(selectedScnID);
+		//caseRes->addSceneToCase(selectedScnID);
 	}
 
 	void getScenesIdInCase(ResID caseID) {
