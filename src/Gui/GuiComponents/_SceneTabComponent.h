@@ -18,6 +18,11 @@ public:
 	std::string* inputSceneName = new std::string("");
 	SceneType scnType = SceneType::STATIC;
 
+	// MESHS FROM RESOURCE HANDLER
+	std::string* inputObjectname = new std::string("");
+	std::vector<std::filesystem::path>* meshes;
+	int selectedMesh = 0;
+
 	SceneTabModelComponent(const char* name_p) : ModelComponent(name_p) {
 		
 	}
@@ -25,6 +30,7 @@ public:
 	void init() override {
 		cases = this->gdSource->getCaseHandler()->getAllCases();
 		currentCase = this->gdSource->getCaseHandler()->getCurrentCase();
+		meshes = this->gdSource->getResourceHandler()->getRenderMeshLoaded();
 		
 	}
 

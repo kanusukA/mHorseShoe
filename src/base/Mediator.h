@@ -228,6 +228,12 @@ public:
 
 
 
+void imGuiVec3Viewer(std::string label, Ogre::Vector3 vec3_p, Ogre::Vector3* output_p = nullptr);
+void imGuiVec4Viewer(std::string label, Ogre::Vector4 vec4_p, Ogre::Vector4* output_p = nullptr);
+
+
+// DEPRICATED STUFF ----------------------------------------------------------------------------------------------------------------
+
 
 // MAIN EVENT ENUM - CONTAINS ALL THE VIEW COMPONENETS
 enum InitEvents
