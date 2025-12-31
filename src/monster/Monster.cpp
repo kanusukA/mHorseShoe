@@ -1045,6 +1045,7 @@ void Monster::deleteScnNode(Ogre::SceneNode* scnNode)
 {
 	scnNode->removeAndDestroyAllChildren();
 	oScnManager->destroySceneNode(scnNode);
+
 }
 
 

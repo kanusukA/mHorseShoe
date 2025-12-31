@@ -8,15 +8,18 @@ protected:
 	GDBuilderContext* builderCxt;
 
 	SDL_Keycode SDL_Key;
-	SDL_EventType eventType;
+
 
 public:
-	Key(GDBuilderContext* builderCxt_p, SDL_Keycode SDL_Key_p, SDL_EventType eventType) {
+	Key(GDBuilderContext* builderCxt_p, SDL_Keycode SDL_Key_p) {
 		builderCxt = builderCxt_p;
 		SDL_Key = SDL_Key_p;
+		
 	}
 
-	virtual void click() {}
+	virtual void click(SDL_EventType key_evnt) {
+		
+	}
 
 	void setSDL_Key(SDL_Keycode SDL_Key_p) {
 		SDL_Key = SDL_Key_p;
@@ -24,23 +27,28 @@ public:
 
 	SDL_Keycode getSDL_Key() { return SDL_Key; }
 
-	SDL_EventType getEventType() { return eventType; }
-
 };
 
 
 class FullScreenKey : public Key {
 private:
 	bool state;
+	bool lock = false;
 public:
-	FullScreenKey(GDBuilderContext* builderCxt_p, bool state_p = true) : Key(builderCxt_p,SDLK_F, SDL_EVENT_KEY_UP) {
+	FullScreenKey(GDBuilderContext* builderCxt_p, bool state_p = true) : Key(builderCxt_p,SDLK_F) {
 		state = state_p;
 	}
 
-	void click() override {
-		state = !state;
-		std::cout << "Clicked";
-		this->builderCxt->setFullScreen(state);
+	void click(SDL_EventType key_evnt) override {
+		if(!lock){
+			state = !state;
+			this->builderCxt->setFullScreen(state);
+			lock = true;
+		}
+		if (key_evnt == SDL_EVENT_KEY_UP)
+		{
+			lock = false;
+		}
 	}
 
 };

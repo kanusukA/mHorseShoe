@@ -52,24 +52,12 @@ void Feel::updateInput(float deltaTime) {
 	while (SDL_PollEvent(&event) != 0)
 	{
 		// NEW IMPLEMENTATION
-		if(event.type == SDL_EVENT_KEY_UP || event.type == SDL_EVENT_KEY_DOWN){
+		if(event.key.type == SDL_EVENT_KEY_DOWN || event.key.type == SDL_EVENT_KEY_UP){
 			for (int i = 0; i < keyHandler->keys->size(); i++)
 			{
-				if(event.key.key == keyHandler->keys->at(i).getSDL_Key()){
+				if(event.key.key == keyHandler->keys->at(i)->getSDL_Key()){
 					std::cout << "event key pressed" << std::endl;
-					switch (keyHandler->keys->at(i).getEventType())
-					{
-					case SDL_EVENT_KEY_DOWN:
-						keyHandler->keys->at(i).click();
-						break;
-					case SDL_EVENT_KEY_UP:
-						keyHandler->keys->at(i).click();
-						break;
-
-					default:
-						break;
-					}
-
+					keyHandler->keys->at(i)->click(event.key.type);
 				}
 			}
 		}

@@ -22,7 +22,10 @@ void Scene::removeObjectById(ResID objId)
 
 void Scene::removeObjectByIndex(int index)
 {
-	
+	if (!this->attachedObject)
+	{
+		attachedObject = new std::vector<Object*>();
+	}
 	SceneResource::_removeObjectByIndex(index);
 	this->attachedObject->erase(attachedObject->begin() + index);
 
@@ -30,6 +33,10 @@ void Scene::removeObjectByIndex(int index)
 
 void Scene::addScene(Scene* scene_p)
 {
+	if (!this->attachedScenes)
+	{
+		attachedScenes = new std::vector<Scene*>();
+	}
 	SceneResource::_attachScene(scene_p->getId());
 	this->attachedScenes->push_back(scene_p);
 

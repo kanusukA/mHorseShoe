@@ -29,6 +29,11 @@ bool GDBuilderContext::sceneExists(std::string scnName_p)
 
 
 
+void GDBuilderContext::removeSceneNode(Ogre::SceneNode* scnNode_p)
+{
+	monster->deleteScnNode(scnNode_p);
+}
+
 void GDBuilderContext::setFullScreen(bool fullScreen)
 {
 	SDL_SetWindowFullscreen(monster->sdlWindow, fullScreen);

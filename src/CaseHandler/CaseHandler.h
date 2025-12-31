@@ -41,7 +41,6 @@ public:
 		
 		// TODO Check Resource Loader for case
 		currentCase = CreateCase("Unnamed case");
-
 		
 
 	};
@@ -68,6 +67,7 @@ public:
 
 	Case* CreateCase(std::string caseName_p);
 	Scene* CreateScene(SceneType scnType, std::string scnName);
+	Scene* CreateSceneAttachToCase(SceneType scnType, std::string scnName);
 	Object* CreateObject(std::string objectName_p, PhysXType type);
 	RenderMesh* CreateRenderMesh(std::string meshName_p);
 	ColliderMesh* CreateColliderMesh(std::string MeshName_p);

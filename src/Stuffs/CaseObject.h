@@ -6,6 +6,7 @@
 class Case : public CaseResource {
 private:
 	std::vector<Scene*>* caseScenes = new std::vector<Scene*>();
+	Scene* selectedScene;
 
 public:
 	Case(GDBuilderContext* builder_p) : CaseResource(ResourceHandler::GetInstance(),this, "") {
@@ -14,6 +15,12 @@ public:
 	Case(GDBuilderContext* builder_p, std::string name_p) : CaseResource(ResourceHandler::GetInstance(),this, name_p) {
 
 	}
+
+	void selectScene(Scene* scn_p) {
+		selectedScene = scn_p;
+		
+	}
+	Scene* getSelectedScene() { return selectedScene; }
 
 	void addSceneToCase(Scene* scene_p){
 		CaseResource::_addSceneToCase(scene_p->getId());
@@ -31,11 +38,15 @@ public:
 				break;
 			}
 		}
+		delete scene_p;
 	}
 
 	void removeByIndex(int index) {
 		CaseResource::_removeSceneByIndex(index);
+		Scene* scn = caseScenes->at(index);
 		caseScenes->erase(caseScenes->begin() + index);
+		delete scn;
+
 	}
 
 

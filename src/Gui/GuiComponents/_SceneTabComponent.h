@@ -5,8 +5,11 @@ class SceneTabModelComponent : public ModelComponent {
 
 private:
 	SceneTabModelComponent();
-
+	bool rootSceneNodeSelected = true;
 public:
+
+	// ID MANAGING (IGNORE)
+	int* id = new int(0);
 	
 	std::vector<Case*>* cases;
 
@@ -31,7 +34,36 @@ public:
 	SceneResource* getCaseScene(ResID scnID) { return this->gdSource->getResourceHandler()->fetchSceneResourceByID(scnID); }
 
 	void addScene() {
-		this->gdSource->getCaseHandler()->CreateScene(scnType,*inputSceneName);
+		if (rootSceneNodeSelected)
+		{
+			this->gdSource->getCaseHandler()->CreateSceneAttachToCase(scnType, *inputSceneName);
+		}
+		else {
+			Scene* new_scn = this->gdSource->getCaseHandler()->CreateScene(scnType, *inputSceneName);
+			if (new_scn)
+			{
+				currentCase->getSelectedScene()->addScene(new_scn);
+			}
+			
+		}
+		
+	}
+
+	void selectScene(Scene* scn_p) {
+		currentCase->selectScene(scn_p);
+		rootSceneNodeSelected = false;
+	}
+	void deleteScene(Scene* scn_p) {
+		currentCase->removeScene(scn_p);
+		rootSceneNodeSelected = true;
+	}
+
+	void selectRootSceneNode() {
+		rootSceneNodeSelected = true;
+	}
+
+	bool isRootScnNodeSelected() {
+		return this->rootSceneNodeSelected;
 	}
 
 	// Button functions

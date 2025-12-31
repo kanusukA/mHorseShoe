@@ -165,7 +165,7 @@ public:
 	KEYBINDS* keyBinds = new KEYBINDS();
 	WINDOW_UTILS* winUtils = new WINDOW_UTILS();
 
-	std::vector<Key>* keys = new std::vector<Key>();
+	std::vector<Key*>* keys = new std::vector<Key*>();
 
 
 	// IMPLEMENT IN FUTURE

@@ -60,6 +60,9 @@ public:
 	virtual Ogre::MaterialPtr createMaterial(std::string materialName_p) { return nullptr; }
 	virtual void setShaderVars(Shader* shader) {};
 
+	// Delete Functions
+	void removeSceneNode(Ogre::SceneNode* scnNode_p);
+
 	// CaseHandler Functions
 	virtual ResID addMaterial(std::string matname_p) { return NULL; }
 	virtual ResID addShader(Ogre::MaterialPtr mat_p, ShaderType type) { return NULL; }

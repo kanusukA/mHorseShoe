@@ -103,6 +103,15 @@ protected:
 	std::vector<ColliderMeshResource*>* colRes = new std::vector<ColliderMeshResource*>();
 	std::vector<ImageResource*>* imageRes = new std::vector<ImageResource*>();
 
+	int caseIndex = 0;
+	int sceneIndex = 0;
+	int objectIndex = 0;
+	int shaderIndex = 0;
+	int matIndex = 0;
+	int renderIndex = 0;
+	int colliderIndex = 0;
+	int imageIndex = 0;
+
 	// Items Must be added to the Master List before Their respective add Function!
 	void AddIndexToMaster(ResID id) {
 
@@ -121,6 +130,16 @@ protected:
 		}
 
 	}
+	void removeMasterListID(ResID id_p) {
+		for (int i = 0; i < masterList->size(); i++)
+		{
+			if (masterList->at(i) == id_p)
+			{
+				masterList->erase(masterList->begin() + i);
+				break;
+			}
+		}
+	}
 
 	void validateMasterList() {
 		unsigned long long totalItems = caseRes->size() + scnRes->size() + objRes->size() +
@@ -132,40 +151,42 @@ protected:
 	}
 
 	int getCaseIndex() {
-		return caseRes->size();
+		return caseIndex;
 	}
 	int getSceneIndex() {
-		return scnRes->size();
+		return sceneIndex;
 	}
 	int getObjectIndex() {
-		return objRes->size();
+		return objectIndex;
 	}
 	int getMaterialIndex() {
-		return matRes->size();
+		return matIndex;
 	}
 	int getShaderIndex() {
-		return shaderRes->size();
+		return shaderIndex;
 	}
 	int getRenderMeshIndex() {
-		return renderRes->size();
+		return renderIndex;
 	}
 	int getColliderMeshIndex() {
-		return colRes->size();
+		return colliderIndex;
 	}
 	int getImageIndex() {
-		return imageRes->size();
+		return imageIndex;
 	}
 
 	void addCaseRes(CaseResource* case_p) {
 		
 		caseRes->push_back(case_p);
 		validateMasterList();
+		caseIndex += 1;
 	}
 
 	void addSceneRes(SceneResource* scn_p) {
 
 		scnRes->push_back(scn_p);
 		validateMasterList();
+		sceneIndex += 1;
 
 		if (guiRegen)
 		{
@@ -177,33 +198,39 @@ protected:
 
 		objRes->push_back(obj_p);
 		validateMasterList();
+		objectIndex += 1;
 	}
 
 	void addShaderRes(ShaderResource* shader_p) {
 
 		shaderRes->push_back(shader_p);
 		validateMasterList();
+		shaderIndex += 1;
 	}
 
 	void addMaterialRes(MaterialResource* mat_p) {
 
 		matRes->push_back(mat_p);
 		validateMasterList();
+		matIndex += 1;
 	}
 
 	void addRenderMeshRes(RenderMeshResource* render_p) {
 		renderRes->push_back(render_p);
 		validateMasterList();
+		renderIndex += 1;
 	}
 
 	void addColliderMeshRes(ColliderMeshResource* collider_p) {
 		colRes->push_back(collider_p);
 		validateMasterList();
+		colliderIndex += 1;
 	}
 
 	void addImageRes(ImageResource* image_p) {
 		imageRes->push_back(image_p);
 		validateMasterList();
+		imageIndex += 1;
 	}
 
 public:
@@ -362,6 +389,95 @@ public:
 	virtual void createColliderMesh(ColliderMeshResource* collider_p) {};
 	virtual void createImage(ImageResource* image_p) {}
 
+	void removeCase(CaseResource* case_p, ResID id) {
+		for (int i = 0; i < caseRes->size(); i++)
+		{
+			if (caseRes->at(i) == case_p)
+			{
+				caseRes->erase(caseRes->begin() + i);
+				break;
+			}
+		}
+		removeMasterListID(id);
+	};
+	void removeScene(SceneResource* scn_p, ResID id) {
+		for (int i = 0; i < scnRes->size(); i++)
+		{
+			if (scnRes->at(i) == scn_p)
+			{
+				scnRes->erase(scnRes->begin() + i);
+				break;
+			}
+		}
+		removeMasterListID(id);
+	};
+	void removeObject(ObjectResource* obj_p, ResID id) {
+		for (int i = 0; i < objRes->size(); i++)
+		{
+			if (objRes->at(i) == obj_p)
+			{
+				objRes->erase(objRes->begin() + i);
+				break;
+			}
+		}
+		removeMasterListID(id);
+	};
+	void removeMaterial(MaterialResource* mat_p, ResID id) {
+		for (int i = 0; i < matRes->size(); i++)
+		{
+			if (matRes->at(i) == mat_p)
+			{
+				matRes->erase(matRes->begin() + i);
+				break;
+			}
+		}
+		removeMasterListID(id);
+	};
+	void removeShader(ShaderResource* shader_p, ResID id) {
+		for (int i = 0; i < shaderRes->size(); i++)
+		{
+			if (shaderRes->at(i) == shader_p)
+			{
+				shaderRes->erase(shaderRes->begin() + i);
+				break;
+			}
+		}
+		removeMasterListID(id);
+	};
+	void removeRenderMesh(RenderMeshResource* render_p, ResID id) {
+		for (int i = 0; i < renderRes->size(); i++)
+		{
+			if (renderRes->at(i) == render_p)
+			{
+				renderRes->erase(renderRes->begin() + i);
+				break;
+			}
+		}
+		removeMasterListID(id);
+	};
+	void removeColliderMesh(ColliderMeshResource* collider_p, ResID id) {
+		for (int i = 0; i < colRes->size(); i++)
+		{
+			if (colRes->at(i) == collider_p)
+			{
+				colRes->erase(colRes->begin() + i);
+				break;
+			}
+		}
+		removeMasterListID(id);
+	};
+	void removeImage(ImageResource* image_p, ResID id) {
+		for (int i = 0; i < imageRes->size(); i++)
+		{
+			if (imageRes->at(i) == image_p)
+			{
+				imageRes->erase(imageRes->begin() + i);
+				break;
+			}
+		}
+		removeMasterListID(id);
+	}
+
 
 };
 
@@ -441,10 +557,12 @@ protected:
 				break;
 			}
 		}
+		
 	}
 
 	void _removeSceneByIndex(int index) {
 		Scenes->erase(Scenes->begin() + index);
+
 	}
 
 
@@ -476,7 +594,9 @@ public:
 		return Scenes;
 	}
 
-	
+	~CaseResource() {
+		resourceHandlerCxt->removeCase(this, _id);
+	}
 
 };
 
@@ -598,6 +718,11 @@ public:
 		return scnType;
 	}
 
+	~SceneResource() {
+		std::cout << "remove" << std::endl;
+		resourceHandlerCxt->removeScene(this, _id);
+	}
+
 };
 
 class Object;
@@ -677,6 +802,8 @@ public:
 	ResID getColliderMesh() { return colliderMeshID; }
 	PhysXType getPhysxType() { return physXType; }
 	float getMass() { return mass; }
+	
+
 
 };
 

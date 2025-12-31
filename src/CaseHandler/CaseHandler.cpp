@@ -41,6 +41,7 @@ Case* CaseHandler::CreateCase(std::string caseName_p)
 	return new_case;
 }
 
+
 Scene* CaseHandler::CreateScene(SceneType scnType, std::string scnName)
 {
 	if (builderCxt->sceneExists(scnName))
@@ -50,12 +51,22 @@ Scene* CaseHandler::CreateScene(SceneType scnType, std::string scnName)
 	}
 	else {
 		Scene* new_scn = new Scene(this->builderCxt, scnType, scnName);
-		this->currentCase->addSceneToCase(new_scn);
+		//this->currentCase->addSceneToCase(new_scn);
 		return new_scn;
 	}
 	
 	
-	//return new Scene(scnType, scnName);
+}
+
+// Creates and adds sceneNode to current Case
+Scene* CaseHandler::CreateSceneAttachToCase(SceneType scnType, std::string scnName)
+{
+	Scene* new_scn = this->CreateScene(scnType, scnName);
+	if (new_scn)
+	{
+		currentCase->addSceneToCase(new_scn);
+	}
+
 }
 
 Object* CaseHandler::CreateObject(std::string objectName_p, PhysXType type)

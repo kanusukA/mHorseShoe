@@ -83,7 +83,28 @@ public:
 		return attachedObject;
 	}
 
-	
+	~Scene() {
+		if(attachedScenes){
+			for (int i = 0; i < attachedScenes->size(); i++)
+			{
+				delete attachedScenes->at(i);
+			}
+			delete attachedScenes;
+		}
+		if(attachedObject){
+			for (int j = 0; j < attachedObject->size(); j++)
+			{
+				delete attachedObject->at(j);
+			}
+
+			delete attachedObject;
+		}
+
+		scene->destroyAllChildrenAndObjects();
+		builderCxt->removeSceneNode(scene);
+		//delete scene;
+		
+	}
 
 };
 
