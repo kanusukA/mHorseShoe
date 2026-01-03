@@ -68,10 +68,11 @@ public:
 	Case* CreateCase(std::string caseName_p);
 	Scene* CreateScene(SceneType scnType, std::string scnName);
 	Scene* CreateSceneAttachToCase(SceneType scnType, std::string scnName);
-	Object* CreateObject(std::string objectName_p, PhysXType type);
+	Object* CreateObject(std::string objectName_p, RenderMeshResource* renderMesh_p, PhysXType type);
 	RenderMesh* CreateRenderMesh(std::string meshName_p);
 	ColliderMesh* CreateColliderMesh(std::string MeshName_p);
 	Shader* CreateShader(Ogre::MaterialPtr mat_p, ShaderType type);
+	// MaterialName must be valid with Ogre::Material before Calling CreateMaterial function.
 	Material* CreateMaterial(std::string materialName_p);
 	Image* CreateImage(std::filesystem::path filePath_p);
 

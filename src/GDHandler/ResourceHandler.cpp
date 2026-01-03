@@ -414,7 +414,7 @@ void ResourceHandler::checkFileStructure()
 
 void ResourceHandler::loadResources()
 {
-	this->loadMaterials(this->Materials, ".material", true, true);
+	this->loadMaterials(this->Materials, ".material", false, true);
 	this->loadShaders(this->Shaders, ".hlsl", true, true);
 	//this->loadShaders(this->Shaders, ".frag", true, true);
 	this->loadRenderMesh(this->RenderMesh);

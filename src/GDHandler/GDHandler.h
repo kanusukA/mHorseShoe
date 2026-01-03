@@ -20,6 +20,11 @@ public:
 	Gui* gui;
 
 	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Kint* physics, Feel* feel_p) : GDBuilderContext(resourceHan_p, renderer, physics) {
+
+		// Init resources
+		ResourceHandler::GetInstance();
+		
+
 		feel = feel_p;
 		KeyHandler* keyHandler = new KeyHandler(this);
 		feel->initFeel(renderer->sdlWindow, keyHandler);
@@ -34,14 +39,21 @@ public:
 
 		feel = feel_p;
 		
-
+	
+		this->setResources();
 
 	};
 
+	// RESOURCE WORK
+
+	// Set Resources Adds all resources loaded by ResourceLoader into ResourceBuilderContext and generates their Resource Objects
+	void setResources();
+
+	// OBJECT CREATION / GDCONTEXT OVERRIDE
 
 	Ogre::SceneNode* createScene(std::string name_p) override;
 	Ogre::Entity* createObject(std::string name_p, std::string mshName_p) override;
-	Ogre::Mesh* createMesh(std::string meshName) override;
+	Ogre::MeshPtr createMesh(std::string meshName) override;
 	Ogre::MaterialPtr createMaterial(std::string materialName_p) override;
 
 

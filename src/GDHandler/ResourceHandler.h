@@ -4,6 +4,7 @@
 #define RESOURCEHANDLER_H
 
 //Local
+#include <ResourceHandler/ResourceReader.h>
 #include<ResourceHandler/ResourceSaver.h>
 #include<ResourceHandler/ResourceLoader.h>
 #include <GDHandler/ResourcePaths.h>
@@ -55,7 +56,7 @@ enum ResourceHandlerType
 
 // Integrate it into gdhandler with Ogre 
 
-class ResourceHandler : public ResourceHandlerBuilderContext, public ResourceSaver , public ResourceLoader
+class ResourceHandler : public ResourceHandlerBuilderContext, public ResourceSaver , public ResourceLoader, public ResourceReader
 {
 
 private:
@@ -172,6 +173,7 @@ public:
 
 	// Loads all the resources - Mesh, texture, Material, shader. Using the paths that are set on ResourceLoader.
 	void loadResources();
+
 
 	std::vector<std::filesystem::path>* getMaterialsLoaded() { return Materials; }
 	std::vector<std::filesystem::path>* getShadersLoaded() { return Shaders; }

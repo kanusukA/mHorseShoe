@@ -147,9 +147,9 @@ Ogre::Entity* Monster::createEntity(Ogre::String entityName_p, Ogre::String mshn
 	return oScnManager->createEntity(entityName_p,mshname);
 }
 
-Ogre::Mesh* Monster::getMesh(Ogre::String meshName, Ogre::String groupName)
+Ogre::MeshPtr Monster::getMesh(Ogre::String meshName, Ogre::String groupName)
 {
-	return Ogre::MeshManager::getSingleton().load(meshName, groupName).get();
+	return Ogre::MeshManager::getSingleton().load(meshName, groupName);
 }
 Ogre::SceneNode* Monster::createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node)
 {
@@ -163,7 +163,13 @@ Ogre::Mesh* Monster::getColliderMesh(Ogre::String meshName, Ogre::String groupNa
 
 Ogre::MaterialPtr Monster::getMaterial(Ogre::String matName_p)
 {
-	return Ogre::MaterialManager::getSingleton().getByName(matName_p);
+	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(matName_p,OGRE_MATERIAL_GROUP);// Fix shader stuff
+
+	if (!mat.get()->isLoaded())
+	{
+		mat.get()->load();
+	}
+	return mat;
 }
 
 Ogre::SceneNode* Monster::addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode)
@@ -559,6 +565,7 @@ void Monster::setSkyBox()
 	RSUS::GetInstance()->readMaterial("myskyHigh");
 
 
+
 	/*skyHighParam.get()->setNamedConstant("baseColor", Ogre::Vector4(0.1, 0.01, 0.06, 1.0));
 
 	skyHighParam.get()->setNamedConstant("highlightCol", Ogre::Vector4(0.82, 0.67, 1.0, 1.0));
@@ -590,6 +597,7 @@ void Monster::setSkyBox()
 	param.get()->setNamedConstant("moonCoreCol", Ogre::Vector4(1.0, 1.0, 1.0, 1.0));
 
 	param.get()->setNamedConstant("worldSpaceLightPos", Ogre::Vector3(-0.14,-0.6,0));*/
+
 	
 	Ogre::Entity* cloudsEnt = this->createMeshEntity("Plane.mesh");
 	Ogre::MaterialPtr cloudsMat = Ogre::MaterialManager::getSingleton().getByName("clouds_material", "Mesh_Materials");
@@ -603,6 +611,7 @@ void Monster::setSkyBox()
 	// Separate Material and their shader files in folders individually!!
 
 
+
 	cloudsEnt->setMaterial(cloudsMat);
 	cloudsEnt->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_LATE);
 	
@@ -614,8 +623,6 @@ void Monster::setSkyBox()
 	cloudsNode->setVisible(true);
 
 	
-
-
 
 	// SKY BOX
 

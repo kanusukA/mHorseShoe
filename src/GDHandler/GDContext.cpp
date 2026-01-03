@@ -27,6 +27,11 @@ bool GDBuilderContext::sceneExists(std::string scnName_p)
 	return monster->oScnManager->hasSceneNode(scnName_p);
 }
 
+bool GDBuilderContext::objectExists(std::string objName_p)
+{
+	return monster->oScnManager->hasEntity(objName_p);
+}
+
 
 
 void GDBuilderContext::removeSceneNode(Ogre::SceneNode* scnNode_p)

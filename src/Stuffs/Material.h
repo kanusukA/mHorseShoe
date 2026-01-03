@@ -10,14 +10,17 @@ private:
 
 public:
 
-	Material(GDBuilderContext* builderCxt_p,std::string matName_p) : MaterialResource(ResourceHandler::GetInstance(), matName_p) {
+	Material(GDBuilderContext* builderCxt_p,std::string matName_p) : MaterialResource(ResourceHandler::GetInstance(),this, matName_p) {
 		builderCxt = builderCxt_p;
 
 		material = builderCxt->createMaterial(matName_p);
 		// Make sure to set Shaders when creating Material.
 
 
+	}
 
+	Ogre::MaterialPtr getMaterialPtr() {
+		return material;
 	}
 
 

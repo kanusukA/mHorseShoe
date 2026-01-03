@@ -143,15 +143,15 @@ void SceneTabComponent::view()
 
 		// ADD OBJECT
 		ImGui::Text("Add Object : ");
-		if(scnTabModel->meshes){
+		if(scnTabModel->renderMeshes){
 
 			ImGui::InputText("Object Name", scnTabModel->inputObjectname);
 
-			if (ImGui::BeginCombo("Render Meshes", scnTabModel->meshes->at(scnTabModel->selectedMesh).filename().string().c_str()))
+			if (ImGui::BeginCombo("Render Meshes", scnTabModel->renderMeshes->at(scnTabModel->selectedMesh)->getName().c_str()))
 			{
-				for (int i = 0; i < scnTabModel->meshes->size(); i++)
+				for (int i = 0; i < scnTabModel->renderMeshes->size(); i++)
 				{
-					if (ImGui::Selectable(scnTabModel->meshes->at(i).filename().string().c_str(), scnTabModel->selectedMesh == i))
+					if (ImGui::Selectable(scnTabModel->renderMeshes->at(i)->getName().c_str(), scnTabModel->selectedMesh == i))
 					{
 						scnTabModel->selectedMesh = i;
 					}
@@ -163,6 +163,7 @@ void SceneTabComponent::view()
 			if (ImGui::Button("Add Object"))
 			{
 				// TODO ADD OBJECT
+				scnTabModel->addObject();
 			}
 
 		}

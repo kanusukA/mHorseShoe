@@ -1,6 +1,12 @@
 #pragma once
 
 
+// OGRE GROUPS
+
+#define OGRE_MATERIAL_GROUP "og_materials_grp"
+#define OGRE_MESH_GROUP "og_meshes_grp"
+
+
 #define DATA_DIRECTORY "/Data"
 #define MASTERLIST_LOC DATA_DIRECTORY + "/MasterList.ini"
 #define RESOURCELOADER_DATA DATA_DIRECTORY + "/ResourceLoad.ini"

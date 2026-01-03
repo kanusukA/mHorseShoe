@@ -69,10 +69,18 @@ Scene* CaseHandler::CreateSceneAttachToCase(SceneType scnType, std::string scnNa
 
 }
 
-Object* CaseHandler::CreateObject(std::string objectName_p, PhysXType type)
+Object* CaseHandler::CreateObject(std::string objectName_p, RenderMeshResource* renderMesh_p ,  PhysXType type)
 {
-	//Object* new_obj = new Object(this->builderCxt,objectName_p,type);
-	//return new_obj;
+	if (!builderCxt->objectExists(objectName_p))
+	{
+		Object* new_obj = new Object(this->builderCxt, renderMesh_p, objectName_p, type);
+		
+		return new_obj;
+	}
+
+	return nullptr;
+	
+	
 }
 
 RenderMesh* CaseHandler::CreateRenderMesh(std::string meshName_p)
@@ -89,14 +97,28 @@ ColliderMesh* CaseHandler::CreateColliderMesh(std::string MeshName_p)
 
 Shader* CaseHandler::CreateShader(Ogre::MaterialPtr mat_p, ShaderType type)
 {
-	Shader* new_shader = new Shader(this->builderCxt, mat_p, type);
-	return new_shader;
+	if (mat_p)
+	{
+		Shader* new_shader = new Shader(this->builderCxt, mat_p, type);
+		return new_shader;
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Invalid MaterialPtr provided");
+	}
+	
 }
 
 Material* CaseHandler::CreateMaterial(std::string materialName_p)
 {
-	Material* new_mat = new Material(this->builderCxt, materialName_p);
-	return new_mat;
+
+		Material* new_mat = new Material(this->builderCxt, materialName_p);
+		return new_mat;
+	
+	
+		/*ToastComponent::GetInstance()->addMessage("Material does not exists for Ogre!");
+		return nullptr;*/
+	
+	
 }
 
 Image* CaseHandler::CreateImage(std::filesystem::path filePath_p)

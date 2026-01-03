@@ -13,15 +13,21 @@ void ResourceLoader::loadSavedPaths()
 	{
 		try
 		{
-			int pos = std::stoi(ini->GetValue("LoadPaths", entry.pItem));
+			int pos = std::stoi(entry.pItem);
 
-			if (pos < 7)
+			std::string value = ini->GetValue("LoadPaths", entry.pItem);
+
+			if (!value.empty())
 			{
-				load_paths->at(pos) = entry.pItem;
+				if (pos < 7)
+				{
+					load_paths->at(pos) = value;
+				}
+				else {
+					load_paths->push_back(value);
+				}
 			}
-			else {
-				load_paths->push_back(entry.pItem);
-			}
+			
 
 		}
 		catch (...)
@@ -45,7 +51,7 @@ void ResourceLoader::saveLoadPaths()
 	{
 		if (!load_paths->at(i).empty())
 		{
-			ini->SetValue("LoadPaths", this->load_paths->at(i).c_str(), std::to_string(i).c_str());
+			ini->SetValue("LoadPaths",std::to_string(i).c_str(), this->load_paths->at(i).c_str());
 		}
 		
 	}

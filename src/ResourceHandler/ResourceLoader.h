@@ -41,6 +41,7 @@ public:
 		delete load_paths;
 	}
 
+	// USE ResourceLoadPaths Enum to fecth specific load paths
 	std::vector<std::string>* getLoadPaths() {
 		return load_paths;
 	}

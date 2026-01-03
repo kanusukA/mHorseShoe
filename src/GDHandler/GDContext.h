@@ -52,11 +52,12 @@ public:
 
 	// Check Functions
 	bool sceneExists(std::string scnName_p);
+	bool objectExists(std::string objName_p);
 	
 	// Create Functions
 	virtual Ogre::SceneNode* createScene(std::string name_p) { return nullptr; }
 	virtual Ogre::Entity* createObject(std::string name_p, std::string mshName_p) { return nullptr; }
-	virtual Ogre::Mesh* createMesh(std::string meshName_p) { return nullptr; }
+	virtual Ogre::MeshPtr createMesh(std::string meshName_p) { return nullptr; }
 	virtual Ogre::MaterialPtr createMaterial(std::string materialName_p) { return nullptr; }
 	virtual void setShaderVars(Shader* shader) {};
 

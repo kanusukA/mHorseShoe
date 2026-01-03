@@ -945,13 +945,17 @@ public:
 
 };
 
+class Material;
+
 class MaterialResource : public Resource
 {
+private:
+	Material* mat;
 
 protected:
 	std::string materialName; // file name of material
 
-	// Shader Resource ID
+	// Shaders have to assigned manually!!!
 	ResID VertexShaderResource;
 	ResID FragmentShaderResource;
 
@@ -960,6 +964,10 @@ protected:
 
 
 public:
+
+	Material* getHigherRef() {
+		return mat;
+	}
 
 	ResID getVertexShader() {
 		return VertexShaderResource;
@@ -976,8 +984,9 @@ public:
 		_id = 10800000000 + index;
 	}
 
-	MaterialResource(ResourceHandlerBuilderContext* context, std::string name_p)
+	MaterialResource(ResourceHandlerBuilderContext* context,Material* mat_p, std::string name_p)
 	{
+		mat = mat_p;
 		this->setName(name_p);
 		this->resourceHandlerCxt = context;
 
@@ -986,6 +995,7 @@ public:
 	}
 
 	void addVertexShader(ResID id) {
+		// TODO TRY TO ADD SHADERS TO MATERIAL SCRIPT AS WELL 
 		if (id >= 10700000000 && id < 10710000000)
 		{
 			if (this->resourceHandlerCxt->resourceExists(id)) {

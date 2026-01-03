@@ -6,7 +6,7 @@ class ColliderMesh : public ColliderMeshResource {
 
 private:
 
-	Ogre::Mesh* mesh;
+	Ogre::MeshPtr mesh;
 	GDBuilderContext* builderCxt;
 
 public:

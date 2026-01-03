@@ -30,7 +30,7 @@ void GDHandler::setShaderVars(Shader* shader)
 	
 }
 
-Ogre::Mesh* GDHandler::createMesh(std::string meshName)
+Ogre::MeshPtr GDHandler::createMesh(std::string meshName)
 {
 	return monster->getMesh(meshName);
 }

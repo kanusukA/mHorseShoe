@@ -5,7 +5,7 @@
 class Shader : public ShaderResource {
 private:
 	
-	Ogre::GpuProgramPtr shader;
+	Ogre::GpuProgramParametersPtr shader;
 	GDBuilderContext* builderCxt;
 
 	// Sets Up shader type and assigns ShaderVars for this shader
@@ -23,7 +23,7 @@ public:
 		
 	}
 
-	Ogre::GpuProgramPtr getShader() { return shader; }
+	Ogre::GpuProgramParametersPtr getShader() { return shader; }
 
 
 
