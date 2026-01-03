@@ -2,6 +2,10 @@
 
 void Scene::addObject(Object* obj_p)
 {
+	if (!this->attachedObject)
+	{
+		this->attachedObject = new std::vector<Object*>();
+	}
 	SceneResource::_addObject(obj_p->getId());
 	this->attachedObject->push_back(obj_p);
 
@@ -10,11 +14,14 @@ void Scene::addObject(Object* obj_p)
 void Scene::removeObjectById(ResID objId)
 {
 	SceneResource::_removeObjectById(objId);
+
 	for (int i = 0; i < this->attachedObject->size(); i++)
 	{
-		if (attachedObject->at(i))
+		Object* obj = attachedObject->at(i);
+		if (obj)
 		{
 			attachedObject->erase(attachedObject->begin() + i);
+			delete obj;
 			break;
 		}
 	}
@@ -27,7 +34,9 @@ void Scene::removeObjectByIndex(int index)
 		attachedObject = new std::vector<Object*>();
 	}
 	SceneResource::_removeObjectByIndex(index);
+	Object* obj = attachedObject->at(index);
 	this->attachedObject->erase(attachedObject->begin() + index);
+	delete obj;
 
 }
 

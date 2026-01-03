@@ -8,15 +8,17 @@ class ObjectTabModelComponent : public ModelComponent {
 	
 public:
 
-	GuiSelectableObject* selectable;
+	SunWindowSize* windowSize;
+
+	Object* selectedObj;
 
 	ObjectTabModelComponent(const char* name_p) : ModelComponent(name_p) {
 
 	}
 
 	void init() override {
-		selectable = this->gdSource->getStuffHandler()->getSelectedObj();
-		
+		selectedObj = this->gdSource->getCaseHandler()->getSelectedObject();
+		windowSize = this->gdSource->getGdSystem()->getWindowSize();
 	}
 
 	void getFragShader() {
@@ -26,7 +28,7 @@ public:
 	}
 
 	void deleteObject() {
-		this->gdSource->getStuffHandler()->deleteSelectedObj();
+		//this->gdSource->getStuffHandler()->deleteSelectedObj();
 	}
 
 };

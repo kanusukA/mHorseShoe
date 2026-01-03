@@ -30,6 +30,15 @@ public:
 		// TODO set object physx
 	}
 
+	~Object() {
+
+		if (entity)
+		{
+			entity->detachFromParent();
+			delete entity;
+		}
+	}
+
 	
 
 

@@ -110,18 +110,20 @@ protected:
 	StuffHandler* stuffHandler = nullptr;
 	ResourceHandler* resourceHandler = nullptr;
 	RSUS* shaderHandler = nullptr;
+	GDSystem* system = nullptr;
 
 	//PlayerObserver* playerObserver = nullptr;
 
 public:
 	GDSource(CaseHandler* casehan, StuffHandler* stuffhan, 
 		ResourceHandler* resourceHan,
-		RSUS* rsus) {
+		RSUS* rsus,GDSystem* system_p) {
 		this->scnHandler = casehan;
 		this->stuffHandler = stuffhan;
 		this->resourceHandler = resourceHan;
 		//this->feel = feelhan;
 		this->shaderHandler = rsus;
+		this->system = system_p;
 	};
 
 	/*void setPlayerObserver(PlayerObserver* playerOb) {
@@ -149,12 +151,14 @@ public:
 	RSUS* getShaderHandler() {
 		return shaderHandler;
 	}
+	GDSystem* getGdSystem() {
+		return system;
+	}
 
 };
 
 
 class GuiFramework : public GDSource {
-	
 protected:
 
 	std::vector<ModelComponent*> Models = std::vector<ModelComponent*>();
@@ -176,8 +180,8 @@ protected:
 
 public:
 
-	GuiFramework(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
-		GDSource(casehan, stuffhan,resourcehan,rsus) {
+	GuiFramework(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus, GDSystem* system_p) : 
+		GDSource(casehan, stuffhan,resourcehan,rsus,system_p) {
 		resourcehan->setGuiRegen(this);
 	}
 
@@ -212,6 +216,8 @@ public:
 		float4[2] = vec4_p[2];
 		float4[3] = vec4_p[3];
 	}
+
+	ImVec2 fetchScreenSize();
 
 	// RUNS AT INIT, USED DURING THE CREATION OF VIEW COMPONENTS
 	// MUST NOT BE RUN FROM OUTSIDE

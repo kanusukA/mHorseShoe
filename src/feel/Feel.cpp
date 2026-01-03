@@ -63,7 +63,7 @@ void Feel::updateInput(float deltaTime) {
 		}
 
 		if (event.type == SDL_EVENT_WINDOW_RESIZED) {
-			SDL_GetWindowSize(window, &keyHandler->winUtils->WINDOW_WIDTH, &keyHandler->winUtils->WINDOW_HEIGHT);
+			this->keyHandler->builderCxt->resized();
 		}
 		
 		// Quit Check

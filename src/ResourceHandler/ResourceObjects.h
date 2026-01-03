@@ -803,6 +803,9 @@ public:
 	PhysXType getPhysxType() { return physXType; }
 	float getMass() { return mass; }
 	
+	~ObjectResource() {
+		resourceHandlerCxt->removeObject(this, _id);
+	}
 
 
 };

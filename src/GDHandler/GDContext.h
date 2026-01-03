@@ -2,7 +2,7 @@
 
 
 // Local
-#include <GDHandler/stuff/Stuff.h>
+#include <GDHandler/GDSystem.h>
 
 // Third
 
@@ -23,7 +23,7 @@ class Kint;
 
 // Primary Class.
 // Used to build object with all required contexts and initializations
-class GDBuilderContext
+class GDBuilderContext : public GDSystem
 {	
 protected:
 
@@ -36,7 +36,7 @@ protected:
 
 public:
 
-	GDBuilderContext(ResourceHandler* resourceHan_p, Monster* monster_p, Kint* kint_p) {
+	GDBuilderContext(ResourceHandler* resourceHan_p, Monster* monster_p, Kint* kint_p) : GDSystem(monster_p) {
 		resourceHandler = resourceHan_p;
 		monster = monster_p;
 		kint = kint_p;
@@ -68,9 +68,6 @@ public:
 	virtual ResID addMaterial(std::string matname_p) { return NULL; }
 	virtual ResID addShader(Ogre::MaterialPtr mat_p, ShaderType type) { return NULL; }
 
-
-	// INTER CLASS FUNCTIONS
-	void setFullScreen(bool fullScreen);
 
 };
 

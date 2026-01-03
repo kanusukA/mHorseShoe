@@ -157,6 +157,8 @@ struct WINDOW_UTILS {
 class KeyHandler {
 public:
 
+	GDBuilderContext* builderCxt;
+
 	KeyHandler(GDBuilderContext* builderCxt_p);
 
 	InputHandler* inputHandler = InputHandler::GetInstance();

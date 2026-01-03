@@ -182,7 +182,13 @@ void SceneTabComponent::view()
 				ImGui::SameLine(180);
 				if (ImGui::Button("Select"))
 				{
-					// TODO SELECT OBJECT BUTTON
+					scnTabModel->selectObject(scnTabModel->currentCase->getSelectedScene()->getObjects()->at(i));
+
+				}
+				if (ImGui::Button("Delete"))
+				{
+					scnTabModel->deleteObject(scnTabModel->currentCase->getSelectedScene()->getObjects()->at(i)->getId());
+
 				}
 			}
 		}

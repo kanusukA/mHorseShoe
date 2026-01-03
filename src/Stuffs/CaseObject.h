@@ -7,6 +7,7 @@ class Case : public CaseResource {
 private:
 	std::vector<Scene*>* caseScenes = new std::vector<Scene*>();
 	Scene* selectedScene;
+	
 
 public:
 	Case(GDBuilderContext* builder_p) : CaseResource(ResourceHandler::GetInstance(),this, "") {

@@ -18,6 +18,7 @@ private:
 	Ogre::SceneManager* oScnManager;
 
 	Case* currentCase;
+	Object* selectedObject;
 
 	std::vector<Case*>* cases = new std::vector<Case*>();
 
@@ -61,7 +62,15 @@ public:
 		return currentCase;
 	}
 
+	void setSelectedObject(Object* obj_p) {
+		selectedObject = obj_p;
+	}
+	Object* getSelectedObject() {
+		return selectedObject;
+	}
+
 	std::vector<Case*>* getAllCases() { return cases; }
+
 
 
 

@@ -52,3 +52,29 @@ public:
 	}
 
 };
+
+class CheckFunctionKey : public Key {
+private:
+	bool state;
+	bool lock = false;
+public:
+	CheckFunctionKey(GDBuilderContext* builderCxt_p, bool state_p = true) : Key(builderCxt_p, SDLK_H) {
+		state = state_p;
+	}
+
+	void click(SDL_EventType key_evnt) override {
+		if (!lock) {
+			state = !state;
+			
+			ToastComponent::GetInstance()->addMessage("Width : " + std::to_string(*builderCxt->getWindowSize()->width));
+			ToastComponent::GetInstance()->addMessage("Height : " + std::to_string(*builderCxt->getWindowSize()->height));
+
+			lock = true;
+		}
+		if (key_evnt == SDL_EVENT_KEY_UP)
+		{
+			lock = false;
+		}
+	}
+
+};

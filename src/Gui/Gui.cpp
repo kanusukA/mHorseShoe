@@ -57,8 +57,8 @@ void Gui::initGuiComponents()
 	AddTabModelComponent* addModel = new AddTabModelComponent("Add tab Model");
 	this->addModelComponent(addModel);
 
-	/*ObjectTabModelComponent* objectModel = new ObjectTabModelComponent("Object tab Model");
-	this->addModelComponent(objectModel);*/
+	ObjectTabModelComponent* objectModel = new ObjectTabModelComponent("Object tab Model");
+	this->addModelComponent(objectModel);
 
 	ScenePanelTabModelComponent* scenePanelModel = new ScenePanelTabModelComponent("Scene Panel tab Model");
 	this->addModelComponent(scenePanelModel);
@@ -85,8 +85,8 @@ void Gui::initGuiComponents()
 	AddTabComponent* addTab = new AddTabComponent("Add Tab", addModel);
 	this->addViewComponent(addTab);
 
-	/*ObjectTabComponent* objectTab = new ObjectTabComponent("Object Tab", objectModel);
-	this->addViewComponent(objectTab);*/
+	ObjectTabComponent* objectTab = new ObjectTabComponent("Object Tab", objectModel);
+	this->addViewComponent(objectTab);
 
 	ScenePanelTabComponent* scenePanelTab = new ScenePanelTabComponent("Scene Panel Tab", scenePanelModel);
 	this->addViewComponent(scenePanelTab);

@@ -13,6 +13,7 @@ private:
 	std::vector<Scene*>* attachedScenes;
 	std::vector<Object*>* attachedObject;
 
+
 public:
 	Scene(GDBuilderContext* builderCxt_p,SceneType scnType, std::string name_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, Ogre::Vector3(), Ogre::Vector4(), Ogre::Vector3()) {

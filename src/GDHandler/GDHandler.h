@@ -9,6 +9,7 @@
 
 class GDHandler : public GDBuilderContext
 {
+
 public:
 
 	CaseHandler* caseHandler;
@@ -33,7 +34,7 @@ public:
 
 		caseHandler = new CaseHandler(this,stuffHandler, renderer->oScnManager);
 
-		gui = new Gui(caseHandler, this->stuffHandler, ResourceHandler::GetInstance(), RSUS::GetInstance());
+		gui = new Gui(caseHandler, this->stuffHandler, ResourceHandler::GetInstance(), RSUS::GetInstance(),this);
 
 		gui->initGui(this->monster->imguiOverlay);
 

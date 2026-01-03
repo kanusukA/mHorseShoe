@@ -1,10 +1,7 @@
 #include "GDContext.h"
 
 void GDBuilderContext::startEngine()
-{
-	// Start Ogre Rendering engine and inits SdlWindow
-	monster->InitMonster();
-	
+{	
 
 	// Start PhysX
 	kint->InitPhysics();
@@ -38,12 +35,6 @@ void GDBuilderContext::removeSceneNode(Ogre::SceneNode* scnNode_p)
 {
 	monster->deleteScnNode(scnNode_p);
 }
-
-void GDBuilderContext::setFullScreen(bool fullScreen)
-{
-	SDL_SetWindowFullscreen(monster->sdlWindow, fullScreen);
-}
-
 
 // function
 

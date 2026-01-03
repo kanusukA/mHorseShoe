@@ -57,9 +57,17 @@ public:
 	}
 
 	void addObject() {
-		this->gdSource->getCaseHandler()->CreateObject(*inputObjectname, renderMeshes->at(selectedMesh), physxType);
+		Object* obj =  this->gdSource->getCaseHandler()->CreateObject(*inputObjectname, renderMeshes->at(selectedMesh), physxType);
+		currentCase->getSelectedScene()->addObject(obj);
 	}
 
+	void deleteObject(ResID id) {
+		currentCase->getSelectedScene()->removeObjectById(id);
+	}
+
+	void selectObject(Object* obj) {
+		this->gdSource->getCaseHandler()->setSelectedObject(obj);
+	}
 
 	void selectScene(Scene* scn_p) {
 		currentCase->selectScene(scn_p);
