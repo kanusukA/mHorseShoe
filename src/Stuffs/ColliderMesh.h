@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GDHandler/GDContext.h>
+#include <Stuffs/Material.h>
 
 class ColliderMesh : public ColliderMeshResource {
 
@@ -19,9 +19,9 @@ public:
 
 	}
 
-	void setMaterial(ResID matID, Ogre::MaterialPtr mat_p) {
+	/*void setMaterial(ResID matID, Ogre::MaterialPtr mat_p) {
 		mesh->getSubMesh(0)->setMaterial(mat_p);
 		material = matID;
-	}
+	}*/
 
 };

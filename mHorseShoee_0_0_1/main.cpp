@@ -41,6 +41,9 @@ int main() {
 
 	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, 0.4), 2);
 
+
+
+
 	std::cout << "Setting up Kint" << std::endl;
 	// Physics INIT
 	kint = new Kint();
@@ -51,6 +54,8 @@ int main() {
 	//GDHANDLER
 	
 	GDHandler* gdHandler = new GDHandler(ResourceHandler::GetInstance(),monster,kint,feel); // TODO integrate Feel with GDHandler itself
+
+	monster->setGrid();
 	
 
 	// TODO SETUP BETTER STARTUP

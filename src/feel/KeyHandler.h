@@ -157,6 +157,10 @@ struct WINDOW_UTILS {
 class KeyHandler {
 public:
 
+	HeldKeys* heldKeys = new HeldKeys();
+
+	PlayerInput* pInput;
+
 	GDBuilderContext* builderCxt;
 
 	KeyHandler(GDBuilderContext* builderCxt_p);
@@ -168,6 +172,9 @@ public:
 	WINDOW_UTILS* winUtils = new WINDOW_UTILS();
 
 	std::vector<Key*>* keys = new std::vector<Key*>();
+
+	void setPlayerInput(PlayerInput* pInput_p);
+
 
 
 	// IMPLEMENT IN FUTURE

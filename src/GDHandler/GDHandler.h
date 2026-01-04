@@ -16,7 +16,7 @@ public:
 	StuffHandler* stuffHandler;
 	Feel* feel;
 
-	//PlayerSubject* playerSubject = nullptr;
+	PlayerSubject* playerSubject = nullptr;
 
 	Gui* gui;
 
@@ -24,10 +24,15 @@ public:
 
 		// Init resources
 		ResourceHandler::GetInstance();
+
+		PlayerInput* pInput = new PlayerInput();
+		playerSubject = new PlayerSubject(monster->getCameraScnNode(), monster->getCamera(), pInput);
 		
 
 		feel = feel_p;
 		KeyHandler* keyHandler = new KeyHandler(this);
+		keyHandler->setPlayerInput(pInput);
+
 		feel->initFeel(renderer->sdlWindow, keyHandler);
 
 		stuffHandler = new StuffHandler(renderer, physics);
@@ -38,7 +43,8 @@ public:
 
 		gui->initGui(this->monster->imguiOverlay);
 
-		feel = feel_p;
+
+
 		
 	
 		this->setResources();

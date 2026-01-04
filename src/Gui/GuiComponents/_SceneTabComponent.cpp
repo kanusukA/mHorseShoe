@@ -180,12 +180,13 @@ void SceneTabComponent::view()
 				ImGui::SetNextItemWidth(180);
 				ImGui::Text(scnTabModel->currentCase->getSelectedScene()->getObjects()->at(i)->getName().c_str());
 				ImGui::SameLine(180);
-				if (ImGui::Button("Select"))
+				if (ImGui::Button(("Select##" + std::to_string(i)).c_str()))
 				{
 					scnTabModel->selectObject(scnTabModel->currentCase->getSelectedScene()->getObjects()->at(i));
 
 				}
-				if (ImGui::Button("Delete"))
+				ImGui::SameLine();
+				if (ImGui::Button(("Delete##" + std::to_string(i)).c_str()))
 				{
 					scnTabModel->deleteObject(scnTabModel->currentCase->getSelectedScene()->getObjects()->at(i)->getId());
 

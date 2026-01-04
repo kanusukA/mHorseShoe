@@ -17,9 +17,29 @@ KeyHandler::KeyHandler(GDBuilderContext* builderCxt_p)
 {
 	builderCxt = builderCxt_p;
 
-	FullScreenKey* fullScreenKey = new FullScreenKey(builderCxt_p);
-	CheckFunctionKey* checkFuncKey = new CheckFunctionKey(builderCxt_p);
+	FullScreenKey* fullScreenKey = new FullScreenKey(builderCxt_p,heldKeys);
+	CheckFunctionKey* checkFuncKey = new CheckFunctionKey(builderCxt_p, heldKeys);
+	WinStateKey* winStateKey = new WinStateKey(builderCxt_p, heldKeys);
 
+	keys->push_back(winStateKey);
 	keys->push_back(fullScreenKey);
 	keys->push_back(checkFuncKey);
+}
+
+void KeyHandler::setPlayerInput(PlayerInput* pInput_p)
+{
+	CamForwardKey* camForwardKey = new CamForwardKey(builderCxt, heldKeys, pInput_p);
+	CamBackwardKey* camBackwardKey = new CamBackwardKey(builderCxt, heldKeys, pInput_p);
+	CamLeftKey* camLeftKey = new CamLeftKey(builderCxt, heldKeys, pInput_p);
+	CamRightKey* camRightKey = new CamRightKey(builderCxt, heldKeys, pInput_p);
+
+	keys->push_back(camForwardKey);
+	keys->push_back(camBackwardKey);
+	keys->push_back(camLeftKey);
+	keys->push_back(camRightKey);
+
+	pInput_p->MouseXrel = &mouseKeys->MouseXrel;
+	pInput_p->MouseYrel = &mouseKeys->MouseYrel;
+
+
 }

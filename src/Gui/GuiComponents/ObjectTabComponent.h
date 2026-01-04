@@ -10,7 +10,10 @@ public:
 
 	SunWindowSize* windowSize;
 
-	Object* selectedObj;
+	ObjectPtr* selectedObj;
+
+	std::vector<MaterialResource*>* materials;
+	int selectedMaterial = 0;
 
 	ObjectTabModelComponent(const char* name_p) : ModelComponent(name_p) {
 
@@ -19,6 +22,7 @@ public:
 	void init() override {
 		selectedObj = this->gdSource->getCaseHandler()->getSelectedObject();
 		windowSize = this->gdSource->getGdSystem()->getWindowSize();
+		materials = this->gdSource->getResourceHandler()->getAllMaterial();
 	}
 
 	void getFragShader() {
@@ -29,6 +33,10 @@ public:
 
 	void deleteObject() {
 		//this->gdSource->getStuffHandler()->deleteSelectedObj();
+	}
+
+	void setMaterial() {
+		selectedObj->get()->getRenderMesh()->setMaterial(materials->at(selectedMaterial)->getHigherRef());
 	}
 
 };

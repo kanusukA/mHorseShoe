@@ -53,8 +53,8 @@ void GDHandler::setResources()
 			Shader* vertShader = caseHandler->CreateShader(mat->getMaterialPtr(), ShaderType::Vertex);
 			Shader* fragShader = caseHandler->CreateShader(mat->getMaterialPtr(), ShaderType::Fragment);
 
-			mat->addVertexShader(vertShader->getId());
-			mat->addFragmentShader(fragShader->getId());
+			mat->setVertexShader(vertShader);
+			mat->setFragmentShader(fragShader);
 
 
 		}
@@ -92,6 +92,12 @@ void GDHandler::setResources()
 void GDHandler::update(float deltatime)
 {
 	feel->updateInput(deltatime);
+
+	if (playerSubject && this->getWindowState() == GDSun::IN_GAME)
+	{
+		playerSubject->updatePosition(deltatime);
+		playerSubject->updateRotation(deltatime);
+	}
 
 	gui->updateGui();
 

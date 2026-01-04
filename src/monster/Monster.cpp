@@ -665,13 +665,13 @@ void Monster::setSkyBox()
 void Monster::setGrid()
 {
 
-	Ogre::MaterialPtr gridMat = Ogre::MaterialManager::getSingleton().getByName("myGrid");
+	Ogre::MaterialPtr gridMat = Ogre::MaterialManager::getSingleton().getByName("myGrid", OGRE_MATERIAL_GROUP);
 	RSUS::GetInstance()->readMaterial("myGrid");
 
 
 	Ogre::ManualObject* gridObj = oScnManager->createManualObject(WORLD_GRID_NAME);
 
-	gridObj->begin("myGrid", Ogre::RenderOperation::OT_TRIANGLE_STRIP, "Mesh_Materials");
+	gridObj->begin("myGrid", Ogre::RenderOperation::OT_TRIANGLE_STRIP, OGRE_MATERIAL_GROUP);
 
 	gridObj->position(Ogre::Vector3(0, 0, 0));
 	gridObj->normal(0, 1, 0);

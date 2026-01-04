@@ -77,7 +77,7 @@ Object* CaseHandler::CreateObject(std::string objectName_p, RenderMeshResource* 
 		
 		return new_obj;
 	}
-
+	ToastComponent::GetInstance()->addMessage("Object already exists");
 	return nullptr;
 	
 	

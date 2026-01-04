@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GDHandler/GDContext.h>
+#include <Stuffs/ColliderMesh.h>
 
 class RenderMesh : public RenderMeshResource {
 
@@ -8,6 +8,8 @@ private:
 
 	Ogre::MeshPtr mesh;
 	GDBuilderContext* builderCxt;
+
+	Material* material;
 
 public:
 
@@ -19,9 +21,14 @@ public:
 
 	}
 
-	void setMaterial(ResID matID, Ogre::MaterialPtr mat_p) {
-		mesh->getSubMesh(0)->setMaterial(mat_p);
-		material = matID;
+	void setMaterial(Material* mat_p) {
+		mesh->getSubMesh(0)->setMaterial(mat_p->getMaterialPtr());
+		materialID = mat_p->getId();
+		material = mat_p;
+	}
+
+	Material* getMaterial() {
+		return material;
 	}
 
 };

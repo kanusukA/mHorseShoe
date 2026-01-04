@@ -187,18 +187,18 @@ void Feel::updateInput(float deltaTime) {
 
 			// HELD KEYS
 			if (event.key.key == keyHandler->keyBinds->CTRL_L_KEY) {
-				keyHandler->inputKeys->CTRL_L_KEY = true;
+				keyHandler->heldKeys->lCrtl = true;
 			}
 			
 			if (event.key.key == keyHandler->keyBinds->ALT_L_KEY) {
-				keyHandler->inputKeys->ALT_L_KEY = true;
+				keyHandler->heldKeys->lAlt = true;
 			}
 			if (event.key.key == keyHandler->keyBinds->CTRL_R_KEY) {
-				keyHandler->inputKeys->CTRL_R_KEY = true;
+				keyHandler->heldKeys->rCrtl = true;
 			}
 			
 			if (event.key.key == keyHandler->keyBinds->ALT_R_KEY) {
-				keyHandler->inputKeys->ALT_R_KEY = true;
+				keyHandler->heldKeys->rAlt = true;
 			}
 
 			// ACTION KEYS
@@ -292,19 +292,19 @@ void Feel::updateInput(float deltaTime) {
 
 			// HELD KEYS
 			if (event.key.key == keyHandler->keyBinds->CTRL_L_KEY) {
-				keyHandler->inputKeys->CTRL_L_KEY = false;
+				keyHandler->heldKeys->lCrtl = false;
 			}
 			
 			if (event.key.key == keyHandler->keyBinds->ALT_L_KEY) {
-				keyHandler->inputKeys->ALT_L_KEY = false;
+				keyHandler->heldKeys->lAlt = false;
 			}
 
 			if (event.key.key == keyHandler->keyBinds->CTRL_R_KEY) {
-				keyHandler->inputKeys->CTRL_R_KEY = false;
+				keyHandler->heldKeys->rCrtl = false;
 			}
 
 			if (event.key.key == keyHandler->keyBinds->ALT_R_KEY) {
-				keyHandler->inputKeys->ALT_R_KEY = false;
+				keyHandler->heldKeys->rAlt = false;
 			}
 
 			// ACTION KEYS

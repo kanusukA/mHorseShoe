@@ -742,6 +742,29 @@ protected:
 	ResID renderMeshID = 0;
 	ResID colliderMeshID = 0;
 
+	void _setRenderMesh(ResID id) {
+		if (10300000000 >= id && id < 10400000000)
+		{
+			if (this->resourceHandlerCxt->resourceExists(id)) {
+				renderMeshID = id;
+			}
+			else {
+				throw ResourceHandlerIDError("Resource is not init with Master List!");
+			}
+		}
+	}
+	void _setColliderMesh(ResID id) {
+		if (10400000000 >= id && id < 10500000000)
+		{
+			if (this->resourceHandlerCxt->resourceExists(id)) {
+				colliderMeshID = id;
+			}
+			else {
+				throw ResourceHandlerIDError("Resource is not init with Master List!");
+			}
+		}
+	}
+
 public:
 
 	Object* getHigherClass() { return higherObj; }
@@ -771,35 +794,14 @@ public:
 		context->createObject(this);
 	}
 
-	void setRenderMesh(ResID id) {
-		if (10300000000 >= id && id < 10400000000)
-		{
-			if (this->resourceHandlerCxt->resourceExists(id)) {
-				renderMeshID = id;
-			}
-			else {
-				throw ResourceHandlerIDError("Resource is not init with Master List!");
-			}
-		}
-	}
-	void setColliderMesh(ResID id) {
-		if (10400000000 >= id && id < 10500000000)
-		{
-			if (this->resourceHandlerCxt->resourceExists(id)) {
-				colliderMeshID = id;
-			}
-			else {
-				throw ResourceHandlerIDError("Resource is not init with Master List!");
-			}
-		}
-	}
+	
 
 	void setMass(float mass_p) {
 		mass = mass_p;
 	}
 
-	ResID getRenderMesh() { return renderMeshID; }
-	ResID getColliderMesh() { return colliderMeshID; }
+	ResID getRenderMeshId() { return renderMeshID; }
+	ResID getColliderMeshId() { return colliderMeshID; }
 	PhysXType getPhysxType() { return physXType; }
 	float getMass() { return mass; }
 	
@@ -857,6 +859,7 @@ class ShaderResource : public Resource {
 protected:
 	std::string VertexShaderName; // file name of vertex shader
 	std::string FragmentShaderName; // file name of fragment shader
+	std::string fileName;
 
 	ShaderType shaderType;
 
@@ -932,7 +935,7 @@ public:
 		return shaderType;
 	}
 
-	std::string getShaderFileName() {
+	std::string getShaderName() {
 		switch (shaderType)
 		{
 		case Vertex:
@@ -944,6 +947,10 @@ public:
 		default:
 			break;
 		}
+	}
+
+	std::string getShaderFileName() {
+		return fileName;
 	}
 
 };
@@ -965,6 +972,37 @@ protected:
 	// textures are stored in material and sent to ShaderResource for application
 	std::vector<ShaderTexture>* Textures = new std::vector<ShaderTexture>(4);
 
+	void _addVertexShader(ResID id) {
+		// TODO TRY TO ADD SHADERS TO MATERIAL SCRIPT AS WELL 
+		if (id >= 10700000000 && id < 10710000000)
+		{
+			if (this->resourceHandlerCxt->resourceExists(id)) {
+				VertexShaderResource = id;
+			}
+			else {
+				throw ResourceHandlerIDError("ID does not exists in Master List");
+			}
+		}
+		else {
+			throw ResourceHandlerIDError("Invalid ID");
+		}
+	}
+
+	void _addFragmentShader(ResID id) {
+		if (id >= 10710000000 && id < 10720000000)
+		{
+			if (this->resourceHandlerCxt->resourceExists(id)) {
+				FragmentShaderResource = id;
+			}
+			else {
+				throw ResourceHandlerIDError("ID does not exists in Master List");
+			}
+		}
+		else {
+			throw ResourceHandlerIDError("Invalid ID");
+		}
+	}
+
 
 public:
 
@@ -972,10 +1010,10 @@ public:
 		return mat;
 	}
 
-	ResID getVertexShader() {
+	ResID getVertexShaderID() {
 		return VertexShaderResource;
 	}
-	ResID getFragmentShader() {
+	ResID getFragmentShaderID() {
 		return FragmentShaderResource;
 	}
 
@@ -997,36 +1035,7 @@ public:
 
 	}
 
-	void addVertexShader(ResID id) {
-		// TODO TRY TO ADD SHADERS TO MATERIAL SCRIPT AS WELL 
-		if (id >= 10700000000 && id < 10710000000)
-		{
-			if (this->resourceHandlerCxt->resourceExists(id)) {
-				VertexShaderResource = id;
-			}
-			else {
-				throw ResourceHandlerIDError("ID does not exists in Master List");
-			}
-		}
-		else {
-			throw ResourceHandlerIDError("Invalid ID");
-		}
-	}
-
-	void addFragmentShader(ResID id) {
-		if (id >= 10710000000 && id < 10720000000)
-		{
-			if (this->resourceHandlerCxt->resourceExists(id)) {
-				FragmentShaderResource = id;
-			}
-			else {
-				throw ResourceHandlerIDError("ID does not exists in Master List");
-			}
-		}
-		else {
-			throw ResourceHandlerIDError("Invalid ID");
-		}
-	}
+	
 
 	void addDiffuseTexture(ShaderTexture diffuse_p) {
 		Textures->at(0) = diffuse_p;
@@ -1106,7 +1115,7 @@ class RenderMeshResource : public Resource
 {
 
 protected:
-	ResID material;
+	ResID materialID;
 
 	RenderMesh* renderMesh;
 
@@ -1132,20 +1141,19 @@ public:
 		context->createRenderMesh(this);
 	}
 
-	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p) {
+	/*RenderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p) {
 		this->resourceHandlerCxt = context;
 		this->setName(meshName_p);
 
-
 		context->createRenderMesh(this);
-	}
+	}*/
 
 	MaterialResource* getMaterialResource() {
-		return this->resourceHandlerCxt->fetchMaterialResourceByID(material);
+		return this->resourceHandlerCxt->fetchMaterialResourceByID(materialID);
 	}
 
 	ResID getMaterialID() {
-		return material;
+		return materialID;
 	}
 
 

@@ -8,6 +8,7 @@ void Scene::addObject(Object* obj_p)
 	}
 	SceneResource::_addObject(obj_p->getId());
 	this->attachedObject->push_back(obj_p);
+	scene->attachObject(obj_p->getEntity());
 
 }
 

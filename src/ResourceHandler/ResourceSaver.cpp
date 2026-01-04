@@ -100,8 +100,8 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p)
 	const char* sectionName = std::to_string(mat_p->getId()).c_str();
 
 	ini->SetValue(sectionName, mat_p->getName().c_str(), NULL);
-	ini->SetValue(sectionName, "vertexShader", std::to_string(mat_p->getVertexShader()).c_str());
-	ini->SetValue(sectionName, "fragmentShader", std::to_string(mat_p->getFragmentShader()).c_str());
+	ini->SetValue(sectionName, "vertexShader", std::to_string(mat_p->getVertexShaderID()).c_str());
+	ini->SetValue(sectionName, "fragmentShader", std::to_string(mat_p->getFragmentShaderID()).c_str());
 
 
 }
@@ -165,8 +165,8 @@ void ResourceSaver::saveObject(ObjectResource* obj_p)
 
 	ini->SetValue(section, "objectName", obj_p->getName().c_str());
 	ini->SetValue(section, "physx", std::to_string(obj_p->getPhysxType()).c_str());
-	ini->SetValue(section, "RenderMeshID", std::to_string(obj_p->getRenderMesh()).c_str());
-	ini->SetValue(section, "ColliderMeshID", std::to_string(obj_p->getColliderMesh()).c_str());
+	ini->SetValue(section, "RenderMeshID", std::to_string(obj_p->getRenderMeshId()).c_str());
+	ini->SetValue(section, "ColliderMeshID", std::to_string(obj_p->getColliderMeshId()).c_str());
 	ini->SetValue(section, "mass", std::to_string(obj_p->getMass()).c_str());
 }
 

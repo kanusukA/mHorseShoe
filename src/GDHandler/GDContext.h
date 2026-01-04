@@ -2,6 +2,7 @@
 
 
 // Local
+#include <feel/playerMovement.h>
 #include <GDHandler/GDSystem.h>
 
 // Third

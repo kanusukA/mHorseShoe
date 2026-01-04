@@ -284,6 +284,7 @@ public:
 	);
 
 	Ogre::Camera* getCamera() { return cam; }
+	Ogre::SceneNode* getCameraScnNode() { return CameraNode; }
 
 	void setSkyBox();
 	void setGrid();
