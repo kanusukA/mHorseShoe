@@ -9,7 +9,8 @@ private:
 	GDBuilderContext* builderCxt;
 
 	// Sets Up shader type and assigns ShaderVars for this shader
-	void initShader(Ogre::MaterialPtr mat_p);
+	void _initShader(Ogre::MaterialPtr mat_p);
+	void _setShaderVars();
 
 public:
 
@@ -18,10 +19,12 @@ public:
 	{
 		builderCxt = builderCxt_p;
 
-		initShader(mat);
+		_initShader(mat);
+		_setShaderVars();
 
-		
 	}
+
+	void loadShader();
 
 	Ogre::GpuProgramParametersPtr getShader() { return shader; }
 

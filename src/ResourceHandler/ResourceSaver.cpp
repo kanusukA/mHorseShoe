@@ -74,9 +74,10 @@ void ResourceSaver::saveScene(SceneResource* scene_p)
 
 	ini->SetValue(sectionName, scene_p->getName().c_str(), NULL);
 
-	ini->SetValue(sectionName, "position", convertVec3ToString(scene_p->getPosition()).c_str());
+	// TODO FIX THIS POSITION TO STRING !!!!!!!!!!!!!!!!!!
+	/*ini->SetValue(sectionName, "position", convertVec3ToString(scene_p->getPosition()).c_str());
 	ini->SetValue(sectionName, "scale", convertVec3ToString(scene_p->getScale()).c_str());
-	ini->SetValue(sectionName, "rotation", convertVec4ToString(Ogre::Vector4(scene_p->getOrientation()[0], scene_p->getOrientation()[1], scene_p->getOrientation()[2], scene_p->getOrientation()[3])).c_str());
+	ini->SetValue(sectionName, "rotation", convertVec4ToString(Ogre::Vector4(scene_p->getOrientation()[0], scene_p->getOrientation()[1], scene_p->getOrientation()[2], scene_p->getOrientation()[3])).c_str());*/
 
 	for (int i = 0; i < scene_p->getAttachedScenesID()->size(); i++)
 	{

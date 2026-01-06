@@ -73,6 +73,8 @@ protected:
 
 public:
 
+	SunWindowSize* windowSize;
+
 	ModelComponent(const char* name_p) {
 		name = name_p;
 	}

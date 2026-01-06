@@ -6,6 +6,7 @@ void ObjectTabComponent::view()
 	ImGui::SetNextWindowPos(ImVec2(0, 600));
 	ImGui::Begin("Object");
 
+	// Refresh when object is deleted and setup grid !!
 	if (objectModel->selectedObj && objectModel->selectedObj->get())
 	{
 		ImGui::Text("Object Name : ");
@@ -55,6 +56,12 @@ void ObjectTabComponent::view()
 			ImGui::Text("Fragment Shader : ");
 			ImGui::SameLine();
 			ImGui::Text(objectModel->selectedObj->get()->getRenderMesh()->getMaterial()->getFragmentShader()->getShaderFileName().c_str());
+
+			if (ImGui::Button("Select Shader"))
+			{
+				objectModel->selectShader(objectModel->selectedObj->get()->getRenderMesh()->getMaterial()->getVertexShader(),
+					objectModel->selectedObj->get()->getRenderMesh()->getMaterial()->getFragmentShader());
+			}
 
 
 		}

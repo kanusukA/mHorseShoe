@@ -1,6 +1,7 @@
 #pragma once
 
 //Local
+#include <ResourceHandler/ResourceReader.h>
 #include <Gui/GuiRegen.h>
 
 // Third-party Headers
@@ -609,9 +610,9 @@ private:
 protected:
 
 
-	Ogre::Vector3 position;
-	Ogre::Vector4 orientation;
-	Ogre::Vector3 scale;
+	float position[3] = { 0.0f,0.0f,0.0f };
+	float orientation[4] = { 0.0f,0.0f,0.0f,0.0f };
+	float scale[3] = { 0.0f,0.0f,0.0f };
 
 	std::vector<ResID>* scenes = new std::vector<ResID>();
 	std::vector<ResID>* objects = new std::vector<ResID>();
@@ -670,17 +671,24 @@ protected:
 
 public:
 
-	virtual Ogre::Vector3 getPosition() {
+	float* _getPosition() {
 		return position;
 	}
 
-	virtual Ogre::Quaternion getOrientation() {
-		return Ogre::Quaternion(orientation[0], orientation[1],orientation[2],orientation[3]);
+	float* _getOrientation() {
+		return orientation;
 	}
 
-	virtual Ogre::Vector3 getScale() {
+	float* _getScale() {
 		return scale;
 	}
+
+	// UPDATES THE POSITION,ORIENTATION,SCALE WITH THE CORRESPONDING FLOAT*
+	// PRIMARILY USED FOR IMGUI INPUT
+	virtual void updatePosition() {}
+	virtual void updateOrientation() {}
+	virtual void updateScale() {}
+
 
 	void setId(int index) override {
 		if (index > 99999)
@@ -694,9 +702,16 @@ public:
 		this->resourceHandlerCxt = context;
 
 		scnType = sceneType;
-		position = position_p;
-		orientation = orientation_p;
-		scale = scale_p;
+		position[0] = position_p[0];
+		position[1] = position_p[1];
+		position[2] = position_p[2];
+		orientation[0] = orientation_p[0];
+		orientation[1] = orientation_p[1];
+		orientation[2] = orientation_p[2];
+		orientation[3] = orientation_p[3];
+		scale[0] = scale_p[0];
+		scale[1] = scale_p[1];
+		scale[2] = scale_p[2];
 
 		this->setName(name_p);
 
@@ -812,33 +827,7 @@ public:
 
 };
 
-enum ShaderVarType
-{
-	INTEGER,
-	FLOAT0,
-	FLOAT2,
-	FLOAT3,
-	FLOAT4,
-	RBOOL
-};
 
-struct ShaderVar {
-
-	std::string varName;
-	ShaderVarType varType;
-
-	int* varInt = new int(0);
-	float* varFloat = new float(0.0);
-	float varFloat2[2] = { 0.0,0.0 };
-	float varFloat3[3] = { 0.0, 0.0, 0.0 };
-	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };
-
-};
-
-enum ShaderType {
-	Vertex,
-	Fragment
-};
 
 struct ShaderTexture
 {
@@ -857,15 +846,13 @@ struct ShaderTexture
 
 class ShaderResource : public Resource {
 protected:
-	std::string VertexShaderName; // file name of vertex shader
-	std::string FragmentShaderName; // file name of fragment shader
+	std::string ShaderName; 
 	std::string fileName;
 
 	ShaderType shaderType;
 
 	// These Parameters contain pre-saved values of Material and must be cross checked with Ogre's Shader parameters for consistancy
-	std::vector<ShaderVar>* VertexParameters = new std::vector<ShaderVar>();
-	std::vector<ShaderVar>* FragmentParameters = new std::vector<ShaderVar>();
+	std::vector<ShaderVar>* ShaderParameters = new std::vector<ShaderVar>();
 
 public:
 
@@ -882,51 +869,23 @@ public:
 		this->setName(name_p);
 		this->resourceHandlerCxt = context;
 		shaderType = shaderType_p;
-		switch (shaderType)
-		{
-		case Vertex:
-			VertexShaderName = shaderFileName;
-			break;
-		case Fragment:
-			FragmentShaderName = shaderFileName;
-			break;
-		default:
-			break;
-		}
+		
+		ShaderName = shaderFileName;
+			
 
 		context->createShader(this);
 
 	}
 
 	void addShaderParameter(ShaderVar variable) {
-		switch (shaderType)
-		{
-		case Vertex:
-			VertexParameters->push_back(variable);
-			break;
-		case Fragment:
-			FragmentParameters->push_back(variable);
-			break;
-		default:
-			break;
-		}
+			ShaderParameters->push_back(variable);	
 	}
 
 
 
 	std::vector<ShaderVar>* getShaderVars() {
 
-		switch (shaderType)
-		{
-		case Vertex:
-			return VertexParameters;
-			break;
-		case Fragment:
-			return FragmentParameters;
-			break;
-		default:
-			break;
-		}
+			return ShaderParameters;
 
 	}
 
@@ -936,17 +895,7 @@ public:
 	}
 
 	std::string getShaderName() {
-		switch (shaderType)
-		{
-		case Vertex:
-			return VertexShaderName;
-			break;
-		case Fragment:
-			return FragmentShaderName;
-			break;
-		default:
-			break;
-		}
+		return ShaderName;
 	}
 
 	std::string getShaderFileName() {

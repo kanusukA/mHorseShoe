@@ -43,6 +43,7 @@ private:
 
 	void addModelComponent(ModelComponent* modelComponent) override {
 		modelComponent->setFramework(this);
+		modelComponent->windowSize = this->getGdSystem()->getWindowSize();
 		modelComponent->setSource(this);
 		modelComponent->init();
 		Models.push_back(modelComponent);

@@ -129,14 +129,15 @@ void SceneTabComponent::view()
 		}
 
 		// Scene position , rotation, scale
-		if (ImGui::InputFloat3("Position", scnTabModel->currentCase->getSelectedScene()->getPosition().ptr())) {
-			scnTabModel->currentCase->getSelectedScene()->setPosition(scnTabModel->currentCase->getSelectedScene()->getPosition());
+		if (ImGui::InputFloat3("Position", scnTabModel->currentCase->getSelectedScene()->_getPosition())) {
+			// _setPosition function ,create it!!
+			scnTabModel->currentCase->getSelectedScene()->updatePosition();
 		}
-		if (ImGui::InputFloat4("Rotation", scnTabModel->currentCase->getSelectedScene()->getOrientation().ptr())) {
-			scnTabModel->currentCase->getSelectedScene()->setPosition(scnTabModel->currentCase->getSelectedScene()->getPosition());
+		if (ImGui::InputFloat4("Rotation", scnTabModel->currentCase->getSelectedScene()->_getOrientation())) {
+			scnTabModel->currentCase->getSelectedScene()->updateOrientation();
 		}
-		if (ImGui::InputFloat3("Scale", scnTabModel->currentCase->getSelectedScene()->getScale().ptr())) {
-			scnTabModel->currentCase->getSelectedScene()->setPosition(scnTabModel->currentCase->getSelectedScene()->getPosition());
+		if (ImGui::InputFloat3("Scale", scnTabModel->currentCase->getSelectedScene()->_getScale())) {
+			scnTabModel->currentCase->getSelectedScene()->updateScale();
 		}
 
 		ImGui::Spacing(); ImGui::Spacing();

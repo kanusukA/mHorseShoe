@@ -13,12 +13,15 @@ private:
 	std::vector<Scene*>* attachedScenes;
 	std::vector<Object*>* attachedObject;
 
+	
+
 
 public:
 	Scene(GDBuilderContext* builderCxt_p,SceneType scnType, std::string name_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, Ogre::Vector3(), Ogre::Vector4(), Ogre::Vector3()) {
 		builderCxt = builderCxt_p;
 		scene = builderCxt->createScene(name_p);
+		
 	}
 	Scene(GDBuilderContext* builderCxt_p, SceneType scnType, std::string name_p, Ogre::Vector3 pos_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, pos_p, orientation_p, scale_p) {
@@ -28,6 +31,7 @@ public:
 		scene->setOrientation(Vec4toQuaternion(orientation_p));
 		scene->setScale(scale_p);
 
+		// fix position!!
 	}
 
 	// Object
@@ -45,35 +49,57 @@ public:
 
 	void removeSceneByIndex(int index);
 
-
-
-	void setPosition(Ogre::Vector3 pos_p) {
-		this->position = pos_p;
-		scene->setPosition(pos_p);
-	}
-
-	void setOrientation(Ogre::Quaternion orientation_p) {
-		this->orientation = QuaternionToVec4(orientation_p);
-		scene->setOrientation(orientation_p);
-
-	}
-
-	void setScale(Ogre::Vector3 scale_p) {
-		this->scale = scale_p;
-		scene->setScale(scale_p);
-	}
-
 	Ogre::Vector3 getPosition() {
 		return scene->getPosition();
+	}
+
+	Ogre::Quaternion getOrientation() {
+		return scene->getOrientation();
 	}
 
 	Ogre::Vector3 getScale() {
 		return scene->getScale();
 	}
 
-	Ogre::Quaternion getOrientation() {
-		return scene->getOrientation();
+	void setPosition(Ogre::Vector3 pos_p) {
+		this->position[0] = pos_p[0];
+		this->position[1] = pos_p[1];
+		this->position[2] = pos_p[2];
+		scene->setPosition(pos_p);
 	}
+
+	void setOrientation(Ogre::Quaternion orientation_p) {
+		this->orientation[0] = orientation_p[0];
+		this->orientation[1] = orientation_p[1];
+		this->orientation[2] = orientation_p[2];
+		this->orientation[3] = orientation_p[3];
+		scene->setOrientation(orientation_p);
+
+	}
+
+	void setScale(Ogre::Vector3 scale_p) {
+		this->scale[0] = scale_p[0];
+		this->scale[1] = scale_p[1];
+		this->scale[2] = scale_p[2];
+		scene->setScale(scale_p);
+	}
+
+	void updatePosition() override {
+		scene->setPosition(Ogre::Vector3(this->position[0], this->position[1], this->position[2]));
+	}
+	void updateScale() override {
+		scene->setScale(Ogre::Vector3(this->scale[0], this->scale[1], this->scale[2]));
+	}
+	void updateOrientation() override {
+		Ogre::Quaternion quat = Ogre::Quaternion(Ogre::Quaternion(this->orientation[0], this->orientation[1], this->orientation[2], this->orientation[3]));
+		quat.normalise();
+		this->orientation[0] = quat.w;
+		this->orientation[1] = quat.x;
+		this->orientation[2] = quat.y;
+		this->orientation[3] = quat.z;
+		scene->setOrientation(quat);
+	}
+	
 
 
 	std::vector<Scene*>* getAttachedScenes() {

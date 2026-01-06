@@ -68,6 +68,10 @@ public:
 	// CaseHandler Functions
 	virtual ResID addMaterial(std::string matname_p) { return NULL; }
 	virtual ResID addShader(Ogre::MaterialPtr mat_p, ShaderType type) { return NULL; }
+	
+	// SHADER FUNCTIONS
+
+	virtual void selectShader(Shader* shader_p) {}
 
 
 };

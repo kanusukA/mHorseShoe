@@ -209,6 +209,7 @@ void ResourceLoader::loadTextures(std::vector<std::filesystem::path>* output, st
 }
 
 
+
 void ResourceLoader::fetchPathContents(std::string path,std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders)
 {
 	for (const auto& entry : std::filesystem::directory_iterator(path))

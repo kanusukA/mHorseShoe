@@ -15,6 +15,9 @@ public:
 
 	Case* currentCase;
 
+	float* position;
+
+
 	std::string* inputSceneName = new std::string("");
 	SceneType scnType = SceneType::STATIC;
 
@@ -67,11 +70,13 @@ public:
 
 	void selectObject(Object* obj) {
 		this->gdSource->getCaseHandler()->setSelectedObject(obj);
+		
 	}
 
 	void selectScene(Scene* scn_p) {
 		currentCase->selectScene(scn_p);
 		rootSceneNodeSelected = false;
+		//position = currentCase->getSelectedScene()->getPosition().ptr();
 	}
 	void deleteScene(Scene* scn_p) {
 		currentCase->removeScene(scn_p);
@@ -101,7 +106,9 @@ private:
 	// MODELS
 	SceneTabModelComponent* scnTabModel;
 
+
 public:
+
 
 	SceneTabComponent(const char* name_p,
 		SceneTabModelComponent* sceneTabComponent

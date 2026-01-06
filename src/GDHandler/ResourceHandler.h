@@ -4,14 +4,12 @@
 #define RESOURCEHANDLER_H
 
 //Local
-#include <ResourceHandler/ResourceReader.h>
 #include<ResourceHandler/ResourceSaver.h>
 #include<ResourceHandler/ResourceLoader.h>
 #include <GDHandler/ResourcePaths.h>
 #include <Gui/GuiComponents/ToastComponent.h>
 
 // STL Headers
-#include<Windows.h>
 #include <list>
 
 
@@ -79,6 +77,8 @@ private:
 	std::vector<std::filesystem::path>* Textures = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* RenderMesh = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* ColliderMesh = new std::vector<std::filesystem::path>();
+
+	std::vector<std::filesystem::path>* fetchResourcesByEnum(ResourceLoaderEnums::ResourceLoadPaths group_p);
 
 
 	// RESOURCES BUILDER
@@ -180,6 +180,9 @@ public:
 	std::vector<std::filesystem::path>* getTexturesLoaded() { return Textures; }
 	std::vector<std::filesystem::path>* getRenderMeshLoaded() { return RenderMesh; }
 	std::vector<std::filesystem::path>* getColliderMeshLoaded() { return ColliderMesh; }
+
+	//Searching fullpath
+	std::filesystem::path fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p);
 
 	//PATHS
 	void setPath(std::string path, ResourcePaths pathOf) {

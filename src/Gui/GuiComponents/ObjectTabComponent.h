@@ -39,6 +39,17 @@ public:
 		selectedObj->get()->getRenderMesh()->setMaterial(materials->at(selectedMaterial)->getHigherRef());
 	}
 
+	void selectShader(Shader* vertShader,Shader* fragShader) {
+		this->gdSource->getShaderHandler()->setShader(selectedObj->get()->getRenderMesh()->getMaterial()->getName(),
+			fragShader->getShaderName(),
+			vertShader->getShaderName(),
+			fragShader->getShaderVars(),
+			vertShader->getShaderVars(),
+			fragShader->getShader(),
+			vertShader->getShader()
+		);
+	}
+
 };
 
 class ObjectTabComponent : public ViewComponent

@@ -54,13 +54,13 @@ void PlayerSubject::updatePosition(float deltatime)
 		);
 	}
 
-	if (input->left) {
+	if (input->right) {
 		setPlayerPosition(
 			getPlayerPosition() + Ogre::Vector3(Zcos, 0, -XSin)
 		);
 	}
 
-	else if (input->right) {
+	else if (input->left) {
 		setPlayerPosition(
 			getPlayerPosition() + Ogre::Vector3(-Zcos, 0, XSin)
 		);

@@ -1219,6 +1219,99 @@ Ogre::Vector3 getObjRotation(Ogre::SceneNode* scnNode) {
 	);
 }
 
+void RSUS::setShader(std::string matName, 
+	std::string fragShaderName, 
+	std::string vertShaderName, 
+	std::vector<ShaderVar>* fragShaderVar, 
+	std::vector<ShaderVar>* vertShaderVar, 
+	Ogre::GpuProgramParametersPtr fragProgram, 
+	Ogre::GpuProgramParametersPtr vertProgram
+) {
+
+	rsusObj->materialName = matName;
+	rsusObj->fragShaderName = fragShaderName;
+	rsusObj->vertShaderName = vertShaderName;
+	rsusObj->fragProgramPtr = fragProgram;
+	rsusObj->vertProgramPtr = vertProgram;
+	rsusObj->fragVariables = fragShaderVar;
+	rsusObj->vertVariables = vertShaderVar;
+
+}
+
+void RSUS::updateShaderVar(ShaderVar var, ShaderType shaderType)
+{
+	switch (var.varType)
+	{
+	case ShaderVarType::INTEGER:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterInt(var.varName, *var.varInt);
+			break;
+		case Fragment:
+			updateFragParameterInt(var.varName, *var.varInt);
+			break;
+		default:
+			break;
+		}
+		break;
+	case ShaderVarType::FLOAT0:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterFloat(var.varName, var.varFloat);
+			break;
+		case Fragment:
+			updateFragParameterFloat(var.varName, var.varFloat);
+			break;
+		default:
+			break;
+		}
+		break;
+	case ShaderVarType::FLOAT2:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterFloat2(var.varName, var.varFloat2);
+			break;
+		case Fragment:
+			updateFragParameterFloat2(var.varName, var.varFloat2);
+			break;
+		default:
+			break;
+		}
+		break;
+	case ShaderVarType::FLOAT3:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterFloat3(var.varName, var.varFloat3);
+			break;
+		case Fragment:
+			updateFragParameterFloat3(var.varName, var.varFloat3);
+			break;
+		default:
+			break;
+		}
+		break;
+	case ShaderVarType::FLOAT4:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterFloat4(var.varName, var.varFloat4);
+			break;
+		case Fragment:
+			updateFragParameterFloat4(var.varName, var.varFloat4);
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 {
 
@@ -1252,11 +1345,11 @@ void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 	//if save file exists
 	//initializes the values of shader
 	if (objectName.empty()) {
-		rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, fragProgramFileName, SECTION_FRAGMNET_SHADER);
+		//rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, fragProgramFileName, SECTION_FRAGMNET_SHADER);
 		//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
 	}
 	else {
-		rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, objectName, SECTION_FRAGMNET_SHADER);
+		//rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, objectName, SECTION_FRAGMNET_SHADER);
 		//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
 	}
 	
@@ -1301,10 +1394,10 @@ void RSUS::updateFragParameterFloat(Ogre::String parameterName, float* val)
 	
 }
 
-void RSUS::updateFragParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val)
+void RSUS::updateFragParameterFloat2(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector2(val[0],val[1]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << val << std::endl;
@@ -1312,10 +1405,10 @@ void RSUS::updateFragParameterFloat2(Ogre::String parameterName, Ogre::Vector2 v
 	
 }
 
-void RSUS::updateFragParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val)
+void RSUS::updateFragParameterFloat3(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector3(val[0],val[1],val[2]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << val << std::endl;
@@ -1323,10 +1416,10 @@ void RSUS::updateFragParameterFloat3(Ogre::String parameterName, Ogre::Vector3 v
 	
 }
 
-void RSUS::updateFragParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val)
+void RSUS::updateFragParameterFloat4(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector4(val[0],val[1],val[2],val[3]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float4 Input For : " << parameterName << " Value : " << val << std::endl;
@@ -1364,30 +1457,30 @@ void RSUS::updateVertParameterFloat(Ogre::String parameterName, float* val)
 	}
 }
 
-void RSUS::updateVertParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val)
+void RSUS::updateVertParameterFloat2(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector2(val[0],val[1]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 }
 
-void RSUS::updateVertParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val)
+void RSUS::updateVertParameterFloat3(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector3(val[0],val[1],val[2]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 }
 
-void RSUS::updateVertParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val)
+void RSUS::updateVertParameterFloat4(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector4(val[0],val[1],val[2],val[3]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float4 Input For : " << parameterName << " Value : " << val << std::endl;

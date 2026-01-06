@@ -87,8 +87,8 @@ struct RSUShader
 	std::string fragShaderFileName;
 	std::string vertShaderName;
 	std::string vertShaderFileName;
-	std::vector<ShaderVar> fragVariables;
-	std::vector<ShaderVar> vertVariables;
+	std::vector<ShaderVar>* fragVariables;
+	std::vector<ShaderVar>* vertVariables;
 
 	RSUSShaderTextures* textures = new RSUSShaderTextures();
 
@@ -103,22 +103,34 @@ public:
 
 	RSUShader* rsusObj = new RSUShader();
 
+	// NEW SHADER FUNCTIONS
+	void setShader(std::string matName,
+		std::string fragShaderName, 
+		std::string vertShaderName, 
+		std::vector<ShaderVar>* fragShaderVar, 
+		std::vector<ShaderVar>* vertShaderVar, 
+		Ogre::GpuProgramParametersPtr fragProgram, 
+		Ogre::GpuProgramParametersPtr vertProgram);
+	
+
+	void updateShaderVar(ShaderVar var, ShaderType shaderType);
+
+
 	
 	void readMaterial(Ogre::String matName , Ogre::String objectName = "");
-	
 
 	void updateFragParameterInt(Ogre::String parameterName, int val);
 	void updateFragParameterFloat(Ogre::String parameterName, float* val);
-	void updateFragParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val);
-	void updateFragParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val);
-	void updateFragParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
+	void updateFragParameterFloat2(Ogre::String parameterName, float* val);
+	void updateFragParameterFloat3(Ogre::String parameterName, float* val);
+	void updateFragParameterFloat4(Ogre::String parameterName, float* val);
 	void updateFragParameterBool(Ogre::String parameteName, bool val);
 
 	void updateVertParameterInt(Ogre::String parameterName, int val);
 	void updateVertParameterFloat(Ogre::String parameterName, float* val);
-	void updateVertParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val);
-	void updateVertParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val);
-	void updateVertParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
+	void updateVertParameterFloat2(Ogre::String parameterName, float* val);
+	void updateVertParameterFloat3(Ogre::String parameterName, float* val);
+	void updateVertParameterFloat4(Ogre::String parameterName, float* val);
 	void updateVertParameterBool(Ogre::String parameterName, bool val);
 
 	// Class should not be clonable
@@ -135,6 +147,7 @@ public:
 	void setNormalTexture(Ogre::Texture* texture);
 	void setRoughnessTexture(Ogre::Texture* texture);
 	void setParallaxTexture(Ogre::Texture* texture);
+
 
 	
 

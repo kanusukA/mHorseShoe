@@ -69,6 +69,8 @@ public:
 
 	void setShaderVars(Shader* shader) override;
 
+	void selectShader(Shader* shader_p) override;
+
 	// Creates SceneNode Based on the name and Mesh.
 	// If PhysicsType : eRIGID_DYNAMIC the same mesh is used for collision.
 	// NOTE : SHAPE IS NOT CONSIDERED IN THE INFO.

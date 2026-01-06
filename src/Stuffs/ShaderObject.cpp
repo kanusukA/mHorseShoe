@@ -1,7 +1,7 @@
 #include "ShaderObject.h"
 
 
-void Shader::initShader(Ogre::MaterialPtr mat_p)
+void Shader::_initShader(Ogre::MaterialPtr mat_p)
 {
 
 	if(mat_p.get()->getTechnique(0)->getPass(0)->hasVertexProgram()){
@@ -9,12 +9,12 @@ void Shader::initShader(Ogre::MaterialPtr mat_p)
 		{
 		case Vertex:
 			shader = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgramParameters(); // humm
-			this->VertexShaderName = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgramName();
+			this->ShaderName = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgramName();
 			this->fileName = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getSourceFile();
 			break;
 		case Fragment:
 			shader = mat_p.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-			this->FragmentShaderName = mat_p.get()->getTechnique(0)->getPass(0)->getFragmentProgramName();
+			this->ShaderName = mat_p.get()->getTechnique(0)->getPass(0)->getFragmentProgramName();
 			this->fileName = mat_p.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();
 			break;
 		default:
@@ -26,5 +26,20 @@ void Shader::initShader(Ogre::MaterialPtr mat_p)
 	else {
 		ToastComponent::GetInstance()->addMessage("No Programable shader!");
 	}
+
+}
+
+void Shader::_setShaderVars()
+{
+	std::filesystem::path shaderLoc = ResourceHandler::GetInstance()->fetchLocByFileName(this->fileName,ResourceLoaderEnums::Shaders);
+
+	//Reading Shader File
+	ResourceHandler::GetInstance()->readShaderFile(shaderLoc, this->ShaderParameters);
+
+
+}
+
+void Shader::loadShader()
+{
 
 }

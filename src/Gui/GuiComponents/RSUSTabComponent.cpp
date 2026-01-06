@@ -57,38 +57,38 @@ void textureViewComponent(
 
 }
 
-void editableFragShaderVarViewComponent(ShaderVar shaderVar,RSUSTabModelComponent* model) {
+void editableShaderVarViewComponent(ShaderVar* shaderVar, ShaderType type ,RSUSTabModelComponent* model) {
 
-	switch (shaderVar.varType)
+	switch (shaderVar->varType)
 	{
 	case INTEGER:
-		if (ImGui::InputInt(shaderVar.varName.c_str(),shaderVar.varInt))
+		if (ImGui::InputInt(shaderVar->varName.c_str(),shaderVar->varInt))
 		{
-			model->updateFragRsusInt(shaderVar.varName, *shaderVar.varInt);
+			model->updateShaderVar(*shaderVar, type);
 		}
 		break;
 	case FLOAT0:
-		if (ImGui::SliderFloat(shaderVar.varName.c_str(), shaderVar.varFloat,-1.0f,1.0f))
+		if (ImGui::SliderFloat(shaderVar->varName.c_str(), shaderVar->varFloat,-1.0f,1.0f))
 		{
-			model->updateFragRsusFloat(shaderVar.varName, shaderVar.varFloat);
+			model->updateShaderVar(*shaderVar, type);
 		}
 		break;
 	case FLOAT2:
-		if (ImGui::SliderFloat2(shaderVar.varName.c_str(), shaderVar.varFloat2,-1.0f,1.0f))
+		if (ImGui::SliderFloat2(shaderVar->varName.c_str(), shaderVar->varFloat2,-1.0f,1.0f))
 		{
-			model->updateFragRsusInt(shaderVar.varName, *shaderVar.varInt);
+			model->updateShaderVar(*shaderVar, type);
 		}
 		break;
 	case FLOAT3:
-		if (ImGui::SliderFloat3(shaderVar.varName.c_str(), shaderVar.varFloat3, -1.0f, 1.0f))
+		if (ImGui::SliderFloat3(shaderVar->varName.c_str(), shaderVar->varFloat3, -1.0f, 1.0f))
 		{
-			model->updateFragRsusInt(shaderVar.varName, *shaderVar.varInt);
+			model->updateShaderVar(*shaderVar, type);
 		}
 		break;
 	case FLOAT4:
-		if (ImGui::SliderFloat4(shaderVar.varName.c_str(), shaderVar.varFloat4, -1.0f, 1.0f))
+		if (ImGui::SliderFloat4(shaderVar->varName.c_str(), shaderVar->varFloat4, -1.0f, 1.0f))
 		{
-			model->updateFragRsusInt(shaderVar.varName, *shaderVar.varInt);
+			model->updateShaderVar(*shaderVar, type);
 		}
 		break;
 	default:
@@ -97,51 +97,63 @@ void editableFragShaderVarViewComponent(ShaderVar shaderVar,RSUSTabModelComponen
 	}
 }
 
-void editableVertShaderVarViewComponent(ShaderVar shaderVar, RSUSTabModelComponent* model) {
-
-	switch (shaderVar.varType)
-	{
-	case INTEGER:
-		if (ImGui::InputInt(shaderVar.varName.c_str(), shaderVar.varInt))
-		{
-			model->updateVertRsusInt(shaderVar.varName, *shaderVar.varInt);
-		}
-		break;
-	case FLOAT0:
-		if (ImGui::SliderFloat(shaderVar.varName.c_str(), shaderVar.varFloat, -1.0f, 1.0f))
-		{
-			model->updateVertRsusFloat(shaderVar.varName, shaderVar.varFloat);
-		}
-		break;
-	case FLOAT2:
-		if (ImGui::SliderFloat2(shaderVar.varName.c_str(), shaderVar.varFloat2, -1.0f, 1.0f))
-		{
-			model->updateVertRsusInt(shaderVar.varName, *shaderVar.varInt);
-		}
-		break;
-	case FLOAT3:
-		if (ImGui::SliderFloat3(shaderVar.varName.c_str(), shaderVar.varFloat3, -1.0f, 1.0f))
-		{
-			model->updateVertRsusInt(shaderVar.varName, *shaderVar.varInt);
-		}
-		break;
-	case FLOAT4:
-		if (ImGui::SliderFloat4(shaderVar.varName.c_str(), shaderVar.varFloat4, -1.0f, 1.0f))
-		{
-			model->updateVertRsusInt(shaderVar.varName, *shaderVar.varInt);
-		}
-		break;
-	default:
-		ImGui::Text("Invalid Type!");
-		break;
-	}
-}
 
 void RSUSTabComponent::view()
 {
-	ImGui::Begin("RSUS");
 
-	if (RSUSModel->ogreMaterials)
+	ImGui::SetNextWindowSize(ImVec2(400, 650));
+	ImGui::SetNextWindowPos(ImVec2(*RSUSModel->windowSize->width - 400, 0));
+
+	ImGui::Begin("RSUS");
+	
+	if(RSUSModel->rsusObj){
+
+		ImGui::Text("Material : "); ImGui::SameLine();
+		ImGui::Text(RSUSModel->rsusObj->materialName.c_str());
+
+		ImGui::Spacing();
+
+		if(RSUSModel->rsusObj->vertVariables){
+
+			ImGui::Text("Vertex Shader : "); ImGui::SameLine();
+			ImGui::Text(RSUSModel->rsusObj->vertShaderName.c_str());
+
+			
+			for (int i = 0; i < RSUSModel->rsusObj->vertVariables->size(); i++)
+			{
+				editableShaderVarViewComponent(&RSUSModel->rsusObj->vertVariables->at(i),ShaderType::Vertex, RSUSModel);
+			}
+
+		}
+		else {
+			ImGui::Text("No Vertex Shader Found!");
+		}
+
+		if (RSUSModel->rsusObj->fragVariables) {
+
+			ImGui::Text("Fragment Shader : "); ImGui::SameLine();
+			ImGui::Text(RSUSModel->rsusObj->fragShaderName.c_str());
+
+			
+			
+			for (int i = 0; i < RSUSModel->rsusObj->fragVariables->size(); i++)
+			{
+				editableShaderVarViewComponent(&RSUSModel->rsusObj->fragVariables->at(i), ShaderType::Fragment, RSUSModel);
+			}
+			
+
+
+		}
+		else {
+			ImGui::Text("No Fragment Shader Found!");
+		}
+
+	}
+	else {
+		ImGui::Text("No Material Selected!");
+	}
+
+	/*if (RSUSModel->ogreMaterials)
 	{
 		if(RSUSModel->ogreMaterials->size() > 0){
 			if (ImGui::BeginCombo("Materials", RSUSModel->ogreMaterials->at(RSUSModel->selectedMaterial).c_str()))
@@ -170,125 +182,125 @@ void RSUSTabComponent::view()
 	if (ImGui::Button("Get Matrials"))
 	{
 		RSUSModel->getMaterials();
-	}
+	}*/
 
 	// SHADER SELECTED
 
-	if (RSUSModel->rsusObj)
-	{
-		ImGui::Text("Fragment Shader Name : ");
-		ImGui::SameLine();
-		ImGui::Text(RSUSModel->rsusObj->fragShaderName.c_str());
+	//if (RSUSModel->rsusObj)
+	//{
+	//	ImGui::Text("Fragment Shader Name : ");
+	//	ImGui::SameLine();
+	//	ImGui::Text(RSUSModel->rsusObj->fragShaderName.c_str());
 
-		ImGui::Text("Fragment Shader File Name : ");
-		ImGui::Text(RSUSModel->rsusObj->fragShaderFileName.c_str());
+	//	ImGui::Text("Fragment Shader File Name : ");
+	//	ImGui::Text(RSUSModel->rsusObj->fragShaderFileName.c_str());
 
 
-		for (int i = 0; i < RSUSModel->rsusObj->fragVariables.size(); i++)
-		{
-			editableFragShaderVarViewComponent(RSUSModel->rsusObj->fragVariables.at(i), RSUSModel);
-		}
+	//	for (int i = 0; i < RSUSModel->rsusObj->fragVariables.size(); i++)
+	//	{
+	//		editableFragShaderVarViewComponent(RSUSModel->rsusObj->fragVariables.at(i), RSUSModel);
+	//	}
 
-		ImGui::Spacing();
+	//	ImGui::Spacing();
 
-		ImGui::Text("Vertex Shader Name : ");
-		ImGui::SameLine();
-		ImGui::Text(RSUSModel->rsusObj->vertShaderName.c_str());
+	//	ImGui::Text("Vertex Shader Name : ");
+	//	ImGui::SameLine();
+	//	ImGui::Text(RSUSModel->rsusObj->vertShaderName.c_str());
 
-		ImGui::Text("Vertex Shader File Name : ");
-		ImGui::SameLine();
-		ImGui::Text(RSUSModel->rsusObj->vertShaderFileName.c_str());
+	//	ImGui::Text("Vertex Shader File Name : ");
+	//	ImGui::SameLine();
+	//	ImGui::Text(RSUSModel->rsusObj->vertShaderFileName.c_str());
 
-		for (int i = 0; i < RSUSModel->rsusObj->vertVariables.size(); i++)
-		{
-			editableVertShaderVarViewComponent(RSUSModel->rsusObj->fragVariables.at(i), RSUSModel);
-		}
+	//	for (int i = 0; i < RSUSModel->rsusObj->vertVariables.size(); i++)
+	//	{
+	//		editableVertShaderVarViewComponent(RSUSModel->rsusObj->fragVariables.at(i), RSUSModel);
+	//	}
 
-		// TEXTURES
+	//	// TEXTURES
 
-		ImGui::Spacing();
-		ImGui::Text("Textures");
-		ImGui::Spacing();
+	//	ImGui::Spacing();
+	//	ImGui::Text("Textures");
+	//	ImGui::Spacing();
 
-		textureViewComponent(
-			"Diffuse",
-			RSUSModel->rsusObj->textures->Diffuse,
-			RSUSModel->Diffuse,
-			&RSUSModel->selectedDiffuseIndex,
-			RSUSModel
-		);
+	//	textureViewComponent(
+	//		"Diffuse",
+	//		RSUSModel->rsusObj->textures->Diffuse,
+	//		RSUSModel->Diffuse,
+	//		&RSUSModel->selectedDiffuseIndex,
+	//		RSUSModel
+	//	);
 
-		if (RSUSModel->Diffuse)
-		{
-			ImGui::Image((ImTextureID)RSUSModel->Diffuse.get()->getHandle(), ImVec2(250, 250));
-		}
+	//	if (RSUSModel->Diffuse)
+	//	{
+	//		ImGui::Image((ImTextureID)RSUSModel->Diffuse.get()->getHandle(), ImVec2(250, 250));
+	//	}
 
-		ImGui::Spacing();
+	//	ImGui::Spacing();
 
-		textureViewComponent(
-			"Normal",
-			RSUSModel->rsusObj->textures->Normal,
-			RSUSModel->Normal,
-			&RSUSModel->selectedNormalIndex,
-			RSUSModel
-		);
+	//	textureViewComponent(
+	//		"Normal",
+	//		RSUSModel->rsusObj->textures->Normal,
+	//		RSUSModel->Normal,
+	//		&RSUSModel->selectedNormalIndex,
+	//		RSUSModel
+	//	);
 
-		if (RSUSModel->Normal)
-		{
-			ImGui::Image((ImTextureID)RSUSModel->Normal.get()->getHandle(), ImVec2(250, 250));
-		}
+	//	if (RSUSModel->Normal)
+	//	{
+	//		ImGui::Image((ImTextureID)RSUSModel->Normal.get()->getHandle(), ImVec2(250, 250));
+	//	}
 
-		ImGui::Spacing();
+	//	ImGui::Spacing();
 
-		textureViewComponent(
-			"Roughness",
-			RSUSModel->rsusObj->textures->Roughness,
-			RSUSModel->Roughness,
-			&RSUSModel->selectedRoughnessIndex,
-			RSUSModel
-		);
+	//	textureViewComponent(
+	//		"Roughness",
+	//		RSUSModel->rsusObj->textures->Roughness,
+	//		RSUSModel->Roughness,
+	//		&RSUSModel->selectedRoughnessIndex,
+	//		RSUSModel
+	//	);
 
-		if (RSUSModel->Roughness)
-		{
-			ImGui::Image((ImTextureID)RSUSModel->Roughness.get()->getHandle(), ImVec2(250, 250));
-		}
+	//	if (RSUSModel->Roughness)
+	//	{
+	//		ImGui::Image((ImTextureID)RSUSModel->Roughness.get()->getHandle(), ImVec2(250, 250));
+	//	}
 
-		ImGui::Spacing();
+	//	ImGui::Spacing();
 
-		textureViewComponent(
-			"Parallax",
-			RSUSModel->rsusObj->textures->Parallax,
-			RSUSModel->Parallax,
-			&RSUSModel->selectedParallaxIndex,
-			RSUSModel
-		);
+	//	textureViewComponent(
+	//		"Parallax",
+	//		RSUSModel->rsusObj->textures->Parallax,
+	//		RSUSModel->Parallax,
+	//		&RSUSModel->selectedParallaxIndex,
+	//		RSUSModel
+	//	);
 
-		if (RSUSModel->Parallax)
-		{
-			ImGui::Image((ImTextureID)RSUSModel->Parallax.get()->getHandle(), ImVec2(250, 250));
-		}
+	//	if (RSUSModel->Parallax)
+	//	{
+	//		ImGui::Image((ImTextureID)RSUSModel->Parallax.get()->getHandle(), ImVec2(250, 250));
+	//	}
 
-		ImGui::Spacing();
+	//	ImGui::Spacing();
 
-		if (ImGui::Button("Set Texture"))
-		{
-			RSUSModel->setTexture();
-		}
+	//	if (ImGui::Button("Set Texture"))
+	//	{
+	//		RSUSModel->setTexture();
+	//	}
 
-		ImGui::Spacing();
+	//	ImGui::Spacing();
 
-		if (ImGui::Button("Save Parameters"))
-		{
-			// TODO CREATE A BETTER RSUS SAVE AND LOAD SYSTEM!!
-		}
+	//	if (ImGui::Button("Save Parameters"))
+	//	{
+	//		// TODO CREATE A BETTER RSUS SAVE AND LOAD SYSTEM!!
+	//	}
 
-		ImGui::Spacing();
+	//	ImGui::Spacing();
 
-		if (ImGui::Button("update shader"))
-		{
-			RSUSModel->updateShader();
-		}
-	}
+	//	if (ImGui::Button("update shader"))
+	//	{
+	//		RSUSModel->updateShader();
+	//	}
+	//}
 
 
 	ImGui::End();

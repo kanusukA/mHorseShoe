@@ -31,6 +31,37 @@ ResourceHandlerType ResourceHandler::_getResourceLocationGroup(std::string group
 
 }
 
+std::vector<std::filesystem::path>* ResourceHandler::fetchResourcesByEnum(ResourceLoaderEnums::ResourceLoadPaths group_p)
+{
+	switch (group_p)
+	{
+	case ResourceLoaderEnums::Objects:
+		return nullptr;
+		break;
+	case ResourceLoaderEnums::Shaders:
+		return this->Shaders;
+		break;
+	case ResourceLoaderEnums::MaterialPath:
+		return this->Materials;
+		break;
+	case ResourceLoaderEnums::MaterialTexture:
+		return this->Textures;
+		break;
+	case ResourceLoaderEnums::RenderMeshPath:
+		return this->RenderMesh;
+		break;
+	case ResourceLoaderEnums::ColliderMeshPath:
+		return this->ColliderMesh;
+		break;
+	case ResourceLoaderEnums::ImagePath:
+		return this->images;
+		break;
+	default:
+		return nullptr;
+		break;
+	}
+}
+
 
 void ResourceHandler::read()
 {
@@ -420,6 +451,26 @@ void ResourceHandler::loadResources()
 	this->loadRenderMesh(this->RenderMesh);
 	this->loadColliderMesh(this->ColliderMesh);
 	this->loadTextures(this->Textures, ".png");
+
+}
+
+std::filesystem::path ResourceHandler::fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p)
+{
+	std::vector<std::filesystem::path>* group = fetchResourcesByEnum(group_p);
+
+	if (group){
+		for (int i = 0; i < group->size(); i++)
+		{
+			if (group->at(i).filename().string() == filename_p)
+			{
+				return group->at(i);
+			}
+		}
+		ToastComponent::GetInstance()->addMessage("No such filename exists");
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Unable to find group");
+	}
 
 }
 
