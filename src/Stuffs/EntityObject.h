@@ -12,30 +12,46 @@ private:
 	RenderMesh* mesh;
 	ColliderMesh* cMesh;
 
+	Material* material;
+
 public:
 
 	Object(GDBuilderContext* builderCxt_p,ResID renderMeshID, std::string name_p, PhysXType objType_p) : ObjectResource(ResourceHandler::GetInstance(),this, name_p, objType_p) {
 		builderCxt = builderCxt_p;
 		mesh = ResourceHandler::GetInstance()->fetchRenderMeshResourceByID(renderMeshID)->getHigherClass();
-		entity = builderCxt->createObject(name_p, mesh->getName());
+		entity = builderCxt->createObject(name_p, mesh->getMesh());
+		
+		material = mesh->getMaterial();
 		
 	}
 
 	Object(GDBuilderContext* builderCxt_p, RenderMeshResource* renderMesh, std::string name_p, PhysXType objType_p) : ObjectResource(ResourceHandler::GetInstance(), this, name_p, objType_p) {
 		builderCxt = builderCxt_p;
 		mesh = renderMesh->getHigherClass();
-		entity = builderCxt->createObject(name_p, renderMesh->getName());
+		entity = builderCxt->createObject(name_p, mesh->getMesh());
+
+		material = mesh->getMaterial();
 
 	}
 
-	void setPxRigidBody() {
-
-		// TODO set object physx
-
+	// TO set Material to an Object use this method. Assigning material from RenderMesh will not work!
+	void setMaterial(Material* mat_p) {
+		material = mat_p;
+		entity->setMaterial(mat_p->getMaterialPtr());
 	}
 
 	RenderMesh* getRenderMesh() {
-		return mesh;
+	    return mesh;
+		
+	}
+
+	// use this method to manage Object related Material
+	Material* getMaterial() {
+		return material;
+	}
+
+	Ogre::MeshPtr getMesh() {
+		return entity->getMesh();
 	}
 
 	ColliderMesh* getColliderMesh() {

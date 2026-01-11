@@ -18,7 +18,7 @@ private:
 
 public:
 	Scene(GDBuilderContext* builderCxt_p,SceneType scnType, std::string name_p) :
-		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, Ogre::Vector3(), Ogre::Vector4(), Ogre::Vector3()) {
+		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, Ogre::Vector3(0,0,0), Ogre::Vector4(0,0,0,0), Ogre::Vector3(0,0,0)) {
 		builderCxt = builderCxt_p;
 		scene = builderCxt->createScene(name_p);
 		

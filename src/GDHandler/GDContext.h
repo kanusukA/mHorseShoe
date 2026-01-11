@@ -57,7 +57,7 @@ public:
 	
 	// Create Functions
 	virtual Ogre::SceneNode* createScene(std::string name_p) { return nullptr; }
-	virtual Ogre::Entity* createObject(std::string name_p, std::string mshName_p) { return nullptr; }
+	virtual Ogre::Entity* createObject(std::string name_p, Ogre::MeshPtr mesh_p) { return nullptr; }
 	virtual Ogre::MeshPtr createMesh(std::string meshName_p) { return nullptr; }
 	virtual Ogre::MaterialPtr createMaterial(std::string materialName_p) { return nullptr; }
 	virtual void setShaderVars(Shader* shader) {};

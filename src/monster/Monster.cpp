@@ -59,17 +59,17 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	oScnManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
 	
 
-	oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
+	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+	oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
 
-	Ogre::MaterialPtr casterMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowCaster");
-	Ogre::MaterialPtr receiverMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowReceiver");
+	//Ogre::MaterialPtr casterMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowCaster");
+	//Ogre::MaterialPtr receiverMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowReceiver");
 
-	oScnManager->setShadowTextureCasterMaterial(casterMat);
-	oScnManager->setShadowTextureReceiverMaterial(receiverMat);
-	//oScnManager->setShadowCasterRenderBackFaces(false);
-	
-	oScnManager->setShadowTextureSelfShadow(true);
+	//oScnManager->setShadowTextureCasterMaterial(casterMat);
+	//oScnManager->setShadowTextureReceiverMaterial(receiverMat);
+	////oScnManager->setShadowCasterRenderBackFaces(false);
+	//
+	//oScnManager->setShadowTextureSelfShadow(true);
 	
 	
 	//oScnManager->setShowDebugShadows(true);
@@ -142,9 +142,9 @@ Ogre::Entity* Monster::createMeshEntity(Ogre::String entityname, Ogre::String ms
 	return oScnManager->createEntity(entityname,msh);
 }
 
-Ogre::Entity* Monster::createEntity(Ogre::String entityName_p, Ogre::String mshname)
+Ogre::Entity* Monster::createEntity(Ogre::String entityName_p, Ogre::MeshPtr mesh_p)
 {
-	return oScnManager->createEntity(entityName_p,mshname);
+	return oScnManager->createEntity(entityName_p,mesh_p);
 }
 
 Ogre::MeshPtr Monster::getMesh(Ogre::String meshName, Ogre::String groupName)
@@ -704,6 +704,18 @@ void Monster::setGrid()
 	gridNode->attachObject(gridObj);
 	
 	gridNode->setPosition(-5000, 0, -5000);
+
+
+	Ogre::SceneNode* test = oScnManager->getRootSceneNode()->createChildSceneNode("testing");
+	Ogre::MaterialPtr m_mat = Ogre::MaterialManager::getSingletonPtr()->getByName("normalMaterial");
+
+	Ogre::Entity* ent = oScnManager->createEntity("Icosphere.mesh");
+	ent->setMaterial(m_mat);
+
+	test->attachObject(ent);
+
+	test->setPosition(0, 2, 0);
+
 
 }
 

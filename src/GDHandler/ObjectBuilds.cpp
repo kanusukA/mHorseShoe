@@ -4,9 +4,9 @@ Ogre::SceneNode* GDHandler::createScene(std::string name_p) {
 	return monster->createNewScnNodeAttach(name_p,monster->oScnManager->getRootSceneNode());
 }
 
-Ogre::Entity* GDHandler::createObject(std::string name_p, std::string mshName_p)
+Ogre::Entity* GDHandler::createObject(std::string name_p, Ogre::MeshPtr mesh_p)
 {
-	return monster->createEntity(name_p, mshName_p);
+	return monster->createEntity(name_p, mesh_p);
 }
 
 Ogre::MaterialPtr GDHandler::createMaterial(std::string materialName_p)

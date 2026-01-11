@@ -20,7 +20,7 @@ void ObjectTabComponent::view()
 		// Mesh
 		ImGui::Text("Mesh : ");
 		ImGui::SameLine();
-		ImGui::Text(objectModel->selectedObj->get()->getRenderMesh()->getName().c_str());
+		ImGui::Text(objectModel->selectedObj->get()->getMesh()->getName().c_str());
 
 		// Material
 		if(objectModel->materials && objectModel->materials->size() > 0) {
@@ -43,24 +43,27 @@ void ObjectTabComponent::view()
 			objectModel->setMaterial();
 		}
 
+		ImGui::Text("Mesh Material : "); ImGui::SameLine();
+		ImGui::Text(objectModel->selectedObj->get()->getMesh().get()->getSubMesh(0)->getMaterialName().c_str());
+
 		ImGui::Text("Material : ");
 		ImGui::SameLine();
-		if (objectModel->selectedObj->get()->getRenderMesh()->getMaterial()) {
+		if (objectModel->selectedObj->get()->getMaterial()) {
 
-			ImGui::Text(objectModel->selectedObj->get()->getRenderMesh()->getMaterial()->getName().c_str());
+			ImGui::Text(objectModel->selectedObj->get()->getMaterial()->getName().c_str());
 
 			ImGui::Text("Vertex Shader : ");
 			ImGui::SameLine();
-			ImGui::Text(objectModel->selectedObj->get()->getRenderMesh()->getMaterial()->getVertexShader()->getShaderFileName().c_str());
+			ImGui::Text(objectModel->selectedObj->get()->getMaterial()->getVertexShader()->getShaderFileName().c_str());
 
 			ImGui::Text("Fragment Shader : ");
 			ImGui::SameLine();
-			ImGui::Text(objectModel->selectedObj->get()->getRenderMesh()->getMaterial()->getFragmentShader()->getShaderFileName().c_str());
+			ImGui::Text(objectModel->selectedObj->get()->getMaterial()->getFragmentShader()->getShaderFileName().c_str());
 
 			if (ImGui::Button("Select Shader"))
 			{
-				objectModel->selectShader(objectModel->selectedObj->get()->getRenderMesh()->getMaterial()->getVertexShader(),
-					objectModel->selectedObj->get()->getRenderMesh()->getMaterial()->getFragmentShader());
+				objectModel->selectShader(objectModel->selectedObj->get()->getMaterial()->getVertexShader(),
+					objectModel->selectedObj->get()->getMaterial()->getFragmentShader());
 			}
 
 

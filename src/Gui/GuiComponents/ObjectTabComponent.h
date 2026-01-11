@@ -3,6 +3,7 @@
 #include <base/Mediator.h>
 #include <OgreImGuiOverlay.h>
 
+// The value for Rsus Input is not correct check once again
 
 class ObjectTabModelComponent : public ModelComponent {
 	
@@ -36,11 +37,11 @@ public:
 	}
 
 	void setMaterial() {
-		selectedObj->get()->getRenderMesh()->setMaterial(materials->at(selectedMaterial)->getHigherRef());
+		selectedObj->get()->setMaterial(materials->at(selectedMaterial)->getHigherRef());
 	}
 
 	void selectShader(Shader* vertShader,Shader* fragShader) {
-		this->gdSource->getShaderHandler()->setShader(selectedObj->get()->getRenderMesh()->getMaterial()->getName(),
+		this->gdSource->getShaderHandler()->setShader(selectedObj->get()->getMaterial()->getName(),
 			fragShader->getShaderName(),
 			vertShader->getShaderName(),
 			fragShader->getShaderVars(),

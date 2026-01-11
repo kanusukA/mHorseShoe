@@ -117,7 +117,7 @@ void ResourceReader::readShaderFile(std::filesystem::path shaderPath_p, std::vec
 
 						if (word == "int" || word == "bool") {
 							shaderVar.varType = ShaderVarType::INTEGER;
-							shaderVar.varInt = 0;
+							*shaderVar.varInt = 0;
 						}
 						else if (word == "float")
 						{

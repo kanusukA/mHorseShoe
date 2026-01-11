@@ -19,16 +19,26 @@ public:
 		builderCxt = builderCxt_p;
 		mesh = builderCxt->createMesh(meshName_p);
 
+
 	}
 
 	void setMaterial(Material* mat_p) {
-		mesh->getSubMesh(0)->setMaterial(mat_p->getMaterialPtr());
+		mesh.get()->getSubMesh(0)->setMaterial(mat_p->getMaterialPtr());
 		materialID = mat_p->getId();
 		material = mat_p;
 	}
 
 	Material* getMaterial() {
 		return material;
+	}
+
+	// Used to check the actual assigned mesh material
+	std::string getMeshMaterialName() {
+		return mesh.get()->getSubMesh(0)->getMaterialName();
+	}
+
+	Ogre::MeshPtr getMesh() {
+		return mesh;
 	}
 
 };

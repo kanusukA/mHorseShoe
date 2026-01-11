@@ -230,7 +230,7 @@ public:
 	Ogre::SceneNode* addCamera(Ogre::String camName, Ogre::Vector3 startPos);
 	Ogre::Entity* createMeshEntity(Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
 	Ogre::Entity* createMeshEntity(Ogre::String entityname ,Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
-	Ogre::Entity* createEntity(Ogre::String entityName_p, Ogre::String mshname);
+	Ogre::Entity* createEntity(Ogre::String entityName_p, Ogre::MeshPtr mesh_p);
 	Ogre::MeshPtr getMesh(Ogre::String meshName, Ogre::String groupName = "Render_Mesh");
 	Ogre::SceneNode* createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node); // Creates a new scnNode and attches it to the given scnNode
 

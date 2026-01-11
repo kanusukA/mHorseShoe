@@ -610,9 +610,9 @@ private:
 protected:
 
 
-	float position[3] = { 0.0f,0.0f,0.0f };
-	float orientation[4] = { 0.0f,0.0f,0.0f,0.0f };
-	float scale[3] = { 0.0f,0.0f,0.0f };
+	float* position = new float[3]{};
+	float* orientation = new float[4] {};
+	float* scale = new float[3] {};
 
 	std::vector<ResID>* scenes = new std::vector<ResID>();
 	std::vector<ResID>* objects = new std::vector<ResID>();
@@ -672,6 +672,7 @@ protected:
 public:
 
 	float* _getPosition() {
+		//std::cout << "position : " << position[0] << " " << position[1] << " " << position[2] << std::endl;
 		return position;
 	}
 
