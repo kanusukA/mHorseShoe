@@ -9,6 +9,42 @@
 //STL Headers
 #include <fstream>
 
+struct RLCase {
+	long long id;
+	std::string name;
+	std::vector<long long> Scenes;
+};
+struct RLScene {
+	long long id;
+	std::string name;
+	int scnType;
+	float* position;
+	float* rotation;
+	float* scale;
+	std::vector<long long> Scenes;
+	std::vector<long long> objects;
+};
+
+struct RLObject {
+	long long id;
+	std::string name;
+	int ObjectPhysxType;
+	int mass;
+	long long renderMeshID;
+	long long colliderMeshID;
+};
+
+struct RLMesh {
+	std::string name;
+	long long materialID;
+};
+
+struct RLMaterial {
+	std::string name;
+	long long vertShaderID;
+	long long fragShaderID;
+};
+
 class ResourceLoader {
 
 private:
@@ -29,11 +65,19 @@ protected:
 
 	void saveLoadPaths();
 
+	
 
 	// LOADING FILES AND FOLDERS
 	void fetchPathContents(std::string path, std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders = false);
 
+	RLMesh* _loadSavedRenderMesh(ResID id, std::string path_p);
+
+
 public:
+
+	std::vector<RLCase>* RLCases = new std::vector<RLCase>();
+	std::vector<RLScene>* RLScenes = new std::vector<RLScene>();
+	std::vector<RLObject>* RLObjects = new std::vector<RLObject>();
 
 
 	~ResourceLoader() {
@@ -58,8 +102,14 @@ public:
 
 	}
 
+	// Loading Saved Data
+	void loadSavedCases(std::string path_p);
+	void loadSavedScenes(std::string path_p);
+	void loadSavedObject(std::string path_p);
 
-	// Loading Things
+
+
+	// Loading Things Not related to Saved Data
 	void loadMaterials(std::vector<std::filesystem::path>* output, std::string extension = ".material", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
 	void loadShaders(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
 	void loadRenderMesh(std::vector<std::filesystem::path>* output, std::string extension = ".mesh", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);

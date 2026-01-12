@@ -1,6 +1,7 @@
 #pragma once
 
 //Local
+#include <GDHandler/ResourcePaths.h>
 #include <ResourceHandler/ResourceReader.h>
 #include <Gui/GuiRegen.h>
 
@@ -91,10 +92,10 @@ class ResourceHandlerBuilderContext {
 
 private:
 	GuiRegen* guiRegen; // used to update Gui Resources
-	std::vector<ResID>* masterList = new std::vector<ResID>();
+	
 
 protected:
-
+	std::vector<ResID>* masterList = new std::vector<ResID>();
 	std::vector<CaseResource*>* caseRes = new std::vector<CaseResource*>();
 	std::vector<SceneResource*>* scnRes = new std::vector<SceneResource*>();
 	std::vector<ObjectResource*>* objRes = new std::vector<ObjectResource*>();
@@ -832,8 +833,8 @@ public:
 
 struct ShaderTexture
 {
-	std::string textureName;
-	ResID texture;
+	std::string textureName = "";
+	ResID texture = 0;
 	int texturePosition; // Position of texture in Shader
 
 	ShaderTexture() {
@@ -1160,4 +1161,9 @@ public:
 std::string convertVec3ToString(Ogre::Vector3 vec3);
 std::string convertVec4ToString(Ogre::Vector4 vec4);
 Ogre::Vector4 convertStringToVec4(std::string str);
+std::string convertFloatPtrToString(float* val_p, int size);
+int convertStringToFloatPtr(std::string str_p,float* &output_p);
+Ogre::Vector3 convertFloatPtrToVec3(float* val_p);
+Ogre::Vector4 convertFloatPtrToVec4(float* val_p);
+
 std::string convertShaderVarValueToStr(ShaderVar variable);

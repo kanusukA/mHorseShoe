@@ -99,6 +99,8 @@ int main() {
 
 	std::cout << "loop ended : " << std::endl;
 
+	ResourceHandler::GetInstance()->saveResources();
+
 	// Shutdown
 	//kint->Shutdown();
 	monster->Shutdown();

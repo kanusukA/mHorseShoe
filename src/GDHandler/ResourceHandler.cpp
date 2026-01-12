@@ -452,6 +452,31 @@ void ResourceHandler::loadResources()
 	this->loadColliderMesh(this->ColliderMesh);
 	this->loadTextures(this->Textures, ".png");
 
+	// loading saved data
+	this->loadSavedCases(*this->getPath(ResourcePaths::Cases));
+	this->loadSavedScenes(*this->getPath(ResourcePaths::Scenes));
+
+	std::cout << "test";
+
+}
+
+RLMesh* ResourceHandler::loadSavedRenderMesh(ResID id)
+{
+	return _loadSavedRenderMesh(id, *this->getPath(ResourcePaths::RenderMeshPath));
+}
+
+void ResourceHandler::saveResources()
+{
+	this->saveMasterList("TODO Change this", masterList, *this->getPath(ResourcePaths::MasterList));
+	this->saveCases(caseRes,*this->getPath(ResourcePaths::Cases));
+	this->saveScenes(scnRes, *this->getPath(ResourcePaths::Scenes), *this->getPath(ResourcePaths::ScnObj));
+	this->saveObjects(objRes, *this->getPath(ResourcePaths::Objects));
+	this->saveShaders(shaderRes, *this->getPath(ResourcePaths::Shaders), *this->getPath(ResourcePaths::ShaderVars), *this->getPath(ResourcePaths::ShaderValues));
+	this->saveMaterials(matRes, *this->getPath(ResourcePaths::MaterialPath), *this->getPath(ResourcePaths::MaterialTexture));
+	this->saveRenderMesh(renderRes, *this->getPath(ResourcePaths::RenderMeshPath));
+	this->saveColliderMesh(colRes, *this->getPath(ResourcePaths::ColliderMeshPath));
+	this->saveImages(imageRes, *this->getPath(ResourcePaths::ImagePath));
+
 }
 
 std::filesystem::path ResourceHandler::fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p)

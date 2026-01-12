@@ -61,7 +61,11 @@ public:
 
 	void addObject() {
 		Object* obj =  this->gdSource->getCaseHandler()->CreateObject(*inputObjectname, renderMeshes->at(selectedMesh), physxType);
-		currentCase->getSelectedScene()->addObject(obj);
+		if (obj)
+		{
+			currentCase->getSelectedScene()->addObject(obj);
+		}
+		
 	}
 
 	void deleteObject(ResID id) {

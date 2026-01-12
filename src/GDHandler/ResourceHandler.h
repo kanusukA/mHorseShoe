@@ -6,7 +6,6 @@
 //Local
 #include<ResourceHandler/ResourceSaver.h>
 #include<ResourceHandler/ResourceLoader.h>
-#include <GDHandler/ResourcePaths.h>
 #include <Gui/GuiComponents/ToastComponent.h>
 
 // STL Headers
@@ -173,6 +172,10 @@ public:
 
 	// Loads all the resources - Mesh, texture, Material, shader. Using the paths that are set on ResourceLoader.
 	void loadResources();
+
+	RLMesh* loadSavedRenderMesh(ResID id);
+
+	void saveResources();
 
 
 	std::vector<std::filesystem::path>* getMaterialsLoaded() { return Materials; }

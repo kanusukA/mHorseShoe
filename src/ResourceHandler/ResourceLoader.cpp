@@ -82,6 +82,119 @@ void ResourceLoader::addLoadPath(std::string path_p)
 
 
 
+void ResourceLoader::loadSavedCases(std::string path_p)
+{
+	ini->Reset();
+	ini->LoadFile(path_p.c_str());
+
+	CSimpleIniA::TNamesDepend sections;
+	ini->GetAllSections(sections);
+
+	for (const auto& entry : sections)
+	{
+		RLCase new_case = RLCase();
+		new_case.id = std::stoll(entry.pItem);
+		new_case.name = ini->GetValue(entry.pItem, CASE_NAME_KEY);
+		new_case.Scenes = std::vector<long long>();
+
+		std::string scenes = ini->GetValue(entry.pItem, CASE_SCENE_KEY);
+
+		std::string val = "";
+		for (int i = 0; i < scenes.size(); i++)
+		{
+			if (scenes.at(i) == '|')
+			{
+				new_case.Scenes.push_back(std::stoll(val));
+				val = "";
+			}
+			else {
+				val += scenes.at(i);
+			}
+		}
+
+		this->RLCases->push_back(new_case);
+		
+	}
+
+}
+
+void ResourceLoader::loadSavedScenes(std::string scene_p)
+{
+	ini->Reset();
+	ini->LoadFile(scene_p.c_str());
+
+	CSimpleIniA::TNamesDepend sections;
+
+	ini->GetAllSections(sections);
+
+	for (const auto& entry : sections)
+	{
+		RLScene new_scn = RLScene();
+		new_scn.id = std::stoll(entry.pItem);
+		new_scn.name = ini->GetValue(entry.pItem, SCENE_NAME_KEY);
+		new_scn.scnType = std::stoi(ini->GetValue(entry.pItem, SCENE_TYPE_KEY));
+		convertStringToFloatPtr(ini->GetValue(entry.pItem, SCENE_POS_KEY),new_scn.position);
+		convertStringToFloatPtr(ini->GetValue(entry.pItem, SCENE_ROT_KEY), new_scn.rotation);
+		convertStringToFloatPtr(ini->GetValue(entry.pItem, SCENE_SCALE_KEY), new_scn.scale);
+
+
+		new_scn.Scenes = std::vector<long long>();
+		new_scn.objects = std::vector<long long>();
+
+		std::string strScenes = ini->GetValue(entry.pItem,ATTACHED_SCN_KEY);
+		std::string strObjects = ini->GetValue(entry.pItem, SCENE_OBJECT_KEY);;
+
+		std::string val = "";
+		for (int i = 0; i < strScenes.size(); i++)
+		{
+			if (strScenes.at(i) == '|')
+			{
+				new_scn.Scenes.push_back(std::stoll(val));
+				val = "";
+			}
+			else {
+				val += strScenes.at(i);
+			}
+		}
+		val = "";
+		for (int i = 0; i < strObjects.size(); i++)
+		{
+			if (strObjects.at(i) == '|')
+			{
+				new_scn.objects.push_back(std::stoll(val));
+				val = "";
+			}
+			else {
+				val += strObjects.at(i);
+			}
+		}
+		this->RLScenes->push_back(new_scn);
+	}
+}
+
+void ResourceLoader::loadSavedObject(std::string path_p)
+{
+	ini->Reset();
+	ini->LoadFile(path_p.c_str());
+
+	CSimpleIniA::TNamesDepend sections;
+	ini->GetAllSections(sections);
+
+	for (const auto& entry : sections)
+	{
+		RLObject new_obj = RLObject();
+		new_obj.id = std::stoll(entry.pItem);
+		new_obj.name = ini->GetValue(entry.pItem, OBJECT_NAME_KEY);
+		new_obj.mass = std::stoi(ini->GetValue(entry.pItem, OBJECT_PHYSX_KEY));
+		new_obj.colliderMeshID = std::stoll(ini->GetValue(entry.pItem, OBJECT_COLLIDERMESH_KEY));
+		new_obj.renderMeshID = std::stoll(ini->GetValue(entry.pItem, OBJECT_RENDERMESH_KEY));
+		
+		this->RLObjects->push_back(new_obj);
+	}	
+	
+
+}
+
 void ResourceLoader::loadMaterials(std::vector<std::filesystem::path>* output,std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
 	if (clearOutput)
@@ -228,3 +341,27 @@ void ResourceLoader::fetchPathContents(std::string path,std::string extension, s
 	}
 
 }
+
+RLMesh* ResourceLoader::_loadSavedRenderMesh(ResID id, std::string path_p)
+{
+	ini->Reset();
+	ini->LoadFile(path_p.c_str());
+
+	CSimpleIniA::TNamesDepend sections;
+	ini->GetAllSections(sections);
+
+	for (const auto& entry : sections) {
+		if (std::stoll(entry.pItem) == id)
+		{
+			RLMesh* mesh = new RLMesh();
+
+			mesh->name = ini->GetValue(entry.pItem, MESH_NAME_KEY);
+			mesh->materialID = std::stoll(ini->GetValue(entry.pItem, MESH_NAME_KEY));
+
+			return mesh;
+
+		}
+	}
+
+}
+

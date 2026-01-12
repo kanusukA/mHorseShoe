@@ -85,6 +85,9 @@ public:
 	Image* CreateImage(std::filesystem::path filePath_p);
 
 
+	void loadSavedResource();
+
+
 
 };
 
