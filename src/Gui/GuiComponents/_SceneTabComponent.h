@@ -24,7 +24,9 @@ public:
 	// MESHS FROM RESOURCE HANDLER
 	std::string* inputObjectname = new std::string("");
 	PhysXType physxType = PhysXType::Static;
-	std::vector<RenderMeshResource*>* renderMeshes;
+	
+	std::vector<std::filesystem::path>* renderMeshes;
+
 	int selectedMesh = 0;
 
 	SceneTabModelComponent(const char* name_p) : ModelComponent(name_p) {
@@ -34,7 +36,8 @@ public:
 	void init() override {
 		cases = this->gdSource->getCaseHandler()->getAllCases();
 		currentCase = this->gdSource->getCaseHandler()->getCurrentCase();
-		renderMeshes = this->gdSource->getResourceHandler()->getAllRenderMesh();
+		
+		renderMeshes = this->gdSource->getResourceHandler()->getRenderMeshLoaded();
 		
 	}
 
@@ -60,7 +63,11 @@ public:
 	}
 
 	void addObject() {
-		Object* obj =  this->gdSource->getCaseHandler()->CreateObject(*inputObjectname, renderMeshes->at(selectedMesh), physxType);
+		// Create RenderMesh
+		RenderMesh* mesh = this->gdSource->getCaseHandler()->CreateRenderMesh(renderMeshes->at(selectedMesh));
+
+		Object* obj =  this->gdSource->getCaseHandler()->CreateObject(*inputObjectname, mesh, physxType);
+
 		if (obj)
 		{
 			currentCase->getSelectedScene()->addObject(obj);

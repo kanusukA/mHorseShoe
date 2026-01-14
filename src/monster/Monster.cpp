@@ -547,6 +547,23 @@ void Monster::getMeshVerticesInformation(
 }
 
 
+void Monster::addOgreResourceLocation(std::string path_p, std::string OgreResourceGroup)
+{
+	if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceGroupExists(OgreResourceGroup))
+	{
+		Ogre::ResourceGroupManager::getSingletonPtr()->createResourceGroup(OgreResourceGroup);
+	}
+	if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(path_p,OgreResourceGroup))
+	{
+		Ogre::ResourceGroupManager::getSingletonPtr()->addResourceLocation(path_p, "FileSystem", OgreResourceGroup);
+
+		Ogre::ResourceGroupManager::getSingletonPtr()->initialiseAllResourceGroups();
+	}
+
+	
+	
+}
+
 void Monster::setSkyBox()
 {
 

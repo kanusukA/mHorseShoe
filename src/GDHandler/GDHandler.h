@@ -47,20 +47,19 @@ public:
 
 		
 	
-		this->setResources();
+		//this->setResources();
 
 	};
 
 	// RESOURCE WORK
 
 	// Set Resources Adds all resources loaded by ResourceLoader into ResourceBuilderContext and generates their Resource Objects
-	void setResources();
+	//void setResources();
 
 	// OBJECT CREATION / GDCONTEXT OVERRIDE
 
 	Ogre::SceneNode* createScene(std::string name_p) override;
 	Ogre::Entity* createObject(std::string name_p, Ogre::MeshPtr mesh_p) override;
-	Ogre::MeshPtr createMesh(std::string meshName) override;
 	Ogre::MaterialPtr createMaterial(std::string materialName_p) override;
 
 

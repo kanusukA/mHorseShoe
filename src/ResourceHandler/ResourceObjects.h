@@ -99,6 +99,8 @@ protected:
 	std::vector<CaseResource*>* caseRes = new std::vector<CaseResource*>();
 	std::vector<SceneResource*>* scnRes = new std::vector<SceneResource*>();
 	std::vector<ObjectResource*>* objRes = new std::vector<ObjectResource*>();
+
+
 	std::vector<ShaderResource*>* shaderRes = new std::vector<ShaderResource*>();
 	std::vector<MaterialResource*>* matRes = new std::vector<MaterialResource*>();
 	std::vector<RenderMeshResource*>* renderRes = new std::vector<RenderMeshResource*>();
@@ -906,12 +908,9 @@ public:
 
 };
 
-class Material;
 
 class MaterialResource : public Resource
 {
-private:
-	Material* mat;
 
 protected:
 	std::string materialName; // file name of material
@@ -954,12 +953,10 @@ protected:
 		}
 	}
 
+	MaterialResource(); // Material can't be created using normal constructor can must be created using ResourceHandler class
+
 
 public:
-
-	Material* getHigherRef() {
-		return mat;
-	}
 
 	ResID getVertexShaderID() {
 		return VertexShaderResource;
@@ -976,17 +973,6 @@ public:
 		_id = 10800000000 + index;
 	}
 
-	MaterialResource(ResourceHandlerBuilderContext* context,Material* mat_p, std::string name_p)
-	{
-		mat = mat_p;
-		this->setName(name_p);
-		this->resourceHandlerCxt = context;
-
-		context->createMaterial(this);
-
-	}
-
-	
 
 	void addDiffuseTexture(ShaderTexture diffuse_p) {
 		Textures->at(0) = diffuse_p;
@@ -1065,14 +1051,7 @@ class RenderMesh;
 class RenderMeshResource : public Resource
 {
 
-protected:
-	ResID materialID;
-
-	RenderMesh* renderMesh;
-
 public:
-
-	RenderMesh* getHigherClass() { return renderMesh; }
 
 	void setId(int index) override {
 
@@ -1085,9 +1064,7 @@ public:
 	}
 	RenderMeshResource(ResourceHandlerBuilderContext* context,RenderMesh* renderMesh_p, std::string meshName_p) {
 		this->resourceHandlerCxt = context;
-		renderMesh = renderMesh_p;
 		this->setName(meshName_p);
-
 
 		context->createRenderMesh(this);
 	}
@@ -1099,18 +1076,7 @@ public:
 		context->createRenderMesh(this);
 	}*/
 
-	MaterialResource* getMaterialResource() {
-		return this->resourceHandlerCxt->fetchMaterialResourceByID(materialID);
-	}
-
-	ResID getMaterialID() {
-		return materialID;
-	}
-
-
 	std::string getMeshName() { return name; }
-
-	virtual void setMaterial(ResID material_p, Ogre::MaterialPtr mat_p) {};
 
 
 

@@ -6,7 +6,7 @@
 //Local
 #include<ResourceHandler/ResourceSaver.h>
 #include<ResourceHandler/ResourceLoader.h>
-#include <Gui/GuiComponents/ToastComponent.h>
+
 
 // STL Headers
 #include <list>
@@ -22,7 +22,7 @@ struct SaveData {
 };
 
 struct SceneObject {
-	std::string name = "";
+	std::string name;
 	std::string RenderMesh = "";
 	std::string ColliderMesh = "";
 	std::string PhysXType = "";
@@ -61,10 +61,6 @@ private:
 	static ResourceHandler* pinstance_;
 	static std::mutex mutex_;
 
-	std::ofstream out_stream;
-	std::ifstream in_stream;
-	std::fstream f_stream;
-
 	ResourceHandlerType _getResourceLocationGroup(std::string groupStr);
 
 	CSimpleIniA ini;
@@ -99,7 +95,8 @@ private:
 		this->addObjectRes(obj_p);
 	}
 
-	void createMaterial(MaterialResource* mat_p) override {
+
+	void createMaterial() override {
 		mat_p->setId(this->getMaterialIndex());
 		AddIndexToMaster(mat_p->getId());
 		this->addMaterialRes(mat_p);
@@ -111,7 +108,7 @@ private:
 		this->addShaderRes(shader_p);
 	}
 
-	void createRenderMesh(RenderMeshResource* render_p) override {
+	void createRenderMesh(RenderMeshResource* render_p) {
 		render_p->setId(this->getRenderMeshIndex());
 		AddIndexToMaster(render_p->getId());
 		this->addRenderMeshRes(render_p);
@@ -173,7 +170,8 @@ public:
 	// Loads all the resources - Mesh, texture, Material, shader. Using the paths that are set on ResourceLoader.
 	void loadResources();
 
-	RLMesh* loadSavedRenderMesh(ResID id);
+	RLFetchedResource* fetchResourcesFromMesh(ResID meshID);
+
 
 	void saveResources();
 
@@ -244,6 +242,13 @@ public:
 	// Used for testing only
 	void getAllResources();
 
+	// CHECKS
+	// returns 0 if not found
+	// filename - must contain extension
+	ResID doesRenderMeshExists(std::string filename);
+	ResID doesMaterialExists(std::string filename);
+
+	// OLDER METHODS _________________________________________________________________________________________________________
 
 	// Ogre Functions
 	void addOgreRenderMeshResourceLocation(); // Adds default render mesh location.

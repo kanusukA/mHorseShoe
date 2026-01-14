@@ -299,6 +299,8 @@ public:
 	Ogre::Camera* getCamera() { return cam; }
 	Ogre::SceneNode* getCameraScnNode() { return CameraNode; }
 
+	void addOgreResourceLocation(std::string path_p, std::string OgreResourceGroup);
+
 	void setSkyBox();
 	void setGrid();
 

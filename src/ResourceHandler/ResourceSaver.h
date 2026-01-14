@@ -44,7 +44,7 @@ private:
 	void saveScnObj(std::string sectionName, ResID objectID);
 
 	void saveMaterial(MaterialResource* mat_p);
-	void saveMaterialTexture(std::string sectionName, std::string textureName, ResID textureID);
+	void saveMaterialTexture(std::string sectionName, std::string textureName, int pos);
 
 	void saveRenderMesh(RenderMeshResource* renderMesh_p);
 	void saveColliderMesh(ColliderMeshResource* colliderMesh_p);

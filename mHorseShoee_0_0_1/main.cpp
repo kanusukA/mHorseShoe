@@ -55,7 +55,7 @@ int main() {
 	
 	GDHandler* gdHandler = new GDHandler(ResourceHandler::GetInstance(),monster,kint,feel); // TODO integrate Feel with GDHandler itself
 
-	monster->setGrid();
+	//monster->setGrid();
 	
 
 	// TODO SETUP BETTER STARTUP

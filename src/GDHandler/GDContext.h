@@ -46,6 +46,9 @@ public:
 		
 	}
 
+	Monster* getMonsterRef() { return monster; }
+
+
 	virtual void update(float deltaTime) {};
 
 	PxRigidDynamic* getPxRigidDynamic(std::string name_p, PxTransform transform, PxGeometry* geometry, float mass);
@@ -58,7 +61,7 @@ public:
 	// Create Functions
 	virtual Ogre::SceneNode* createScene(std::string name_p) { return nullptr; }
 	virtual Ogre::Entity* createObject(std::string name_p, Ogre::MeshPtr mesh_p) { return nullptr; }
-	virtual Ogre::MeshPtr createMesh(std::string meshName_p) { return nullptr; }
+	Ogre::MeshPtr createMesh(std::string meshName_p, std::string OgreGroup = OGRE_MESH_GROUP);
 	virtual Ogre::MaterialPtr createMaterial(std::string materialName_p) { return nullptr; }
 	virtual void setShaderVars(Shader* shader) {};
 

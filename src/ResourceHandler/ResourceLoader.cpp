@@ -43,6 +43,7 @@ void ResourceLoader::loadSavedPaths()
 
 }
 
+
 void ResourceLoader::saveLoadPaths()
 {
 	ini->Reset();
@@ -195,6 +196,139 @@ void ResourceLoader::loadSavedObject(std::string path_p)
 
 }
 
+RLFetchedResource* ResourceLoader::_fetchedResourcesFromMesh(ResID meshID, std::vector<std::string>* resourcePaths_p)
+{
+	RLFetchedResource* resources = new RLFetchedResource();
+	// Fetch Mesh
+
+	RLMesh* mesh = _fetchMesh(meshID, resourcePaths_p->at(ResourcePaths::RenderMeshPath));
+
+	RLMaterial* material;
+	RLShader* shader;
+	if (mesh)
+	{
+		resources->mesh = mesh;
+		material = _fetchMaterial(mesh->materialID, resourcePaths_p->at(ResourcePaths::MaterialPath), resourcePaths_p->at(ResourcePaths::MaterialTexture));
+		if (material)
+		{
+			resources->material = material;
+
+			shader = _fetchShader(material->fragShaderID, resourcePaths_p->at(ResourcePaths::Shaders));
+
+		}
+		
+	}
+	return resources;
+
+}
+
+RLMesh* ResourceLoader::_fetchMesh(ResID id, std::string path_p)
+{
+	ini->Reset();
+	ini->LoadFile(path_p.c_str());
+
+	CSimpleIniA::TNamesDepend sections;
+	ini->GetAllSections(sections);
+
+	for (const auto& entry : sections) {
+		if (std::stoll(entry.pItem) == id)
+		{
+			RLMesh* mesh = new RLMesh();
+
+			mesh->name = ini->GetValue(entry.pItem, MESH_NAME_KEY);
+			mesh->materialID = std::stoll(ini->GetValue(entry.pItem, MESH_NAME_KEY));
+			ini->Reset();
+			return mesh;
+
+		}
+	}
+	ini->Reset();
+}
+
+RLMaterial* ResourceLoader::_fetchMaterial(ResID id, std::string path_p, std::string matTexPath_p)
+{
+	ini->Reset();
+	ini->LoadFile(path_p.c_str());
+
+	CSimpleIniA::TNamesDepend sections;
+	ini->GetAllSections(sections);
+	int texSize = 0;
+	for (const auto& entry : sections)
+	{
+		if (id == std::stoll(entry.pItem))
+		{
+			RLMaterial* mat = new RLMaterial();
+			mat->name = ini->GetValue(entry.pItem, MATERIAL_NAME_KEY);
+			mat->fragShaderID = std::stoll(ini->GetValue(entry.pItem, MATERIAL_FRAGMENT_KEY));
+			mat->vertShaderID = std::stoll(ini->GetValue(entry.pItem, MATERIAL_VERTEX_KEY));
+			texSize = std::stoi(ini->GetValue(entry.pItem, MATERIAL_TEXTURE_SIZE_KEY));
+
+			if (texSize > 0)
+			{
+				mat->textures = std::vector<ShaderTexture>(texSize);
+				ini->Reset();
+				ini->LoadFile(path_p.c_str());
+
+				
+				ShaderTexture tex = ShaderTexture();
+				std::string texValue = ini->GetValue(entry.pItem, MATERIAL_TEXTURE_KEY);
+				std::string buffer;
+				int nextSize = 0;
+				int pos = 0;
+				int index = 0;
+				
+				while (index < texValue.size())
+				{
+					if (texValue.at(index) == '|')
+					{
+						break;
+					}
+
+					if (texValue.at(index) == ';')
+					{
+						nextSize = std::stoi(buffer);
+						buffer = texValue.substr(index, nextSize);
+						if (pos == 0)
+						{
+							tex.textureName = buffer;
+							pos += 1;
+							index += 1;
+						}else if (pos == 1)
+						{
+							tex.texture = std::stoll(buffer);
+							pos += 1;
+							index += 1;
+						}
+						else if (pos == 2) {
+							tex.texturePosition = std::stoi(buffer);
+							pos = 0;
+
+							mat->textures.push_back(tex);
+							tex = ShaderTexture();
+							index += 1;
+						}
+					}
+					else {
+						buffer += texValue.at(index);
+						index += 1;
+					}
+				}
+
+				
+					
+			}
+			return mat;
+			
+		}
+	}
+	
+	
+
+
+	return nullptr;
+
+}
+
 void ResourceLoader::loadMaterials(std::vector<std::filesystem::path>* output,std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
 	if (clearOutput)
@@ -342,26 +476,5 @@ void ResourceLoader::fetchPathContents(std::string path,std::string extension, s
 
 }
 
-RLMesh* ResourceLoader::_loadSavedRenderMesh(ResID id, std::string path_p)
-{
-	ini->Reset();
-	ini->LoadFile(path_p.c_str());
 
-	CSimpleIniA::TNamesDepend sections;
-	ini->GetAllSections(sections);
-
-	for (const auto& entry : sections) {
-		if (std::stoll(entry.pItem) == id)
-		{
-			RLMesh* mesh = new RLMesh();
-
-			mesh->name = ini->GetValue(entry.pItem, MESH_NAME_KEY);
-			mesh->materialID = std::stoll(ini->GetValue(entry.pItem, MESH_NAME_KEY));
-
-			return mesh;
-
-		}
-	}
-
-}
 

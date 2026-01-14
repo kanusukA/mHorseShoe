@@ -148,11 +148,11 @@ void SceneTabComponent::view()
 
 			ImGui::InputText("Object Name", scnTabModel->inputObjectname);
 
-			if (ImGui::BeginCombo("Render Meshes", scnTabModel->renderMeshes->at(scnTabModel->selectedMesh)->getName().c_str()))
+			if (ImGui::BeginCombo("Render Meshes", scnTabModel->renderMeshes->at(scnTabModel->selectedMesh).filename().string().c_str()))
 			{
 				for (int i = 0; i < scnTabModel->renderMeshes->size(); i++)
 				{
-					if (ImGui::Selectable(scnTabModel->renderMeshes->at(i)->getName().c_str(), scnTabModel->selectedMesh == i))
+					if (ImGui::Selectable(scnTabModel->renderMeshes->at(i).filename().string().c_str(), scnTabModel->selectedMesh == i))
 					{
 						scnTabModel->selectedMesh = i;
 					}
@@ -170,7 +170,7 @@ void SceneTabComponent::view()
 		}
 		else
 		{
-			ImGui::Text("No Render Mesh avaliable");
+			ImGui::Text("No Render Mesh available");
 		}
 
 		// Objects

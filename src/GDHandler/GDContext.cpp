@@ -31,6 +31,11 @@ bool GDBuilderContext::objectExists(std::string objName_p)
 
 
 
+Ogre::MeshPtr GDBuilderContext::createMesh(std::string meshName_p, std::string OgreGroup /*= OGRE_MESH_GROUP*/)
+{
+	return monster->getMesh(meshName_p, OgreGroup);
+}
+
 void GDBuilderContext::removeSceneNode(Ogre::SceneNode* scnNode_p)
 {
 	monster->deleteScnNode(scnNode_p);

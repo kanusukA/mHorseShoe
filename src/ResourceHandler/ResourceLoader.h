@@ -43,7 +43,23 @@ struct RLMaterial {
 	std::string name;
 	long long vertShaderID;
 	long long fragShaderID;
+	std::vector<ShaderTexture> textures;
 };
+
+
+struct RLShader {
+	std::string name;
+	std::string fileName;
+	ShaderType type;
+	std::vector<ShaderVar> shaderVars;
+};
+
+struct RLFetchedResource {
+	RLMesh* mesh;
+	RLMaterial* material;
+	RLShader* shader;
+};
+
 
 class ResourceLoader {
 
@@ -52,6 +68,8 @@ private:
 	std::string loadLocationIniPath;
 
 	void loadSavedPaths();
+
+	
 
 protected:
 
@@ -70,7 +88,17 @@ protected:
 	// LOADING FILES AND FOLDERS
 	void fetchPathContents(std::string path, std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders = false);
 
-	RLMesh* _loadSavedRenderMesh(ResID id, std::string path_p);
+
+
+	RLFetchedResource* _fetchedResourcesFromMesh(ResID meshID, std::vector<std::string>* resourcePaths_p);
+
+	RLMesh* _fetchMesh(ResID id, std::string path_p);
+	RLMaterial* _fetchMaterial(ResID id, std::string path_p, std::string matTexPath_p);
+	RLShader* _fetchShader(ResID id, std::string path_p) { return nullptr; };
+	ShaderTexture _fetchShaderTexture(ResID id, std::string path_p) { return ShaderTexture(); };
+	
+
+
 
 
 public:
@@ -106,6 +134,8 @@ public:
 	void loadSavedCases(std::string path_p);
 	void loadSavedScenes(std::string path_p);
 	void loadSavedObject(std::string path_p);
+
+	
 
 
 

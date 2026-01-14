@@ -53,6 +53,8 @@ public:
 		oScnManager = oScnManager_p;
 		currentCase = case_p;
 
+		//this->loadSavedResource();
+
 	};
 
 	void setCaseName(std::string caseName) {
@@ -76,12 +78,18 @@ public:
 	Case* CreateCase(std::string caseName_p);
 	Scene* CreateScene(SceneType scnType, std::string scnName);
 	Scene* CreateSceneAttachToCase(SceneType scnType, std::string scnName);
-	Object* CreateObject(std::string objectName_p, RenderMeshResource* renderMesh_p, PhysXType type);
-	RenderMesh* CreateRenderMesh(std::string meshName_p);
+	Object* CreateObject(std::string objectName_p, RenderMesh* renderMesh_p, PhysXType type);
+
+	// old method
+	//RenderMesh* CreateRenderMesh(std::string meshName_p);
+
+	RenderMesh* CreateRenderMesh(std::filesystem::path path_p);
+	Material* CreateMaterial(std::filesystem::path path_p);
+
 	ColliderMesh* CreateColliderMesh(std::string MeshName_p);
 	Shader* CreateShader(Ogre::MaterialPtr mat_p, ShaderType type);
 	// MaterialName must be valid with Ogre::Material before Calling CreateMaterial function.
-	Material* CreateMaterial(std::string materialName_p);
+	
 	Image* CreateImage(std::filesystem::path filePath_p);
 
 

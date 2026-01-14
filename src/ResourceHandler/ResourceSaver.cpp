@@ -117,12 +117,23 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p)
 	ini->SetValue(sectionName.c_str(), MATERIAL_VERTEX_KEY, std::to_string(mat_p->getVertexShaderID()).c_str());
 	ini->SetValue(sectionName.c_str(), MATERIAL_FRAGMENT_KEY, std::to_string(mat_p->getFragmentShaderID()).c_str());
 
-
+	std::string texValue = "";
+	
+	for (auto & i : *mat_p->getTextures())
+	{
+		std::string texId = std::to_string(i.texture);
+		std::string pos = std::to_string(i.texturePosition);
+		texValue += std::to_string(i.textureName.size())+";" + i.textureName + std::to_string(texId.size())
+			+";" + texId + std::to_string(pos.size())+";"+ pos;
+	}
+	texValue += '|';
+	ini->SetValue(sectionName.c_str(), MATERIAL_TEXTURE_SIZE_KEY, std::to_string(mat_p->getTextures()->size()).c_str());
+	ini->SetValue(sectionName.c_str(), MATERIAL_TEXTURE_KEY, texValue.c_str());
 }
 
-void ResourceSaver::saveMaterialTexture(std::string sectionName, std::string textureName , ResID textureID)
+void ResourceSaver::saveMaterialTexture(std::string sectionName, std::string textureName , int pos)
 {
-	ini->SetValue(sectionName.c_str(), std::to_string(textureID).c_str(), textureName.c_str());
+	ini->SetValue(sectionName.c_str(), std::to_string(pos).c_str(), textureName.c_str());
 }
 
 // Debug ResourceSaver functions and start ResourceLoader (Also setup MasterList.ini)
@@ -133,7 +144,7 @@ void ResourceSaver::saveRenderMesh(RenderMeshResource* renderMesh_p)
 	ini->SetValue(section.c_str(), MESH_NAME_KEY, renderMesh_p->getName().c_str());
 	// TODO FECTH LOCATION MANUALLY
 	
-	ini->SetValue(section.c_str(), MESH_MATERIAL_KEY, std::to_string(renderMesh_p->getMaterialID()).c_str());
+	//ini->SetValue(section.c_str(), MESH_MATERIAL_KEY, std::to_string(renderMesh_p->getMaterialID()).c_str());
 
 }
 
@@ -251,22 +262,21 @@ void ResourceSaver::saveMaterials(std::vector<MaterialResource*>* mat_res, std::
 	{ 
 		
 		this->saveMaterial(mat_res->at(i));
-		this->saveIni(matIniPath);
-		this->resetIni();
+		
+		/*this->resetIni();
 
 		if (!overwrite || i > 0)
 		{
 			this->loadIniFile(matTexIniPath);
-		}
+		}*/
+		
+		
 
-		for (int j = 0; j < mat_res->at(i)->getTextures()->size(); j++)
-		{
-			this->saveMaterialTexture(std::to_string(mat_res->at(i)->getId()), mat_res->at(i)->getTextures()->at(j).textureName,mat_res->at(i)->getTextures()->at(j).texture);
-		}
-		this->saveIni(matTexIniPath);
+		this->saveIni(matIniPath);
+		/*this->saveIni(matTexIniPath);
 
 		this->resetIni();
-		this->loadIniFile(matIniPath);
+		this->loadIniFile(matIniPath);*/
 
 	}
 	this->resetIni();

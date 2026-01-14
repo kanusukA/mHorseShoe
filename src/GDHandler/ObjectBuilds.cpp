@@ -35,7 +35,3 @@ void GDHandler::selectShader(Shader* shader_p)
 
 }
 
-Ogre::MeshPtr GDHandler::createMesh(std::string meshName)
-{
-	return monster->getMesh(meshName);
-}

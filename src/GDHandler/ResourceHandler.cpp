@@ -120,108 +120,108 @@ std::filesystem::path ResourceHandler::_getSaveFileLoc(std::string filename)
 void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::filesystem::path path)
 {
 
-	in_stream.open(path);
-	std::string line;
+	//in_stream.open(path);
+	//std::string line;
 
-	std::string word = "";
+	//std::string word = "";
 
-	bool uniFound = false;
-	bool uniName = false;
-	bool skip = false;
-	int type;
+	//bool uniFound = false;
+	//bool uniName = false;
+	//bool skip = false;
+	//int type;
 
-	std::cout << "Variables : " << std::endl;
+	//std::cout << "Variables : " << std::endl;
 
-	if (in_stream.is_open()) {
-		while (std::getline(in_stream, line))
-		{
-			//std::cout << line << std::endl;
-			if (line == "//SKIP")
-			{
-				skip = true;
-			}
+	//if (in_stream.is_open()) {
+	//	while (std::getline(in_stream, line))
+	//	{
+	//		//std::cout << line << std::endl;
+	//		if (line == "//SKIP")
+	//		{
+	//			skip = true;
+	//		}
 
-			//std::cout << "Line : " << line << std::endl;
+	//		//std::cout << "Line : " << line << std::endl;
 
-			if (skip)
-			{
-				if (line == "//!SKIP") {
-					skip = false;
-					//shaderVar->push_back(word);
-				}
+	//		if (skip)
+	//		{
+	//			if (line == "//!SKIP") {
+	//				skip = false;
+	//				//shaderVar->push_back(word);
+	//			}
 
-				continue;
-			}
+	//			continue;
+	//		}
 
-			// first check uniform keyword
-			for (int i = 0; i < line.size(); i++)
-			{
-			
+	//		// first check uniform keyword
+	//		for (int i = 0; i < line.size(); i++)
+	//		{
+	//		
 
-				if (line.at(i) != ' ' && line.at(i) != ',' && line.at(i) != ')') {
-					word += line.at(i);
-				}
+	//			if (line.at(i) != ' ' && line.at(i) != ',' && line.at(i) != ')') {
+	//				word += line.at(i);
+	//			}
 
-				else {
-					// skips the coming constants
+	//			else {
+	//				// skips the coming constants
 
-					if (word == "uniform") {
+	//				if (word == "uniform") {
 
-						//std::cout << "uniform" << std::endl;
-						uniFound = true;
+	//					//std::cout << "uniform" << std::endl;
+	//					uniFound = true;
 
-					}
-					else if (uniFound) {
-						//std::cout << "type : ";
+	//				}
+	//				else if (uniFound) {
+	//					//std::cout << "type : ";
 
-						uniFound = false;
-						uniName = true;
+	//					uniFound = false;
+	//					uniName = true;
 
-						if (word == "int" || word == "bool") {
-							shaderVar->push_back("0");
-							std::cout << word << std::endl;
-						}
-						else if (word == "float")
-						{
-							shaderVar->push_back("1");
-							std::cout << "float" << std::endl;
-						}
-						else if (word == "float2")
-						{
-							shaderVar->push_back("2");
-							std::cout << "float2" << std::endl;
-						}
-						else if (word == "float3")
-						{
-							shaderVar->push_back("3");
-							std::cout << "float3" << std::endl;
-						}
-						else if (word == "float4")
-						{
-							shaderVar->push_back("4");
-							std::cout << "float4" << std::endl;
-						}
-						else {
-							std::cout << "invalid type" << std::endl;
-							uniName = false;
-						}
+	//					if (word == "int" || word == "bool") {
+	//						shaderVar->push_back("0");
+	//						std::cout << word << std::endl;
+	//					}
+	//					else if (word == "float")
+	//					{
+	//						shaderVar->push_back("1");
+	//						std::cout << "float" << std::endl;
+	//					}
+	//					else if (word == "float2")
+	//					{
+	//						shaderVar->push_back("2");
+	//						std::cout << "float2" << std::endl;
+	//					}
+	//					else if (word == "float3")
+	//					{
+	//						shaderVar->push_back("3");
+	//						std::cout << "float3" << std::endl;
+	//					}
+	//					else if (word == "float4")
+	//					{
+	//						shaderVar->push_back("4");
+	//						std::cout << "float4" << std::endl;
+	//					}
+	//					else {
+	//						std::cout << "invalid type" << std::endl;
+	//						uniName = false;
+	//					}
 
 
-					}
-					else if (uniName)
-					{
-						shaderVar->push_back(word);
-						//std::cout << "Word: " << word << std::endl;
-						uniName = false;
-					}
-					word = "";
-				}
-			}
+	//				}
+	//				else if (uniName)
+	//				{
+	//					shaderVar->push_back(word);
+	//					//std::cout << "Word: " << word << std::endl;
+	//					uniName = false;
+	//				}
+	//				word = "";
+	//			}
+	//		}
 
-		}
-	}
+	//	}
+	//}
 
-	in_stream.close();
+	//in_stream.close();
 
 
 }
@@ -453,17 +453,18 @@ void ResourceHandler::loadResources()
 	this->loadTextures(this->Textures, ".png");
 
 	// loading saved data
-	this->loadSavedCases(*this->getPath(ResourcePaths::Cases));
-	this->loadSavedScenes(*this->getPath(ResourcePaths::Scenes));
+	//this->loadSavedCases(*this->getPath(ResourcePaths::Cases));
+	//this->loadSavedScenes(*this->getPath(ResourcePaths::Scenes));
 
 	std::cout << "test";
 
 }
 
-RLMesh* ResourceHandler::loadSavedRenderMesh(ResID id)
+RLFetchedResource* ResourceHandler::fetchResourcesFromMesh(ResID meshID)
 {
-	return _loadSavedRenderMesh(id, *this->getPath(ResourcePaths::RenderMeshPath));
+	_fetchedResourcesFromMesh(meshID, paths);
 }
+
 
 void ResourceHandler::saveResources()
 {
@@ -543,28 +544,28 @@ std::filesystem::path ResourceHandler::find(std::string fileName, std::string lo
 
 std::filesystem::path ResourceHandler::findAllInLocation(std::string filename, ResourceHandlerType type = ResourceHandlerType::GLOBAL)
 {
-	in_stream.open(RESOURCE_DEFAULT_LOC);
-	std::string line;
+	//in_stream.open(RESOURCE_DEFAULT_LOC);
+	//std::string line;
 
-	if (in_stream.is_open()) {
+	//if (in_stream.is_open()) {
 
-		// Searching in Default Resource Loc
-		while (std::getline(in_stream, line)) {
-			try {
-				std::filesystem::path path = this->find(filename, line);
-				in_stream.close();
-				return path;
-			}
-			catch (const std::exception&) {
-				in_stream.close();
-				throw ResourceHandlerFileNotFound();
-			}
-			
-		}
-		in_stream.close();
-		throw ResourceHandlerFileNotFound();
-		
-	}
+	//	// Searching in Default Resource Loc
+	//	while (std::getline(in_stream, line)) {
+	//		try {
+	//			std::filesystem::path path = this->find(filename, line);
+	//			in_stream.close();
+	//			return path;
+	//		}
+	//		catch (const std::exception&) {
+	//			in_stream.close();
+	//			throw ResourceHandlerFileNotFound();
+	//		}
+	//		
+	//	}
+	//	in_stream.close();
+	//	throw ResourceHandlerFileNotFound();
+	//	
+	//}
 
 }
 
@@ -589,38 +590,61 @@ std::string ResourceHandler::getResourceFile(std::string fileName, ResourceHandl
 void ResourceHandler::getAllResources()
 {
 
-	std::cout << "Loading All Resources" << std::endl;
+	//std::cout << "Loading All Resources" << std::endl;
 
-	// open Resource default location file
-	this->in_stream.open(SourceDir.string() + "/" + RESOURCE_DEFAULT_LOC);
-	
-	std::filesystem::current_path(SourceDir);
+	//// open Resource default location file
+	//this->in_stream.open(SourceDir.string() + "/" + RESOURCE_DEFAULT_LOC);
+	//
+	//std::filesystem::current_path(SourceDir);
 
 
-	std::cout << "Current Working Path : " << std::filesystem::current_path() << std::endl;
-	
-	std::string line;
-	ResourceHandlerType resourceType = ResourceHandlerType::GLOBAL;
-	if (in_stream.is_open()) {
-		while (std::getline(in_stream, line)) {
-			try {
-				//std::cout << "Finding At : " << line << std::endl;
-				this->findAll(line,resourceType);
-			}
-			catch (const std::exception&e) {
-				//std::cout << "Resource error " << e.what() << std::endl;
-				resourceType = this->_getResourceLocationGroup(line);
-			}
+	//std::cout << "Current Working Path : " << std::filesystem::current_path() << std::endl;
+	//
+	//std::string line;
+	//ResourceHandlerType resourceType = ResourceHandlerType::GLOBAL;
+	//if (in_stream.is_open()) {
+	//	while (std::getline(in_stream, line)) {
+	//		try {
+	//			//std::cout << "Finding At : " << line << std::endl;
+	//			this->findAll(line,resourceType);
+	//		}
+	//		catch (const std::exception&e) {
+	//			//std::cout << "Resource error " << e.what() << std::endl;
+	//			resourceType = this->_getResourceLocationGroup(line);
+	//		}
 
-		}
-		in_stream.close();
-	}
-	else {
-		std::cout << std::endl <<  "Error Finding Resource Loc File";
-	}
+	//	}
+	//	in_stream.close();
+	//}
+	//else {
+	//	std::cout << std::endl <<  "Error Finding Resource Loc File";
+	//}
 
 }
 
+
+ResID ResourceHandler::doesRenderMeshExists(std::string filename)
+{
+	for (int i = 0; i < renderRes->size(); i++)
+	{
+		if (renderRes->at(i)->getMeshName() == filename)
+		{
+			return renderRes->at(i)->getId();
+		}
+	}
+	return 0;
+}
+
+ResID ResourceHandler::doesMaterialExists(std::string filename)
+{
+	for (int i = 0; i < matRes->size(); i++)
+	{
+		if (matRes->at(i)->getName() == filename)
+		{
+			return matRes->at(i)->getId();
+		}
+	}
+}
 
 //void ResourceHandler::addOgreRenderMeshResourceLocation()
 //{
@@ -973,11 +997,11 @@ void ResourceHandler::writeToFile(std::vector<SaveData>* data, std::string filen
 
 void ResourceHandler::clearFile(std::string filename)
 {
-	std::ofstream outStream(_getSaveFileLoc(filename));
+	/*std::ofstream outStream(_getSaveFileLoc(filename));
 	if (out_stream.is_open()) {
 		out_stream.clear();
 		out_stream.close();
-	}
+	}*/
 	
 }
 

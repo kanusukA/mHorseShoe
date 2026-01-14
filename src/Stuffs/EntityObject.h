@@ -9,28 +9,21 @@ private:
 
 	Ogre::Entity* entity;
 
-	RenderMesh* mesh;
 	ColliderMesh* cMesh;
 
 	Material* material;
 
 public:
 
-	Object(GDBuilderContext* builderCxt_p,ResID renderMeshID, std::string name_p, PhysXType objType_p) : ObjectResource(ResourceHandler::GetInstance(),this, name_p, objType_p) {
+	/*Object(GDBuilderContext* builderCxt_p,ResID renderMeshID, std::string name_p, PhysXType objType_p) : ObjectResource(ResourceHandler::GetInstance(),this, name_p, objType_p) {
 		builderCxt = builderCxt_p;
-		mesh = ResourceHandler::GetInstance()->fetchRenderMeshResourceByID(renderMeshID)->getHigherClass();
-		entity = builderCxt->createObject(name_p, mesh->getMesh());
-		
-		material = mesh->getMaterial();
-		
-	}
+		entity = builderCxt->createObject(name_p, ResourceHandler::GetInstance()->);
 
-	Object(GDBuilderContext* builderCxt_p, RenderMeshResource* renderMesh, std::string name_p, PhysXType objType_p) : ObjectResource(ResourceHandler::GetInstance(), this, name_p, objType_p) {
+	}*/
+
+	Object(GDBuilderContext* builderCxt_p, RenderMesh* renderMesh, std::string name_p, PhysXType objType_p) : ObjectResource(ResourceHandler::GetInstance(), this, name_p, objType_p) {
 		builderCxt = builderCxt_p;
-		mesh = renderMesh->getHigherClass();
-		entity = builderCxt->createObject(name_p, mesh->getMesh());
-
-		material = mesh->getMaterial();
+		entity = builderCxt->createObject(name_p, renderMesh->getMesh());
 
 	}
 
@@ -38,11 +31,6 @@ public:
 	void setMaterial(Material* mat_p) {
 		material = mat_p;
 		entity->setMaterial(mat_p->getMaterialPtr());
-	}
-
-	RenderMesh* getRenderMesh() {
-	    return mesh;
-		
 	}
 
 	// use this method to manage Object related Material
