@@ -102,7 +102,7 @@ protected:
 
 
 	std::vector<ShaderResource*>* shaderRes = new std::vector<ShaderResource*>();
-	std::vector<MaterialResource*>* matRes = new std::vector<MaterialResource*>();
+	std::vector<std::unique_ptr<MaterialResource>>* matRes = new std::vector<std::unique_ptr<MaterialResource>>();
 	std::vector<RenderMeshResource*>* renderRes = new std::vector<RenderMeshResource*>();
 	std::vector<ColliderMeshResource*>* colRes = new std::vector<ColliderMeshResource*>();
 	std::vector<ImageResource*>* imageRes = new std::vector<ImageResource*>();
@@ -212,9 +212,8 @@ protected:
 		shaderIndex += 1;
 	}
 
-	void addMaterialRes(MaterialResource* mat_p) {
-
-		matRes->push_back(mat_p);
+	void addMaterialRes(std::unique_ptr<MaterialResource> uniqueMaterial) {
+		matRes->push_back(std::move(uniqueMaterial));
 		validateMasterList();
 		matIndex += 1;
 	}
@@ -252,7 +251,7 @@ public:
 	std::vector<CaseResource*>* getAllCase() { return caseRes; };
 	std::vector<SceneResource*>* getAllScenes() { return scnRes; };
 	std::vector<ObjectResource*>* getAllObjects() { return objRes; };
-	std::vector<MaterialResource*>* getAllMaterial() { return matRes; };
+	std::vector<std::unique_ptr<MaterialResource>>* getAllMaterial() { return matRes; };
 	std::vector<ShaderResource*>* getAllShader() { return shaderRes; };
 	std::vector<RenderMeshResource*>* getAllRenderMesh() { return renderRes; };
 	std::vector<ColliderMeshResource*>* getAllColliderMesh() { return colRes; };
@@ -327,7 +326,7 @@ public:
 		}
 
 	}
-	MaterialResource* fetchMaterialResourceByID(ResID id) {
+	/*MaterialResource* fetchMaterialResourceByID(ResID id) {
 		try
 		{
 			return matRes->at(id - 10800000000);
@@ -337,7 +336,7 @@ public:
 			throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
 		}
 
-	}
+	}*/
 
 	RenderMeshResource* fetchRenderMeshResourceByID(ResID id) {
 		try
@@ -426,10 +425,10 @@ public:
 		}
 		removeMasterListID(id);
 	};
-	void removeMaterial(MaterialResource* mat_p, ResID id) {
+	void removeMaterial(ResID id) {
 		for (int i = 0; i < matRes->size(); i++)
 		{
-			if (matRes->at(i) == mat_p)
+			if (matRes->at(i)->_id == id)
 			{
 				matRes->erase(matRes->begin() + i);
 				break;
@@ -489,7 +488,7 @@ public:
 class Resource {
 protected:
 	bool init = false;
-	ResID _id;
+	
 	virtual void setId(int index) {};
 
 	std::string name = "";
@@ -497,6 +496,8 @@ protected:
 	ResourceHandlerBuilderContext* resourceHandlerCxt;
 
 public:
+
+	ResID _id;
 
 	virtual void build(ResourceHandlerBuilderContext* context) {}
 
@@ -913,14 +914,6 @@ class MaterialResource : public Resource
 {
 
 protected:
-	std::string materialName; // file name of material
-
-	// Shaders have to assigned manually!!!
-	ResID VertexShaderResource;
-	ResID FragmentShaderResource;
-
-	// textures are stored in material and sent to ShaderResource for application
-	std::vector<ShaderTexture>* Textures = new std::vector<ShaderTexture>(4);
 
 	void _addVertexShader(ResID id) {
 		// TODO TRY TO ADD SHADERS TO MATERIAL SCRIPT AS WELL 
@@ -953,10 +946,17 @@ protected:
 		}
 	}
 
-	MaterialResource(); // Material can't be created using normal constructor can must be created using ResourceHandler class
-
 
 public:
+
+	std::string materialName; // file name of material
+
+	// Shaders have to assigned manually!!!
+	ResID VertexShaderResource;
+	ResID FragmentShaderResource;
+
+	// textures are stored in material and sent to ShaderResource for application
+	std::vector<ShaderTexture>* Textures = new std::vector<ShaderTexture>(4);
 
 	ResID getVertexShaderID() {
 		return VertexShaderResource;
@@ -1008,6 +1008,16 @@ public:
 
 	void removeTextureByIndex(int index) {
 		Textures->erase(Textures->begin() + index);
+	}
+
+	MaterialResource() {}; // Material must not be created outside MaterialManager
+
+	MaterialResource(const MaterialResource& copyObj) {
+		materialName = copyObj.materialName;
+		VertexShaderResource = copyObj.VertexShaderResource;
+		FragmentShaderResource = copyObj.FragmentShaderResource;
+		Textures = new std::vector<ShaderTexture>(*copyObj.Textures);
+
 	}
 
 };
@@ -1108,9 +1118,9 @@ public:
 
 	}
 
-	MaterialResource* getMaterialResource() {
-		return this->resourceHandlerCxt->fetchMaterialResourceByID(material);
-	}
+	//MaterialResource* getMaterialResource() {
+	//	//return this->resourceHandlerCxt->fetchMaterialResourceByID(material);
+	//}
 
 	ResID getMaterialID() {
 		return material;

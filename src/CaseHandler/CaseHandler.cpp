@@ -35,7 +35,7 @@ void CaseHandler::checkIntegrity()
 
 Case* CaseHandler::CreateCase(std::string caseName_p)
 {
-	Case* new_case = new Case(this->builderCxt,caseName_p);
+	Case* new_case = new Case(this,caseName_p);
 	this->cases->push_back(new_case);
 	this->currentCase = new_case;
 	return new_case;
@@ -44,13 +44,13 @@ Case* CaseHandler::CreateCase(std::string caseName_p)
 
 Scene* CaseHandler::CreateScene(SceneType scnType, std::string scnName)
 {
-	if (builderCxt->sceneExists(scnName))
+	if (this->sceneExists(scnName))
 	{
 		ToastComponent::GetInstance()->addMessage("Scene Already exists!!");
 		return nullptr;
 	}
 	else {
-		Scene* new_scn = new Scene(this->builderCxt, scnType, scnName);
+		Scene* new_scn = new Scene(this, scnType, scnName);
 		//this->currentCase->addSceneToCase(new_scn);
 		return new_scn;
 	}
@@ -72,9 +72,9 @@ Scene* CaseHandler::CreateSceneAttachToCase(SceneType scnType, std::string scnNa
 
 Object* CaseHandler::CreateObject(std::string objectName_p, RenderMesh* renderMesh_p ,  PhysXType type)
 {
-	if (!builderCxt->objectExists(objectName_p))
+	if (!this->objectExists(objectName_p))
 	{
-		Object* new_obj = new Object(this->builderCxt, renderMesh_p, objectName_p, type);
+		Object* new_obj = new Object(this, renderMesh_p, objectName_p, type);
 		
 		return new_obj;
 	}
@@ -104,10 +104,10 @@ RenderMesh* CaseHandler::CreateRenderMesh(std::filesystem::path path_p)
 	else { // Render Mesh DOES NOT EXIST
 		
 		// initialize location from ogre/monster
-		builderCxt->getMonsterRef()->addOgreResourceLocation(path_p.parent_path().string(), OGRE_MESH_GROUP);
+		getMonsterRef()->addOgreResourceLocation(path_p.parent_path().string(), OGRE_MESH_GROUP);
 
 		// Create RenderMesh
-		RenderMesh* renderMesh = new RenderMesh(builderCxt, path_p.filename().string());
+		RenderMesh* renderMesh = new RenderMesh(this, path_p.filename().string());
 		return renderMesh;
 
 	}
@@ -116,7 +116,7 @@ RenderMesh* CaseHandler::CreateRenderMesh(std::filesystem::path path_p)
 
 ColliderMesh* CaseHandler::CreateColliderMesh(std::string MeshName_p)
 {
-	ColliderMesh* new_msh = new ColliderMesh(this->builderCxt, MeshName_p);
+	ColliderMesh* new_msh = new ColliderMesh(this, MeshName_p);
 	return new_msh;
 }
 
@@ -124,7 +124,7 @@ Shader* CaseHandler::CreateShader(Ogre::MaterialPtr mat_p, ShaderType type)
 {
 	if (mat_p)
 	{
-		Shader* new_shader = new Shader(this->builderCxt, mat_p, type);
+		Shader* new_shader = new Shader(this, mat_p, type);
 		return new_shader;
 	}
 	else {
@@ -133,7 +133,7 @@ Shader* CaseHandler::CreateShader(Ogre::MaterialPtr mat_p, ShaderType type)
 	
 }
 
-ResID CaseHandler::CreateMaterial(std::filesystem::path path_p)
+ResID CaseHandler::CreateMaterialResource(std::filesystem::path path_p)
 {
 	// Check if Exists
 	ResID id = ResourceHandler::GetInstance()->doesMaterialExists(path_p.filename().string());
@@ -141,12 +141,24 @@ ResID CaseHandler::CreateMaterial(std::filesystem::path path_p)
 	if (id == 0)
 	{
 		// Creating a Copy of Material and Making it a unique_ptr to Object
-		this->builderCxt->getMonsterRef()->addOgreResourceLocation(path_p.parent_path().string(), OGRE_MATERIAL_GROUP);
+		monster->addOgreResourceLocation(path_p.parent_path().string(), OGRE_MATERIAL_GROUP);
 
-		Material* mat = // Make a unique_ptr for ResourceHandler it self and let it manage its shared pointers and unique_ptrs.
+		return createMaterialResource(path_p.filename().string());
 
 	}
+
+	return 0;
 	
+}
+
+Material* CaseHandler::getMaterial(std::filesystem::path materialPath_p)
+{
+	ResID materialResID = CreateMaterialResource(materialPath_p);
+
+	Ogre::MaterialPtr material = createMaterial(materialPath_p.filename().string());
+
+	return fetchNewMaterial(materialResID, material);
+
 }
 
 Image* CaseHandler::CreateImage(std::filesystem::path filePath_p)
@@ -163,7 +175,7 @@ void CaseHandler::loadSavedResource()
 	if (ResourceHandler::GetInstance()->RLCases->size() > 0)
 	{
 		// the first case
-		Case* savedCase = new Case(this->builderCxt, ResourceHandler::GetInstance()->RLCases->at(0).name);
+		Case* savedCase = new Case(this, ResourceHandler::GetInstance()->RLCases->at(0).name);
 
 	
 		for (int i = 0; i < ResourceHandler::GetInstance()->RLCases->at(0).Scenes.size(); i++)
@@ -173,7 +185,7 @@ void CaseHandler::loadSavedResource()
 				if (ResourceHandler::GetInstance()->RLScenes->at(j).id == ResourceHandler::GetInstance()->RLCases->at(0).Scenes.at(i))
 				{
 					RLScene* scn = &ResourceHandler::GetInstance()->RLScenes->at(j);
-					Scene* new_scn = new Scene(this->builderCxt, SceneType(scn->scnType), scn->name, convertFloatPtrToVec3(scn->position), convertFloatPtrToVec4(scn->rotation),
+					Scene* new_scn = new Scene(this, SceneType(scn->scnType), scn->name, convertFloatPtrToVec3(scn->position), convertFloatPtrToVec4(scn->rotation),
 						convertFloatPtrToVec3(scn->scale));
 					savedCase->addSceneToCase(new_scn);
 
@@ -213,3 +225,5 @@ void CaseHandler::loadSavedResource()
 	}
 
 }
+
+

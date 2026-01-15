@@ -15,6 +15,7 @@ class Scene;
 class Case;
 class Shader;
 class Object;
+class Material;
 
 class ResourceHandler;
 class Monster;
@@ -68,8 +69,8 @@ public:
 	// Delete Functions
 	void removeSceneNode(Ogre::SceneNode* scnNode_p);
 
-	// CaseHandler Functions
-	virtual ResID addMaterial(std::string matname_p) { return NULL; }
+	// CASEHANDLER Functions
+	virtual Material* addMaterial(std::string matname_p) { return NULL; }
 	virtual ResID addShader(Ogre::MaterialPtr mat_p, ShaderType type) { return NULL; }
 	
 	// SHADER FUNCTIONS

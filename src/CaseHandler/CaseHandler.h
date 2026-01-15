@@ -10,18 +10,10 @@
 
 // Manages Case. i.e all the Scenes in a single save file
 // Also manages the integration of ResourceScenes and Ogre::Scenes
-class CaseHandler {
+class CaseHandler : public GDBuilderContext, public MaterialManager {
 
 private:
-	GDBuilderContext* builderCxt;
-	StuffHandler* stuffHandler;
-	Ogre::SceneManager* oScnManager;
-
-	Case* currentCase;
-	ObjectPtr selectedObject = ObjectPtr();
 	
-
-	std::vector<Case*>* cases = new std::vector<Case*>();
 
 
 protected:
@@ -32,12 +24,20 @@ protected:
 
 public:
 
+	std::unique_ptr<StuffHandler> stuffHandler;
+	Ogre::SceneManager* oScnManager;
+
+	Case* currentCase;
+	ObjectPtr selectedObject = ObjectPtr();
+
+
+	std::vector<Case*>* cases = new std::vector<Case*>();
+
 	// CASE FUNCTIONS
 
-	CaseHandler(GDBuilderContext* builderCxt_p,StuffHandler* stuffHandler_p, Ogre::SceneManager* oScnManager_p) {
-		builderCxt = builderCxt_p;
-		stuffHandler = stuffHandler_p;
-		oScnManager = oScnManager_p;
+	CaseHandler(Monster* monster, Kint * kint) : GDBuilderContext(ResourceHandler::GetInstance(), monster,kint) {
+		stuffHandler = std::make_unique<StuffHandler>(monster, kint);
+		oScnManager = monster->oScnManager;
 
 		// Set Case manually
 		
@@ -47,10 +47,11 @@ public:
 
 	};
 	// Used to start CaseHandler with a predefined case as the program starts
-	CaseHandler(StuffHandler* stuffHandler_p, Ogre::SceneManager* oScnManager_p, Case* case_p) {
+	CaseHandler(Monster* monster, Kint* kint, Case* case_p) : GDBuilderContext(ResourceHandler::GetInstance(), monster, kint) {
 
-		stuffHandler = stuffHandler_p;
-		oScnManager = oScnManager_p;
+		stuffHandler = std::make_unique<StuffHandler>(monster, kint);
+		
+		oScnManager = monster->oScnManager;
 		currentCase = case_p;
 
 		//this->loadSavedResource();
@@ -84,7 +85,8 @@ public:
 	//RenderMesh* CreateRenderMesh(std::string meshName_p);
 
 	RenderMesh* CreateRenderMesh(std::filesystem::path path_p);
-	Material* CreateMaterial(std::filesystem::path path_p);
+
+	ResID CreateMaterialResource(std::filesystem::path path_p);
 
 	ColliderMesh* CreateColliderMesh(std::string MeshName_p);
 	Shader* CreateShader(Ogre::MaterialPtr mat_p, ShaderType type);
@@ -94,6 +96,9 @@ public:
 
 
 	void loadSavedResource();
+
+	// GD_CONTEXT FUNCTIONS
+	Material* getMaterial(std::filesystem::path materialName);
 
 
 

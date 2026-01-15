@@ -96,11 +96,7 @@ private:
 	}
 
 
-	void createMaterial() override {
-		mat_p->setId(this->getMaterialIndex());
-		AddIndexToMaster(mat_p->getId());
-		this->addMaterialRes(mat_p);
-	}
+	
 
 	void createShader(ShaderResource* shader_p) override {
 		shader_p->setId(this->getShaderIndex());
@@ -163,7 +159,32 @@ protected:
 
 public:
 
-	// OVERHAUL FUNCTIONS
+	// OVERHAUL FUNCTIONS 
+	// This function creates a Material and sets a unique_ptr. The ownership of incoming mat_p is taken.
+	// Make sure Material is not a duplicate of existing
+	ResID createMaterial(MaterialResource mat_p) { 
+		std::unique_ptr<MaterialResource> u_material = std::make_unique<MaterialResource>(MaterialResource(mat_p));
+		u_material->setId(this->getMaterialIndex());
+		ResID id = u_material->getId();
+		this->addMaterialRes(std::move(u_material)); // Moves material to the ResourceBuilderCxt List!
+		return id;
+	}
+
+	MaterialResource* fetchNewMaterial(ResID materialID) {
+		MaterialResource* fetchedMaterial = nullptr;
+		for (int i = 0; i < matRes->size();i++)
+		{
+			if (matRes->at(i)->getId() == materialID)
+			{
+				*fetchedMaterial = MaterialResource(*matRes->at(i));
+
+				return fetchedMaterial;
+			}
+		}
+		return nullptr;
+	}
+	 
+	 
 	// Checks if the folder structure and required files exists for Resource Tasks
 	void checkFileStructure();
 

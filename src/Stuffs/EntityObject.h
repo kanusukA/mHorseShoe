@@ -7,13 +7,15 @@ class Object : public ObjectResource {
 private:
 	GDBuilderContext* builderCxt;
 
+	
+
+public:
+
 	Ogre::Entity* entity;
 
 	ColliderMesh* cMesh;
 
-	Material* material;
-
-public:
+	std::unique_ptr<Material> material;
 
 	/*Object(GDBuilderContext* builderCxt_p,ResID renderMeshID, std::string name_p, PhysXType objType_p) : ObjectResource(ResourceHandler::GetInstance(),this, name_p, objType_p) {
 		builderCxt = builderCxt_p;
@@ -28,15 +30,10 @@ public:
 	}
 
 	// TO set Material to an Object use this method. Assigning material from RenderMesh will not work!
-	void setMaterial(Material* mat_p) {
-		material = mat_p;
-		entity->setMaterial(mat_p->getMaterialPtr());
+	void setMaterial(std::string materialPath_p) {
+		builderCxt->addMaterial(materialPath_p);
 	}
-
-	// use this method to manage Object related Material
-	Material* getMaterial() {
-		return material;
-	}
+	
 
 	Ogre::MeshPtr getMesh() {
 		return entity->getMesh();

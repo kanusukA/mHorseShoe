@@ -7,20 +7,18 @@
 #include <GDHandler/StartPlatinum.h>
 #include <feel/Feel.h>
 
-class GDHandler : public GDBuilderContext
+class GDHandler : public CaseHandler
 {
 
 public:
 
-	CaseHandler* caseHandler;
-	StuffHandler* stuffHandler;
 	Feel* feel;
 
 	PlayerSubject* playerSubject = nullptr;
 
 	Gui* gui;
 
-	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Kint* physics, Feel* feel_p) : GDBuilderContext(resourceHan_p, renderer, physics) {
+	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Kint* physics, Feel* feel_p) : CaseHandler(renderer, physics) {
 
 		// Init resources
 		ResourceHandler::GetInstance();
@@ -35,11 +33,8 @@ public:
 
 		feel->initFeel(renderer->sdlWindow, keyHandler);
 
-		stuffHandler = new StuffHandler(renderer, physics);
 
-		caseHandler = new CaseHandler(this,stuffHandler, renderer->oScnManager);
-
-		gui = new Gui(caseHandler, this->stuffHandler, ResourceHandler::GetInstance(), RSUS::GetInstance(),this);
+		gui = new Gui(this, this->stuffHandler, ResourceHandler::GetInstance(), RSUS::GetInstance(),this);
 
 		gui->initGui(this->monster->imguiOverlay);
 
