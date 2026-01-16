@@ -10,8 +10,8 @@ private:
 
 	Ogre::SceneNode* scene;
 
-	std::vector<Scene*>* attachedScenes;
-	std::vector<Object*>* attachedObject;
+	std::vector<std::shared_ptr<Scene>> sceneVec;
+	std::vector<std::shared_ptr<Object>> objVec;
 
 	
 
@@ -20,22 +20,23 @@ public:
 	Scene(GDBuilderContext* builderCxt_p,SceneType scnType, std::string name_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, Ogre::Vector3(0,0,0), Ogre::Vector4(0,0,0,0), Ogre::Vector3(0,0,0)) {
 		builderCxt = builderCxt_p;
-		scene = builderCxt->createScene(name_p);
+		
 		
 	}
 	Scene(GDBuilderContext* builderCxt_p, SceneType scnType, std::string name_p, Ogre::Vector3 pos_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, pos_p, orientation_p, scale_p) {
 		builderCxt = builderCxt_p;
-		scene = builderCxt->createScene(name_p);
 		scene->setPosition(pos_p);
 		scene->setOrientation(Vec4toQuaternion(orientation_p));
 		scene->setScale(scale_p);
-
-		// fix position!!
 	}
 
 	// Object
-	void addObject(Object* obj_p);
+	void attachNewObject(std::string objectName_p, std::filesystem::path meshPath_p, PhysXType type) {
+		Object* newObject = builderCxt->CreateObject(objectName_p, meshPath_p, type);
+		std::shared_ptr<Object> uObject(newObject);
+		objVec.push_back(std::move(uObject));
+	}
 
 	void removeObjectById(ResID objId);
 
@@ -102,36 +103,14 @@ public:
 	
 
 
-	std::vector<Scene*>* getAttachedScenes() {
-		return attachedScenes;
+	std::vector <std::shared_ptr< Scene >>* getAttachedScenes() {
+		return &sceneVec;
 	}
 
-	std::vector<Object*>* getObjects() {
-		return attachedObject;
+	std::vector <std::shared_ptr< Object >>* getObjects() {
+		return &objVec;
 	}
 
-	~Scene() {
-		if(attachedScenes){
-			for (int i = 0; i < attachedScenes->size(); i++)
-			{
-				delete attachedScenes->at(i);
-			}
-			delete attachedScenes;
-		}
-		if(attachedObject){
-			for (int j = 0; j < attachedObject->size(); j++)
-			{
-				delete attachedObject->at(j);
-			}
-
-			delete attachedObject;
-		}
-
-		scene->destroyAllChildrenAndObjects();
-		builderCxt->removeSceneNode(scene);
-		//delete scene;
-		
-	}
 
 };
 

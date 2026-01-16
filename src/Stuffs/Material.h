@@ -8,43 +8,33 @@ protected:
 	Ogre::MaterialPtr material;
 
 	// TODO convert to shared_ptr
-	Shader* vertexShader;
-	Shader* fragmentShader;
+	std::unique_ptr<Shader> vertexShader;
+	std::unique_ptr<Shader> fragmentShader;
 
-	Material() {};
+	
 
 
 public:
 
-	void initMaterial(Ogre::MaterialPtr mat_p) {
-		material = mat_p;
-	}
+	Material(GDBuilderContext* builderCxt, Ogre::MaterialPtr material_p ) : MaterialResource(ResourceHandler::GetInstance(),material_p->getName()) {
+		material = material_p;
+	};
 
-	void setVertexShader(Shader* vertex_p) {
-		MaterialResource::_addVertexShader(vertex_p->getId());
-		vertexShader = vertex_p;
-	}
-	void setFragmentShader(Shader* fragment_p) {
-		MaterialResource::_addFragmentShader(fragment_p->getId());
-		fragmentShader = fragment_p;
-	}
+	
 
-	Shader* getFragmentShader() {
-		return fragmentShader;
-	}
-	Shader* getVertexShader() {
-		return vertexShader;
-	}
+	//void setVertexShader(Shader* vertex_p) {
+	//	/*MaterialResource::_addVertexShader(vertex_p->getId());
+	//	vertexShader = vertex_p;*/
+	//}
+	//void setFragmentShader(Shader* fragment_p) {
+	//	/*MaterialResource::_addFragmentShader(fragment_p->getId());
+	//	fragmentShader = fragment_p;*/
+	//}
+
+	
 
 	Ogre::MaterialPtr getMaterialPtr() {
 		return material;
-	}
-
-	Material(const MaterialResource& materialObj) {
-		materialName = materialObj.materialName;
-		setId(materialObj._id);
-		VertexShaderResource = materialObj.VertexShaderResource;
-		FragmentShaderResource = materialObj.FragmentShaderResource;
 	}
 
 

@@ -47,47 +47,32 @@ public:
 		
 	}
 
-	Monster* getMonsterRef() { return monster; }
-
-
 	virtual void update(float deltaTime) {};
 
 	PxRigidDynamic* getPxRigidDynamic(std::string name_p, PxTransform transform, PxGeometry* geometry, float mass);
 	PxRigidStatic* getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry);
 
+	// Monster functions
+
+	void monSetLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);
+	Ogre::MeshPtr monGetMesh(std::string meshName_p);
+	Ogre::Entity* monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p);
+
 	// Check Functions
 	bool sceneExists(std::string scnName_p);
 	bool objectExists(std::string objName_p);
-	
-	// Create Functions
-	virtual Ogre::SceneNode* createScene(std::string name_p) { return nullptr; }
-	virtual Ogre::Entity* createObject(std::string name_p, Ogre::MeshPtr mesh_p) { return nullptr; }
-	Ogre::MeshPtr createMesh(std::string meshName_p, std::string OgreGroup = OGRE_MESH_GROUP);
-	virtual Ogre::MaterialPtr createMaterial(std::string materialName_p) { return nullptr; }
-	virtual void setShaderVars(Shader* shader) {};
-
-	// Delete Functions
-	void removeSceneNode(Ogre::SceneNode* scnNode_p);
 
 	// CASEHANDLER Functions
-	virtual Material* addMaterial(std::string matname_p) { return NULL; }
-	virtual ResID addShader(Ogre::MaterialPtr mat_p, ShaderType type) { return NULL; }
-	
-	// SHADER FUNCTIONS
+	virtual Scene* CreateScene(std::string sceneName, SceneType type) {};
+	virtual Object* CreateObject(std::string objName_p, std::filesystem::path meshPath_p, PhysXType type) {};
 
-	virtual void selectShader(Shader* shader_p) {}
+	virtual Ogre::MeshPtr fetchMeshByName(std::filesystem::path meshPath_p) {};
+	virtual Ogre::MeshPtr fetchMeshById(ResID meshID_p) {};
+	
+
 
 
 };
-
-//class GDBuilderImpli {
-//private:
-//	GDBuilderContext* builderCxt;
-//public:
-//	GDBuilderImpli(GDBuilderContext* builderCxt_p) {
-//		builderCxt = builderCxt_p;
-//	}
-//};
 
 
 

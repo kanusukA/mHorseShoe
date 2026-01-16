@@ -5,52 +5,33 @@
 
 class Case : public CaseResource {
 private:
-	std::vector<Scene*>* caseScenes = new std::vector<Scene*>();
-	Scene* selectedScene;
-	
+	GDBuilderContext* GDBuilderCxt;
+
+	std::vector<std::shared_ptr<Scene>>* caseVec = new std::vector<std::shared_ptr<Scene>>();
 
 public:
-	Case(GDBuilderContext* builder_p) : CaseResource(ResourceHandler::GetInstance(),this, "") {
 
+
+	Case(GDBuilderContext* builderCxt_p) : CaseResource(ResourceHandler::GetInstance(), "") {
+		GDBuilderCxt = builderCxt_p;
 	}
-	Case(GDBuilderContext* builder_p, std::string name_p) : CaseResource(ResourceHandler::GetInstance(),this, name_p) {
-
-	}
-
-	void selectScene(Scene* scn_p) {
-		selectedScene = scn_p;
-		
-	}
-	Scene* getSelectedScene() { return selectedScene; }
-
-	void addSceneToCase(Scene* scene_p){
-		CaseResource::_addSceneToCase(scene_p->getId());
-		caseScenes->push_back(scene_p);
-
+	Case(GDBuilderContext* builderCxt_p, std::string name_p) : CaseResource(ResourceHandler::GetInstance(), name_p) {
+		GDBuilderCxt = builderCxt_p;
 	}
 
-	void removeScene(Scene* scene_p) {
-		CaseResource::_removeSceneByID(scene_p->getId());
-		for (int i = 0; i < caseScenes->size(); i++) // TODO OPTIMIZATION REMOVE RUNS TWICES FOR ID AND SCENE OBJ
-		{
-			if (scene_p->getId() == caseScenes->at(i)->getId())
-			{
-				caseScenes->erase(caseScenes->begin() + i);
-				break;
-			}
-		}
-		delete scene_p;
+	// CREATEING A NEW SCENE
+	void attachNewScene(std::string sceneName, SceneType scnType) {
+		Scene* newScene = GDBuilderCxt->CreateScene(sceneName, scnType);
+		std::shared_ptr<Scene> sScene(newScene);
+		caseVec->push_back(std::move(sScene));
 	}
 
-	void removeByIndex(int index) {
-		CaseResource::_removeSceneByIndex(index);
-		Scene* scn = caseScenes->at(index);
-		caseScenes->erase(caseScenes->begin() + index);
-		delete scn;
-
+	std::weak_ptr<Scene> getwScene(int index) {
+		return caseVec->at(index);
 	}
 
-
-	std::vector<Scene*>* getScenes() { return caseScenes; }
+	void removeSceneByIndex(int index) {
+		caseVec->erase(caseVec->begin() + index);
+	}
 
 };

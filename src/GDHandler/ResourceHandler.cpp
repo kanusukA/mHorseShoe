@@ -39,22 +39,19 @@ std::vector<std::filesystem::path>* ResourceHandler::fetchResourcesByEnum(Resour
 		return nullptr;
 		break;
 	case ResourceLoaderEnums::Shaders:
-		return this->Shaders;
+		return this->ShaderDp;
 		break;
 	case ResourceLoaderEnums::MaterialPath:
-		return this->Materials;
+		return this->MaterialDp;
 		break;
 	case ResourceLoaderEnums::MaterialTexture:
-		return this->Textures;
+		return this->TextureDp;
 		break;
 	case ResourceLoaderEnums::RenderMeshPath:
-		return this->RenderMesh;
-		break;
-	case ResourceLoaderEnums::ColliderMeshPath:
-		return this->ColliderMesh;
+		return this->MeshDp;
 		break;
 	case ResourceLoaderEnums::ImagePath:
-		return this->images;
+		return this->TextureDp;
 		break;
 	default:
 		return nullptr;
@@ -63,59 +60,7 @@ std::vector<std::filesystem::path>* ResourceHandler::fetchResourcesByEnum(Resour
 }
 
 
-void ResourceHandler::read()
-{
 
-}
-
-void ResourceHandler::write()
-{
-}
-
-void ResourceHandler::addResource(std::filesystem::path filePath, ResourceHandlerType type) {
-
-	switch (type)
-	{
-	case GLOBAL:
-		break;
-	case RENDER_MESH:
-		if (!vectorContains(filePath.string(), renderMeshes)) {
-			//std::cout << "Added render meshes " << filePath.string() << std::endl;
-			this->renderMeshes->push_back(filePath.string());
-		}
-		break;
-	case COLLIDER_MESH:
-		if (!vectorContains(filePath.string(), colliderMeshes)) {
-			//std::cout << "Added collider meshes " << filePath.string() << std::endl;
-			this->colliderMeshes->push_back(filePath.string());
-		}
-		break;
-	case MESH_MATERIALS:
-		if (!vectorContains(filePath.string(), meshMaterials)) {
-			//std::cout << "Added mesh material " << filePath.string() << std::endl;
-			this->meshMaterials->push_back(filePath.string());
-		}
-		break;
-	case IMAGE:
-		if (!vectorContains(filePath.string(), images)) {
-			//std::cout << "Added Image " << filePath.string() << std::endl;
-			this->images->push_back(filePath.string());
-		}
-		break;
-	default:
-		break;
-	}
-
-}
-
-std::filesystem::path ResourceHandler::_getSaveFileLoc(std::string filename)
-{
-	std::filesystem::path cur_path = std::filesystem::current_path();
-	cur_path += "/save";
-	cur_path += "/" + filename + ".txt";
-
-	return cur_path;
-}
 
 void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::filesystem::path path)
 {
@@ -242,7 +187,6 @@ ResourceHandler::ResourceHandler()
 {
 	ToastComponent::GetInstance()->addMessage("Starting Resource Handler");
 	this->SourceDir = getSourceDir();
-	this->colliderMeshes->push_back("box");
 
 	checkFileStructure();
 	
@@ -267,14 +211,14 @@ void ResourceHandler::checkFileStructure()
 
 	if (!std::filesystem::exists(this->SourceDir.string() + MASTERLIST_LOC))
 	{
-		ToastComponent::GetInstance()->addMessage("Maste list does not exists. Creating");
+		ToastComponent::GetInstance()->addMessage("Master list does not exists. Creating");
 		_LoadIniFile(this->SourceDir.string() + MASTERLIST_LOC);
 	}
 	this->setPath(this->SourceDir.string() + MASTERLIST_LOC, ResourcePaths::MasterList);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + RESOURCELOADER_DATA))
 	{
-		ToastComponent::GetInstance()->addMessage("Maste list does not exists. Creating");
+		ToastComponent::GetInstance()->addMessage("Master list does not exists. Creating");
 		_LoadIniFile(this->SourceDir.string() + RESOURCELOADER_DATA);
 	}
 	
@@ -363,19 +307,6 @@ void ResourceHandler::checkFileStructure()
 
 	this->setPath(this->SourceDir.string() + RENDERMESH_INI_LOC, ResourcePaths::RenderMeshPath);
 
-	if (!std::filesystem::exists(this->SourceDir.string() + COLLIDERMESH_DIRECTORY))
-	{
-		ToastComponent::GetInstance()->addMessage("ColliderMesh Directory does not exists. Creating");
-		std::filesystem::create_directory(this->SourceDir.string() + COLLIDERMESH_DIRECTORY);
-	}
-
-	if (!std::filesystem::exists(this->SourceDir.string() + COLLIDERMESH_INI_LOC))
-	{
-		ToastComponent::GetInstance()->addMessage("ColliderMeshes.ini does not exsits. Creating");
-		_LoadIniFile(this->SourceDir.string() + COLLIDERMESH_INI_LOC);
-	}
-
-	this->setPath(this->SourceDir.string() + COLLIDERMESH_INI_LOC, ResourcePaths::ColliderMeshPath);
 
 	if (!std::filesystem::exists(this->SourceDir.string() + SHADER_DIRECTORY))
 	{
@@ -445,38 +376,27 @@ void ResourceHandler::checkFileStructure()
 
 void ResourceHandler::loadResources()
 {
-	this->loadMaterials(this->Materials, ".material", false, true);
-	this->loadShaders(this->Shaders, ".hlsl", true, true);
-	//this->loadShaders(this->Shaders, ".frag", true, true);
-	this->loadRenderMesh(this->RenderMesh);
-	this->loadColliderMesh(this->ColliderMesh);
-	this->loadTextures(this->Textures, ".png");
+	this->loadMaterialsDp(this->MaterialDp, ".material", false, true);
+	this->loadShadersDp(this->ShaderDp, ".hlsl", true, true);
+	this->loadMeshesDp(this->MeshDp);
+	this->loadTexturesDp(this->TextureDp, ".png");
 
 	// loading saved data
 	//this->loadSavedCases(*this->getPath(ResourcePaths::Cases));
 	//this->loadSavedScenes(*this->getPath(ResourcePaths::Scenes));
 
-	std::cout << "test";
 
 }
 
 RLFetchedResource* ResourceHandler::fetchResourcesFromMesh(ResID meshID)
 {
-	_fetchedResourcesFromMesh(meshID, paths);
+	_fetchedResourcesFromMesh(meshID, allResourceParentPaths);
 }
 
 
 void ResourceHandler::saveResources()
 {
-	this->saveMasterList("TODO Change this", masterList, *this->getPath(ResourcePaths::MasterList));
-	this->saveCases(caseRes,*this->getPath(ResourcePaths::Cases));
-	this->saveScenes(scnRes, *this->getPath(ResourcePaths::Scenes), *this->getPath(ResourcePaths::ScnObj));
-	this->saveObjects(objRes, *this->getPath(ResourcePaths::Objects));
-	this->saveShaders(shaderRes, *this->getPath(ResourcePaths::Shaders), *this->getPath(ResourcePaths::ShaderVars), *this->getPath(ResourcePaths::ShaderValues));
-	this->saveMaterials(matRes, *this->getPath(ResourcePaths::MaterialPath), *this->getPath(ResourcePaths::MaterialTexture));
-	this->saveRenderMesh(renderRes, *this->getPath(ResourcePaths::RenderMeshPath));
-	this->saveColliderMesh(colRes, *this->getPath(ResourcePaths::ColliderMeshPath));
-	this->saveImages(imageRes, *this->getPath(ResourcePaths::ImagePath));
+ // TODO IMPLEMENT SAVE FUNCTION!!!!!!!!
 
 }
 
@@ -622,30 +542,6 @@ void ResourceHandler::getAllResources()
 
 }
 
-
-ResID ResourceHandler::doesRenderMeshExists(std::string filename)
-{
-	for (int i = 0; i < renderRes->size(); i++)
-	{
-		if (renderRes->at(i)->getMeshName() == filename)
-		{
-			return renderRes->at(i)->getId();
-		}
-	}
-	return 0;
-}
-
-ResID ResourceHandler::doesMaterialExists(std::string filename)
-{
-	for (int i = 0; i < matRes->size(); i++)
-	{
-		if (matRes->at(i)->getName() == filename)
-		{
-			return matRes->at(i)->getId();
-		}
-	}
-}
-
 //void ResourceHandler::addOgreRenderMeshResourceLocation()
 //{
 //	this->in_stream.open(RESOURCE_DEFAULT_LOC);
@@ -685,171 +581,7 @@ ResID ResourceHandler::doesMaterialExists(std::string filename)
 //
 //}
 
-void ResourceHandler::addOgreRenderMeshResourceLocation()
-{
 
-	if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(RENDER_MESH_LOC)) {
-		Ogre::ResourceGroupManager::getSingleton().createResourceGroup(RENDER_MESH_LOC);
-	}
-	if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(COLLIDER_MESH_LOC)) {
-		Ogre::ResourceGroupManager::getSingleton().createResourceGroup(COLLIDER_MESH_LOC);
-	}
-	if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(MESH_MATERIAL_LOC)) {
-		Ogre::ResourceGroupManager::getSingleton().createResourceGroup(MESH_MATERIAL_LOC);
-	}
-	if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(IMAGES_LOC)) {
-		Ogre::ResourceGroupManager::getSingleton().createResourceGroup(IMAGES_LOC);
-	}
-	// Adds Meshes to Ogre
-	for (int i = 0; i < renderMeshes->size(); i++)
-	{
-
-		std::string loc = renderMeshes->at(i).parent_path().string();
-
-		if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(loc,RENDER_MESH_LOC)) {
-			std::cout << "path added : " << loc << std::endl;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(loc, "FileSystem", RENDER_MESH_LOC);
-		}
-
-	} 
-
-	// Adds Collider Meshes to Ogre , for conversion into physx
-	for (int i = 0; i < colliderMeshes->size(); i++)
-	{
-		std::string loc = colliderMeshes->at(i).parent_path().string();
-
-		if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(loc, COLLIDER_MESH_LOC)) {
-			std::cout << "path added : " << loc << std::endl;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(loc, "FileSystem", COLLIDER_MESH_LOC);
-		}
-	}
-
-	// Adds Materials to Ogre
-	for (int i = 0; i < meshMaterials->size(); i++)
-	{
-		std::string loc = meshMaterials->at(i).parent_path().string();
-
-		if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(loc, MESH_MATERIAL_LOC)) {
-			std::cout << "path added : " << loc << std::endl;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(loc, "FileSystem", MESH_MATERIAL_LOC);
-		}
-	}
-
-	// Adds Images to Ogre
-	for (int i = 0; i < images->size(); i++)
-	{
-		std::string loc = images->at(i).parent_path().string();
-
-		if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(loc, IMAGES_LOC)) {
-			std::cout << "path added : " << loc << std::endl;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(loc, "FileSystem", IMAGES_LOC);
-		}
-	}
-
-	std::cout << "added meshes : " << Ogre::ResourceGroupManager::getSingleton().listResourceNames(RENDER_MESH_LOC).get()->size() << std::endl;
-	std::cout << "added materials : " << Ogre::ResourceGroupManager::getSingleton().listResourceNames(MESH_MATERIAL_LOC).get()->size() << std::endl;
-	std::cout << "added images : " << Ogre::ResourceGroupManager::getSingleton().listResourceNames(IMAGES_LOC).get()->size() << std::endl;
-	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-	this->getOgreRenderMeshes();
-
-}
-
-void ResourceHandler::addOgreResourceLocation(std::filesystem::path location, std::string group = GENERAL_RESOURCE_LOC)
-{
-	try {
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation(location.filename().string(), location.string(), group);
-	}
-	catch (const std::exception&) {
-		std::cout << "unable to add Resource to Ogre";
-	}
-
-}
-
-void ResourceHandler::getOgreRenderMeshes()
-{
-	try
-	{
-
-		Ogre::StringVectorPtr render_meshes = Ogre::ResourceGroupManager::getSingleton().listResourceNames(RENDER_MESH_LOC);
-		
-		for (int i = 0; i < render_meshes.get()->size(); i++)
-		{
-			if (render_meshes.get()->at(i).substr(render_meshes.get()->at(i).find(".")) != ".mesh") {
-				render_meshes.get()->erase(render_meshes.get()->begin() + i);
-			}
-		}
-		
-		this->ogreRenderMeshes = render_meshes;
-		// Add Material through resource handler to each render mesh!!
-	}
-	catch (const std::exception&)
-	{
-		
-	}
-	
-}
-
-void ResourceHandler::updateOgreMaterials()
-{
-	if (!OgreMaterials) {
-		OgreMaterials = new std::vector<std::string>();
-	}
-
-	Ogre::ResourceManager::ResourceMapIterator it = Ogre::MaterialManager::getSingleton().getResourceIterator();
-
-	while (it.hasMoreElements()) {
-		Ogre::ResourcePtr res = it.getNext();
-
-		OgreMaterials->push_back(res.get()->getName());
-	}
-
-}
-
-
-bool vectorContains(std::string term, std::vector<std::string>* vec) {
-
-	if (vec) {
-
-		for (int i = 0; i < vec->size(); i++)
-		{
-			std::cout << term.c_str() << "  :  " << vec->at(i).c_str() << std::endl;
-			if (!strcmp(term.c_str(), vec->at(i).c_str())) {
-				std::cout << "Already Exists" << std::endl;
-				return true;
-			}
-		}
-		return false;
-	}
-	else {
-		return false;
-	}
-}
-
-bool vectorContains(std::string term, std::vector<std::filesystem::path>* vec) {
-
-	if (vec->empty()) {
-		return false;
-	}
-	else {
-		for (int i = 0; i < vec->size(); i++)
-		{
-			if (!strcmp(term.c_str(),vec->at(i).string().c_str())) {
-				std::cout << "Already Exists" << std::endl;
-				return true;
-			}
-		}
-		return false;
-	}
-}
-
-
-
-void ResourceHandler::readFile(std::string filename)
-{
-
-	// NOT YET USED
-	
-}
 
 
 
@@ -887,87 +619,6 @@ void ResourceHandler::getCases(std::vector<Ogre::String>* outputVec)
 
 }
 
-void ResourceHandler::readShaderFiles(Ogre::MaterialPtr mat)
-{
-	Ogre::String fragFileName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();
-	Ogre::String vertFileName = mat.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getSourceFile();
-	Ogre::GpuProgramParametersPtr fragParam = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-	Ogre::GpuProgramParametersPtr vertParam = mat.get()->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-
-	if (!fragShaderVariables) {
-		fragShaderVariables = new std::vector<std::string>();
-	}
-	else {
-		fragShaderVariables->clear();
-	}
-	if (!vertShaderVariables) {
-		vertShaderVariables = new std::vector<std::string>();
-	}
-	else {
-		vertShaderVariables->clear();
-	}
-
-	std::filesystem::path vertfilepath;
-	std::filesystem::path fragfilepath;
-
-	for (int i = 0; i < meshMaterials->size(); i++)
-	{
-		if (meshMaterials->at(i).filename().string() == vertFileName)
-		{
-			vertfilepath = meshMaterials->at(i);
-		}
-		if (meshMaterials->at(i).filename().string() == fragFileName)
-		{
-			fragfilepath = meshMaterials->at(i);
-		}
-	}
-
-	std::cout << "vert File loc : " << vertfilepath.relative_path().string() << std::endl;
-	std::cout << "frag File loc : " << fragfilepath.relative_path().string() << std::endl;
-	_readShaderFile(fragShaderVariables, fragfilepath);
-	_readShaderFile(vertShaderVariables, vertfilepath);
-
-	
-
-
-}
-
-void ResourceHandler::readShaderFiles(Ogre::GpuProgramPtr program)
-{
-	Ogre::ParameterList programParameters = program.get()->getParameters();
-
-
-
-	if (!fragShaderVariables) {
-		fragShaderVariables = new std::vector<std::string>();
-	}
-	else {
-		fragShaderVariables->clear();
-	}
-	if (!vertShaderVariables) {
-		vertShaderVariables = new std::vector<std::string>();
-	}
-	else {
-		vertShaderVariables->clear();
-	}
-
-	std::filesystem::path vertfilepath;
-	std::filesystem::path fragfilepath;
-
-	for (int i = 0; i < meshMaterials->size(); i++)
-	{
-		/*if (meshMaterials->at(i).filename().string() == vertFileName)
-		{
-			
-		}*/
-		
-	}
-
-	std::cout << "vert File loc : " << vertfilepath.relative_path().string() << std::endl;
-	std::cout << "frag File loc : " << fragfilepath.relative_path().string() << std::endl;
-	_readShaderFile(fragShaderVariables, fragfilepath);
-	_readShaderFile(vertShaderVariables, vertfilepath);
-}
 
 
 // single value
@@ -1289,15 +940,6 @@ SceneObject ResourceHandler::loadObject(std::string filename, int scnType)
 	//ini.Reset();
 
 	return obj;
-}
-
-void ResourceHandler::loadImgToTex()
-{
-	for (int i = 0; i < images->size(); i++)
-	{
-		Ogre::TextureManager::getSingleton().load(images->at(i).filename().string().c_str(), "Images");
-	}
-
 }
 
 

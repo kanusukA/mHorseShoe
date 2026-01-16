@@ -48,9 +48,6 @@ enum ResourceHandlerType
 
 
 
-
-
-
 // Integrate it into gdhandler with Ogre 
 
 class ResourceHandler : public ResourceHandlerBuilderContext, public ResourceSaver , public ResourceLoader, public ResourceReader
@@ -67,64 +64,12 @@ private:
 
 	// RESOURCES STORE
 	// HERE GENERAL RESOURCES ARE STORED.
-	std::vector<std::filesystem::path>* Materials = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* Shaders = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* Textures = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* RenderMesh = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* ColliderMesh = new std::vector<std::filesystem::path>();
+	std::vector<std::filesystem::path>* MaterialDp = new std::vector<std::filesystem::path>();
+	std::vector<std::filesystem::path>* ShaderDp = new std::vector<std::filesystem::path>();
+	std::vector<std::filesystem::path>* TextureDp = new std::vector<std::filesystem::path>();
+	std::vector<std::filesystem::path>* MeshDp = new std::vector<std::filesystem::path>();
 
 	std::vector<std::filesystem::path>* fetchResourcesByEnum(ResourceLoaderEnums::ResourceLoadPaths group_p);
-
-
-	// RESOURCES BUILDER
-	void createCase(CaseResource* case_p) override {
-		case_p->setId(this->getCaseIndex());
-		AddIndexToMaster(case_p->getId());
-		this->addCaseRes(case_p);
-	}
-
-	void createScene(SceneResource* scn_p) override {
-		scn_p->setId(this->getSceneIndex());
-		AddIndexToMaster(scn_p->getId());
-		this->addSceneRes(scn_p);
-	}
-
-	void createObject(ObjectResource* obj_p) override {
-		obj_p->setId(this->getObjectIndex());
-		AddIndexToMaster(obj_p->getId());
-		this->addObjectRes(obj_p);
-	}
-
-
-	
-
-	void createShader(ShaderResource* shader_p) override {
-		shader_p->setId(this->getShaderIndex());
-		AddIndexToMaster(shader_p->getId());
-		this->addShaderRes(shader_p);
-	}
-
-	void createRenderMesh(RenderMeshResource* render_p) {
-		render_p->setId(this->getRenderMeshIndex());
-		AddIndexToMaster(render_p->getId());
-		this->addRenderMeshRes(render_p);
-	}
-
-	void createColliderMesh(ColliderMeshResource* col_p) override {
-		col_p->setId(this->getColliderMeshIndex());
-		AddIndexToMaster(col_p->getId());
-		this->addColliderMeshRes(col_p);
-	}
-
-	void createImage(ImageResource* image_p) override {
-		image_p->setId(this->getImageIndex());
-		AddIndexToMaster(image_p->getId());
-		this->addImageRes(image_p);
-	}
-
-	// default locations
-	void read();
-	void write();
 
 	// Searching Methods
 	// Main search function
@@ -143,11 +88,8 @@ private:
 	void _LoadIniFile(std::string filename);
 
 	// OVERHAUL PROJECT
-	void createFolder(std::filesystem::path path);
-	void createFile(std::filesystem::path path);
 
-	
-	std::vector<std::string>* paths = new std::vector<std::string>(13);
+	std::vector<std::string>* allResourceParentPaths = new std::vector<std::string>(13);
 
 
 	// Hide the constructor and destructor of the class
@@ -162,27 +104,6 @@ public:
 	// OVERHAUL FUNCTIONS 
 	// This function creates a Material and sets a unique_ptr. The ownership of incoming mat_p is taken.
 	// Make sure Material is not a duplicate of existing
-	ResID createMaterial(MaterialResource mat_p) { 
-		std::unique_ptr<MaterialResource> u_material = std::make_unique<MaterialResource>(MaterialResource(mat_p));
-		u_material->setId(this->getMaterialIndex());
-		ResID id = u_material->getId();
-		this->addMaterialRes(std::move(u_material)); // Moves material to the ResourceBuilderCxt List!
-		return id;
-	}
-
-	MaterialResource* fetchNewMaterial(ResID materialID) {
-		MaterialResource* fetchedMaterial = nullptr;
-		for (int i = 0; i < matRes->size();i++)
-		{
-			if (matRes->at(i)->getId() == materialID)
-			{
-				*fetchedMaterial = MaterialResource(*matRes->at(i));
-
-				return fetchedMaterial;
-			}
-		}
-		return nullptr;
-	}
 	 
 	 
 	// Checks if the folder structure and required files exists for Resource Tasks
@@ -197,11 +118,11 @@ public:
 	void saveResources();
 
 
-	std::vector<std::filesystem::path>* getMaterialsLoaded() { return Materials; }
-	std::vector<std::filesystem::path>* getShadersLoaded() { return Shaders; }
-	std::vector<std::filesystem::path>* getTexturesLoaded() { return Textures; }
-	std::vector<std::filesystem::path>* getRenderMeshLoaded() { return RenderMesh; }
-	std::vector<std::filesystem::path>* getColliderMeshLoaded() { return ColliderMesh; }
+	std::vector<std::filesystem::path>* getMaterialsLoaded() { return MaterialDp; }
+	std::vector<std::filesystem::path>* getShadersLoaded() { return ShaderDp; }
+	std::vector<std::filesystem::path>* getTexturesLoaded() { return TextureDp; }
+	std::vector<std::filesystem::path>* getRenderMeshLoaded() { return MeshDp; }
+
 
 	//Searching fullpath
 	std::filesystem::path fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p);
@@ -210,7 +131,7 @@ public:
 	void setPath(std::string path, ResourcePaths pathOf) {
 		if (std::filesystem::exists(path))
 		{
-			paths->at(pathOf) = path;
+			allResourceParentPaths->at(pathOf) = path;
 		}
 		else {
 			throw ResourceHandlerIDError(("Invalid Path - " + path).c_str());
@@ -220,43 +141,29 @@ public:
 	void setPath(std::string path, int pathPos) {
 		if (std::filesystem::exists(path))
 		{
-			paths->at(pathPos) = path;
+			allResourceParentPaths->at(pathPos) = path;
 		}
 		else {
 			throw ResourceHandlerIDError(("Invalid Path - " + path).c_str());
 		}
 	}
 	std::string* getPath(ResourcePaths pathOf) {
-		return &paths->at(pathOf);
+		return &allResourceParentPaths->at(pathOf);
 	}
 	std::vector<std::string>* getPaths() {
-		return paths;
+		return allResourceParentPaths;
 	}
 
 	// Resources
-	// RenderMeshes
-	// OPTIMIZE THIS !!!!!!
-	//  Can be changed to an Observable state in future for regulation of use
-	std::vector<std::filesystem::path>* renderMeshes = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* meshMaterials = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* colliderMeshes = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* images = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* globalResources = new std::vector<std::filesystem::path>();
-	std::vector<std::string>* OgreMaterials;
-	std::vector<std::string>* fragShaderVariables;
-	std::vector<std::string>* vertShaderVariables;
 
 	std::filesystem::path SourceDir;
 
-	Ogre::StringVectorPtr ogreRenderMeshes = Ogre::StringVectorPtr();
 
-	// Class should not be clonable
+	// Class should not be cloneable
 	ResourceHandler(ResourceHandler& copy) = delete;
 
 	// Class should not be assignable
 	void operator=(const ResourceHandler&) = delete;
-
-	void readFile(std::string filename);
 
 	std::string getResourceFile(std::string fileName, ResourceHandlerType type, bool addToOgre);
 

@@ -140,11 +140,10 @@ public:
 
 
 	// Loading Things Not related to Saved Data
-	void loadMaterials(std::vector<std::filesystem::path>* output, std::string extension = ".material", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
-	void loadShaders(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
-	void loadRenderMesh(std::vector<std::filesystem::path>* output, std::string extension = ".mesh", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
-	void loadColliderMesh(std::vector<std::filesystem::path>* output, std::string extension = ".mesh", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
-	void loadTextures(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
+	void loadMaterialsDp(std::vector<std::filesystem::path>* output, std::string extension = ".material", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
+	void loadShadersDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
+	void loadMeshesDp(std::vector<std::filesystem::path>* output, std::string extension = ".mesh", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
+	void loadTexturesDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
 
 
 

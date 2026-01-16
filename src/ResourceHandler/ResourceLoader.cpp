@@ -329,7 +329,7 @@ RLMaterial* ResourceLoader::_fetchMaterial(ResID id, std::string path_p, std::st
 
 }
 
-void ResourceLoader::loadMaterials(std::vector<std::filesystem::path>* output,std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
+void ResourceLoader::loadMaterialsDp(std::vector<std::filesystem::path>* output,std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
 	if (clearOutput)
 	{
@@ -355,7 +355,7 @@ void ResourceLoader::loadMaterials(std::vector<std::filesystem::path>* output,st
 
 }
 
-void ResourceLoader::loadShaders(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
+void ResourceLoader::loadShadersDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
 	if (clearOutput)
 	{
@@ -380,7 +380,7 @@ void ResourceLoader::loadShaders(std::vector<std::filesystem::path>* output, std
 	}
 }
 
-void ResourceLoader::loadRenderMesh(std::vector<std::filesystem::path>* output,std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
+void ResourceLoader::loadMeshesDp(std::vector<std::filesystem::path>* output,std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
 	if (clearOutput)
 	{
@@ -405,32 +405,32 @@ void ResourceLoader::loadRenderMesh(std::vector<std::filesystem::path>* output,s
 	}
 }
 
-void ResourceLoader::loadColliderMesh(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
-{
-	if (clearOutput)
-	{
-		output->clear();
-	}
+//void ResourceLoader::loadColliderMesh(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
+//{
+//	if (clearOutput)
+//	{
+//		output->clear();
+//	}
+//
+//	if (searchAllResources)
+//	{
+//		for (int i = 0; i < load_paths->size(); i++)
+//		{
+//			if (!load_paths->at(i).empty())
+//			{
+//				fetchPathContents(load_paths->at(i), extension, output, searchFolders);
+//			}
+//		}
+//	}
+//	else {
+//		if (!load_paths->at(ResourceLoaderEnums::ColliderMeshPath).empty())
+//		{
+//			fetchPathContents(load_paths->at(ResourceLoaderEnums::ColliderMeshPath), extension, output, searchFolders);
+//		}
+//	}
+//}
 
-	if (searchAllResources)
-	{
-		for (int i = 0; i < load_paths->size(); i++)
-		{
-			if (!load_paths->at(i).empty())
-			{
-				fetchPathContents(load_paths->at(i), extension, output, searchFolders);
-			}
-		}
-	}
-	else {
-		if (!load_paths->at(ResourceLoaderEnums::ColliderMeshPath).empty())
-		{
-			fetchPathContents(load_paths->at(ResourceLoaderEnums::ColliderMeshPath), extension, output, searchFolders);
-		}
-	}
-}
-
-void ResourceLoader::loadTextures(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
+void ResourceLoader::loadTexturesDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
 	if (clearOutput)
 	{

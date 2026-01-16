@@ -11,7 +11,7 @@ public:
 
 	SunWindowSize* windowSize;
 
-	ObjectPtr* selectedObj;
+	std::weak_ptr<Object> selectedObj;
 
 	std::vector<MaterialResource*>* materials;
 	int selectedMaterial = 0;
@@ -21,9 +21,9 @@ public:
 	}
 
 	void init() override {
-		selectedObj = this->gdSource->getCaseHandler()->getSelectedObject();
+		//selectedObj = this->gdSource->getCaseHandler()->getSelectedObject();
 		windowSize = this->gdSource->getGdSystem()->getWindowSize();
-		materials = this->gdSource->getResourceHandler()->getAllMaterial();
+		//materials = this->gdSource->getResourceHandler()->getAllMaterial();
 	}
 
 	void getFragShader() {
@@ -37,18 +37,18 @@ public:
 	}
 
 	void setMaterial() {
-		selectedObj->get()->setMaterial(materials->at(selectedMaterial)->getHigherRef());
+		//selectedObj->get()->setMaterial(materials->at(selectedMaterial)->getHigherRef());
 	}
 
 	void selectShader(Shader* vertShader,Shader* fragShader) {
-		this->gdSource->getShaderHandler()->setShader(selectedObj->get()->getMaterial()->getName(),
+		/*this->gdSource->getShaderHandler()->setShader(selectedObj->get()->getMaterial()->getName(),
 			fragShader->getShaderName(),
 			vertShader->getShaderName(),
 			fragShader->getShaderVars(),
 			vertShader->getShaderVars(),
 			fragShader->getShader(),
 			vertShader->getShader()
-		);
+		);*/
 	}
 
 };

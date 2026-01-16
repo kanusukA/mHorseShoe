@@ -22,28 +22,27 @@ protected:
 	void checkIntegrity();
 
 
+
 public:
 
 	std::unique_ptr<StuffHandler> stuffHandler;
 	Ogre::SceneManager* oScnManager;
 
-	Case* currentCase;
-	ObjectPtr selectedObject = ObjectPtr();
 
+	std::vector<std::unique_ptr<Case>>* caseVec = new std::vector<std::unique_ptr<Case>>();
+	int selCase;
 
-	std::vector<Case*>* cases = new std::vector<Case*>();
+	// DEPEDENT RESOURCE VECTOR
+	// These resources are used to create copy of themselves to be used by other resources in a lifecycle aware manner. (hopefully)
+
+	std::vector<std::unique_ptr<RenderMesh>>* meshVec = new std::vector<std::unique_ptr<RenderMesh>>();
+	
 
 	// CASE FUNCTIONS
 
 	CaseHandler(Monster* monster, Kint * kint) : GDBuilderContext(ResourceHandler::GetInstance(), monster,kint) {
 		stuffHandler = std::make_unique<StuffHandler>(monster, kint);
 		oScnManager = monster->oScnManager;
-
-		// Set Case manually
-		
-		// TODO Check Resource Loader for case
-		currentCase = CreateCase("Unnamed case");
-		
 
 	};
 	// Used to start CaseHandler with a predefined case as the program starts
@@ -52,34 +51,26 @@ public:
 		stuffHandler = std::make_unique<StuffHandler>(monster, kint);
 		
 		oScnManager = monster->oScnManager;
-		currentCase = case_p;
-
-		//this->loadSavedResource();
 
 	};
 
 	void setCaseName(std::string caseName) {
-		currentCase->setName(caseName);
+		caseVec->at(selCase)->setName(caseName);
 	}
 
-	Case* getCurrentCase() {
-		return currentCase;
-	}
 
-	void setSelectedObject(Object* obj_p) {
-		selectedObject.set(obj_p);
-	}
-	ObjectPtr* getSelectedObject() {
-		return &selectedObject;
-	}
-
-	std::vector<Case*>* getAllCases() { return cases; }
+	std::vector<std::unique_ptr<Case>>* fetchAllCases() { return caseVec; }
 
 
-	Case* CreateCase(std::string caseName_p);
-	Scene* CreateScene(SceneType scnType, std::string scnName);
-	Scene* CreateSceneAttachToCase(SceneType scnType, std::string scnName);
-	Object* CreateObject(std::string objectName_p, RenderMesh* renderMesh_p, PhysXType type);
+	void CreateCase(std::string caseName_p);
+	Scene* CreateScene(std::string scnName, SceneType scnType) override;
+	Object* CreateObject(std::string objName_p , std::filesystem::path meshPath_p, PhysXType type);
+
+	// DEPENDENT RESOURCE
+	Ogre::MeshPtr fetchMeshByName(std::filesystem::path meshPath_p) override;
+	Ogre::MeshPtr fetchMeshById(ResID meahID_p) override;
+
+
 
 	// old method
 	//RenderMesh* CreateRenderMesh(std::string meshName_p);

@@ -5,7 +5,7 @@ void CaseHandler::checkIntegrity()
 	// Check Scenes in 
 	Ogre::Node::ChildNodeMap nodes = oScnManager->getRootSceneNode()->getChildren();
 
-	std::vector<SceneResource*>* scnNodes = ResourceHandler::GetInstance()->getAllScenes();
+	//std::vector<SceneResource*>* scnNodes = ResourceHandler::GetInstance()->getAllScenes();
 	bool match = true;
 	if (nodes.size() == scnNodes->size())
 	{
@@ -33,55 +33,80 @@ void CaseHandler::checkIntegrity()
 }
 
 
-Case* CaseHandler::CreateCase(std::string caseName_p)
+void CaseHandler::CreateCase(std::string caseName_p)
 {
-	Case* new_case = new Case(this,caseName_p);
-	this->cases->push_back(new_case);
-	this->currentCase = new_case;
-	return new_case;
+	std::unique_ptr<Case> uCase = std::make_unique<Case>(this,caseName_p);
+	caseVec->push_back(uCase);
+	selCase = caseVec->size() - 1;
+
 }
 
 
-Scene* CaseHandler::CreateScene(SceneType scnType, std::string scnName)
+Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType)
 {
 	if (this->sceneExists(scnName))
 	{
 		ToastComponent::GetInstance()->addMessage("Scene Already exists!!");
 		return nullptr;
 	}
-	else {
-		Scene* new_scn = new Scene(this, scnType, scnName);
-		//this->currentCase->addSceneToCase(new_scn);
-		return new_scn;
-	}
 	
+	Scene* new_scn = new Scene(this, scnType, scnName);
+	return new_scn;
 	
 }
 
-// Creates and adds sceneNode to current Case
-Scene* CaseHandler::CreateSceneAttachToCase(SceneType scnType, std::string scnName)
+Object* CaseHandler::CreateObject(std::string objectName_p, std::filesystem::path meshPath_p ,  PhysXType type)
 {
-	Scene* new_scn = this->CreateScene(scnType, scnName);
-	if (new_scn)
-	{
-		currentCase->addSceneToCase(new_scn);
-		return new_scn;
-	}
-	return nullptr;
-}
+	
+	// Get RenderMesh
+	Ogre::MeshPtr mesh = fetchMeshByName(meshPath_p);
 
-Object* CaseHandler::CreateObject(std::string objectName_p, RenderMesh* renderMesh_p ,  PhysXType type)
-{
 	if (!this->objectExists(objectName_p))
 	{
-		Object* new_obj = new Object(this, renderMesh_p, objectName_p, type);
-		
+		Ogre::Entity* ent = this->monCreateEntity(objectName_p, mesh);
+		Object* new_obj = new Object(this, ent, objectName_p, type);
 		return new_obj;
+
 	}
 	ToastComponent::GetInstance()->addMessage("Object already exists");
 	return nullptr;
 	
 	
+}
+
+Ogre::MeshPtr CaseHandler::fetchMeshByName(std::filesystem::path meshPath_p)
+{
+	// Check if it already exists
+	for (int i = 0; i < meshVec.size(); i++)
+	{
+		if (meshVec.at(i)->getMeshName() == meshPath_p.filename().string())
+		{
+			return meshVec.at(i)->getMesh();
+		}
+	}
+	
+	// Create if it does not exist
+	this->monSetLocation(meshPath_p, OGRE_MESH_GROUP);
+	Ogre::MeshPtr mesh = this->monGetMesh(meshPath_p.filename().string());
+	
+	std::unique_ptr<RenderMesh> uMesh = std::make_unique<RenderMesh>(this,mesh);
+	meshVec.push_back(std::move(uMesh));
+
+	return mesh;
+
+}
+
+Ogre::MeshPtr CaseHandler::fetchMeshById(ResID meshID_p)
+{
+	for (int i = 0; i < meshVec.size(); i++)
+	{
+		if (meshVec.at(i)->getId() == meshID_p)
+		{
+			return meshVec.at(i)->getMesh();
+		}
+	}
+
+	return nullptr;
 }
 
 // old method
