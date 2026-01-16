@@ -538,7 +538,7 @@ void ResourceHandler::readFile(std::string filename)
 
 ResourceHandler* ResourceHandler::GetInstance() {
 
-	ToastComponent::GetInstance()->addMessage("Starting Resource Handler");
+	//ToastComponent::GetInstance()->addMessage("Starting Resource Handler");
 
 	// locks storage 
 	std::lock_guard<std::mutex> lock(mutex_);

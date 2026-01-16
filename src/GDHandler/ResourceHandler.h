@@ -3,7 +3,7 @@
 #ifndef RESOURCEHANDLER_H
 #define RESOURCEHANDLER_H
 
-#include <Gui/GuiComponents/ToastComponent.h>
+//#include <Gui/GuiComponents/ToastComponent.h>
 
 #include<Windows.h>
 #include <Ogre.h>
