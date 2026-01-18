@@ -91,7 +91,7 @@ void ResourceSaver::saveScene(SceneResource* scene_p)
 	std::string scenes = "";
 	std::string objects = "";
 
-	for (int i = 0; i < scene_p->getAttachedScenesID()->size(); i++)
+	/*for (int i = 0; i < scene_p->getAttachedScenesID()->size(); i++)
 	{
 		scenes += std::to_string(scene_p->getAttachedScenesID()->at(i)) + "|";
 	}
@@ -100,7 +100,7 @@ void ResourceSaver::saveScene(SceneResource* scene_p)
 	{
 		objects += std::to_string(scene_p->getObjectsID()->at(i)) + "|";
 	}
-	ini->SetValue(sectionName.c_str(), SCENE_OBJECT_KEY, objects.c_str());
+	ini->SetValue(sectionName.c_str(), SCENE_OBJECT_KEY, objects.c_str());*/
 
 }
 
@@ -111,7 +111,7 @@ void ResourceSaver::saveScnObj(std::string sectionName, ResID objectID)
 
 void ResourceSaver::saveMaterial(MaterialResource* mat_p)
 {
-	std::string sectionName = std::to_string(mat_p->getId());
+	/*std::string sectionName = std::to_string(mat_p->getId());
 
 	ini->SetValue(sectionName.c_str(), MATERIAL_NAME_KEY , mat_p->getName().c_str());
 	ini->SetValue(sectionName.c_str(), MATERIAL_VERTEX_KEY, std::to_string(mat_p->getVertexShaderID()).c_str());
@@ -128,7 +128,7 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p)
 	}
 	texValue += '|';
 	ini->SetValue(sectionName.c_str(), MATERIAL_TEXTURE_SIZE_KEY, std::to_string(mat_p->getTextures()->size()).c_str());
-	ini->SetValue(sectionName.c_str(), MATERIAL_TEXTURE_KEY, texValue.c_str());
+	ini->SetValue(sectionName.c_str(), MATERIAL_TEXTURE_KEY, texValue.c_str());*/
 }
 
 void ResourceSaver::saveMaterialTexture(std::string sectionName, std::string textureName , int pos)
@@ -150,11 +150,11 @@ void ResourceSaver::saveRenderMesh(RenderMeshResource* renderMesh_p)
 
 void ResourceSaver::saveColliderMesh(ColliderMeshResource* colliderMesh_p)
 {
-	const char* section = std::to_string(colliderMesh_p->getId()).c_str();
-	ini->SetValue(section, MESH_NAME_KEY, colliderMesh_p->getName().c_str());
-	// TODO FETCH LOCATION MANUALLY
-	//ini->SetValue(section, "meshFileName", colliderMesh_p->getMeshFileName().c_str());
-	ini->SetValue(section, MESH_MATERIAL_KEY, colliderMesh_p->getName().c_str());
+	//const char* section = std::to_string(colliderMesh_p->getId()).c_str();
+	//ini->SetValue(section, MESH_NAME_KEY, colliderMesh_p->getName().c_str());
+	//// TODO FETCH LOCATION MANUALLY
+	////ini->SetValue(section, "meshFileName", colliderMesh_p->getMeshFileName().c_str());
+	//ini->SetValue(section, MESH_MATERIAL_KEY, colliderMesh_p->getName().c_str());
 }
 
 void ResourceSaver::saveShader(ShaderResource* shader_p)
@@ -190,11 +190,11 @@ void ResourceSaver::saveObject(ObjectResource* obj_p)
 {
 	std::string section = std::to_string(obj_p->getId());
 
-	ini->SetValue(section.c_str(), OBJECT_NAME_KEY, obj_p->getName().c_str());
-	ini->SetValue(section.c_str(), OBJECT_PHYSX_KEY, std::to_string(obj_p->getPhysxType()).c_str());
-	ini->SetValue(section.c_str(), OBJECT_RENDERMESH_KEY, std::to_string(obj_p->getRenderMeshId()).c_str());
-	ini->SetValue(section.c_str(), OBJECT_COLLIDERMESH_KEY, std::to_string(obj_p->getColliderMeshId()).c_str());
-	ini->SetValue(section.c_str(), OBJECT_MASS_KEY, std::to_string(obj_p->getMass()).c_str());
+	//ini->SetValue(section.c_str(), OBJECT_NAME_KEY, obj_p->getName().c_str());
+	//ini->SetValue(section.c_str(), OBJECT_PHYSX_KEY, std::to_string(obj_p->getPhysxType()).c_str());
+	//ini->SetValue(section.c_str(), OBJECT_RENDERMESH_KEY, std::to_string(obj_p->getRenderMeshId()).c_str());
+	//ini->SetValue(section.c_str(), OBJECT_COLLIDERMESH_KEY, std::to_string(obj_p->getColliderMeshId()).c_str());
+	//ini->SetValue(section.c_str(), OBJECT_MASS_KEY, std::to_string(obj_p->getMass()).c_str());
 }
 
 

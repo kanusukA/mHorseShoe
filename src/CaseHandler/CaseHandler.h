@@ -10,7 +10,7 @@
 
 // Manages Case. i.e all the Scenes in a single save file
 // Also manages the integration of ResourceScenes and Ogre::Scenes
-class CaseHandler : public GDBuilderContext, public MaterialManager {
+class CaseHandler : public GDBuilderContext{
 
 private:
 	
@@ -24,45 +24,42 @@ protected:
 
 
 public:
-
-	std::unique_ptr<StuffHandler> stuffHandler;
+	StuffHandler* stuffHandler;
 	Ogre::SceneManager* oScnManager;
 
 
-	std::vector<std::unique_ptr<Case>>* caseVec = new std::vector<std::unique_ptr<Case>>();
-	int selCase;
+	std::vector<std::shared_ptr<Case>>* caseVec = new std::vector<std::shared_ptr<Case>>();
 
 	// DEPEDENT RESOURCE VECTOR
 	// These resources are used to create copy of themselves to be used by other resources in a lifecycle aware manner. (hopefully)
 
 	std::vector<std::unique_ptr<RenderMesh>>* meshVec = new std::vector<std::unique_ptr<RenderMesh>>();
+	std::vector<std::unique_ptr<Material>>* materialVec = new std::vector<std::unique_ptr<Material>>();
 	
 
 	// CASE FUNCTIONS
 
 	CaseHandler(Monster* monster, Kint * kint) : GDBuilderContext(ResourceHandler::GetInstance(), monster,kint) {
-		stuffHandler = std::make_unique<StuffHandler>(monster, kint);
+		//stuffHandler = std::make_unique<StuffHandler>(monster, kint);
+		stuffHandler = new StuffHandler(monster, kint);
 		oScnManager = monster->oScnManager;
 
 	};
 	// Used to start CaseHandler with a predefined case as the program starts
 	CaseHandler(Monster* monster, Kint* kint, Case* case_p) : GDBuilderContext(ResourceHandler::GetInstance(), monster, kint) {
 
-		stuffHandler = std::make_unique<StuffHandler>(monster, kint);
-		
+		//stuffHandler = std::make_unique<StuffHandler>(monster, kint);
+		stuffHandler = new StuffHandler(monster, kint);
 		oScnManager = monster->oScnManager;
 
 	};
 
-	void setCaseName(std::string caseName) {
-		caseVec->at(selCase)->setName(caseName);
-	}
 
-
-	std::vector<std::unique_ptr<Case>>* fetchAllCases() { return caseVec; }
+	std::vector<std::shared_ptr<Case>>* fetchAllCases() { return caseVec; }
 
 
 	void CreateCase(std::string caseName_p);
+	Scene* CreateScene(std::string scnName, SceneType scnType, Ogre::SceneNode* parentNode_p) override;
 	Scene* CreateScene(std::string scnName, SceneType scnType) override;
 	Object* CreateObject(std::string objName_p , std::filesystem::path meshPath_p, PhysXType type);
 
@@ -70,28 +67,25 @@ public:
 	Ogre::MeshPtr fetchMeshByName(std::filesystem::path meshPath_p) override;
 	Ogre::MeshPtr fetchMeshById(ResID meahID_p) override;
 
-
+	//RenderMesh* CreateRenderMesh(std::filesystem::path path_p);
+	
+	Material* CreateMaterial(std::filesystem::path materialPath_p, std::string materialName);
 
 	// old method
 	//RenderMesh* CreateRenderMesh(std::string meshName_p);
 
-	RenderMesh* CreateRenderMesh(std::filesystem::path path_p);
+	
 
-	ResID CreateMaterialResource(std::filesystem::path path_p);
 
-	ColliderMesh* CreateColliderMesh(std::string MeshName_p);
-	Shader* CreateShader(Ogre::MaterialPtr mat_p, ShaderType type);
+
+	//ColliderMesh* CreateColliderMesh(std::string MeshName_p);
+	//Shader* CreateShader(Ogre::MaterialPtr mat_p, ShaderType type); Shaders are created by Materials themselves!
 	// MaterialName must be valid with Ogre::Material before Calling CreateMaterial function.
 	
 	Image* CreateImage(std::filesystem::path filePath_p);
 
 
 	void loadSavedResource();
-
-	// GD_CONTEXT FUNCTIONS
-	Material* getMaterial(std::filesystem::path materialName);
-
-
 
 };
 

@@ -35,9 +35,6 @@ public:
 
 	void init() override {
 
-		ogreMaterials = this->gdSource->getResourceHandler()->OgreMaterials;
-		rsusObj = this->gdSource->getShaderHandler()->rsusObj;
-		images = this->gdSource->getResourceHandler()->images;
 
 	}
 
@@ -46,7 +43,7 @@ public:
 	}
 	
 	void getMaterials() {
-		this->gdSource->getResourceHandler()->updateOgreMaterials();
+		//this->gdSource->getResourceHandler()->updateOgreMaterials();
 	}
 
 	void setTexture() {

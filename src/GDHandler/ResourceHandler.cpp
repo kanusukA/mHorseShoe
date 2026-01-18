@@ -429,7 +429,7 @@ void ResourceHandler::findAll(std::string location, ResourceHandlerType type = R
 	try {
 		for (const auto& entry : fs::directory_iterator(location)) {
 			//std::cout << "Adding resource : " << entry.path().string() << std::endl;
-			this->addResource(entry.path().string(),type);
+			//this->addResource(entry.path().string(),type);
 		}
 	}
 	catch (const std::exception& e) {
@@ -624,11 +624,11 @@ void ResourceHandler::getCases(std::vector<Ogre::String>* outputVec)
 // single value
 void ResourceHandler::writeToFile(std::string key, std::string value , std::string section, std::string filename)
 {
-	_LoadIniFile(_getSaveFileLoc(filename).string());
+	//_LoadIniFile(_getSaveFileLoc(filename).string());
 
-	ini.SetValue(section.c_str(), key.c_str(), value.c_str());
+	/*ini.SetValue(section.c_str(), key.c_str(), value.c_str());
 
-	ini.SaveFile(_getSaveFileLoc(filename).string().c_str());
+	ini.SaveFile(_getSaveFileLoc(filename).string().c_str());*/
 
 
 
@@ -636,14 +636,14 @@ void ResourceHandler::writeToFile(std::string key, std::string value , std::stri
 
 void ResourceHandler::writeToFile(std::vector<SaveData>* data, std::string filename)
 {
-	_LoadIniFile(_getSaveFileLoc(filename).string());
+	/*_LoadIniFile(_getSaveFileLoc(filename).string());
 
 	for (int i = 0; i < data->size(); i++)
 	{
 		ini.SetValue(data->at(i).section.c_str(), data->at(i).key.c_str(), data->at(i).value.c_str());
 	}
 	ini.SaveFile(_getSaveFileLoc(filename).string().c_str());
-	ini.Reset();
+	ini.Reset();*/
 }
 
 void ResourceHandler::clearFile(std::string filename)
@@ -658,14 +658,14 @@ void ResourceHandler::clearFile(std::string filename)
 
 bool ResourceHandler::fileExists(std::string filename)
 {
-	return std::filesystem::exists(_getSaveFileLoc(filename));
+	//return std::filesystem::exists(_getSaveFileLoc(filename));
 }
 
 
 
 std::string ResourceHandler::readFromFile(std::string key, std::string section, std::string filename)
 {
-	_LoadIniFile(_getSaveFileLoc(filename).string());
+	/*_LoadIniFile(_getSaveFileLoc(filename).string());
 
 	const char* value = ini.GetValue(section.c_str(), key.c_str());
 
@@ -673,7 +673,7 @@ std::string ResourceHandler::readFromFile(std::string key, std::string section, 
 		return value;
 	}
 	
-	return "";
+	return "";*/
 
 }
 
@@ -696,7 +696,7 @@ std::filesystem::path ResourceHandler::getSourceDir()
 bool ResourceHandler::materialSaved(Ogre::String objectName, Ogre::String Material)
 {
 	
-	return std::filesystem::exists(_getSaveFileLoc(objectName));
+	//return std::filesystem::exists(_getSaveFileLoc(objectName));
 	
 }
 

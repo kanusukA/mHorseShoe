@@ -20,8 +20,8 @@ void Shader::_initShader(Ogre::MaterialPtr mat_p)
 		default:
 			break;
 		}
-
-		builderCxt->setShaderVars(this);
+		// TODO IMPLEMENT RSUS
+		/*builderCxt->setShaderVars(this);*/
 	}
 	else {
 		ToastComponent::GetInstance()->addMessage("No Programable shader!");

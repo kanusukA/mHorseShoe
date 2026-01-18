@@ -4,6 +4,7 @@
 
 class Material : public  MaterialResource {
 protected:
+	GDBuilderContext* builderCxt;
 
 	Ogre::MaterialPtr material;
 
@@ -12,25 +13,32 @@ protected:
 	std::unique_ptr<Shader> fragmentShader;
 
 	
-
-
 public:
 
-	Material(GDBuilderContext* builderCxt, Ogre::MaterialPtr material_p ) : MaterialResource(ResourceHandler::GetInstance(),material_p->getName()) {
+	Material(GDBuilderContext* builderCxt_p, Ogre::MaterialPtr material_p ) : MaterialResource(ResourceHandler::GetInstance(),material_p->getName()) {
 		material = material_p;
+		builderCxt = builderCxt_p;
 	};
 
-	
+	void setVertexShader() {
+		vertexShader = std::make_unique<Shader>(builderCxt, material, ShaderType::Vertex);
+	}
 
-	//void setVertexShader(Shader* vertex_p) {
-	//	/*MaterialResource::_addVertexShader(vertex_p->getId());
-	//	vertexShader = vertex_p;*/
-	//}
-	//void setFragmentShader(Shader* fragment_p) {
-	//	/*MaterialResource::_addFragmentShader(fragment_p->getId());
-	//	fragmentShader = fragment_p;*/
-	//}
+	void setFragmentShader() {
+		fragmentShader = std::make_unique<Shader>(builderCxt, material, ShaderType::Fragment);
+	}
 
+	void selectShader() {
+		// TODO SETUP SHADERS RSUS SELECTION
+	}
+
+	const std::string const getVertexShaderName() {
+		return vertexShader->getShaderName();
+	}
+
+	const std::string const getFragmentShaderName() {
+		return fragmentShader->getShaderName();
+	}
 	
 
 	Ogre::MaterialPtr getMaterialPtr() {
@@ -45,20 +53,20 @@ public:
 // Material Resource in horseshoee is consists of a single primary reference, which is a unique_ptr owned by the ResourceBuilderCxt.
 // This reference can be used to create more copies of the material or shared material.
 // It is important to note that primary Material is created by ResourceBuilderCxt and this class only manages the distribution of that Material.
-class MaterialManager  {
-private:
-	ResourceHandler* resourceHan = ResourceHandler::GetInstance();
-protected:
-	
-	MaterialManager() {
-		
-	};
-
-public:
-
-	ResID createMaterialResource(std::string mat_name);
-
-	// A new instance of called material is created. The returned unique_ptr is attached to the Owner Object.
-	Material* fetchNewMaterial(ResID materialID, Ogre::MaterialPtr matPtr);
-
-};
+//class MaterialManager  {
+//private:
+//	ResourceHandler* resourceHan = ResourceHandler::GetInstance();
+//protected:
+//	
+//	MaterialManager() {
+//		
+//	};
+//
+//public:
+//
+//	ResID createMaterialResource(std::string mat_name);
+//
+//	// A new instance of called material is created. The returned unique_ptr is attached to the Owner Object.
+//	Material* fetchNewMaterial(ResID materialID, Ogre::MaterialPtr matPtr);
+//
+//};

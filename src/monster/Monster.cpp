@@ -149,7 +149,7 @@ Ogre::Entity* Monster::createEntity(Ogre::String entityName_p, Ogre::MeshPtr mes
 
 Ogre::MeshPtr Monster::getMesh(Ogre::String meshName, Ogre::String groupName)
 {
-	return Ogre::MeshManager::getSingleton().load(meshName, groupName);
+	return Ogre::MeshManager::getSingleton().load(meshName, groupName); // FILE NOT FOUND!!!!
 }
 Ogre::SceneNode* Monster::createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node)
 {
@@ -161,15 +161,23 @@ Ogre::Mesh* Monster::getColliderMesh(Ogre::String meshName, Ogre::String groupNa
 	return Ogre::MeshManager::getSingleton().load(meshName, groupName).get();
 }
 
-Ogre::MaterialPtr Monster::getMaterial(Ogre::String matName_p)
+Ogre::MaterialPtr Monster::getMaterial(Ogre::String matName_p, Ogre::String groupName)
 {
-	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(matName_p,OGRE_MATERIAL_GROUP);// Fix shader stuff
-
+	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(matName_p,groupName);
 	if (!mat.get()->isLoaded())
 	{
 		mat.get()->load();
 	}
 	return mat;
+}
+
+Ogre::MaterialPtr Monster::createEmptyMaterial(std::string name_p, Ogre::String groupName)
+{
+	if (!Ogre::MaterialManager::getSingletonPtr()->resourceExists(name_p,groupName))
+	{
+		return Ogre::MaterialManager::getSingletonPtr()->create(name_p, groupName);
+	}
+	return nullptr;
 }
 
 Ogre::SceneNode* Monster::addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode)
@@ -1365,10 +1373,10 @@ void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 
 	// Reads the shader file
 	// Gets the filenames and paths and the shader variables are prepared
-	ResourceHandler::GetInstance()->readShaderFiles(mat);
+	//ResourceHandler::GetInstance()->readShaderFiles(mat);
 
 	// collects the read shader variables
-	std::vector<std::string>* fragshaderVar = ResourceHandler::GetInstance()->fragShaderVariables;
+	//std::vector<std::string>* fragshaderVar = ResourceHandler::GetInstance()->fragShaderVariables;
 	//std::vector<std::string>* vertshaderVar = ResourceHandler::GetInstance()->vertShaderVariables;
 
 	//if save file exists

@@ -10,10 +10,8 @@ class ObjectTabModelComponent : public ModelComponent {
 public:
 
 	SunWindowSize* windowSize;
+	std::string* materialName;
 
-	std::weak_ptr<Object> selectedObj;
-
-	std::vector<MaterialResource*>* materials;
 	int selectedMaterial = 0;
 
 	ObjectTabModelComponent(const char* name_p) : ModelComponent(name_p) {
@@ -26,29 +24,8 @@ public:
 		//materials = this->gdSource->getResourceHandler()->getAllMaterial();
 	}
 
-	void getFragShader() {
-		// INTIGRATE AFTER SETTING RSUS
-		
-		this->gdSource->getResourceHandler()->loadImgToTex();
-	}
-
-	void deleteObject() {
-		//this->gdSource->getStuffHandler()->deleteSelectedObj();
-	}
-
 	void setMaterial() {
-		//selectedObj->get()->setMaterial(materials->at(selectedMaterial)->getHigherRef());
-	}
-
-	void selectShader(Shader* vertShader,Shader* fragShader) {
-		/*this->gdSource->getShaderHandler()->setShader(selectedObj->get()->getMaterial()->getName(),
-			fragShader->getShaderName(),
-			vertShader->getShaderName(),
-			fragShader->getShaderVars(),
-			vertShader->getShaderVars(),
-			fragShader->getShader(),
-			vertShader->getShader()
-		);*/
+		ModelComponent::selectedObject->selObject.lock()->setMaterial(ModelComponent::materialDpVec->at(selectedMaterial), *materialName);
 	}
 
 };

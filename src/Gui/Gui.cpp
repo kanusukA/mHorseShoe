@@ -13,7 +13,7 @@ void Gui::initGui(Ogre::ImGuiOverlay* overlay) {
 
 	this->viewport = ImGui::GetMainViewport();
 
-	resourceHandler->updateOgreMaterials();
+	//resourceHandler->updateOgreMaterials();
 
 	this->initGuiComponents();
 
@@ -48,20 +48,20 @@ void Gui::initGuiComponents()
 	SceneTabModelComponent* scnTabModel = new SceneTabModelComponent("Scene tab Model");
 	this->addModelComponent(scnTabModel);
 
-	ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent("Resource Tab Model");
-	this->addModelComponent(resourceTabModel);
+	//ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent("Resource Tab Model");
+	//this->addModelComponent(resourceTabModel);
 
-	/*StatusTabModelComponent* statusModel = new StatusTabModelComponent("Status tab Model");
-	this->addModelComponent(statusModel);*/
+	///*StatusTabModelComponent* statusModel = new StatusTabModelComponent("Status tab Model");
+	//this->addModelComponent(statusModel);*/
 
-	AddTabModelComponent* addModel = new AddTabModelComponent("Add tab Model");
-	this->addModelComponent(addModel);
+	//AddTabModelComponent* addModel = new AddTabModelComponent("Add tab Model");
+	//this->addModelComponent(addModel);
 
 	ObjectTabModelComponent* objectModel = new ObjectTabModelComponent("Object tab Model");
 	this->addModelComponent(objectModel);
 
-	ScenePanelTabModelComponent* scenePanelModel = new ScenePanelTabModelComponent("Scene Panel tab Model");
-	this->addModelComponent(scenePanelModel);
+	//ScenePanelTabModelComponent* scenePanelModel = new ScenePanelTabModelComponent("Scene Panel tab Model");
+	//this->addModelComponent(scenePanelModel);
 
 	RSUSTabModelComponent* rsusModel = new RSUSTabModelComponent("Rsus tab Model");
 	this->addModelComponent(rsusModel);
@@ -69,39 +69,39 @@ void Gui::initGuiComponents()
 	TestingTabModelComponent* testModel = new TestingTabModelComponent("Testing tab model");
 	this->addModelComponent(testModel);
 
-	ToastTabModelComponent* toastModel = new ToastTabModelComponent("Toast tab model");
-	this->addModelComponent(toastModel);
+	//ToastTabModelComponent* toastModel = new ToastTabModelComponent("Toast tab model");
+	//this->addModelComponent(toastModel);
 
 	// Views
 	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab",scnTabModel);
 	this->addViewComponent(scnTab);
 
-	ResourceTabComponent* resourceTab = new ResourceTabComponent("Resource Tab", resourceTabModel);
-	this->addViewComponent(resourceTab);
+	//ResourceTabComponent* resourceTab = new ResourceTabComponent("Resource Tab", resourceTabModel);
+	//this->addViewComponent(resourceTab);
 
-	/*StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
-	this->addViewComponent(statusTab);*/
+	///*StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
+	//this->addViewComponent(statusTab);*/
 
-	AddTabComponent* addTab = new AddTabComponent("Add Tab", addModel);
-	this->addViewComponent(addTab);
+	//AddTabComponent* addTab = new AddTabComponent("Add Tab", addModel);
+	//this->addViewComponent(addTab);
 
 	ObjectTabComponent* objectTab = new ObjectTabComponent("Object Tab", objectModel);
 	this->addViewComponent(objectTab);
 
-	ScenePanelTabComponent* scenePanelTab = new ScenePanelTabComponent("Scene Panel Tab", scenePanelModel);
-	this->addViewComponent(scenePanelTab);
+	//ScenePanelTabComponent* scenePanelTab = new ScenePanelTabComponent("Scene Panel Tab", scenePanelModel);
+	//this->addViewComponent(scenePanelTab);
 
 	RSUSTabComponent* rsusTab = new RSUSTabComponent("RSUS tab", rsusModel);
 	this->addViewComponent(rsusTab);
 
-	HUDComponent* hudTab = new HUDComponent("Hud tab");
-	this->addViewComponent(hudTab);
+	//HUDComponent* hudTab = new HUDComponent("Hud tab");
+	//this->addViewComponent(hudTab);
 
 	TestingTabComponent* testingTab = new TestingTabComponent("Test tab", testModel);
 	this->addViewComponent(testingTab);
 
-	ToastTabViewComponent* toastView = new ToastTabViewComponent("Toast tab", toastModel);
-	this->addViewComponent(toastView);
+	//ToastTabViewComponent* toastView = new ToastTabViewComponent("Toast tab", toastModel);
+	//this->addViewComponent(toastView);
 
 }
 

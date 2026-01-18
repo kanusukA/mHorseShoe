@@ -16,9 +16,6 @@
 
 
 
-
-
-
 // CODE CLEAN UP SHIFT TO NEW GUI FRAMEWORK!!
 
 // GuiFRAMEWORK IMPLEMENTATION
@@ -61,38 +58,24 @@ public:
 // It is a base class and stores data and functions relative to the view its attached with.
 // A single ViewComponent may have multiple ModelComponents and ModelComponents can be shared among ViewComponents to provide
 // data consistancy.
-class ModelComponent {
-private:
-	ModelComponent();
 
-protected:
-	GuiFramework* guiFramework;
-	GDSource* gdSource;
+// SELECTED VARIABLES (AN IMPLEMENTATION OF DOUBLE POINTERS)
 
-	const char* name;
-
-public:
-
-	SunWindowSize* windowSize;
-
-	ModelComponent(const char* name_p) {
-		name = name_p;
-	}
-
-	void setFramework(GuiFramework* framework) {
-		guiFramework = framework;
-	}
-	void setSource(GDSource* source) {
-		gdSource = source;
-	}
-
-	// USED TO INITALIZE PREDEFINED DATA AND VARIABLE OF THE COMPONENT
-	// USE THIS INSTED OF CONSTRUCTOR AS GDSOURCE IS INITALIZED AFTER THE OBJECT IS CREATED
-	virtual void init() {};
-
-	// Run when a ResourceUpdates!
-	virtual void update() {};
-
+struct SelectedCase
+{
+	std::weak_ptr<Case> selCase;
+};
+struct SelectedScene
+{
+	std::weak_ptr<Scene> selScene;
+};
+struct SelectedObject
+{
+	std::weak_ptr<Object> selObject;
+};
+struct SelectedMaterial
+{
+	std::weak_ptr<Material> selMaterial;
 };
 
 
@@ -128,12 +111,6 @@ public:
 		this->system = system_p;
 	};
 
-	/*void setPlayerObserver(PlayerObserver* playerOb) {
-		playerObserver = playerOb;
-	}*/
-
-	// TODO Add player Observer directly to GUI system
-
 	CaseHandler* getCaseHandler() {
 		return scnHandler;
 	}
@@ -146,9 +123,6 @@ public:
 		return resourceHandler;
 	}
 
-	/*PlayerObserver* getPlayerObserver() {
-		return playerObserver;
-	}*/
 
 	RSUS* getShaderHandler() {
 		return shaderHandler;
@@ -158,6 +132,89 @@ public:
 	}
 
 };
+
+class ModelComponent {
+private:
+	ModelComponent();
+
+protected:
+	GuiFramework* guiFramework;
+	GDSource* gdSource;
+
+	const char* name;
+
+public:
+
+	// INDEPENDENT RESOURCE DATA
+	static	std::vector<std::shared_ptr<Case>>* caseVec;
+
+	static SelectedCase* selectedCase;
+	static SelectedScene* selectedScene;
+	static SelectedObject* selectedObject;
+	static SelectedMaterial* selectedMaterial;
+
+	// DEPENDENT RESOURCE DATA
+	static std::vector<std::filesystem::path>* meshDpVec;
+	static std::vector<std::filesystem::path>* materialDpVec;
+	static std::vector<std::filesystem::path>* shaderDpVec;
+	static std::vector<std::filesystem::path>* textureDpVec;
+
+	SunWindowSize* windowSize;
+
+	ModelComponent(const char* name_p) {
+		name = name_p;
+		selectedCase = new SelectedCase();
+		selectedScene = new SelectedScene();
+		selectedObject = new SelectedObject();
+		selectedMaterial = new SelectedMaterial();
+
+	}
+
+	void setFramework(GuiFramework* framework) {
+		guiFramework = framework;
+	}
+	void setSource(GDSource* source) {
+		gdSource = source;
+
+		// SETUP DEPENDENT RESOURCE
+		meshDpVec = gdSource->getResourceHandler()->getRenderMeshLoaded();
+		materialDpVec = gdSource->getResourceHandler()->getMaterialsLoaded();
+		shaderDpVec = gdSource->getResourceHandler()->getShadersLoaded();
+		textureDpVec = gdSource->getResourceHandler()->getTexturesLoaded();
+
+		caseVec = gdSource->getCaseHandler()->caseVec;
+
+	}
+
+	// SETTERS
+	void selectCase(const int index) {
+		selectedCase->selCase = caseVec->at(index);
+	}
+
+	void selectScene(const std::weak_ptr<Scene>& scene_p) {
+		selectedScene->selScene = scene_p;
+	}
+
+	void selectObject(const std::weak_ptr<Object>& object_p) {
+		selectedObject->selObject = object_p;
+	}
+
+	void selectMaterial(const std::weak_ptr<Material>& material_p) {
+		selectedMaterial->selMaterial = material_p;
+	}
+
+
+	// USED TO INITALIZE PREDEFINED DATA AND VARIABLE OF THE COMPONENT
+	// USE THIS INSTED OF CONSTRUCTOR AS GDSOURCE IS INITALIZED AFTER THE OBJECT IS CREATED
+	virtual void init() {};
+
+	// Run when a ResourceUpdates!
+	virtual void update() {};
+
+};
+
+
+
 
 
 class GuiFramework : public GDSource {
@@ -184,7 +241,7 @@ public:
 
 	GuiFramework(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus, GDSystem* system_p) : 
 		GDSource(casehan, stuffhan,resourcehan,rsus,system_p) {
-		resourcehan->setGuiRegen(this);
+		//resourcehan->setGuiRegen(this);
 	}
 
 	// GUI FUNCTIONS

@@ -21,7 +21,7 @@ int main() {
 	std::cout << "Ogre started : " << std::endl;
 
 	ResourceHandler::GetInstance()->getAllResources();
-	ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
+	//ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
 
 	// Ogre AND ImGui
 	std::cout << "Setting up ImGui" << std::endl;

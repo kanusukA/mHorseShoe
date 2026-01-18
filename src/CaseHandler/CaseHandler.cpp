@@ -3,44 +3,56 @@
 void CaseHandler::checkIntegrity()
 {
 	// Check Scenes in 
-	Ogre::Node::ChildNodeMap nodes = oScnManager->getRootSceneNode()->getChildren();
+	//Ogre::Node::ChildNodeMap nodes = oScnManager->getRootSceneNode()->getChildren();
 
-	//std::vector<SceneResource*>* scnNodes = ResourceHandler::GetInstance()->getAllScenes();
-	bool match = true;
-	if (nodes.size() == scnNodes->size())
-	{
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			match = false;
-			for (int j = 0; j < scnNodes->size(); j++)
-			{
-				if (nodes.at(i)->getName() != scnNodes->at(j)->getName())
-				{
-					match = true;
-				}
-			}
-			if (!match)
-			{
-				throw CaseErrorHandler("Ogre Nodes are inconsistent with Resource Nodes");
-			}
-		}
-	}
-	else {
-		throw CaseErrorHandler("Ogre Nodes are inconsistent with Resource Nodes");
-	}
-	
+	////std::vector<SceneResource*>* scnNodes = ResourceHandler::GetInstance()->getAllScenes();
+	//bool match = true;
+	//if (nodes.size() == scnNodes->size())
+	//{
+	//	for (int i = 0; i < nodes.size(); i++)
+	//	{
+	//		match = false;
+	//		for (int j = 0; j < scnNodes->size(); j++)
+	//		{
+	//			if (nodes.at(i)->getName() != scnNodes->at(j)->getName())
+	//			{
+	//				match = true;
+	//			}
+	//		}
+	//		if (!match)
+	//		{
+	//			throw CaseErrorHandler("Ogre Nodes are inconsistent with Resource Nodes");
+	//		}
+	//	}
+	//}
+	//else {
+	//	throw CaseErrorHandler("Ogre Nodes are inconsistent with Resource Nodes");
+	//}
+	//
 
 }
 
 
 void CaseHandler::CreateCase(std::string caseName_p)
 {
-	std::unique_ptr<Case> uCase = std::make_unique<Case>(this,caseName_p);
-	caseVec->push_back(uCase);
-	selCase = caseVec->size() - 1;
+	std::shared_ptr<Case> sCase = std::make_shared<Case>(this,caseName_p);
+	caseVec->push_back(sCase);
 
 }
 
+
+Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType, Ogre::SceneNode* parentNode_p)
+{
+	if (this->sceneExists(scnName))
+	{
+		ToastComponent::GetInstance()->addMessage("Scene Already exists!!");
+		return nullptr;
+	}
+	Ogre::SceneNode* sceneNode = monCreateSceneNode(scnName,parentNode_p);
+	Scene* new_scn = new Scene(this, scnType, scnName,sceneNode);
+	return new_scn;
+	
+}
 
 Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType)
 {
@@ -49,10 +61,9 @@ Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType)
 		ToastComponent::GetInstance()->addMessage("Scene Already exists!!");
 		return nullptr;
 	}
-	
-	Scene* new_scn = new Scene(this, scnType, scnName);
+	Ogre::SceneNode* sceneNode = monCreateSceneNode(scnName, oScnManager->getRootSceneNode());
+	Scene* new_scn = new Scene(this, scnType, scnName, sceneNode);
 	return new_scn;
-	
 }
 
 Object* CaseHandler::CreateObject(std::string objectName_p, std::filesystem::path meshPath_p ,  PhysXType type)
@@ -77,20 +88,20 @@ Object* CaseHandler::CreateObject(std::string objectName_p, std::filesystem::pat
 Ogre::MeshPtr CaseHandler::fetchMeshByName(std::filesystem::path meshPath_p)
 {
 	// Check if it already exists
-	for (int i = 0; i < meshVec.size(); i++)
+	for (int i = 0; i < meshVec->size(); i++)
 	{
-		if (meshVec.at(i)->getMeshName() == meshPath_p.filename().string())
+		if (meshVec->at(i)->getMeshName() == meshPath_p.filename().string())
 		{
-			return meshVec.at(i)->getMesh();
+			return meshVec->at(i)->getMesh();
 		}
 	}
 	
 	// Create if it does not exist
-	this->monSetLocation(meshPath_p, OGRE_MESH_GROUP);
+	this->monSetLocation(meshPath_p.parent_path(), OGRE_MESH_GROUP);
 	Ogre::MeshPtr mesh = this->monGetMesh(meshPath_p.filename().string());
 	
 	std::unique_ptr<RenderMesh> uMesh = std::make_unique<RenderMesh>(this,mesh);
-	meshVec.push_back(std::move(uMesh));
+	meshVec->push_back(std::move(uMesh));
 
 	return mesh;
 
@@ -98,93 +109,62 @@ Ogre::MeshPtr CaseHandler::fetchMeshByName(std::filesystem::path meshPath_p)
 
 Ogre::MeshPtr CaseHandler::fetchMeshById(ResID meshID_p)
 {
-	for (int i = 0; i < meshVec.size(); i++)
+	for (int i = 0; i < meshVec->size(); i++)
 	{
-		if (meshVec.at(i)->getId() == meshID_p)
+		if (meshVec->at(i)->getId() == meshID_p)
 		{
-			return meshVec.at(i)->getMesh();
+			return meshVec->at(i)->getMesh();
 		}
 	}
 
 	return nullptr;
 }
 
-// old method
-//RenderMesh* CaseHandler::CreateRenderMesh(std::string meshName_p)
+
+Material* CaseHandler::CreateMaterial(std::filesystem::path materialPath_p, std::string materialName)
+{
+	// Check if Material is already set in stored vector
+	for (int i = 0; i < materialVec->size(); i++)
+	{
+		if (materialVec->at(i)->getName() == materialPath_p.filename().string())
+		{
+			// Copy Material from stored place
+			Ogre::MaterialPtr newMat = this->monCreateNewMaterial(materialName);
+			materialVec->at(i)->getMaterialPtr().get()->copyDetailsTo(newMat);
+
+			Material* mat = new Material(this, newMat);
+			return mat;
+		}
+	}
+
+	// if not stored
+	Ogre::MaterialPtr ogreMaterial = monCreateMaterial(materialPath_p.filename().string());
+	std::unique_ptr<Material> uMat = std::make_unique<Material>(this, ogreMaterial);
+	materialVec->push_back(std::move(uMat));
+
+	Ogre::MaterialPtr newMat = monCreateNewMaterial(materialName);
+	Material* mat = new Material(this, newMat);
+
+	return mat;
+
+}
+
+
+//Shader* CaseHandler::CreateShader(Ogre::MaterialPtr mat_p, ShaderType type)
 //{
-//	RenderMesh* new_msh = new RenderMesh(this->builderCxt, meshName_p);
-//	return new_msh;
+//	if (mat_p)
+//	{
+//		Shader* new_shader = new Shader(this, mat_p, type);
+//		return new_shader;
+//	}
+//	else {
+//		ToastComponent::GetInstance()->addMessage("Invalid MaterialPtr provided");
+//	}
+//	
 //}
 
-RenderMesh* CaseHandler::CreateRenderMesh(std::filesystem::path path_p)
-{
 
-	// Check if Render Mesh already Exists
-	ResID id = ResourceHandler::GetInstance()->doesRenderMeshExists(path_p.filename().string());
 
-	if (id > 0) // Render Mesh EXIST
-	{
-		return static_cast<RenderMesh*>(ResourceHandler::GetInstance()->fetchRenderMeshResourceByID(id));
-	}
-	else { // Render Mesh DOES NOT EXIST
-		
-		// initialize location from ogre/monster
-		getMonsterRef()->addOgreResourceLocation(path_p.parent_path().string(), OGRE_MESH_GROUP);
-
-		// Create RenderMesh
-		RenderMesh* renderMesh = new RenderMesh(this, path_p.filename().string());
-		return renderMesh;
-
-	}
-
-}
-
-ColliderMesh* CaseHandler::CreateColliderMesh(std::string MeshName_p)
-{
-	ColliderMesh* new_msh = new ColliderMesh(this, MeshName_p);
-	return new_msh;
-}
-
-Shader* CaseHandler::CreateShader(Ogre::MaterialPtr mat_p, ShaderType type)
-{
-	if (mat_p)
-	{
-		Shader* new_shader = new Shader(this, mat_p, type);
-		return new_shader;
-	}
-	else {
-		ToastComponent::GetInstance()->addMessage("Invalid MaterialPtr provided");
-	}
-	
-}
-
-ResID CaseHandler::CreateMaterialResource(std::filesystem::path path_p)
-{
-	// Check if Exists
-	ResID id = ResourceHandler::GetInstance()->doesMaterialExists(path_p.filename().string());
-
-	if (id == 0)
-	{
-		// Creating a Copy of Material and Making it a unique_ptr to Object
-		monster->addOgreResourceLocation(path_p.parent_path().string(), OGRE_MATERIAL_GROUP);
-
-		return createMaterialResource(path_p.filename().string());
-
-	}
-
-	return 0;
-	
-}
-
-Material* CaseHandler::getMaterial(std::filesystem::path materialPath_p)
-{
-	ResID materialResID = CreateMaterialResource(materialPath_p);
-
-	Ogre::MaterialPtr material = createMaterial(materialPath_p.filename().string());
-
-	return fetchNewMaterial(materialResID, material);
-
-}
 
 Image* CaseHandler::CreateImage(std::filesystem::path filePath_p)
 {
@@ -197,57 +177,57 @@ Image* CaseHandler::CreateImage(std::filesystem::path filePath_p)
 void CaseHandler::loadSavedResource()
 {
 	// Cases
-	if (ResourceHandler::GetInstance()->RLCases->size() > 0)
-	{
-		// the first case
-		Case* savedCase = new Case(this, ResourceHandler::GetInstance()->RLCases->at(0).name);
+	//if (ResourceHandler::GetInstance()->RLCases->size() > 0)
+	//{
+	//	// the first case
+	//	Case* savedCase = new Case(this, ResourceHandler::GetInstance()->RLCases->at(0).name);
 
-	
-		for (int i = 0; i < ResourceHandler::GetInstance()->RLCases->at(0).Scenes.size(); i++)
-		{
-			for (int j = 0; j < ResourceHandler::GetInstance()->RLScenes->size(); j++)
-			{
-				if (ResourceHandler::GetInstance()->RLScenes->at(j).id == ResourceHandler::GetInstance()->RLCases->at(0).Scenes.at(i))
-				{
-					RLScene* scn = &ResourceHandler::GetInstance()->RLScenes->at(j);
-					Scene* new_scn = new Scene(this, SceneType(scn->scnType), scn->name, convertFloatPtrToVec3(scn->position), convertFloatPtrToVec4(scn->rotation),
-						convertFloatPtrToVec3(scn->scale));
-					savedCase->addSceneToCase(new_scn);
+	//
+	//	for (int i = 0; i < ResourceHandler::GetInstance()->RLCases->at(0).Scenes.size(); i++)
+	//	{
+	//		for (int j = 0; j < ResourceHandler::GetInstance()->RLScenes->size(); j++)
+	//		{
+	//			if (ResourceHandler::GetInstance()->RLScenes->at(j).id == ResourceHandler::GetInstance()->RLCases->at(0).Scenes.at(i))
+	//			{
+	//				RLScene* scn = &ResourceHandler::GetInstance()->RLScenes->at(j);
+	//				Scene* new_scn = new Scene(this, SceneType(scn->scnType), scn->name, convertFloatPtrToVec3(scn->position), convertFloatPtrToVec4(scn->rotation),
+	//					convertFloatPtrToVec3(scn->scale));
+	//				savedCase->addSceneToCase(new_scn);
 
-					// load Objects
-					if (scn->objects.size() > 0)
-					{
-						for (int objindex = 0; objindex < scn->objects.size(); objindex++)
-						{
-							for (int RlobjIndex = 0; RlobjIndex < ResourceHandler::GetInstance()->RLObjects->size(); RlobjIndex++)
-							{
-								if (scn->objects.at(objindex) == ResourceHandler::GetInstance()->RLObjects->at(RlobjIndex).id)
-								{
-									RLObject* rl_obj = &ResourceHandler::GetInstance()->RLObjects->at(RlobjIndex);
+	//				// load Objects
+	//				if (scn->objects.size() > 0)
+	//				{
+	//					for (int objindex = 0; objindex < scn->objects.size(); objindex++)
+	//					{
+	//						for (int RlobjIndex = 0; RlobjIndex < ResourceHandler::GetInstance()->RLObjects->size(); RlobjIndex++)
+	//						{
+	//							if (scn->objects.at(objindex) == ResourceHandler::GetInstance()->RLObjects->at(RlobjIndex).id)
+	//							{
+	//								RLObject* rl_obj = &ResourceHandler::GetInstance()->RLObjects->at(RlobjIndex);
 
-									RLFetchedResource* rlResources = ResourceHandler::GetInstance()->fetchResourcesFromMesh(rl_obj->renderMeshID);
-									if (rlResources)
-									{
-										
+	//								RLFetchedResource* rlResources = ResourceHandler::GetInstance()->fetchResourcesFromMesh(rl_obj->renderMeshID);
+	//								if (rlResources)
+	//								{
+	//									
 
 
-										//Object* newObj = new Object(this->builderCxt, )
-									}
-									
+	//									//Object* newObj = new Object(this->builderCxt, )
+	//								}
+	//								
 
-								}
-							}
-						}
+	//							}
+	//						}
+	//					}
 
-					}
+	//				}
 
-				}
-			}
-			
-		}
-		
+	//			}
+	//		}
+	//		
+	//	}
+	//	
 
-	}
+	//}
 
 }
 

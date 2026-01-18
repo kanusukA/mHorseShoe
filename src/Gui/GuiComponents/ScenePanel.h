@@ -12,7 +12,7 @@ private:
 
 public:
 
-	std::vector<SceneResource*>* scenes;
+	//std::vector<SceneResource*>* scenes;
 
 	ScenePanelTabModelComponent(const char* name_p) : ModelComponent(name_p)
 	{
@@ -20,7 +20,7 @@ public:
 	}
 
 	void init() override {
-		scenes = this->gdSource->getResourceHandler()->getAllScenes();
+		//scenes = this->gdSource->getResourceHandler()->getAllScenes();
 	}
 };
 

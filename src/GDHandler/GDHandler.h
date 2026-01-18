@@ -53,7 +53,7 @@ public:
 
 	// OBJECT CREATION / GDCONTEXT OVERRIDE
 
-	Ogre::SceneNode* createScene(std::string name_p) override;
+	/*Ogre::SceneNode* createScene(std::string name_p) override;
 	Ogre::Entity* createObject(std::string name_p, Ogre::MeshPtr mesh_p) override;
 	Ogre::MaterialPtr createMaterial(std::string materialName_p) override;
 
@@ -63,7 +63,7 @@ public:
 
 	void setShaderVars(Shader* shader) override;
 
-	void selectShader(Shader* shader_p) override;
+	void selectShader(Shader* shader_p) override;*/
 
 	// Creates SceneNode Based on the name and Mesh.
 	// If PhysicsType : eRIGID_DYNAMIC the same mesh is used for collision.

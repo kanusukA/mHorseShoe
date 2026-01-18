@@ -232,10 +232,11 @@ public:
 	Ogre::Entity* createMeshEntity(Ogre::String entityname ,Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
 	Ogre::Entity* createEntity(Ogre::String entityName_p, Ogre::MeshPtr mesh_p);
 	Ogre::MeshPtr getMesh(Ogre::String meshName, Ogre::String groupName = "Render_Mesh");
-	Ogre::SceneNode* createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node); // Creates a new scnNode and attches it to the given scnNode
+	Ogre::SceneNode* createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node); // Creates a new scnNode and attaches it to the given scnNode
 
 	Ogre::Mesh* getColliderMesh(Ogre::String meshName, Ogre::String groupName = "Collider_Mesh");
-	Ogre::MaterialPtr getMaterial(Ogre::String matName_p);
+	Ogre::MaterialPtr getMaterial(Ogre::String matName_p, Ogre::String groupName);
+	Ogre::MaterialPtr createEmptyMaterial(std::string name_p, Ogre::String groupName);
 	Ogre::SceneNode* addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode);
 
 	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::String scnNodeName, Ogre::Entity* ent);

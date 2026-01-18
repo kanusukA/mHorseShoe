@@ -8,14 +8,8 @@ private:
 	bool rootSceneNodeSelected = true;
 public:
 
-	// ID MANAGING (IGNORE)
-	int* id = new int(0);
-	
-	std::vector<Case*>* cases;
-
-	Case* currentCase;
-
-	float* position;
+	std::string* inputCaseName = new std::string("");
+	int selectedCase = 0;
 
 
 	std::string* inputSceneName = new std::string("");
@@ -24,8 +18,6 @@ public:
 	// MESHS FROM RESOURCE HANDLER
 	std::string* inputObjectname = new std::string("");
 	PhysXType physxType = PhysXType::Static;
-	
-	std::vector<std::filesystem::path>* renderMeshes;
 
 	int selectedMesh = 0;
 
@@ -34,64 +26,49 @@ public:
 	}
 
 	void init() override {
-		cases = this->gdSource->getCaseHandler()->getAllCases();
-		currentCase = this->gdSource->getCaseHandler()->getCurrentCase();
-		
-		renderMeshes = this->gdSource->getResourceHandler()->getRenderMeshLoaded();
 		
 	}
 
-
-	std::string getCaseName() { return currentCase->getName(); }
-	
-	SceneResource* getCaseScene(ResID scnID) { return this->gdSource->getResourceHandler()->fetchSceneResourceByID(scnID); }
+	void addCase() {
+		this->gdSource->getCaseHandler()->CreateCase(*inputCaseName);
+	}
 
 	void addScene() {
 		if (rootSceneNodeSelected)
 		{
-			this->gdSource->getCaseHandler()->CreateSceneAttachToCase(scnType, *inputSceneName);
+			ModelComponent::selectedCase->selCase.lock()->attachNewSceneToRoot(*inputSceneName, scnType);
 		}
 		else {
-			Scene* new_scn = this->gdSource->getCaseHandler()->CreateScene(scnType, *inputSceneName);
-			if (new_scn)
-			{
-				currentCase->getSelectedScene()->addScene(new_scn);
-			}
-			
+			ModelComponent::selectedScene->selScene.lock()->attachNewScene(*inputSceneName, scnType);
 		}
+		
 		
 	}
 
 	void addObject() {
-		// Create RenderMesh
-		RenderMesh* mesh = this->gdSource->getCaseHandler()->CreateRenderMesh(renderMeshes->at(selectedMesh));
-
-		Object* obj =  this->gdSource->getCaseHandler()->CreateObject(*inputObjectname, mesh, physxType);
-
-		if (obj)
-		{
-			currentCase->getSelectedScene()->addObject(obj);
-		}
-		
+		ModelComponent::selectedScene->selScene.lock()->attachNewObject(*inputObjectname, ModelComponent::meshDpVec->at(selectedMesh), physxType);
 	}
 
-	void deleteObject(ResID id) {
-		currentCase->getSelectedScene()->removeObjectById(id);
+	void deleteObject(int index) {
+		ModelComponent::selectedScene->selScene.lock()->removeObjectByIndex(index);
 	}
 
-	void selectObject(Object* obj) {
-		this->gdSource->getCaseHandler()->setSelectedObject(obj);
-		
+	void selectObject(std::weak_ptr<Object> wObject_p) {
+		ModelComponent::selectObject(wObject_p);
 	}
 
-	void selectScene(Scene* scn_p) {
-		currentCase->selectScene(scn_p);
+	void selectScene(std::weak_ptr<Scene> wScene_p) {
 		rootSceneNodeSelected = false;
-		//position = currentCase->getSelectedScene()->getPosition().ptr();
+		ModelComponent::selectScene(wScene_p);
 	}
-	void deleteScene(Scene* scn_p) {
-		currentCase->removeScene(scn_p);
+
+	void selectCase(int index) {
+		ModelComponent::selectCase(index);
+	}
+
+	void deleteScene(int index) {
 		rootSceneNodeSelected = true;
+		ModelComponent::selectedCase->selCase.lock()->removeSceneByIndex(index);
 	}
 
 	void selectRootSceneNode() {

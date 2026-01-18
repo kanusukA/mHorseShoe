@@ -33,7 +33,7 @@ public:
 
 	void init() override{
 		renderMeshes = gdSource->getResourceHandler()->getRenderMeshLoaded();
-		colliderMeshes = gdSource->getResourceHandler()->getColliderMeshLoaded();
+		//colliderMeshes = gdSource->getResourceHandler()->getColliderMeshLoaded();
 		materials = gdSource->getResourceHandler()->getMaterialsLoaded();
 		images = gdSource->getResourceHandler()->getTexturesLoaded();
 		shaders = gdSource->getResourceHandler()->getShadersLoaded();
@@ -44,7 +44,7 @@ public:
 	}
 
 	void RenderMeshToOgreBtn() {
-		gdSource->getResourceHandler()->addOgreRenderMeshResourceLocation();
+		//gdSource->getResourceHandler()->addOgreRenderMeshResourceLocation();
 	}
 
 	void FetchAllResourcesBtn() {

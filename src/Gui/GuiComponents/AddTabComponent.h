@@ -45,8 +45,8 @@ public:
 		DynamicScenes = this->gdSource->getCaseHandler()->getDynamicScenes();
 		MeshScenes = this->gdSource->getCaseHandler()->getMeshScenes();*/
 
-		RenderMeshes = this->gdSource->getResourceHandler()->ogreRenderMeshes;
-		ColliderMeshes = this->gdSource->getResourceHandler()->colliderMeshes;
+	/*	RenderMeshes = this->gdSource->getResourceHandler()->ogreRenderMeshes;
+		ColliderMeshes = this->gdSource->getResourceHandler()->colliderMeshes;*/
 
 		
 	}
@@ -86,7 +86,7 @@ public:
 	
 
 	void createSceneBtn() {
-		switch (SelectedStuffType)
+		/*switch (SelectedStuffType)
 		{
 		case STUFF_DYNAMIC:
 			gdSource->getCaseHandler()->CreateScene(SceneType::DYNAMIC, *CreateSceneNode);
@@ -99,7 +99,7 @@ public:
 			break;
 		default:
 			break;
-		}
+		}*/
 	}
 
 	void add() {

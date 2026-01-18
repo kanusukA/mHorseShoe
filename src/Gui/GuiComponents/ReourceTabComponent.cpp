@@ -62,9 +62,6 @@ void addLoadPath(ResourceTabModelComponent* model) {
 			case ResourceLoaderEnums::RenderMeshPath:
 				ImGui::Text("RenderMeshPath : ");
 				break;
-			case ResourceLoaderEnums::ColliderMeshPath:
-				ImGui::Text("ColliderMeshPath : ");
-				break;
 			case ResourceLoaderEnums::ImagePath:
 				ImGui::Text("Images : ");
 				break;

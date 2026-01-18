@@ -6,49 +6,54 @@
 // The Scene class connects SceneResource with Ogre::SceneManager. As such using SceneResource to initalize is not recommened as it may lead to complications.
 class Scene : public SceneResource {
 private:
-	GDBuilderContext* builderCxt;
+	GDBuilderContext* GDBuilderCxt;
 
 	Ogre::SceneNode* scene;
 
 	std::vector<std::shared_ptr<Scene>> sceneVec;
 	std::vector<std::shared_ptr<Object>> objVec;
 
-	
-
 
 public:
-	Scene(GDBuilderContext* builderCxt_p,SceneType scnType, std::string name_p) :
+	Scene(GDBuilderContext* GDBuilderCxt_p,SceneType scnType, std::string name_p,Ogre::SceneNode* sceneNode_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, Ogre::Vector3(0,0,0), Ogre::Vector4(0,0,0,0), Ogre::Vector3(0,0,0)) {
-		builderCxt = builderCxt_p;
-		
+		GDBuilderCxt = GDBuilderCxt_p;
+		scene = sceneNode_p;
 		
 	}
-	Scene(GDBuilderContext* builderCxt_p, SceneType scnType, std::string name_p, Ogre::Vector3 pos_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) :
+	Scene(GDBuilderContext* GDBuilderCxt_p, SceneType scnType, std::string name_p, Ogre::SceneNode* sceneNode_p , Ogre::Vector3 pos_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, pos_p, orientation_p, scale_p) {
-		builderCxt = builderCxt_p;
+		GDBuilderCxt = GDBuilderCxt_p;
+		scene = sceneNode_p;
 		scene->setPosition(pos_p);
 		scene->setOrientation(Vec4toQuaternion(orientation_p));
 		scene->setScale(scale_p);
 	}
 
 	// Object
-	void attachNewObject(std::string objectName_p, std::filesystem::path meshPath_p, PhysXType type) {
-		Object* newObject = builderCxt->CreateObject(objectName_p, meshPath_p, type);
-		std::shared_ptr<Object> uObject(newObject);
-		objVec.push_back(std::move(uObject));
+	void attachNewObject(const std::string objectName_p, std::filesystem::path meshPath_p, PhysXType type) {
+		Object* newObject = GDBuilderCxt->CreateObject(objectName_p, meshPath_p, type);
+		std::shared_ptr<Object> sObject(newObject);
+		scene->attachObject(sObject->entity.get());
+		objVec.push_back(std::move(sObject));
+
 	}
 
-	void removeObjectById(ResID objId);
-
-	void removeObjectByIndex(int index);
+	void removeObjectByIndex(int index) {
+		objVec.erase(objVec.begin() + index);
+	}
 
 	
 	//Scene
-	void addScene(Scene* scene_p);
+	void attachNewScene(const std::string sceneName_p, const SceneType sceneType_p) {
+		Scene* newScene = GDBuilderCxt->CreateScene(sceneName_p, sceneType_p,scene);
+		std::shared_ptr<Scene> sScene(newScene);
+		sceneVec.push_back(std::move(sScene));
+	}
 
-	void removeSceneById(ResID sceneId);
-
-	void removeSceneByIndex(int index);
+	void removeSceneByIndex(int index) {
+		sceneVec.erase(sceneVec.begin() + index);
+	}
 
 	Ogre::Vector3 getPosition() {
 		return scene->getPosition();
@@ -103,11 +108,11 @@ public:
 	
 
 
-	std::vector <std::shared_ptr< Scene >>* getAttachedScenes() {
+	const std::vector<std::shared_ptr<Scene>>* getAttachedScenes() {
 		return &sceneVec;
 	}
 
-	std::vector <std::shared_ptr< Object >>* getObjects() {
+	const std::vector <std::shared_ptr<Object>>* getObjects() {
 		return &objVec;
 	}
 

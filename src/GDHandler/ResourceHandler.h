@@ -79,9 +79,9 @@ private:
 
 	
 	// Add Resource
-	void addResource(std::filesystem::path filePath, ResourceHandlerType type);
+	//void addResource(std::filesystem::path filePath, ResourceHandlerType type);
 
-	std::filesystem::path _getSaveFileLoc(std::string filename);
+	//std::filesystem::path _getSaveFileLoc(std::string filename);
 	void _readShaderFile(std::vector<std::string>* shaderVar, std::filesystem::path path);
 
 	// Loads ini file in ini obj. Creates the file if it does not exists
@@ -170,19 +170,15 @@ public:
 	// Used for testing only
 	void getAllResources();
 
-	// CHECKS
-	// returns 0 if not found
-	// filename - must contain extension
-	ResID doesRenderMeshExists(std::string filename);
-	ResID doesMaterialExists(std::string filename);
+	
 
 	// OLDER METHODS _________________________________________________________________________________________________________
 
 	// Ogre Functions
-	void addOgreRenderMeshResourceLocation(); // Adds default render mesh location.
-	void addOgreResourceLocation(std::filesystem::path location, std::string group);
-	void getOgreRenderMeshes();
-	void updateOgreMaterials();
+	//void addOgreRenderMeshResourceLocation(); // Adds default render mesh location.
+	//void addOgreResourceLocation(std::filesystem::path location, std::string group);
+	//void getOgreRenderMeshes();
+	//void updateOgreMaterials();
 
 
 	// Only way to initialize the class
@@ -193,8 +189,8 @@ public:
 	// Gets saved Cases Name
 	void getCases(std::vector<Ogre::String> *outputVec);
 
-	void readShaderFiles(Ogre::MaterialPtr mat);
-	void readShaderFiles(Ogre::GpuProgramPtr program);
+	//void readShaderFiles(Ogre::MaterialPtr mat);
+	//void readShaderFiles(Ogre::GpuProgramPtr program);
 
 	void writeToFile(std::string key, std::string value,std::string section, std::string filename);
 	void writeToFile(std::vector<SaveData>* data, std::string filename);
@@ -218,7 +214,7 @@ public:
 	SceneObject loadObject(std::string filename, int scnType);
 
 	// IMAGES / TEXTURE
-	void loadImgToTex();
+	/*void loadImgToTex();*/
 
 	void shutdown() {
 		this->resource_loader_shutdown();

@@ -29,7 +29,22 @@ Ogre::MeshPtr GDBuilderContext::monGetMesh(std::string meshName_p)
 
 Ogre::Entity* GDBuilderContext::monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p)
 {
-	return monster->createEntity(name_p,mesh_p)
+	return monster->createEntity(name_p, mesh_p);
+}
+
+Ogre::MaterialPtr GDBuilderContext::monCreateMaterial(std::string name_p)
+{
+	return monster->getMaterial(name_p, OGRE_MATERIAL_GROUP);
+}
+
+Ogre::MaterialPtr GDBuilderContext::monCreateNewMaterial(std::string name_p)
+{
+	return monster->createEmptyMaterial(name_p, OGRE_MATERIAL_GROUP);
+}
+
+Ogre::SceneNode* GDBuilderContext::monCreateSceneNode(std::string name_p, Ogre::SceneNode* parentNode_p)
+{
+	return monster->createNewScnNodeAttach(name_p, parentNode_p);
 }
 
 bool GDBuilderContext::sceneExists(std::string scnName_p)

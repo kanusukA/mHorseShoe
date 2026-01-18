@@ -7,7 +7,7 @@ class Case : public CaseResource {
 private:
 	GDBuilderContext* GDBuilderCxt;
 
-	std::vector<std::shared_ptr<Scene>>* caseVec = new std::vector<std::shared_ptr<Scene>>();
+	std::vector<std::shared_ptr<Scene>>* sceneVec = new std::vector<std::shared_ptr<Scene>>();
 
 public:
 
@@ -20,18 +20,27 @@ public:
 	}
 
 	// CREATEING A NEW SCENE
-	void attachNewScene(std::string sceneName, SceneType scnType) {
+	void attachNewScene(std::string sceneName, SceneType scnType, Ogre::SceneNode* parentNode_p) {
+		Scene* newScene = GDBuilderCxt->CreateScene(sceneName, scnType,parentNode_p);
+		std::shared_ptr<Scene> sScene(newScene);
+		sceneVec->push_back(std::move(sScene));
+	}
+	void attachNewSceneToRoot(std::string sceneName, SceneType scnType) {
 		Scene* newScene = GDBuilderCxt->CreateScene(sceneName, scnType);
 		std::shared_ptr<Scene> sScene(newScene);
-		caseVec->push_back(std::move(sScene));
+		sceneVec->push_back(std::move(sScene));
 	}
 
 	std::weak_ptr<Scene> getwScene(int index) {
-		return caseVec->at(index);
+		return sceneVec->at(index);
 	}
 
 	void removeSceneByIndex(int index) {
-		caseVec->erase(caseVec->begin() + index);
+		sceneVec->erase(sceneVec->begin() + index);
+	}
+
+	const std::vector<std::shared_ptr<Scene>>* getScenes() {
+		return sceneVec;
 	}
 
 };

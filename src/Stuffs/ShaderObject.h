@@ -24,6 +24,8 @@ public:
 
 	}
 
+
+
 	void loadShader();
 
 	Ogre::GpuProgramParametersPtr getShader() { return shader; }
