@@ -88,20 +88,20 @@ Object* CaseHandler::CreateObject(std::string objectName_p, std::filesystem::pat
 Ogre::MeshPtr CaseHandler::fetchMeshByName(std::filesystem::path meshPath_p)
 {
 	// Check if it already exists
-	for (int i = 0; i < meshVec->size(); i++)
+	/*for (int i = 0; i < meshVec->size(); i++)
 	{
 		if (meshVec->at(i)->getMeshName() == meshPath_p.filename().string())
 		{
 			return meshVec->at(i)->getMesh();
 		}
-	}
+	}*/
 	
 	// Create if it does not exist
 	this->monSetLocation(meshPath_p.parent_path(), OGRE_MESH_GROUP);
 	Ogre::MeshPtr mesh = this->monGetMesh(meshPath_p.filename().string());
 	
-	std::unique_ptr<RenderMesh> uMesh = std::make_unique<RenderMesh>(this,mesh);
-	meshVec->push_back(std::move(uMesh));
+	//std::unique_ptr<RenderMesh> uMesh = std::make_unique<RenderMesh>(this,mesh);
+	//meshVec->push_back(std::move(uMesh));
 
 	return mesh;
 
@@ -124,28 +124,37 @@ Ogre::MeshPtr CaseHandler::fetchMeshById(ResID meshID_p)
 Material* CaseHandler::CreateMaterial(std::filesystem::path materialPath_p, std::string materialName)
 {
 	// Check if Material is already set in stored vector
-	for (int i = 0; i < materialVec->size(); i++)
-	{
-		if (materialVec->at(i)->getName() == materialPath_p.filename().string())
-		{
-			// Copy Material from stored place
-			Ogre::MaterialPtr newMat = this->monCreateNewMaterial(materialName);
-			materialVec->at(i)->getMaterialPtr().get()->copyDetailsTo(newMat);
+	//for (int i = 0; i < materialVec->size(); i++)
+	//{
+	//	if (materialVec->at(i)->getName() == materialPath_p.filename().string())
+	//	{
+	//		// Copy Material from stored place
+	//		Ogre::MaterialPtr newMat = this->monCreateNewMaterial(materialName);
+	//		materialVec->at(i)->getMaterialPtr().get()->copyDetailsTo(newMat);
 
-			Material* mat = new Material(this, newMat);
-			return mat;
-		}
-	}
+	//		Material* mat = new Material(this, newMat);
+	//		return mat;
+	//	}
+	//}
 
 	// if not stored
-	Ogre::MaterialPtr ogreMaterial = monCreateMaterial(materialPath_p.filename().string());
-	std::unique_ptr<Material> uMat = std::make_unique<Material>(this, ogreMaterial);
-	materialVec->push_back(std::move(uMat));
+	//this->monSetLocation(materialPath_p.parent_path(), OGRE_MATERIAL_GROUP);
+	Ogre::MaterialPtr ogreMaterial = monCreateMaterial(resourceHandler->readMaterialName(materialPath_p));
+	/*std::unique_ptr<Material> uMat = std::make_unique<Material>(this, ogreMaterial);
+	materialVec->push_back(std::move(uMat));*/
 
 	Ogre::MaterialPtr newMat = monCreateNewMaterial(materialName);
-	Material* mat = new Material(this, newMat);
+	if (newMat)
+	{
+		ogreMaterial->copyDetailsTo(newMat);
+		Material* mat = new Material(this, newMat);
 
-	return mat;
+		return mat;
+	}
+	else {
+		return nullptr;
+	}
+	
 
 }
 

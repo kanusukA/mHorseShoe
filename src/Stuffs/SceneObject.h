@@ -2,6 +2,8 @@
 
 #include <Stuffs/EntityObject.h>
 
+void SceneDeleter(Scene* scene_p);
+
 
 // The Scene class connects SceneResource with Ogre::SceneManager. As such using SceneResource to initalize is not recommened as it may lead to complications.
 class Scene : public SceneResource {
@@ -47,7 +49,7 @@ public:
 	//Scene
 	void attachNewScene(const std::string sceneName_p, const SceneType sceneType_p) {
 		Scene* newScene = GDBuilderCxt->CreateScene(sceneName_p, sceneType_p,scene);
-		std::shared_ptr<Scene> sScene(newScene);
+		std::shared_ptr<Scene> sScene(newScene, SceneDeleter);
 		sceneVec.push_back(std::move(sScene));
 	}
 
@@ -114,6 +116,15 @@ public:
 
 	const std::vector <std::shared_ptr<Object>>* getObjects() {
 		return &objVec;
+	}
+
+	Ogre::SceneNode* getSceneNode() {
+		return scene;
+	}
+
+	// Used my Shared_ptr's custom deleter
+	void destroyScene() {
+		GDBuilderCxt->monDeleteSceneNode(scene);
 	}
 
 

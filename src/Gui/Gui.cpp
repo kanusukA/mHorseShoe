@@ -69,8 +69,8 @@ void Gui::initGuiComponents()
 	TestingTabModelComponent* testModel = new TestingTabModelComponent("Testing tab model");
 	this->addModelComponent(testModel);
 
-	//ToastTabModelComponent* toastModel = new ToastTabModelComponent("Toast tab model");
-	//this->addModelComponent(toastModel);
+	ToastTabModelComponent* toastModel = new ToastTabModelComponent("Toast tab model");
+	this->addModelComponent(toastModel);
 
 	// Views
 	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab",scnTabModel);
@@ -100,8 +100,8 @@ void Gui::initGuiComponents()
 	TestingTabComponent* testingTab = new TestingTabComponent("Test tab", testModel);
 	this->addViewComponent(testingTab);
 
-	//ToastTabViewComponent* toastView = new ToastTabViewComponent("Toast tab", toastModel);
-	//this->addViewComponent(toastView);
+	ToastTabViewComponent* toastView = new ToastTabViewComponent("Toast tab", toastModel);
+	this->addViewComponent(toastView);
 
 }
 

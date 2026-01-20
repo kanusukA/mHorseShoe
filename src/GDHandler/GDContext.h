@@ -54,11 +54,18 @@ public:
 
 	// Monster functions
 	void monSetLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);
+
 	Ogre::MeshPtr monGetMesh(std::string meshName_p);
 	Ogre::Entity* monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p);
+
 	Ogre::MaterialPtr monCreateMaterial(std::string name_p);
 	Ogre::MaterialPtr monCreateNewMaterial(std::string name_p);
+
 	Ogre::SceneNode* monCreateSceneNode(std::string name_p, Ogre::SceneNode* parentNode_p);
+	void monDeleteSceneNode(Ogre::SceneNode* scene_p);
+	void monDeleteEntity(Ogre::Entity* entity_p);
+
+	RSUS* monProvideRsus();
 
 	// Check Functions
 	bool sceneExists(std::string scnName_p);

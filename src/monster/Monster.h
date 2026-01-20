@@ -96,7 +96,7 @@ struct RSUShader
 
 
 
-// Singleton Class
+// Singleton Class // TODO make a part of Monster class.
 class RSUS
 {
 public:
@@ -301,6 +301,7 @@ public:
 	Ogre::SceneNode* getCameraScnNode() { return CameraNode; }
 
 	void addOgreResourceLocation(std::string path_p, std::string OgreResourceGroup);
+	void initalizeResourceGroup(std::string OgreResourceGroup);
 
 	void setSkyBox();
 	void setGrid();

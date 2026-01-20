@@ -565,11 +565,13 @@ void Monster::addOgreResourceLocation(std::string path_p, std::string OgreResour
 	{
 		Ogre::ResourceGroupManager::getSingletonPtr()->addResourceLocation(path_p, "FileSystem", OgreResourceGroup);
 
-		Ogre::ResourceGroupManager::getSingletonPtr()->initialiseAllResourceGroups();
 	}
+	
+}
 
-	
-	
+void Monster::initalizeResourceGroup(std::string OgreResourceGroup)
+{
+	Ogre::ResourceGroupManager::getSingletonPtr()->initialiseResourceGroup(OgreResourceGroup);
 }
 
 void Monster::setSkyBox()
@@ -731,7 +733,7 @@ void Monster::setGrid()
 	gridNode->setPosition(-5000, 0, -5000);
 
 
-	Ogre::SceneNode* test = oScnManager->getRootSceneNode()->createChildSceneNode("testing");
+	/*Ogre::SceneNode* test = oScnManager->getRootSceneNode()->createChildSceneNode("testing");
 	Ogre::MaterialPtr m_mat = Ogre::MaterialManager::getSingletonPtr()->getByName("normalMaterial");
 
 	Ogre::Entity* ent = oScnManager->createEntity("Icosphere.mesh");
@@ -739,7 +741,7 @@ void Monster::setGrid()
 
 	test->attachObject(ent);
 
-	test->setPosition(0, 2, 0);
+	test->setPosition(0, 2, 0);*/
 
 
 }

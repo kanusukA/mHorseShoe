@@ -1,7 +1,7 @@
 #include "RSUSTabComponent.h"
 
 
-void textureViewComponent(
+inline void textureViewComponent(
 	Ogre::String name,
 	Ogre::TextureUnitState* textureState,
 	Ogre::TexturePtr& texture,
@@ -57,7 +57,7 @@ void textureViewComponent(
 
 }
 
-void editableShaderVarViewComponent(ShaderVar* shaderVar, ShaderType type ,RSUSTabModelComponent* model) {
+inline void editableShaderVarViewComponent(ShaderVar* shaderVar, ShaderType type ,RSUSTabModelComponent* model) {
 
 	switch (shaderVar->varType)
 	{
@@ -106,22 +106,22 @@ void RSUSTabComponent::view()
 
 	ImGui::Begin("RSUS");
 	
-	if(RSUSModel->rsusObj){
+	if(!ModelComponent::selectedMaterial->selMaterial.expired()){
 
 		ImGui::Text("Material : "); ImGui::SameLine();
-		ImGui::Text(RSUSModel->rsusObj->materialName.c_str());
+		ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getName().c_str());
 
 		ImGui::Spacing();
 
-		if(RSUSModel->rsusObj->vertVariables){
+		if(ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()){
 
 			ImGui::Text("Vertex Shader : "); ImGui::SameLine();
-			ImGui::Text(RSUSModel->rsusObj->vertShaderName.c_str());
+			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()->getShaderName().c_str());
 
 			
-			for (int i = 0; i < RSUSModel->rsusObj->vertVariables->size(); i++)
+			for (int i = 0; i < ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()->getShaderVars()->size(); i++)
 			{
-				editableShaderVarViewComponent(&RSUSModel->rsusObj->vertVariables->at(i),ShaderType::Vertex, RSUSModel);
+				editableShaderVarViewComponent(&ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()->getShaderVars()->at(i),ShaderType::Vertex, RSUSModel);
 			}
 
 		}
@@ -129,16 +129,16 @@ void RSUSTabComponent::view()
 			ImGui::Text("No Vertex Shader Found!");
 		}
 
-		if (RSUSModel->rsusObj->fragVariables) {
+		if (ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()) {
 
 			ImGui::Text("Fragment Shader : "); ImGui::SameLine();
-			ImGui::Text(RSUSModel->rsusObj->fragShaderName.c_str());
+			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()->getName().c_str());
 
 			
 			
-			for (int i = 0; i < RSUSModel->rsusObj->fragVariables->size(); i++)
+			for (int i = 0; i < ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()->getShaderVars()->size(); i++)
 			{
-				editableShaderVarViewComponent(&RSUSModel->rsusObj->fragVariables->at(i), ShaderType::Fragment, RSUSModel);
+				editableShaderVarViewComponent(&ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()->getShaderVars()->at(i), ShaderType::Fragment, RSUSModel);
 			}
 			
 

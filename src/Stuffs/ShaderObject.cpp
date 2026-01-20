@@ -11,6 +11,7 @@ void Shader::_initShader(Ogre::MaterialPtr mat_p)
 			shader = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgramParameters(); // humm
 			this->ShaderName = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgramName();
 			this->fileName = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getSourceFile();
+			
 			break;
 		case Fragment:
 			shader = mat_p.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
@@ -20,11 +21,12 @@ void Shader::_initShader(Ogre::MaterialPtr mat_p)
 		default:
 			break;
 		}
-		// TODO IMPLEMENT RSUS
-		/*builderCxt->setShaderVars(this);*/
+
+		this->setName(ShaderName);
+		
 	}
 	else {
-		ToastComponent::GetInstance()->addMessage("No Programable shader!");
+		ToastComponent::GetInstance()->addMessage("No Programmable shader!");
 	}
 
 }

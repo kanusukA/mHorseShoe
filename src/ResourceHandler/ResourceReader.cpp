@@ -24,7 +24,7 @@ std::string ResourceReader::readMaterialName(std::filesystem::path mat_path_p)
 
 		bool materialFound = false;
 
-		while (inStream >> word) { // Not reading properly
+		while (inStream >> word) {
 			if (materialFound)
 			{
 				inStream.close();
@@ -146,7 +146,7 @@ void ResourceReader::readShaderFile(std::filesystem::path shaderPath_p, std::vec
 							shaderVar.varFloat4[3] = 0.0f;
 						}
 						else {
-							std::cout << "invalid type" << std::endl;
+							std::cout << "invalid type : " << uniName << " , " << word << std::endl;
 							uniName = false;
 						}
 

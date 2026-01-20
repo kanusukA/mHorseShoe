@@ -2,43 +2,69 @@
 
 #include <Stuffs/ShaderObject.h>
 
+// TODO DELETE MATERIAL_PTR ??
+
 class Material : public  MaterialResource {
 protected:
-	GDBuilderContext* builderCxt;
+	GDBuilderContext* GDBuilderCxt;
 
 	Ogre::MaterialPtr material;
 
-	// TODO convert to shared_ptr
+	
 	std::unique_ptr<Shader> vertexShader;
 	std::unique_ptr<Shader> fragmentShader;
 
+	Ogre::CullingMode culling = Ogre::CULL_CLOCKWISE;
+
+	bool wireFrameMode = false;
 	
 public:
 
-	Material(GDBuilderContext* builderCxt_p, Ogre::MaterialPtr material_p ) : MaterialResource(ResourceHandler::GetInstance(),material_p->getName()) {
+	Material(GDBuilderContext* GDBuilderCxt_p, Ogre::MaterialPtr material_p ) : MaterialResource(ResourceHandler::GetInstance(),material_p->getName()) {
 		material = material_p;
-		builderCxt = builderCxt_p;
+		GDBuilderCxt = GDBuilderCxt_p;
+		setVertexShader();
+		setFragmentShader();
+
+		if (vertexShader && fragmentShader)
+		{
+			GDBuilderCxt->monProvideRsus()->setShader(material->getName(),
+				fragmentShader->getName(), vertexShader->getName(),
+				fragmentShader->getShaderVars(), vertexShader->getShaderVars(),
+				fragmentShader->getShader(), vertexShader->getShader());
+		}
+		else {
+			ToastComponent::GetInstance()->addMessage("Failed to create Material Shaders, for Material : " + material->getName());
+		}
+
 	};
 
 	void setVertexShader() {
-		vertexShader = std::make_unique<Shader>(builderCxt, material, ShaderType::Vertex);
+		vertexShader = std::make_unique<Shader>(GDBuilderCxt, material, ShaderType::Vertex);
 	}
 
 	void setFragmentShader() {
-		fragmentShader = std::make_unique<Shader>(builderCxt, material, ShaderType::Fragment);
+		fragmentShader = std::make_unique<Shader>(GDBuilderCxt, material, ShaderType::Fragment);
 	}
 
-	void selectShader() {
-		// TODO SETUP SHADERS RSUS SELECTION
+	const std::unique_ptr<Shader>& const getVertexShader() {
+		return vertexShader;
 	}
 
-	const std::string const getVertexShaderName() {
-		return vertexShader->getShaderName();
+	const std::unique_ptr<Shader>& const getFragmentShader() {
+		return fragmentShader;
 	}
 
-	const std::string const getFragmentShaderName() {
-		return fragmentShader->getShaderName();
+	void setCullingMode(Ogre::CullingMode culling_p);
+	const Ogre::CullingMode& const getCullingMode() {
+		return culling;
 	}
+	void setWireFrameMode(bool mode_p);
+	const bool& const getWireFrameMode() {
+		return wireFrameMode;
+	}
+
+
 	
 
 	Ogre::MaterialPtr getMaterialPtr() {

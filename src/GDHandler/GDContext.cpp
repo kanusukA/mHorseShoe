@@ -5,6 +5,19 @@ void GDBuilderContext::startEngine()
 	// Start PhysX
 	kint->InitPhysics();
 
+	// Start Resource Group initialization
+	std::vector<std::filesystem::path>* MaterialPaths = ResourceHandler::GetInstance()->getMaterialsLoaded();
+	
+	// Material
+	for (int index = 0; index < MaterialPaths->size(); index++)
+	{
+		monster->addOgreResourceLocation(MaterialPaths->at(index).parent_path().string(), OGRE_MATERIAL_GROUP);
+	}
+	monster->initalizeResourceGroup(OGRE_MATERIAL_GROUP);
+	
+	//monster->setGrid();
+	// implement saving and loading
+
 }
 
 PxRigidDynamic* GDBuilderContext::getPxRigidDynamic(std::string name_p,PxTransform transform, PxGeometry* geometry, float mass)
@@ -45,6 +58,30 @@ Ogre::MaterialPtr GDBuilderContext::monCreateNewMaterial(std::string name_p)
 Ogre::SceneNode* GDBuilderContext::monCreateSceneNode(std::string name_p, Ogre::SceneNode* parentNode_p)
 {
 	return monster->createNewScnNodeAttach(name_p, parentNode_p);
+}
+
+void GDBuilderContext::monDeleteSceneNode(Ogre::SceneNode* scene_p)
+{
+	scene_p->detachAllObjects();
+
+	scene_p->destroyAllChildrenAndObjects();
+
+	monster->oScnManager->destroySceneNode(scene_p);
+
+}
+
+void GDBuilderContext::monDeleteEntity(Ogre::Entity* entity_p)
+{
+	if (entity_p)
+	{
+		monster->oScnManager->destroyEntity(entity_p);
+	}
+	
+}
+
+RSUS* GDBuilderContext::monProvideRsus()
+{
+	return RSUS::GetInstance();
 }
 
 bool GDBuilderContext::sceneExists(std::string scnName_p)

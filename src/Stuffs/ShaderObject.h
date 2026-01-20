@@ -6,7 +6,7 @@ class Shader : public ShaderResource {
 private:
 	
 	Ogre::GpuProgramParametersPtr shader;
-	GDBuilderContext* builderCxt;
+	GDBuilderContext* GDBuilderCxt;
 
 	// Sets Up shader type and assigns ShaderVars for this shader
 	void _initShader(Ogre::MaterialPtr mat_p);
@@ -14,10 +14,10 @@ private:
 
 public:
 
-	Shader(GDBuilderContext* builderCxt_p, Ogre::MaterialPtr mat, ShaderType shaderType_p) : 
+	Shader(GDBuilderContext* GDBuilderCxt_p, Ogre::MaterialPtr mat, ShaderType shaderType_p) : 
 		ShaderResource(ResourceHandler::GetInstance(), "", shaderType_p, "")
 	{
-		builderCxt = builderCxt_p;
+		GDBuilderCxt = GDBuilderCxt_p;
 
 		_initShader(mat);
 		_setShaderVars();
@@ -29,6 +29,8 @@ public:
 	void loadShader();
 
 	Ogre::GpuProgramParametersPtr getShader() { return shader; }
+
+
 
 
 

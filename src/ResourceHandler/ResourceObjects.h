@@ -560,7 +560,7 @@ protected:
 
 	float* position = new float[3]{};
 	float* orientation = new float[4] {};
-	float* scale = new float[3] {};
+	float* scale = new float[3] {1,1,1};
 
 
 public:
@@ -759,6 +759,7 @@ public:
 
 
 	MaterialResource(ResourceHandlerBuilderContext* context, std::string materialName_p) {
+		this->setName(materialName_p);
 		materialName = materialName_p;
 		setId(context->generateMaterialID());
 	};

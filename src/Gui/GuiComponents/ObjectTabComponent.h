@@ -10,7 +10,9 @@ class ObjectTabModelComponent : public ModelComponent {
 public:
 
 	SunWindowSize* windowSize;
-	std::string* materialName;
+	std::string* materialName = new std::string("");
+
+	bool wireframeMode = false;
 
 	int selectedMaterial = 0;
 
@@ -25,7 +27,18 @@ public:
 	}
 
 	void setMaterial() {
-		ModelComponent::selectedObject->selObject.lock()->setMaterial(ModelComponent::materialDpVec->at(selectedMaterial), *materialName);
+		if (!materialName->empty())
+		{
+			if (!ModelComponent::selectedObject->selObject.lock()->setMaterial(ModelComponent::materialDpVec->at(selectedMaterial), *materialName))
+			{
+				ToastComponent::GetInstance()->addMessage("Failed to create Material!");
+			}
+			else {
+				ModelComponent::selectMaterial(ModelComponent::selectedObject->selObject.lock()->getwMaterial());
+			}
+
+		}
+		
 	}
 
 };
