@@ -38,10 +38,79 @@ void Shader::_setShaderVars()
 	//Reading Shader File
 	ResourceHandler::GetInstance()->readShaderFile(shaderLoc, this->ShaderParameters);
 
+	// Implement a system by which shader value can be integrated at initialization!
+
+
+}
+
+void Shader::loadShaderVar(std::vector<ShaderVar> vars_p)
+{
+	// length check
+	if (vars_p.size() != ShaderParameters->size())
+	{
+		ToastComponent::GetInstance()->addMessage("Shader : loadShaderVar() is inconsistant with shaderParameter. For : " + this->getName());
+		ToastComponent::GetInstance()->addMessage("Shader : Merging Values");
+	}
+
+	bool found = false;
+
+	for (int varsIndex = 0; varsIndex < vars_p.size(); varsIndex++)
+	{
+		found = false;
+		for (int paramsIndex = 0; paramsIndex < ShaderParameters->size(); paramsIndex++)
+		{
+			if (vars_p.at(varsIndex).varType == ShaderParameters->at(paramsIndex).varType)
+			{
+				if (vars_p.at(varsIndex).varName == ShaderParameters->at(paramsIndex).varName)
+				{
+					found = true;
+					switch (vars_p.at(varsIndex).varType)
+					{
+					case ShaderVarType::INTEGER:
+						*ShaderParameters->at(paramsIndex).varInt = *vars_p.at(varsIndex).varInt;
+						break;
+					case ShaderVarType::FLOAT0:
+						*ShaderParameters->at(paramsIndex).varFloat = *vars_p.at(varsIndex).varFloat;
+						break;
+					case ShaderVarType::FLOAT2:
+						ShaderParameters->at(paramsIndex).varFloat2[0] = vars_p.at(varsIndex).varFloat2[0];
+						ShaderParameters->at(paramsIndex).varFloat2[1] = vars_p.at(varsIndex).varFloat2[1];
+						break;
+					case ShaderVarType::FLOAT3:
+						ShaderParameters->at(paramsIndex).varFloat3[0] = vars_p.at(varsIndex).varFloat3[0];
+						ShaderParameters->at(paramsIndex).varFloat3[1] = vars_p.at(varsIndex).varFloat3[1];
+						ShaderParameters->at(paramsIndex).varFloat3[2] = vars_p.at(varsIndex).varFloat3[2];
+						break;
+					case ShaderVarType::FLOAT4:
+						ShaderParameters->at(paramsIndex).varFloat4[0] = vars_p.at(varsIndex).varFloat4[0];
+						ShaderParameters->at(paramsIndex).varFloat4[1] = vars_p.at(varsIndex).varFloat4[1];
+						ShaderParameters->at(paramsIndex).varFloat4[2] = vars_p.at(varsIndex).varFloat4[2];
+						ShaderParameters->at(paramsIndex).varFloat4[3] = vars_p.at(varsIndex).varFloat4[3];
+						break;
+					default:
+						break;
+					}
+				}
+			}
+
+		}
+		if (!found)
+		{
+			ToastComponent::GetInstance()->addMessage("Shader: Var not found : " + vars_p.at(varsIndex).varName);
+		}
+	}
+
+	GDBuilderCxt->monSetShaderVars(vars_p, shader);
+	// try this
 
 }
 
 void Shader::loadShader()
 {
 
+}
+
+void Shader::_refreshShader()
+{
+	// ADD a rsus function to update only a shaderProgram with value, only limited to Shader class. ig use the GDBuilderCxt for that function!
 }

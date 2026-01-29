@@ -1351,6 +1351,17 @@ void RSUS::updateShaderVar(ShaderVar var, ShaderType shaderType)
 	}
 }
 
+void RSUS::updateShaderVars(std::vector<ShaderVar> vars_p, Ogre::GpuProgramParametersPtr shaderPrgm)
+{
+	rsusObj->fragProgramPtr = shaderPrgm;
+
+	for (int i = 0; i < vars_p.size(); i++)
+	{
+		updateShaderVar(vars_p.at(i), ShaderType::Fragment);
+	}
+
+}
+
 void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 {
 

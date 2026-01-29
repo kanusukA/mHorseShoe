@@ -203,7 +203,7 @@ public:
 	bool materialSaved(Ogre::String objectName, Ogre::String Material = "");
 
 
-	void saveScene(std::string scnName, std::string caseName, std::string Filename, int scnType);
+	//void saveScene(std::string scnName, std::string caseName, std::string Filename, int scnType);
 	void saveSceneObject(std::string filename, std::string caseName, SceneObject obj, int scnType);
 	bool scnExists(std::string filename, int scnType);
 	bool objExists(std::string filename, int scnType);

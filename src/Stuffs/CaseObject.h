@@ -20,15 +20,17 @@ public:
 	}
 
 	// CREATEING A NEW SCENE
-	void attachNewScene(std::string sceneName, SceneType scnType, Ogre::SceneNode* parentNode_p) {
+	std::weak_ptr<Scene> attachNewScene(std::string sceneName, SceneType scnType, Ogre::SceneNode* parentNode_p) {
 		Scene* newScene = GDBuilderCxt->CreateScene(sceneName, scnType,parentNode_p);
 		std::shared_ptr<Scene> sScene(newScene,SceneDeleter);
 		sceneVec->push_back(std::move(sScene));
+		return sceneVec->at(sceneVec->size() - 1);
 	}
-	void attachNewSceneToRoot(std::string sceneName, SceneType scnType) {
+	std::weak_ptr<Scene> attachNewSceneToRoot(std::string sceneName, SceneType scnType) {
 		Scene* newScene = GDBuilderCxt->CreateScene(sceneName, scnType);
 		std::shared_ptr<Scene> sScene(newScene,SceneDeleter);
 		sceneVec->push_back(std::move(sScene));
+		return sceneVec->at(sceneVec->size() - 1);
 	}
 
 	std::weak_ptr<Scene> getwScene(int index) {

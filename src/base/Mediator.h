@@ -159,6 +159,8 @@ public:
 	static std::vector<std::filesystem::path>* shaderDpVec;
 	static std::vector<std::filesystem::path>* textureDpVec;
 
+	static std::vector<std::filesystem::path>* savedCaseFiles;
+
 	SunWindowSize* windowSize;
 
 	ModelComponent(const char* name_p) {
@@ -184,6 +186,8 @@ public:
 
 		caseVec = gdSource->getCaseHandler()->caseVec;
 
+		savedCaseFiles = gdSource->getResourceHandler()->getSavedCaseFiles();
+
 	}
 
 	// SETTERS
@@ -197,6 +201,10 @@ public:
 
 	void selectObject(const std::weak_ptr<Object>& object_p) {
 		selectedObject->selObject = object_p;
+		if (!object_p.lock()->getwMaterial().expired())
+		{
+			this->selectMaterial(object_p.lock()->getwMaterial());
+		}
 	}
 
 	void selectMaterial(const std::weak_ptr<Material>& material_p) {

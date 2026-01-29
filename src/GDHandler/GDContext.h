@@ -66,6 +66,7 @@ public:
 	void monDeleteEntity(Ogre::Entity* entity_p);
 
 	RSUS* monProvideRsus();
+	void monSetShaderVars(std::vector<ShaderVar> vars_p, Ogre::GpuProgramParametersPtr shaderPrgm);
 
 	// Check Functions
 	bool sceneExists(std::string scnName_p);

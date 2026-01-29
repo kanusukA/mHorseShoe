@@ -10,6 +10,8 @@ private:
 
 	// Sets Up shader type and assigns ShaderVars for this shader
 	void _initShader(Ogre::MaterialPtr mat_p);
+
+	// used to read shaderVar from file
 	void _setShaderVars();
 
 public:
@@ -24,11 +26,14 @@ public:
 
 	}
 
-
+	void loadShaderVar(std::vector<ShaderVar> vars_p);
 
 	void loadShader();
 
 	Ogre::GpuProgramParametersPtr getShader() { return shader; }
+
+	// Runs and updates shader values with Rsus
+	void _refreshShader();
 
 
 

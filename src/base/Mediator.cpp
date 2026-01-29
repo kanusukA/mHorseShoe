@@ -11,3 +11,5 @@ std::vector<std::filesystem::path>* ModelComponent::shaderDpVec;
 std::vector<std::filesystem::path>* ModelComponent::textureDpVec;
 
 std::vector<std::shared_ptr<Case>>* ModelComponent::caseVec;
+
+std::vector<std::filesystem::path>* ModelComponent::savedCaseFiles;

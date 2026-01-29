@@ -3,6 +3,7 @@
 
 //Local Header
 #include <ResourceHandler/ResourceObjects.h>
+#include <timer/glock.h>
 
 // Third Headers
 #include "SimpleIni.h"
@@ -22,7 +23,9 @@
 // Make sure referenced Resources are also saved separately as it can lead to Load Errors!
 class ResourceSaver
 {
-private:
+public:
+
+	std::ofstream outStreamFile;
 
 	std::string saveLocation;
 
@@ -38,26 +41,32 @@ private:
 
 	void saveIniFile(std::string filename, std::string section, std::string key, std::string value);
 
-	void saveCase(CaseResource* case_p);
+	bool openSaveFile(std::string filepath);
+	void writeToSaveFile(const char* data);
+	void closeSaveFile();
 
-	void saveScene(SceneResource* scene_p);
+	// Runs OpenSaveFile(). make sure to close it.
+	// returns the filename. this can be passed on to same content in the same file!
+	std::string saveCase(CaseResource* case_p);
+
+	void saveScene(SceneResource* scene_p, YAML::Emitter& out);
 	void saveScnObj(std::string sectionName, ResID objectID);
 
-	void saveMaterial(MaterialResource* mat_p);
+	void saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p, ShaderResource* frag_p,YAML::Emitter& out);
 	void saveMaterialTexture(std::string sectionName, std::string textureName, int pos);
 
 	void saveRenderMesh(RenderMeshResource* renderMesh_p);
 	void saveColliderMesh(ColliderMeshResource* colliderMesh_p);
 
-	void saveShader(ShaderResource* shader_p);
+	void saveShader(ShaderResource* shader_p, ShaderType type, ResID attachedToObject);
 	void saveShaderVar(std::string sectionName, std::string varName, std::string type);
 	// Here section is the ShaderID and key can be set to ShaderVarName. different shader can shader same parameter name.
 	void saveShaderValue(std::string sectionName,std::string key, std::string value);
 
 	void saveImage(ImageResource* image_p);
-	void saveObject(ObjectResource* obj_p);
+	void saveObject(ObjectResource* obj_p, YAML::Emitter& out);
 
-protected:
+
 
 	void saveMasterList(std::string instanceName, std::vector<ResID>* master_p, std::string path, bool overwrite = true);
 

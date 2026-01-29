@@ -38,6 +38,30 @@ void ResourceSaver::saveIniFile(std::string filename, std::string section, std::
 
 }
 
+bool ResourceSaver::openSaveFile(std::string filepath)
+{
+	outStreamFile.open(filepath);
+	if (!outStreamFile.is_open())
+	{
+		ToastComponent::GetInstance()->addMessage("Invalid Filepath. ResourceSaver outputFile not open.");
+		return false;
+	}
+	return true;
+}
+
+void ResourceSaver::writeToSaveFile(const char* data)
+{
+	if (outStreamFile.is_open())
+	{
+		outStreamFile << data;
+	}
+}
+
+void ResourceSaver::closeSaveFile()
+{
+	outStreamFile.close();
+}
+
 void ResourceSaver::saveMasterList(std::string instanceName, std::vector<ResID>* master_p, std::string path, bool overwrite)
 {
 	ini->Reset();
@@ -58,50 +82,86 @@ void ResourceSaver::saveMasterList(std::string instanceName, std::vector<ResID>*
 
 }
 
-void ResourceSaver::saveCase(CaseResource* case_p)
+std::string ResourceSaver::saveCase(CaseResource* case_p)
 {
-	std::string sectionName = std::to_string(case_p->getId());
+	// YAML REFORM ------------------------------------------------------------
+	std::string outputFileDir = this->saveLocation + "/" + case_p->getName() + std::to_string((unsigned long long)getCurrentTime()) + ".yml";
 
-	ini->SetValue(sectionName.c_str(), CASE_NAME_KEY , case_p->getName().c_str());
+	if (this->openSaveFile(outputFileDir))
+	{
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << CASE_NAME_KEY;
+		out << YAML::Value << case_p->getName();
+		out << YAML::EndMap;
+		
+		outStreamFile << out.c_str() << "\n";
 
-	std::string scenes = "";
+	}
+	
+	return outputFileDir;
+	// -------------------------------------------------------------------------
+
+	/*std::string sectionName = std::to_string(case_p->getId());
+
+	ini->SetValue(sectionName.c_str(), CASE_NAME_KEY , case_p->getName().c_str());*/
+
+	/*std::string scenes = "";
 
 	for (int i = 0; i < case_p->getScenesIdInCase()->size(); i++)
 	{
 		scenes += std::to_string(case_p->getScenesIdInCase()->at(i)) + "|";
 	}
-	ini->SetValue(sectionName.c_str(), CASE_SCENE_KEY, scenes.c_str());
+	ini->SetValue(sectionName.c_str(), CASE_SCENE_KEY, scenes.c_str());*/
 
 }
 
-void ResourceSaver::saveScene(SceneResource* scene_p)
+void ResourceSaver::saveScene(SceneResource* scene_p, YAML::Emitter& out)
 {
+	
+	
+	out << YAML::BeginMap;
 
-	std::string sectionName = std::to_string(scene_p->getId());
+	out << YAML::Key << SCENE_NAME_KEY;
+	out << YAML::Value << scene_p->getName();
 
-	ini->SetValue(sectionName.c_str(), SCENE_NAME_KEY, scene_p->getName().c_str());
+	out << YAML::Key << SCENE_TYPE_KEY;
+	out << YAML::Value << scene_p->getSceneType();
 
-	ini->SetValue(sectionName.c_str(), SCENE_TYPE_KEY, std::to_string(scene_p->getSceneType()).c_str());
+	out << YAML::Key << SCENE_POS_KEY;
+	out << YAML::Value << YAML::Flow;
+	out << YAML::BeginSeq << scene_p->_getPosition()[0] << scene_p->_getPosition()[1] << scene_p->_getPosition()[2] << YAML::EndSeq;
+	
+	out << YAML::Key << SCENE_ROT_KEY;
+	out << YAML::Value << YAML::Flow;
+	out << YAML::BeginSeq << scene_p->_getOrientation()[0] << scene_p->_getOrientation()[1] << scene_p->_getOrientation()[2] << scene_p->_getOrientation()[3] << YAML::EndSeq;
+	
+	out << YAML::Key << SCENE_SCALE_KEY;
+	out << YAML::Value << YAML::Flow << YAML::BeginSeq;
+	out << scene_p->_getScale()[0] << scene_p->_getScale()[1] << scene_p->_getScale()[2] << YAML::EndSeq;
 
-	// TODO FIX THIS POSITION TO STRING !!!!!!!!!!!!!!!!!!
-	ini->SetValue(sectionName.c_str(), SCENE_POS_KEY, convertFloatPtrToString(scene_p->_getPosition(),3).c_str());
-	ini->SetValue(sectionName.c_str(), SCENE_SCALE_KEY, convertFloatPtrToString(scene_p->_getScale(),3).c_str());
-	ini->SetValue(sectionName.c_str(), SCENE_ROT_KEY, convertFloatPtrToString(scene_p->_getOrientation(),4).c_str());
+	
+	
+	
 
-	std::string scenes = "";
-	std::string objects = "";
+	
+	
 
-	/*for (int i = 0; i < scene_p->getAttachedScenesID()->size(); i++)
-	{
-		scenes += std::to_string(scene_p->getAttachedScenesID()->at(i)) + "|";
-	}
-	ini->SetValue(sectionName.c_str(), ATTACHED_SCN_KEY, scenes.c_str());
-	for (int i = 0; i < scene_p->getObjectsID()->size(); i++)
-	{
-		objects += std::to_string(scene_p->getObjectsID()->at(i)) + "|";
-	}
-	ini->SetValue(sectionName.c_str(), SCENE_OBJECT_KEY, objects.c_str());*/
 
+	//std::string sectionName = std::to_string(scene_p->getId());
+
+	//ini->SetValue(sectionName.c_str(), SCENE_NAME_KEY, scene_p->getName().c_str());
+
+	//ini->SetValue(sectionName.c_str(), SCENE_TYPE_KEY, std::to_string(scene_p->getSceneType()).c_str());
+
+	//// TODO FIX THIS POSITION TO STRING !!!!!!!!!!!!!!!!!!
+	//ini->SetValue(sectionName.c_str(), SCENE_POS_KEY, convertFloatPtrToString(scene_p->_getPosition(),3).c_str());
+	//ini->SetValue(sectionName.c_str(), SCENE_SCALE_KEY, convertFloatPtrToString(scene_p->_getScale(),3).c_str());
+	//ini->SetValue(sectionName.c_str(), SCENE_ROT_KEY, convertFloatPtrToString(scene_p->_getOrientation(),4).c_str());
+
+	//ini->SetValue(sectionName.c_str(), SCENE_ATTACHED_TO, std::to_string(attachedTo).c_str());
+	//ini->SetValue(sectionName.c_str(), SCENE_ATTACHED_CASE, std::to_string(parentCase).c_str());
+	
 }
 
 void ResourceSaver::saveScnObj(std::string sectionName, ResID objectID)
@@ -109,17 +169,89 @@ void ResourceSaver::saveScnObj(std::string sectionName, ResID objectID)
 	ini->SetValue(sectionName.c_str(), std::to_string(objectID).c_str(), NULL );
 }
 
-void ResourceSaver::saveMaterial(MaterialResource* mat_p)
+inline void _shaderYaml(std::vector<ShaderVar>* shadervars, YAML::Emitter& out) {
+	out << YAML::Value << YAML::BeginSeq;
+	for (int i = 0; i < shadervars->size(); i++)
+	{
+		out << YAML::BeginMap << YAML::Key << SHADER_NAME_KEY << YAML::Value << shadervars->at(i).varName;
+		out << YAML::Key << SHADER_VALUE_KEY;
+		switch (shadervars->at(i).varType)
+		{
+		case ShaderVarType::INTEGER:
+			out << YAML::Value << *shadervars->at(i).varInt;
+			break;
+		case ShaderVarType::FLOAT0:
+			out << YAML::Value << *shadervars->at(i).varFloat;
+			break;
+		case ShaderVarType::FLOAT2:
+			out << YAML::Value << YAML::Flow << YAML::BeginSeq << shadervars->at(i).varFloat2[0] << shadervars->at(i).varFloat2[1] << YAML::EndSeq;
+			break;
+		case ShaderVarType::FLOAT3:
+			out << YAML::Value << YAML::Flow << YAML::BeginSeq << shadervars->at(i).varFloat3[0] << shadervars->at(i).varFloat3[1]
+				<< shadervars->at(i).varFloat3[2] << YAML::EndSeq;
+			break;
+		case ShaderVarType::FLOAT4:
+			out << YAML::Value << YAML::Flow << YAML::BeginSeq << shadervars->at(i).varFloat4[0] << shadervars->at(i).varFloat4[1]
+				<< shadervars->at(i).varFloat4[2] << shadervars->at(i).varFloat4[2] << YAML::EndSeq;
+			break;
+		default:
+			out << YAML::Value << " ";
+			break;
+		}
+		out << YAML::Key << SHADER_TYPE_KEY;
+		out << YAML::Value << shadervars->at(i).varType;
+		out << YAML::EndMap;
+	}
+	out << YAML::EndSeq;
+}
+
+void ResourceSaver::saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p, ShaderResource* frag_p, YAML::Emitter& out)
 {
+
+	out << YAML::BeginMap;
+	
+	out << YAML::Key << MATERIAL_NAME_KEY;
+	out << YAML::Value << mat_p->getName();
+
+	out << YAML::Key << MATERIAL_FILENAME_KEY;
+	out << YAML::Value << mat_p->materialFilePath;
+
+	out << YAML::Key << MATERIAL_VERTEX_KEY;
+	
+	if (vert_p)
+	{
+		_shaderYaml(vert_p->getShaderVars(), out);
+	}
+	else {
+		out << YAML::Value << "";
+	}
+
+	out << YAML::Key << MATERIAL_FRAGMENT_KEY;
+
+	if (vert_p)
+	{
+		_shaderYaml(frag_p->getShaderVars(), out);
+	}
+	else {
+		out << YAML::Value << "";
+	}
+	
+
 	/*std::string sectionName = std::to_string(mat_p->getId());
 
 	ini->SetValue(sectionName.c_str(), MATERIAL_NAME_KEY , mat_p->getName().c_str());
-	ini->SetValue(sectionName.c_str(), MATERIAL_VERTEX_KEY, std::to_string(mat_p->getVertexShaderID()).c_str());
-	ini->SetValue(sectionName.c_str(), MATERIAL_FRAGMENT_KEY, std::to_string(mat_p->getFragmentShaderID()).c_str());
-
-	std::string texValue = "";
+	ini->SetValue(sectionName.c_str(), MATERIAL_ATTACHED_OBJECT, std::to_string(attachedToObject).c_str());*/
 	
-	for (auto & i : *mat_p->getTextures())
+
+
+	/*ini->SetValue(sectionName.c_str(), MATERIAL_VERTEX_KEY, std::to_string(mat_p->getVertexShaderID()).c_str());
+	ini->SetValue(sectionName.c_str(), MATERIAL_FRAGMENT_KEY, std::to_string(mat_p->getFragmentShaderID()).c_str());*/
+
+	//std::string texValue = "";
+	
+
+
+	/*for (auto & i : *mat_p->getTextures())
 	{
 		std::string texId = std::to_string(i.texture);
 		std::string pos = std::to_string(i.texturePosition);
@@ -157,13 +289,57 @@ void ResourceSaver::saveColliderMesh(ColliderMeshResource* colliderMesh_p)
 	//ini->SetValue(section, MESH_MATERIAL_KEY, colliderMesh_p->getName().c_str());
 }
 
-void ResourceSaver::saveShader(ShaderResource* shader_p)
+void ResourceSaver::saveShader(ShaderResource* shader_p, ShaderType type, ResID attachedToMaterial)
 {
 	std::string section = std::to_string(shader_p->getId());
 	ini->SetValue(section.c_str(), SHADER_NAME_KEY, shader_p->getName().c_str());
 	ini->SetValue(section.c_str(), SHADER_FILE_KEY, shader_p->getShaderFileName().c_str());
 	ini->SetValue(section.c_str(), SHADER_TYPE_KEY, std::to_string(shader_p->getShaderType()).c_str());
 
+	// Making Data String 
+	// Its an continuous string of shaderName, shaderVarType, and its value.
+	std::string data = "";
+	std::string key = "";
+	for (int vindex = 0; vindex < shader_p->getShaderVars()->size(); vindex++)
+	{
+		/*data += std::to_string(vindex);
+		data += "I";*/
+		data += shader_p->getShaderVars()->at(vindex).varName;
+		key += std::to_string(data.length()-1) + "N";
+		key += std::to_string(shader_p->getShaderVars()->at(vindex).varType) + "F";
+
+		switch (shader_p->getShaderVars()->at(vindex).varType)
+		{
+		case ShaderVarType::INTEGER:
+			data += std::to_string(*shader_p->getShaderVars()->at(vindex).varInt);
+			break;
+		case ShaderVarType::FLOAT0:
+			data += std::to_string(*shader_p->getShaderVars()->at(vindex).varFloat);
+			break;
+		case ShaderVarType::FLOAT2:
+			data += std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[0]) +"|"+ 
+				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[1]);
+			break;
+		case ShaderVarType::FLOAT3:
+			data += std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[0]) +"|"+
+				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[1]) + "|" +
+				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[2]);
+			break;
+		case ShaderVarType::FLOAT4:
+			data += std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[0]) + "|" +
+				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[1]) + "|" +
+				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[2]) + "|" + 
+				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[3]);
+			break;
+		default:
+			break;
+		}
+
+		key += std::to_string(data.length() - 1) + "V";
+	}
+
+	ini->SetValue(section.c_str(), SHADER_VAR_KEY, data.c_str()); // Complete this system
+	ini->SetValue(section.c_str(), SHADER_VALUE_KEY, key.c_str());
 }
 
 void ResourceSaver::saveShaderVar(std::string sectionName, std::string varName, std::string type)
@@ -186,15 +362,34 @@ void ResourceSaver::saveImage(ImageResource* image_p)
 
 }
 
-void ResourceSaver::saveObject(ObjectResource* obj_p)
+void ResourceSaver::saveObject(ObjectResource* obj_p, YAML::Emitter& out)
 {
-	std::string section = std::to_string(obj_p->getId());
+
+	out << YAML::BeginMap;
+	
+	out << YAML::Key << OBJECT_NAME_KEY;
+	out << YAML::Value << obj_p->getName();
+
+	out << YAML::Key << OBJECT_PHYSX_KEY;
+	out << YAML::Value << obj_p->getPhysxType();
+
+	out << YAML::Key << OBJECT_MASS_KEY;
+	out << YAML::Value << obj_p->getMass();
+
+	out << YAML::Key << OBJECT_RENDERMESH_KEY;
+	out << YAML::Value << obj_p->_getMeshName();
+
+	out << YAML::Key << OBJECT_MESHPATH_KEY;
+	out << YAML::Value << obj_p->getMeshFilePath().string();
+
+	//std::string section = std::to_string(obj_p->getId());
 
 	//ini->SetValue(section.c_str(), OBJECT_NAME_KEY, obj_p->getName().c_str());
 	//ini->SetValue(section.c_str(), OBJECT_PHYSX_KEY, std::to_string(obj_p->getPhysxType()).c_str());
-	//ini->SetValue(section.c_str(), OBJECT_RENDERMESH_KEY, std::to_string(obj_p->getRenderMeshId()).c_str());
-	//ini->SetValue(section.c_str(), OBJECT_COLLIDERMESH_KEY, std::to_string(obj_p->getColliderMeshId()).c_str());
+	//ini->SetValue(section.c_str(), OBJECT_RENDERMESH_KEY, obj_p->_getMeshName().c_str());
+	////ini->SetValue(section.c_str(), OBJECT_COLLIDERMESH_KEY, std::to_string(obj_p->getColliderMeshId()).c_str());
 	//ini->SetValue(section.c_str(), OBJECT_MASS_KEY, std::to_string(obj_p->getMass()).c_str());
+
 }
 
 
@@ -233,7 +428,7 @@ void ResourceSaver::saveScenes(std::vector<SceneResource*>* scene_res, std::stri
 	{
 		
 		
-		this->saveScene(scene_res->at(i));
+		//this->saveScene(scene_res->at(i));
 		
 
 		/*this->resetIni();
@@ -261,7 +456,7 @@ void ResourceSaver::saveMaterials(std::vector<MaterialResource*>* mat_res, std::
 	for (int i = 0; i < mat_res->size(); i++)
 	{ 
 		
-		this->saveMaterial(mat_res->at(i));
+		//this->saveMaterial(mat_res->at(i));
 		
 		/*this->resetIni();
 
@@ -291,7 +486,7 @@ void ResourceSaver::saveObjects(std::vector<ObjectResource*>* obj_res, std::stri
 	}
 	for (int i = 0; i < obj_res->size(); i++)
 	{
-		this->saveObject(obj_res->at(i));
+	//	this->saveObject(obj_res->at(i));
 
 	}
 	this->saveIni(objIniPath);
@@ -343,7 +538,7 @@ void ResourceSaver::saveShaders(std::vector<ShaderResource*>* shader_res, std::s
 
 		
 
-		this->saveShader(shader_res->at(i));
+		//this->saveShader(shader_res->at(i),);
 		this->saveIni(shaderIniPath);
 
 		this->resetIni();

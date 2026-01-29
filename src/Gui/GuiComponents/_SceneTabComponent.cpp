@@ -47,6 +47,21 @@ void SceneTabComponent::view()
 	ImGui::SetNextWindowSize(ImVec2(350, 600));
 	ImGui::Begin("Cases",0,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
+	if (ModelComponent::savedCaseFiles && !ModelComponent::savedCaseFiles->empty())
+	{
+		if (ImGui::BeginCombo("Saved Cases", ModelComponent::savedCaseFiles->at(scnTabModel->selectedSavedCaseFile).filename().string().c_str()))
+		{
+			for (int i = 0; i < ModelComponent::savedCaseFiles->size(); i++)
+			{
+				if (ImGui::Selectable(ModelComponent::savedCaseFiles->at(i).filename().string().c_str(), scnTabModel->selectedSavedCaseFile == i))
+				{
+					scnTabModel->selectedSavedCaseFile = i;
+				}
+			}
+			ImGui::EndCombo();
+		}
+	}
+
 	if (ModelComponent::caseVec && !ModelComponent::caseVec->empty())
 	{
 		if (ImGui::BeginCombo("Cases",ModelComponent::caseVec->at(scnTabModel->selectedCase)->getName().c_str()))
@@ -61,6 +76,16 @@ void SceneTabComponent::view()
 			}
 			ImGui::EndCombo();
 		}
+	}
+
+	if (ImGui::Button("Save Case"))
+	{
+		scnTabModel->saveCase();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Load Case"))
+	{
+		scnTabModel->loadCase();
 	}
 
 	ImGui::InputText("Case Name", scnTabModel->inputCaseName);
@@ -240,20 +265,3 @@ void SceneTabComponent::view()
 	ImGui::End();
 }
 
-
-
-
-
-// BUTTON FUNCTIONS
-void SceneTabModelComponent::refresh() {
-	//TODO Implement button after creating resource Handler Loader class
-}
-
-void SceneTabModelComponent::saveCase() {
-
-}
-
-void SceneTabModelComponent::loadCase() {
-
-
-}

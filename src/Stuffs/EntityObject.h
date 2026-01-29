@@ -27,9 +27,11 @@ public:
 
 	std::shared_ptr<Material> sMaterial;
 
-	Object(GDBuilderContext* GDBuilderCxt_p, Ogre::Entity* entity_p, std::string name_p, PhysXType objType_p) : 
-		ObjectResource(ResourceHandler::GetInstance(), name_p, objType_p) {
+	Object(GDBuilderContext* GDBuilderCxt_p, Ogre::Entity* entity_p, std::string name_p, PhysXType objType_p,std::filesystem::path meshPath_p) : 
+		ObjectResource(ResourceHandler::GetInstance(), name_p, objType_p,meshPath_p) {
 		GDBuilderCxt = GDBuilderCxt_p;
+
+		this->renderMeshName = entity_p->getName();
 		
 		auto deleter = [this](Ogre::Entity* entity) {
 			GDBuilderCxt->monDeleteEntity(entity);

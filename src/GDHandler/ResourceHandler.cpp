@@ -193,7 +193,7 @@ ResourceHandler::ResourceHandler()
 	this->ini.SetUnicode();
 	this->initResourceSaver(&ini, this->SourceDir.string() + DATA_DIRECTORY);
 
-	this->initResourceLoader(&ini,this->SourceDir.string() + RESOURCELOADER_DATA);
+	this->initResourceLoader(&ini, SourceDir.string() + DATA_DIRECTORY , this->SourceDir.string() + RESOURCELOADER_DATA);
 
 	this->loadResources();
 
@@ -700,54 +700,54 @@ bool ResourceHandler::materialSaved(Ogre::String objectName, Ogre::String Materi
 	
 }
 
-void ResourceHandler::saveScene(std::string scnName, std::string caseName, std::string Filename, int scnType)
-{
-
-	std::string masterLoc;
-	
-	if (scnType == 0) {
-		masterLoc = DYNAMIC_NODES_LOC;
-	}
-	else if (scnType == 1)
-	{
-		masterLoc = STATIC_NODES_LOC;
-	}
-	else if (scnType == 2)
-	{
-		masterLoc = MESH_NODES_LOC;
-	}
-	else {
-		throw ResourceHandlerFileNotFound();
-	}
-
-	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
-	{
-		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
-	}
-
-	if (!std::filesystem::exists(SourceDir.string() + "/Scenes/" + caseName))
-	{
-		std::filesystem::create_directory(SourceDir.string() + "/Scenes/" + caseName);
-	}
-
-	if (!std::filesystem::exists(SourceDir.string() + masterLoc))
-	{
-		std::filesystem::create_directory(SourceDir.string() + masterLoc);
-	}
-
-	std::string loc = masterLoc + Filename;
-
-	_LoadIniFile(loc);
-	
-	ini.SetValue(SECTION_SCENE, scnName.c_str(), "");
-	
-
-	ini.SaveFile(loc.c_str());
-
-	ini.Reset();
-
-
-}
+//void ResourceHandler::saveScene(std::string scnName, std::string caseName, std::string Filename, int scnType)
+//{
+//
+//	std::string masterLoc;
+//	
+//	if (scnType == 0) {
+//		masterLoc = DYNAMIC_NODES_LOC;
+//	}
+//	else if (scnType == 1)
+//	{
+//		masterLoc = STATIC_NODES_LOC;
+//	}
+//	else if (scnType == 2)
+//	{
+//		masterLoc = MESH_NODES_LOC;
+//	}
+//	else {
+//		throw ResourceHandlerFileNotFound();
+//	}
+//
+//	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
+//	{
+//		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
+//	}
+//
+//	if (!std::filesystem::exists(SourceDir.string() + "/Scenes/" + caseName))
+//	{
+//		std::filesystem::create_directory(SourceDir.string() + "/Scenes/" + caseName);
+//	}
+//
+//	if (!std::filesystem::exists(SourceDir.string() + masterLoc))
+//	{
+//		std::filesystem::create_directory(SourceDir.string() + masterLoc);
+//	}
+//
+//	std::string loc = masterLoc + Filename;
+//
+//	_LoadIniFile(loc);
+//	
+//	ini.SetValue(SECTION_SCENE, scnName.c_str(), "");
+//	
+//
+//	ini.SaveFile(loc.c_str());
+//
+//	ini.Reset();
+//
+//
+//}
 
 void ResourceHandler::saveSceneObject(std::string filename, std::string caseName, SceneObject obj , int scnType)
 {

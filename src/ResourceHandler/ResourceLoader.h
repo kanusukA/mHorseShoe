@@ -9,50 +9,49 @@
 //STL Headers
 #include <fstream>
 
-struct RLCase {
-	long long id;
-	std::string name;
-	std::vector<long long> Scenes;
-};
-struct RLScene {
-	long long id;
-	std::string name;
-	int scnType;
-	float* position;
-	float* rotation;
-	float* scale;
-	std::vector<long long> Scenes;
-	std::vector<long long> objects;
-};
-
-struct RLObject {
-	long long id;
-	std::string name;
-	int ObjectPhysxType;
-	int mass;
-	long long renderMeshID;
-	long long colliderMeshID;
-};
-
-struct RLMesh {
-	std::string name;
-	long long materialID;
-};
-
-struct RLMaterial {
-	std::string name;
-	long long vertShaderID;
-	long long fragShaderID;
-	std::vector<ShaderTexture> textures;
-};
-
-
 struct RLShader {
 	std::string name;
 	std::string fileName;
 	ShaderType type;
 	std::vector<ShaderVar> shaderVars;
 };
+
+struct RLMaterial {
+	std::string name;
+	std::string materialFilePath;
+	RLShader vertShader;
+	RLShader fragShader;
+	std::vector<ShaderTexture> textures;
+};
+
+struct RLMesh {
+	std::string name;
+	std::string filepath;
+};
+
+struct RLObject {
+	std::string name;
+	int ObjectPhysxType;
+	int mass;
+	RLMesh mesh;
+	RLMaterial material;
+};
+
+struct RLScene {
+	std::string name;
+	int scnType;
+	float* position;
+	float* rotation;
+	float* scale;
+	std::vector<RLObject> objects;
+};
+
+struct RLCase {
+	long long id;
+	std::string name;
+	std::vector<RLScene> Scenes;
+};
+
 
 struct RLFetchedResource {
 	RLMesh* mesh;
@@ -64,14 +63,22 @@ struct RLFetchedResource {
 class ResourceLoader {
 
 private:
+
 	CSimpleIniA* ini;
-	std::string loadLocationIniPath;
+	std::filesystem::path resourceLoaderIniPath;
+	std::filesystem::path dataDirPath;
+
 
 	void loadSavedPaths();
 
+	std::vector<std::filesystem::path> caseFileNames = std::vector<std::filesystem::path>();
 	
 
 protected:
+
+	void loadSavedCases();
+
+	
 
 	void resource_loader_shutdown() {
 		this->~ResourceLoader();
@@ -98,9 +105,6 @@ protected:
 	ShaderTexture _fetchShaderTexture(ResID id, std::string path_p) { return ShaderTexture(); };
 	
 
-
-
-
 public:
 
 	std::vector<RLCase>* RLCases = new std::vector<RLCase>();
@@ -113,7 +117,7 @@ public:
 		delete load_paths;
 	}
 
-	// USE ResourceLoadPaths Enum to fecth specific load paths
+	// USE ResourceLoadPaths Enum to fetch specific load paths
 	std::vector<std::string>* getLoadPaths() {
 		return load_paths;
 	}
@@ -122,21 +126,26 @@ public:
 	void addLoadPath(std::string path_p);
 
 	// loadLocation_p - Resource Loader's path saving directory
-	void initResourceLoader(CSimpleIniA* ini_p, std::string loadLocation_p) {
+	void initResourceLoader(CSimpleIniA* ini_p,std::filesystem::path dataDirPath_p , std::string resourceLoaderIniPath_p) {
 		ini = ini_p;
-		loadLocationIniPath = loadLocation_p;
-
+		resourceLoaderIniPath = resourceLoaderIniPath_p;
+		dataDirPath = dataDirPath_p;
 		loadSavedPaths();
+		loadSavedCases();
 
 	}
 
+	RLCase fetchCaseData(std::filesystem::path yamlFilePath);
+
 	// Loading Saved Data
-	void loadSavedCases(std::string path_p);
+	//void loadSavedCases(std::string path_p);
 	void loadSavedScenes(std::string path_p);
 	void loadSavedObject(std::string path_p);
 
-	
-
+	// GETTER
+	std::vector<std::filesystem::path>* getSavedCaseFiles() {
+		return &caseFileNames;
+	}
 
 
 	// Loading Things Not related to Saved Data

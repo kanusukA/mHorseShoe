@@ -12,9 +12,8 @@ private:
 
 public:
 
-	// Material must be added separately
-	RenderMesh(GDBuilderContext* builderCxt_p,Ogre::MeshPtr mesh_p) : 
-		RenderMeshResource(ResourceHandler::GetInstance(), mesh_p->getName() ) {
+	RenderMesh(GDBuilderContext* builderCxt_p,Ogre::MeshPtr mesh_p, std::filesystem::path meshPath_p) : 
+		RenderMeshResource(ResourceHandler::GetInstance(), mesh_p->getName(), meshPath_p ) {
 		builderCxt = builderCxt_p;
 
 

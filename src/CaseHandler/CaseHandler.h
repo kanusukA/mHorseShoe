@@ -58,7 +58,7 @@ public:
 	std::vector<std::shared_ptr<Case>>* fetchAllCases() { return caseVec; }
 
 
-	void CreateCase(std::string caseName_p);
+	std::weak_ptr<Case> CreateCase(std::string caseName_p);
 	Scene* CreateScene(std::string scnName, SceneType scnType, Ogre::SceneNode* parentNode_p) override;
 	Scene* CreateScene(std::string scnName, SceneType scnType) override;
 	Object* CreateObject(std::string objName_p , std::filesystem::path meshPath_p, PhysXType type);
@@ -69,7 +69,7 @@ public:
 
 	//RenderMesh* CreateRenderMesh(std::filesystem::path path_p);
 	
-	Material* CreateMaterial(std::filesystem::path materialPath_p, std::string materialName);
+	Material* CreateMaterial( std::filesystem::path materialPath_p, std::string materialName);
 
 	// old method
 	//RenderMesh* CreateRenderMesh(std::string meshName_p);
@@ -84,8 +84,17 @@ public:
 	
 	Image* CreateImage(std::filesystem::path filePath_p);
 
-
 	void loadSavedResource();
+
+	// Loading Functions
+	void loadCase(std::filesystem::path yamlFilePath);
+
+	// SAVING FUNCTIONS
+	void saveAll();
+	void saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes);
+	void saveObjects(const std::vector<std::shared_ptr<Object>>* objects, YAML::Emitter& out);
+	/*void saveMaterial();
+	void saveShader();*/
 
 };
 

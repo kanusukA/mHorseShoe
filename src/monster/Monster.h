@@ -115,6 +115,7 @@ public:
 
 	void updateShaderVar(ShaderVar var, ShaderType shaderType);
 
+	void updateShaderVars(std::vector<ShaderVar> var, Ogre::GpuProgramParametersPtr shaderPrgm);
 
 	
 	void readMaterial(Ogre::String matName , Ogre::String objectName = "");

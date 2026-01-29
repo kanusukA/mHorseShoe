@@ -84,6 +84,11 @@ RSUS* GDBuilderContext::monProvideRsus()
 	return RSUS::GetInstance();
 }
 
+void GDBuilderContext::monSetShaderVars(std::vector<ShaderVar> vars_p, Ogre::GpuProgramParametersPtr shaderPrgm)
+{
+	RSUS::GetInstance()->updateShaderVars(vars_p, shaderPrgm);
+}
+
 bool GDBuilderContext::sceneExists(std::string scnName_p)
 {
 	return monster->oScnManager->hasSceneNode(scnName_p);

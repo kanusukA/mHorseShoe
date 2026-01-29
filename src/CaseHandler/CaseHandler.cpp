@@ -33,10 +33,12 @@ void CaseHandler::checkIntegrity()
 }
 
 
-void CaseHandler::CreateCase(std::string caseName_p)
+std::weak_ptr<Case> CaseHandler::CreateCase(std::string caseName_p)
 {
 	std::shared_ptr<Case> sCase = std::make_shared<Case>(this,caseName_p);
-	caseVec->push_back(sCase);
+	caseVec->push_back(std::move(sCase));
+
+	return caseVec->at(caseVec->size() - 1);
 
 }
 
@@ -75,7 +77,7 @@ Object* CaseHandler::CreateObject(std::string objectName_p, std::filesystem::pat
 	if (!this->objectExists(objectName_p))
 	{
 		Ogre::Entity* ent = this->monCreateEntity(objectName_p, mesh);
-		Object* new_obj = new Object(this, ent, objectName_p, type);
+		Object* new_obj = new Object(this, ent, objectName_p, type,meshPath_p);
 		return new_obj;
 
 	}
@@ -147,7 +149,7 @@ Material* CaseHandler::CreateMaterial(std::filesystem::path materialPath_p, std:
 	if (newMat)
 	{
 		ogreMaterial->copyDetailsTo(newMat);
-		Material* mat = new Material(this, newMat);
+		Material* mat = new Material(this, newMat,materialPath_p.string());
 
 		return mat;
 	}
@@ -239,5 +241,42 @@ void CaseHandler::loadSavedResource()
 	//}
 
 }
+
+void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
+{
+	RLCase rlCase = resourceHandler->fetchCaseData(yamlFilePath);
+	
+	std::weak_ptr<Case> wCase = CreateCase(rlCase.name);
+
+	for (int scenesIndex = 0; scenesIndex < rlCase.Scenes.size(); scenesIndex++)
+	{
+		std::weak_ptr<Scene> wScene = wCase.lock()->attachNewSceneToRoot(rlCase.Scenes.at(scenesIndex).name,SceneType(rlCase.Scenes.at(scenesIndex).scnType));
+
+		for (int objIndex = 0; objIndex < rlCase.Scenes.at(scenesIndex).objects.size(); objIndex++)
+		{
+			RLObject obj = rlCase.Scenes.at(scenesIndex).objects.at(objIndex);
+
+			std::weak_ptr<Object> wObj =  wScene.lock()->attachNewObject(obj.name, obj.mesh.filepath, PhysXType(obj.ObjectPhysxType));
+
+			wObj.lock()->setMaterial(obj.material.materialFilePath, obj.material.name);
+
+			if (!obj.material.vertShader.shaderVars.empty())
+			{
+				wObj.lock()->getwMaterial().lock()->getVertexShader()->loadShaderVar(obj.material.vertShader.shaderVars);
+			}
+			
+			if (!obj.material.fragShader.shaderVars.empty())
+			{
+				wObj.lock()->getwMaterial().lock()->getFragmentShader()->loadShaderVar(obj.material.fragShader.shaderVars);
+			}
+
+		}
+
+	}
+
+
+	ToastComponent::GetInstance()->addMessage("Loaded");
+}
+
 
 

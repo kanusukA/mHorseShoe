@@ -7,6 +7,7 @@
 
 // Third-party Headers
 #include <Ogre.h>
+#include "yaml-cpp/yaml.h"
 
 // STL Headers
 #include <filesystem>
@@ -633,6 +634,9 @@ protected:
 
 	float mass = 0;
 
+	std::string renderMeshName;
+
+	std::filesystem::path meshFilePath;
 
 public:
 
@@ -644,11 +648,11 @@ public:
 		_id = 10200000000 + index + (this->physXType * 10000000);
 	}
 
-	ObjectResource(ResourceHandlerBuilderContext* context, std::string name_p, PhysXType objectType) {
+	ObjectResource(ResourceHandlerBuilderContext* context, std::string name_p, PhysXType objectType,std::filesystem::path meshFilePath_p) {
 		this->resourceHandlerCxt = context;
 		physXType = objectType;
 		this->setName(name_p);
-
+		meshFilePath = meshFilePath_p;
 		setId(context->generateObjectID());
 	}
 
@@ -659,7 +663,13 @@ public:
 	PhysXType getPhysxType() { return physXType; }
 	float getMass() { return mass; }
 	
+	const std::string _getMeshName() {
+		return renderMeshName;
+	}
 
+	const std::filesystem::path getMeshFilePath() {
+		return meshFilePath;
+	}
 
 };
 
@@ -746,7 +756,7 @@ class MaterialResource : public Resource
 
 public:
 
-	std::string materialName; // file name of material
+	std::string materialFilePath; // file name of material
 
 
 	void setId(int index) override {
@@ -758,9 +768,9 @@ public:
 	}
 
 
-	MaterialResource(ResourceHandlerBuilderContext* context, std::string materialName_p) {
-		this->setName(materialName_p);
-		materialName = materialName_p;
+	MaterialResource(ResourceHandlerBuilderContext* context, std::string materialName, std::string materialPath_p) {
+		this->setName(materialName);
+		materialFilePath = materialPath_p;
 		setId(context->generateMaterialID());
 	};
 
@@ -806,6 +816,8 @@ class RenderMeshResource : public Resource
 
 public:
 
+	std::filesystem::path meshFile;
+
 	void setId(int index) override {
 
 		if (index > 99999)
@@ -815,10 +827,10 @@ public:
 		_id = 10300000000 + index;
 
 	}
-	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p) {
+	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p, std::filesystem::path meshFile_p) {
 		this->resourceHandlerCxt = context;
 		this->setName(meshName_p);
-
+		meshFile = meshFile_p;
 		setId(context->generateMeshID());
 	}
 

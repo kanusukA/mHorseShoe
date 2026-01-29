@@ -33,12 +33,12 @@ public:
 	}
 
 	// Object
-	void attachNewObject(const std::string objectName_p, std::filesystem::path meshPath_p, PhysXType type) {
+	std::weak_ptr<Object> attachNewObject(const std::string objectName_p, std::filesystem::path meshPath_p, PhysXType type) {
 		Object* newObject = GDBuilderCxt->CreateObject(objectName_p, meshPath_p, type);
 		std::shared_ptr<Object> sObject(newObject);
 		scene->attachObject(sObject->entity.get());
 		objVec.push_back(std::move(sObject));
-
+		return objVec.at(objVec.size() - 1);
 	}
 
 	void removeObjectByIndex(int index) {
