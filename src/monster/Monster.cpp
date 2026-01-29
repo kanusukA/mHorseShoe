@@ -45,7 +45,7 @@ std::mutex RSUS::mutex_;
 	}
 }
 
-Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay)
+Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay,Ogre::ImGuiOverlay* imguiOverlay_p)
 {
 	oRoot = root;
 	
@@ -59,17 +59,17 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	oScnManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
 	
 
-	oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
+	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+	oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
 
-	Ogre::MaterialPtr casterMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowCaster");
-	Ogre::MaterialPtr receiverMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowReceiver");
+	//Ogre::MaterialPtr casterMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowCaster");
+	//Ogre::MaterialPtr receiverMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowReceiver");
 
-	oScnManager->setShadowTextureCasterMaterial(casterMat);
-	oScnManager->setShadowTextureReceiverMaterial(receiverMat);
-	//oScnManager->setShadowCasterRenderBackFaces(false);
-	
-	oScnManager->setShadowTextureSelfShadow(true);
+	//oScnManager->setShadowTextureCasterMaterial(casterMat);
+	//oScnManager->setShadowTextureReceiverMaterial(receiverMat);
+	////oScnManager->setShadowCasterRenderBackFaces(false);
+	//
+	//oScnManager->setShadowTextureSelfShadow(true);
 	
 	
 	//oScnManager->setShowDebugShadows(true);
@@ -85,7 +85,9 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	mRayScnQuery->setQueryMask(~QueryMask::SKY & ~QueryMask::GRID);
 	
 
-	inputkeys = InputHandler::GetInstance()->getInputKeys();
+//	inputkeys = InputHandler::GetInstance()->getInputKeys();
+
+	imguiOverlay = imguiOverlay_p;
 
 	
 	
@@ -128,22 +130,60 @@ Ogre::SceneNode* Monster::addCamera(Ogre::String camName, Ogre::Vector3 startPos
 	return camNode;
 }
 
-Ogre::Entity* Monster::getMeshEntity(Ogre::String mshname, Ogre::String groupName)
+Ogre::Entity* Monster::createMeshEntity(Ogre::String mshname, Ogre::String groupName)
 {
 	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(mshname, groupName);
 	return oScnManager->createEntity(msh);
 }
 
-Ogre::Entity* Monster::getMeshEntity(Ogre::String entityname, Ogre::String mshname, Ogre::String groupName)
+Ogre::Entity* Monster::createMeshEntity(Ogre::String entityname, Ogre::String mshname, Ogre::String groupName)
 {
 	Ogre::MeshPtr msh = Ogre::MeshManager::getSingleton().load(mshname, groupName);
 	return oScnManager->createEntity(entityname,msh);
 }
 
+Ogre::Entity* Monster::createEntity(Ogre::String entityName_p, Ogre::MeshPtr mesh_p)
+{
+	return oScnManager->createEntity(entityName_p,mesh_p);
+}
+
+Ogre::MeshPtr Monster::getMesh(Ogre::String meshName, Ogre::String groupName)
+{
+	return Ogre::MeshManager::getSingleton().load(meshName, groupName); // FILE NOT FOUND!!!!
+}
+Ogre::SceneNode* Monster::createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node)
+{
+	Ogre::SceneNode* new_scnNode = node->createChildSceneNode(scnNodeName);
+	return new_scnNode;
+}
+Ogre::Mesh* Monster::getColliderMesh(Ogre::String meshName, Ogre::String groupName)
+{
+	return Ogre::MeshManager::getSingleton().load(meshName, groupName).get();
+}
+
+Ogre::MaterialPtr Monster::getMaterial(Ogre::String matName_p, Ogre::String groupName)
+{
+	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(matName_p,groupName);
+	if (!mat.get()->isLoaded())
+	{
+		mat.get()->load();
+	}
+	return mat;
+}
+
+Ogre::MaterialPtr Monster::createEmptyMaterial(std::string name_p, Ogre::String groupName)
+{
+	if (!Ogre::MaterialManager::getSingletonPtr()->resourceExists(name_p,groupName))
+	{
+		return Ogre::MaterialManager::getSingletonPtr()->create(name_p, groupName);
+	}
+	return nullptr;
+}
+
 Ogre::SceneNode* Monster::addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode)
 {
 	Ogre::SceneNode* scnNode = toScnNode->createChildSceneNode();
-	scnNode->attachObject(getMeshEntity(meshName));
+	scnNode->attachObject(createMeshEntity(meshName));
 	return scnNode;
 }
 
@@ -515,8 +555,30 @@ void Monster::getMeshVerticesInformation(
 }
 
 
+void Monster::addOgreResourceLocation(std::string path_p, std::string OgreResourceGroup)
+{
+	if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceGroupExists(OgreResourceGroup))
+	{
+		Ogre::ResourceGroupManager::getSingletonPtr()->createResourceGroup(OgreResourceGroup);
+	}
+	if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(path_p,OgreResourceGroup))
+	{
+		Ogre::ResourceGroupManager::getSingletonPtr()->addResourceLocation(path_p, "FileSystem", OgreResourceGroup);
+
+	}
+	
+}
+
+void Monster::initalizeResourceGroup(std::string OgreResourceGroup)
+{
+	Ogre::ResourceGroupManager::getSingletonPtr()->initialiseResourceGroup(OgreResourceGroup);
+}
+
 void Monster::setSkyBox()
 {
+
+	//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("D:/source/repos/mHorseShoe_cmake/mHorseShoee_0_0_2/x64/assets/meshes/Materials/Shaders", "FileSystem", "Mesh_Materials");
+
 	//Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 	//oScnManager->setSkyBox(true, "mySky",300,true,Ogre::Quaternion::IDENTITY,"Render_Mesh");
 	
@@ -528,6 +590,7 @@ void Monster::setSkyBox()
 
 	RSUS::GetInstance()->readMaterial("mySky");
 	RSUS::GetInstance()->readMaterial("myskyHigh");
+
 
 
 	/*skyHighParam.get()->setNamedConstant("baseColor", Ogre::Vector4(0.1, 0.01, 0.06, 1.0));
@@ -561,12 +624,19 @@ void Monster::setSkyBox()
 	param.get()->setNamedConstant("moonCoreCol", Ogre::Vector4(1.0, 1.0, 1.0, 1.0));
 
 	param.get()->setNamedConstant("worldSpaceLightPos", Ogre::Vector3(-0.14,-0.6,0));*/
+
 	
-	Ogre::Entity* cloudsEnt = this->getMeshEntity("Plane.mesh");
+	Ogre::Entity* cloudsEnt = this->createMeshEntity("Plane.mesh");
 	Ogre::MaterialPtr cloudsMat = Ogre::MaterialManager::getSingleton().getByName("clouds_material", "Mesh_Materials");
 	Ogre::GpuProgramParametersPtr cloudsParam = cloudsMat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 
-	cloudsParam.get()->setNamedConstant("_cloudCol", Ogre::Vector4(0.18, 0.13, 0.24, 0.75));
+	std::cout << "Source file : " << cloudsMat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile() << std::endl;
+	std::cout << "Source : " << cloudsMat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSource() << std::endl;
+	
+
+	//cloudsParam.get()->setNamedConstant("_cloudCol", Ogre::Vector4(0.18, 0.13, 0.24, 0.75));
+	// Separate Material and their shader files in folders individually!!
+
 
 
 	cloudsEnt->setMaterial(cloudsMat);
@@ -581,8 +651,6 @@ void Monster::setSkyBox()
 
 	
 
-
-
 	// SKY BOX
 
 
@@ -590,7 +658,7 @@ void Monster::setSkyBox()
 	skyHighNode = oScnManager->getRootSceneNode()->createChildSceneNode(SKY_BOX_NAME);
 
 	
-	Ogre::Entity* ent_high = this->getMeshEntity("sky_box_mesh", "Sphere_up.mesh", "Render_Mesh");
+	Ogre::Entity* ent_high = this->createMeshEntity("sky_box_mesh", "Sphere_up.mesh", "Render_Mesh");
 
 	ent_high->setMaterial(skyHighMat);
 	ent_high->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_EARLY);
@@ -602,7 +670,7 @@ void Monster::setSkyBox()
 
 	skySphere = oScnManager->getRootSceneNode()->createChildSceneNode(SKY_SPHERE_NAME);
 
-	Ogre::Entity* ent_sky = this->getMeshEntity("sky_sphere_mesh", "Sphere.mesh", "Render_Mesh");
+	Ogre::Entity* ent_sky = this->createMeshEntity("sky_sphere_mesh", "Sphere.mesh", "Render_Mesh");
 
 	ent_sky->setMaterial(skyMat);
 	ent_sky->setRenderQueueGroup(Ogre::RenderQueueGroupID::RENDER_QUEUE_SKIES_LATE);
@@ -624,13 +692,13 @@ void Monster::setSkyBox()
 void Monster::setGrid()
 {
 
-	Ogre::MaterialPtr gridMat = Ogre::MaterialManager::getSingleton().getByName("myGrid");
+	Ogre::MaterialPtr gridMat = Ogre::MaterialManager::getSingleton().getByName("myGrid", OGRE_MATERIAL_GROUP);
 	RSUS::GetInstance()->readMaterial("myGrid");
 
 
 	Ogre::ManualObject* gridObj = oScnManager->createManualObject(WORLD_GRID_NAME);
 
-	gridObj->begin("myGrid", Ogre::RenderOperation::OT_TRIANGLE_STRIP, "Mesh_Materials");
+	gridObj->begin("myGrid", Ogre::RenderOperation::OT_TRIANGLE_STRIP, OGRE_MATERIAL_GROUP);
 
 	gridObj->position(Ogre::Vector3(0, 0, 0));
 	gridObj->normal(0, 1, 0);
@@ -664,6 +732,18 @@ void Monster::setGrid()
 	
 	gridNode->setPosition(-5000, 0, -5000);
 
+
+	/*Ogre::SceneNode* test = oScnManager->getRootSceneNode()->createChildSceneNode("testing");
+	Ogre::MaterialPtr m_mat = Ogre::MaterialManager::getSingletonPtr()->getByName("normalMaterial");
+
+	Ogre::Entity* ent = oScnManager->createEntity("Icosphere.mesh");
+	ent->setMaterial(m_mat);
+
+	test->attachObject(ent);
+
+	test->setPosition(0, 2, 0);*/
+
+
 }
 
 void Monster::createTerrain(Ogre::Vector2 size,unsigned int vertSize, unsigned int grassDensity)
@@ -681,7 +761,7 @@ void Monster::createTerrain(Ogre::Vector2 size,unsigned int vertSize, unsigned i
 	Ogre::StaticGeometry* mField = oScnManager->createStaticGeometry("stat_geo");
 	//mField->setOrigin(Ogre::Vector3(0, 1, 0));
 
-	Ogre::Entity* ent = this->getMeshEntity("Blade2mesh.mesh");
+	Ogre::Entity* ent = this->createMeshEntity("Blade2mesh.mesh");
 	ent->setCastShadows(true);
 	
 	Ogre::MaterialPtr ent_mat = Ogre::MaterialManager::getSingleton().getByName("Blade_mat");
@@ -794,7 +874,7 @@ void Monster::setHeightMap(Ogre::String heightMapImg, Ogre::String grassMapImg, 
 	std::cout << "Size : " << imgManager->getWidth() << " " << imgManager->getWidth() << std::endl;
 
 	// Grass repositioning setup
-	Ogre::Entity* ent = this->getMeshEntity("Grass.mesh");
+	Ogre::Entity* ent = this->createMeshEntity("Grass.mesh");
 	Ogre::StaticGeometry* mField = oScnManager->getStaticGeometry("stat_geo");
 	mField->reset();
 	int numberOfGrasses = 0;
@@ -943,7 +1023,7 @@ void Monster::createGrass()
 	Ogre::StaticGeometry* mField = oScnManager->createStaticGeometry("stat_geo");
 	mField->setOrigin(Ogre::Vector3(0, 1, 0));
 
-	Ogre::Entity* ent = this->getMeshEntity("Grass.mesh");
+	Ogre::Entity* ent = this->createMeshEntity("Grass.mesh");
 	//Ogre::Entity* ent = oScnManager->createEntity("grass");
 
 	// get Terrain positions
@@ -990,6 +1070,8 @@ HWND* Monster::getHWND()
 
 void Monster::updateMonster()
 {
+	oRoot->renderOneFrame();
+
 	if (skySphere) {
 		skySphere->setPosition(CameraNode->getPosition().x,CameraNode->getPosition().y - 2500, CameraNode->getPosition().z);
 		
@@ -1009,6 +1091,7 @@ void Monster::deleteScnNode(Ogre::SceneNode* scnNode)
 {
 	scnNode->removeAndDestroyAllChildren();
 	oScnManager->destroySceneNode(scnNode);
+
 }
 
 
@@ -1048,26 +1131,26 @@ void Monster::windowUpdate()
 {
 	// Fullscreen
 
-	if (inputkeys->ALT_L_KEY || inputkeys->ALT_R_KEY) {
-		if (inputkeys->ENTER_KEY) {
-			SDL_SetWindowFullscreen(sdlWindow, !window_fullScreen);
-		}
-	
-		
-	}
-	else {
-		// add full screen toggle
-		auto flag = SDL_GetWindowFlags(sdlWindow);
-		auto is_fullscreen = flag & SDL_WINDOW_FULLSCREEN;
-		if (is_fullscreen == SDL_WINDOW_FULLSCREEN) {
-			//is fullscreen
-			window_fullScreen = true;
-		}
-		else {
-			window_fullScreen = false;
-		}
+	//if (inputkeys->ALT_L_KEY || inputkeys->ALT_R_KEY) {
+	//	if (inputkeys->ENTER_KEY) {
+	//		SDL_SetWindowFullscreen(sdlWindow, !window_fullScreen);
+	//	}
+	//
+	//	
+	//}
+	//else {
+	//	// add full screen toggle
+	//	auto flag = SDL_GetWindowFlags(sdlWindow);
+	//	auto is_fullscreen = flag & SDL_WINDOW_FULLSCREEN;
+	//	if (is_fullscreen == SDL_WINDOW_FULLSCREEN) {
+	//		//is fullscreen
+	//		window_fullScreen = true;
+	//	}
+	//	else {
+	//		window_fullScreen = false;
+	//	}
 
-	}
+	//}
 	
 
 }
@@ -1175,6 +1258,110 @@ Ogre::Vector3 getObjRotation(Ogre::SceneNode* scnNode) {
 	);
 }
 
+void RSUS::setShader(std::string matName, 
+	std::string fragShaderName, 
+	std::string vertShaderName, 
+	std::vector<ShaderVar>* fragShaderVar, 
+	std::vector<ShaderVar>* vertShaderVar, 
+	Ogre::GpuProgramParametersPtr fragProgram, 
+	Ogre::GpuProgramParametersPtr vertProgram
+) {
+
+	rsusObj->materialName = matName;
+	rsusObj->fragShaderName = fragShaderName;
+	rsusObj->vertShaderName = vertShaderName;
+	rsusObj->fragProgramPtr = fragProgram;
+	rsusObj->vertProgramPtr = vertProgram;
+	rsusObj->fragVariables = fragShaderVar;
+	rsusObj->vertVariables = vertShaderVar;
+
+}
+
+void RSUS::updateShaderVar(ShaderVar var, ShaderType shaderType)
+{
+	switch (var.varType)
+	{
+	case ShaderVarType::INTEGER:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterInt(var.varName, *var.varInt);
+			break;
+		case Fragment:
+			updateFragParameterInt(var.varName, *var.varInt);
+			break;
+		default:
+			break;
+		}
+		break;
+	case ShaderVarType::FLOAT0:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterFloat(var.varName, var.varFloat);
+			break;
+		case Fragment:
+			updateFragParameterFloat(var.varName, var.varFloat);
+			break;
+		default:
+			break;
+		}
+		break;
+	case ShaderVarType::FLOAT2:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterFloat2(var.varName, var.varFloat2);
+			break;
+		case Fragment:
+			updateFragParameterFloat2(var.varName, var.varFloat2);
+			break;
+		default:
+			break;
+		}
+		break;
+	case ShaderVarType::FLOAT3:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterFloat3(var.varName, var.varFloat3);
+			break;
+		case Fragment:
+			updateFragParameterFloat3(var.varName, var.varFloat3);
+			break;
+		default:
+			break;
+		}
+		break;
+	case ShaderVarType::FLOAT4:
+		switch (shaderType)
+		{
+		case Vertex:
+			updateVertParameterFloat4(var.varName, var.varFloat4);
+			break;
+		case Fragment:
+			updateFragParameterFloat4(var.varName, var.varFloat4);
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void RSUS::updateShaderVars(std::vector<ShaderVar> vars_p, Ogre::GpuProgramParametersPtr shaderPrgm)
+{
+	rsusObj->fragProgramPtr = shaderPrgm;
+
+	for (int i = 0; i < vars_p.size(); i++)
+	{
+		updateShaderVar(vars_p.at(i), ShaderType::Fragment);
+	}
+
+}
+
 void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 {
 
@@ -1199,20 +1386,20 @@ void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 
 	// Reads the shader file
 	// Gets the filenames and paths and the shader variables are prepared
-	ResourceHandler::GetInstance()->readShaderFiles(mat);
+	//ResourceHandler::GetInstance()->readShaderFiles(mat);
 
 	// collects the read shader variables
-	std::vector<std::string>* fragshaderVar = ResourceHandler::GetInstance()->fragShaderVariables;
+	//std::vector<std::string>* fragshaderVar = ResourceHandler::GetInstance()->fragShaderVariables;
 	//std::vector<std::string>* vertshaderVar = ResourceHandler::GetInstance()->vertShaderVariables;
 
 	//if save file exists
 	//initializes the values of shader
 	if (objectName.empty()) {
-		rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, fragProgramFileName, SECTION_FRAGMNET_SHADER);
+		//rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, fragProgramFileName, SECTION_FRAGMNET_SHADER);
 		//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
 	}
 	else {
-		rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, objectName, SECTION_FRAGMNET_SHADER);
+		//rsusObj->fragVariables = _initShaderValue(fragParam, fragshaderVar, objectName, SECTION_FRAGMNET_SHADER);
 		//rsusObj->vertVariables =  _initShaderValue(vertParam, vertshaderVar, vertProgramName);
 	}
 	
@@ -1257,10 +1444,10 @@ void RSUS::updateFragParameterFloat(Ogre::String parameterName, float* val)
 	
 }
 
-void RSUS::updateFragParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val)
+void RSUS::updateFragParameterFloat2(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector2(val[0],val[1]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << val << std::endl;
@@ -1268,10 +1455,10 @@ void RSUS::updateFragParameterFloat2(Ogre::String parameterName, Ogre::Vector2 v
 	
 }
 
-void RSUS::updateFragParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val)
+void RSUS::updateFragParameterFloat3(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector3(val[0],val[1],val[2]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << val << std::endl;
@@ -1279,10 +1466,10 @@ void RSUS::updateFragParameterFloat3(Ogre::String parameterName, Ogre::Vector3 v
 	
 }
 
-void RSUS::updateFragParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val)
+void RSUS::updateFragParameterFloat4(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->fragProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector4(val[0],val[1],val[2],val[3]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float4 Input For : " << parameterName << " Value : " << val << std::endl;
@@ -1320,30 +1507,30 @@ void RSUS::updateVertParameterFloat(Ogre::String parameterName, float* val)
 	}
 }
 
-void RSUS::updateVertParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val)
+void RSUS::updateVertParameterFloat2(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector2(val[0],val[1]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float2 Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 }
 
-void RSUS::updateVertParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val)
+void RSUS::updateVertParameterFloat3(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector3(val[0],val[1],val[2]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float3 Input For : " << parameterName << " Value : " << val << std::endl;
 	}
 }
 
-void RSUS::updateVertParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val)
+void RSUS::updateVertParameterFloat4(Ogre::String parameterName, float* val)
 {
 	try {
-		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, val);
+		this->rsusObj->vertProgramPtr.get()->setNamedConstant(parameterName, Ogre::Vector4(val[0],val[1],val[2],val[3]));
 	}
 	catch (...) {
 		std::cout << "Invalid Float4 Input For : " << parameterName << " Value : " << val << std::endl;

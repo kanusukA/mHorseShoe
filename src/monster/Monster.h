@@ -3,20 +3,21 @@
 #ifndef MONSTER_H
 #define MONSTER_H
 
-
-#include <monster/terrain.h>
-
+//  IMPORT THIS BEFORE OGRE.H !!!!!!!!!!!
 #include <OgreApplicationContext.h>
 #include <OgreTrays.h>
 
+// Local Headers
+#include <monster/terrain.h>
+//#include <feel/KeyHandler.h>
 #include <GDHandler/ResourceHandler.h>
 
-#include <feel/KeyHandler.h>
+// Third-party header
+#include <SDL3/SDL.h>
 #include <PxPhysicsAPI.h>
 
-#include <SDL3/SDL.h>
+// STL headers
 #include <Windows.h>
-
 #include <random>
 
 
@@ -86,8 +87,8 @@ struct RSUShader
 	std::string fragShaderFileName;
 	std::string vertShaderName;
 	std::string vertShaderFileName;
-	std::vector<ShaderVar> fragVariables;
-	std::vector<ShaderVar> vertVariables;
+	std::vector<ShaderVar>* fragVariables;
+	std::vector<ShaderVar>* vertVariables;
 
 	RSUSShaderTextures* textures = new RSUSShaderTextures();
 
@@ -95,29 +96,42 @@ struct RSUShader
 
 
 
-// Singleton Class
+// Singleton Class // TODO make a part of Monster class.
 class RSUS
 {
 public:
 
 	RSUShader* rsusObj = new RSUShader();
 
+	// NEW SHADER FUNCTIONS
+	void setShader(std::string matName,
+		std::string fragShaderName, 
+		std::string vertShaderName, 
+		std::vector<ShaderVar>* fragShaderVar, 
+		std::vector<ShaderVar>* vertShaderVar, 
+		Ogre::GpuProgramParametersPtr fragProgram, 
+		Ogre::GpuProgramParametersPtr vertProgram);
+	
+
+	void updateShaderVar(ShaderVar var, ShaderType shaderType);
+
+	void updateShaderVars(std::vector<ShaderVar> var, Ogre::GpuProgramParametersPtr shaderPrgm);
+
 	
 	void readMaterial(Ogre::String matName , Ogre::String objectName = "");
-	
 
 	void updateFragParameterInt(Ogre::String parameterName, int val);
 	void updateFragParameterFloat(Ogre::String parameterName, float* val);
-	void updateFragParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val);
-	void updateFragParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val);
-	void updateFragParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
+	void updateFragParameterFloat2(Ogre::String parameterName, float* val);
+	void updateFragParameterFloat3(Ogre::String parameterName, float* val);
+	void updateFragParameterFloat4(Ogre::String parameterName, float* val);
 	void updateFragParameterBool(Ogre::String parameteName, bool val);
 
 	void updateVertParameterInt(Ogre::String parameterName, int val);
 	void updateVertParameterFloat(Ogre::String parameterName, float* val);
-	void updateVertParameterFloat2(Ogre::String parameterName, Ogre::Vector2 val);
-	void updateVertParameterFloat3(Ogre::String parameterName, Ogre::Vector3 val);
-	void updateVertParameterFloat4(Ogre::String parameterName, Ogre::Vector4 val);
+	void updateVertParameterFloat2(Ogre::String parameterName, float* val);
+	void updateVertParameterFloat3(Ogre::String parameterName, float* val);
+	void updateVertParameterFloat4(Ogre::String parameterName, float* val);
 	void updateVertParameterBool(Ogre::String parameterName, bool val);
 
 	// Class should not be clonable
@@ -134,6 +148,7 @@ public:
 	void setNormalTexture(Ogre::Texture* texture);
 	void setRoughnessTexture(Ogre::Texture* texture);
 	void setParallaxTexture(Ogre::Texture* texture);
+
 
 	
 
@@ -169,7 +184,7 @@ private:
 
 	Ogre::Vector3 result = Ogre::Vector3();
 
-	IKEYS* inputkeys;
+	//IKEYS* inputkeys;
 
 public:
 
@@ -177,9 +192,11 @@ public:
 
 	WindowProperties* windowProp = new WindowProperties();
 
+	Ogre::ImGuiOverlay* imguiOverlay;
+
 	// INITIALIZE OGRE3D AND CREATE A RENDERWINDOW
 	// name  -  NAME OF THE RENDERWINDOW
-	Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay);
+	Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p);
 
 	// INITIALISES SDL3 WINDOW / ADDS DEFAULT CAMERAMAN / GUI SYSTEM
 	void InitMonster();
@@ -212,8 +229,15 @@ public:
 	// RENDERING RELATED 
 	
 	Ogre::SceneNode* addCamera(Ogre::String camName, Ogre::Vector3 startPos);
-	Ogre::Entity* getMeshEntity(Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
-	Ogre::Entity* getMeshEntity(Ogre::String entityname ,Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
+	Ogre::Entity* createMeshEntity(Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
+	Ogre::Entity* createMeshEntity(Ogre::String entityname ,Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
+	Ogre::Entity* createEntity(Ogre::String entityName_p, Ogre::MeshPtr mesh_p);
+	Ogre::MeshPtr getMesh(Ogre::String meshName, Ogre::String groupName = "Render_Mesh");
+	Ogre::SceneNode* createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node); // Creates a new scnNode and attaches it to the given scnNode
+
+	Ogre::Mesh* getColliderMesh(Ogre::String meshName, Ogre::String groupName = "Collider_Mesh");
+	Ogre::MaterialPtr getMaterial(Ogre::String matName_p, Ogre::String groupName);
+	Ogre::MaterialPtr createEmptyMaterial(std::string name_p, Ogre::String groupName);
 	Ogre::SceneNode* addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode);
 
 	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::String scnNodeName, Ogre::Entity* ent);
@@ -275,6 +299,10 @@ public:
 	);
 
 	Ogre::Camera* getCamera() { return cam; }
+	Ogre::SceneNode* getCameraScnNode() { return CameraNode; }
+
+	void addOgreResourceLocation(std::string path_p, std::string OgreResourceGroup);
+	void initalizeResourceGroup(std::string OgreResourceGroup);
 
 	void setSkyBox();
 	void setGrid();

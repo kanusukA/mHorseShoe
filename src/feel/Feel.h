@@ -3,13 +3,16 @@
 #ifndef FEEL_H
 #define FEEL_H
 
-#include <string>
+// Local
 #include "KeyHandler.h"
-#include <Windows.h>
-#include <iostream>
 
+// Third
 #include<imgui.h>
 
+//STL
+#include <string>
+#include <Windows.h>
+#include <iostream>
 #include <stdio.h>
 
 
@@ -20,7 +23,7 @@ class Feel
 {
 public:
 	// INITIALIZES INPUT HANDLER. CREATES NEW BINDINGS.
-	void initFeel(SDL_Window* sdlWindow);
+	void initFeel(SDL_Window* sdlWindow,KeyHandler* keyhandler_p);
 
 	KeyHandler* keyHandler;
 	SDL_Window* window = NULL;

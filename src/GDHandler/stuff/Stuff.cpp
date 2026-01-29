@@ -394,7 +394,7 @@ void StuffHandler::addObject(
 void StuffHandler::addGrass(Ogre::Real numOfGrass)
 {
 	StuffMesh* stuffMesh = new StuffMesh;
-	Ogre::Entity* ent = monster->getMeshEntity("Grass.mesh");
+	Ogre::Entity* ent = monster->createMeshEntity("Grass.mesh");
 	ent->setMaterial(Ogre::MaterialManager::getSingleton().getByName("GrasssMaterial"));
 	int ref = 0;
 	
@@ -535,64 +535,64 @@ void StuffHandler::update(float deltaTime)
 	this->updateSelectedPos();
 
 
-	if (InputHandler::GetInstance()->getInputKeys()->SPACE_KEY)
-	{
-		this->addLastObject();
-	}
+	//if (InputHandler::GetInstance()->getInputKeys()->SPACE_KEY)
+	//{
+	//	this->addLastObject();
+	//}
 
-	for (int i = 0; i < this->stuffDynamics->size(); i++)
-	{
-		this->stuffDynamics->at(i)->update(deltaTime);
-	}
-	if (showingColliderDebug) {
-		this->updateVisualDebug();
-	}
+	//for (int i = 0; i < this->stuffDynamics->size(); i++)
+	//{
+	//	this->stuffDynamics->at(i)->update(deltaTime);
+	//}
+	//if (showingColliderDebug) {
+	//	this->updateVisualDebug();
+	//}
 
-	// update rayCast from monster
-	Ogre::MovableObject* rayObj = monster->RayCastFromPoint();
-	if (rayObj) {
+	//// update rayCast from monster
+	//Ogre::MovableObject* rayObj = monster->RayCastFromPoint();
+	//if (rayObj) {
 
-		*this->selectedObj->selectingName = rayObj->getParentSceneNode()->getName();
+	//	*this->selectedObj->selectingName = rayObj->getParentSceneNode()->getName();
 
-		if(InputHandler::GetInstance()->getInputKeys()->MOUSE_LEFT_CLICK > 0){
+	//	if(InputHandler::GetInstance()->getInputKeys()->MOUSE_LEFT_CLICK > 0){
 
-			Ogre::Any any = rayObj->getParentSceneNode()->getUserObjectBindings().getUserAny();
-			
-			
+	//		Ogre::Any any = rayObj->getParentSceneNode()->getUserObjectBindings().getUserAny();
+	//		
+	//		
 
 
-			if (any.type() == typeid(StuffDynamic*)) {
+	//		if (any.type() == typeid(StuffDynamic*)) {
 
-				
-				this->selectedObj->selectedStuff = Ogre::any_cast<StuffDynamic*>(any);
-				this->selectedObj->type = STUFF_DYNAMIC;
-				
-				*this->selectedObj->shadowCasting = selectedObj->selectedStuff->getEntity()->getCastShadows();
-				
-			}
-			else if (any.type() == typeid(StuffStatic*)) {
-				
-				this->selectedObj->selectedStuff = Ogre::any_cast<StuffStatic*>(any);
-				this->selectedObj->type = STUFF_STATIC;
-					
-				
-				*this->selectedObj->shadowCasting = selectedObj->selectedStuff->getEntity()->getCastShadows();
-				
-			}
-			else if (any.type() == typeid(StuffMesh*)) {
-				
-				this->selectedObj->selectedStuff = Ogre::any_cast<StuffMesh*>(any);
-				this->selectedObj->type = STUFF_MESH_ONLY;
-				
-				*this->selectedObj->shadowCasting = selectedObj->selectedStuff->getEntity()->getCastShadows();
-			}
-			
-		}
+	//			
+	//			this->selectedObj->selectedStuff = Ogre::any_cast<StuffDynamic*>(any);
+	//			this->selectedObj->type = STUFF_DYNAMIC;
+	//			
+	//			*this->selectedObj->shadowCasting = selectedObj->selectedStuff->getEntity()->getCastShadows();
+	//			
+	//		}
+	//		else if (any.type() == typeid(StuffStatic*)) {
+	//			
+	//			this->selectedObj->selectedStuff = Ogre::any_cast<StuffStatic*>(any);
+	//			this->selectedObj->type = STUFF_STATIC;
+	//				
+	//			
+	//			*this->selectedObj->shadowCasting = selectedObj->selectedStuff->getEntity()->getCastShadows();
+	//			
+	//		}
+	//		else if (any.type() == typeid(StuffMesh*)) {
+	//			
+	//			this->selectedObj->selectedStuff = Ogre::any_cast<StuffMesh*>(any);
+	//			this->selectedObj->type = STUFF_MESH_ONLY;
+	//			
+	//			*this->selectedObj->shadowCasting = selectedObj->selectedStuff->getEntity()->getCastShadows();
+	//		}
+	//		
+	//	}
 
-	}
-	else {
-		*this->selectedObj->selectingName = "";
-	}
+	//}
+	//else {
+	//	*this->selectedObj->selectingName = "";
+	//}
 
 	
 
@@ -602,26 +602,26 @@ void StuffHandler::updateSelectedPos()
 {
 
 
-	if (this->selectedObj->type) {
-		//set type
-		if (inputKeys->UP_KEY)
-		{
-			this->selectedObj->selectedStuff->moveStuffBy(Ogre::Vector3(0, 1 - inputKeys->ALT_L_KEY, 0 + inputKeys->ALT_L_KEY));
-		}
-		if (inputKeys->DOWN_KEY)
-		{
-			this->selectedObj->selectedStuff->moveStuffBy(Ogre::Vector3(0, -1 + inputKeys->ALT_L_KEY, 0 - inputKeys->ALT_L_KEY));
-		}
-		if (inputKeys->LEFT_KEY)
-		{
-			this->selectedObj->selectedStuff->moveStuffBy(Ogre::Vector3(1, 0, 0));
-		}
-		if (inputKeys->RIGHT_KEY)
-		{
-			this->selectedObj->selectedStuff->moveStuffBy(Ogre::Vector3(-1, 0, 0));
-		}
+	//if (this->selectedObj->type) {
+	//	//set type
+	//	if (inputKeys->UP_KEY)
+	//	{
+	//		this->selectedObj->selectedStuff->moveStuffBy(Ogre::Vector3(0, 1 - inputKeys->ALT_L_KEY, 0 + inputKeys->ALT_L_KEY));
+	//	}
+	//	if (inputKeys->DOWN_KEY)
+	//	{
+	//		this->selectedObj->selectedStuff->moveStuffBy(Ogre::Vector3(0, -1 + inputKeys->ALT_L_KEY, 0 - inputKeys->ALT_L_KEY));
+	//	}
+	//	if (inputKeys->LEFT_KEY)
+	//	{
+	//		this->selectedObj->selectedStuff->moveStuffBy(Ogre::Vector3(1, 0, 0));
+	//	}
+	//	if (inputKeys->RIGHT_KEY)
+	//	{
+	//		this->selectedObj->selectedStuff->moveStuffBy(Ogre::Vector3(-1, 0, 0));
+	//	}
 
-	}
+	//}
 }
 
 void StuffHandler::deleteSelectedObj()

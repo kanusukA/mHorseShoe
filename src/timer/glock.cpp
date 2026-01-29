@@ -9,6 +9,10 @@ double getCurrentTime() {
 	return ms.count();
 }
 
+std::string getTimeStamp() {
+	
+}
+
 int getFPS(int framesPerMilli) {
 	return (float) 1000 / framesPerMilli;
 }

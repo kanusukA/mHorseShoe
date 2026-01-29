@@ -31,166 +31,142 @@ ResourceHandlerType ResourceHandler::_getResourceLocationGroup(std::string group
 
 }
 
-
-void ResourceHandler::read()
+std::vector<std::filesystem::path>* ResourceHandler::fetchResourcesByEnum(ResourceLoaderEnums::ResourceLoadPaths group_p)
 {
-
-}
-
-void ResourceHandler::write()
-{
-}
-
-void ResourceHandler::addResource(std::filesystem::path filePath, ResourceHandlerType type) {
-
-	switch (type)
+	switch (group_p)
 	{
-	case GLOBAL:
+	case ResourceLoaderEnums::Objects:
+		return nullptr;
 		break;
-	case RENDER_MESH:
-		if (!vectorContains(filePath.string(), renderMeshes)) {
-			//std::cout << "Added render meshes " << filePath.string() << std::endl;
-			this->renderMeshes->push_back(filePath.string());
-		}
+	case ResourceLoaderEnums::Shaders:
+		return this->ShaderDp;
 		break;
-	case COLLIDER_MESH:
-		if (!vectorContains(filePath.string(), colliderMeshes)) {
-			//std::cout << "Added collider meshes " << filePath.string() << std::endl;
-			this->colliderMeshes->push_back(filePath.string());
-		}
+	case ResourceLoaderEnums::MaterialPath:
+		return this->MaterialDp;
 		break;
-	case MESH_MATERIALS:
-		if (!vectorContains(filePath.string(), meshMaterials)) {
-			//std::cout << "Added mesh material " << filePath.string() << std::endl;
-			this->meshMaterials->push_back(filePath.string());
-		}
+	case ResourceLoaderEnums::MaterialTexture:
+		return this->TextureDp;
 		break;
-	case IMAGE:
-		if (!vectorContains(filePath.string(), images)) {
-			//std::cout << "Added Image " << filePath.string() << std::endl;
-			this->images->push_back(filePath.string());
-		}
+	case ResourceLoaderEnums::RenderMeshPath:
+		return this->MeshDp;
+		break;
+	case ResourceLoaderEnums::ImagePath:
+		return this->TextureDp;
 		break;
 	default:
+		return nullptr;
 		break;
 	}
-
 }
 
-std::filesystem::path ResourceHandler::_getSaveFileLoc(std::string filename)
-{
-	std::filesystem::path cur_path = std::filesystem::current_path();
-	cur_path += "/save";
-	cur_path += "/" + filename + ".txt";
 
-	return cur_path;
-}
+
 
 void ResourceHandler::_readShaderFile(std::vector<std::string>* shaderVar, std::filesystem::path path)
 {
 
-	in_stream.open(path);
-	std::string line;
+	//in_stream.open(path);
+	//std::string line;
 
-	std::string word = "";
+	//std::string word = "";
 
-	bool uniFound = false;
-	bool uniName = false;
-	bool skip = false;
-	int type;
+	//bool uniFound = false;
+	//bool uniName = false;
+	//bool skip = false;
+	//int type;
 
-	std::cout << "Variables : " << std::endl;
+	//std::cout << "Variables : " << std::endl;
 
-	if (in_stream.is_open()) {
-		while (std::getline(in_stream, line))
-		{
-			//std::cout << line << std::endl;
-			if (line == "//SKIP")
-			{
-				skip = true;
-			}
+	//if (in_stream.is_open()) {
+	//	while (std::getline(in_stream, line))
+	//	{
+	//		//std::cout << line << std::endl;
+	//		if (line == "//SKIP")
+	//		{
+	//			skip = true;
+	//		}
 
-			//std::cout << "Line : " << line << std::endl;
+	//		//std::cout << "Line : " << line << std::endl;
 
-			if (skip)
-			{
-				if (line == "//!SKIP") {
-					skip = false;
-					//shaderVar->push_back(word);
-				}
+	//		if (skip)
+	//		{
+	//			if (line == "//!SKIP") {
+	//				skip = false;
+	//				//shaderVar->push_back(word);
+	//			}
 
-				continue;
-			}
+	//			continue;
+	//		}
 
-			// first check uniform keyword
-			for (int i = 0; i < line.size(); i++)
-			{
-			
+	//		// first check uniform keyword
+	//		for (int i = 0; i < line.size(); i++)
+	//		{
+	//		
 
-				if (line.at(i) != ' ' && line.at(i) != ',' && line.at(i) != ')') {
-					word += line.at(i);
-				}
+	//			if (line.at(i) != ' ' && line.at(i) != ',' && line.at(i) != ')') {
+	//				word += line.at(i);
+	//			}
 
-				else {
-					// skips the coming constants
+	//			else {
+	//				// skips the coming constants
 
-					if (word == "uniform") {
+	//				if (word == "uniform") {
 
-						//std::cout << "uniform" << std::endl;
-						uniFound = true;
+	//					//std::cout << "uniform" << std::endl;
+	//					uniFound = true;
 
-					}
-					else if (uniFound) {
-						//std::cout << "type : ";
+	//				}
+	//				else if (uniFound) {
+	//					//std::cout << "type : ";
 
-						uniFound = false;
-						uniName = true;
+	//					uniFound = false;
+	//					uniName = true;
 
-						if (word == "int" || word == "bool") {
-							shaderVar->push_back("0");
-							std::cout << word << std::endl;
-						}
-						else if (word == "float")
-						{
-							shaderVar->push_back("1");
-							std::cout << "float" << std::endl;
-						}
-						else if (word == "float2")
-						{
-							shaderVar->push_back("2");
-							std::cout << "float2" << std::endl;
-						}
-						else if (word == "float3")
-						{
-							shaderVar->push_back("3");
-							std::cout << "float3" << std::endl;
-						}
-						else if (word == "float4")
-						{
-							shaderVar->push_back("4");
-							std::cout << "float4" << std::endl;
-						}
-						else {
-							std::cout << "invalid type" << std::endl;
-							uniName = false;
-						}
+	//					if (word == "int" || word == "bool") {
+	//						shaderVar->push_back("0");
+	//						std::cout << word << std::endl;
+	//					}
+	//					else if (word == "float")
+	//					{
+	//						shaderVar->push_back("1");
+	//						std::cout << "float" << std::endl;
+	//					}
+	//					else if (word == "float2")
+	//					{
+	//						shaderVar->push_back("2");
+	//						std::cout << "float2" << std::endl;
+	//					}
+	//					else if (word == "float3")
+	//					{
+	//						shaderVar->push_back("3");
+	//						std::cout << "float3" << std::endl;
+	//					}
+	//					else if (word == "float4")
+	//					{
+	//						shaderVar->push_back("4");
+	//						std::cout << "float4" << std::endl;
+	//					}
+	//					else {
+	//						std::cout << "invalid type" << std::endl;
+	//						uniName = false;
+	//					}
 
 
-					}
-					else if (uniName)
-					{
-						shaderVar->push_back(word);
-						//std::cout << "Word: " << word << std::endl;
-						uniName = false;
-					}
-					word = "";
-				}
-			}
+	//				}
+	//				else if (uniName)
+	//				{
+	//					shaderVar->push_back(word);
+	//					//std::cout << "Word: " << word << std::endl;
+	//					uniName = false;
+	//				}
+	//				word = "";
+	//			}
+	//		}
 
-		}
-	}
+	//	}
+	//}
 
-	in_stream.close();
+	//in_stream.close();
 
 
 }
@@ -206,6 +182,244 @@ void ResourceHandler::_LoadIniFile(std::string filename)
 	}
 }
 
+
+ResourceHandler::ResourceHandler()
+{
+	ToastComponent::GetInstance()->addMessage("Starting Resource Handler");
+	this->SourceDir = getSourceDir();
+
+	checkFileStructure();
+	
+	this->ini.SetUnicode();
+	this->initResourceSaver(&ini, this->SourceDir.string() + DATA_DIRECTORY);
+
+	this->initResourceLoader(&ini, SourceDir.string() + DATA_DIRECTORY , this->SourceDir.string() + RESOURCELOADER_DATA);
+
+	this->loadResources();
+
+}
+
+void ResourceHandler::checkFileStructure()
+{
+	ToastComponent::GetInstance()->addMessage("Checking Resource Handler File Structure");
+	// Check if Data Directory Exists First
+	if (!std::filesystem::exists(this->SourceDir.string() + DATA_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("Data Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + DATA_DIRECTORY);
+	}
+
+	if (!std::filesystem::exists(this->SourceDir.string() + MASTERLIST_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("Master list does not exists. Creating");
+		_LoadIniFile(this->SourceDir.string() + MASTERLIST_LOC);
+	}
+	this->setPath(this->SourceDir.string() + MASTERLIST_LOC, ResourcePaths::MasterList);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + RESOURCELOADER_DATA))
+	{
+		ToastComponent::GetInstance()->addMessage("Master list does not exists. Creating");
+		_LoadIniFile(this->SourceDir.string() + RESOURCELOADER_DATA);
+	}
+	
+
+	if (!std::filesystem::exists(this->SourceDir.string() + CASE_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("Case Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + CASE_DIRECTORY);
+	}
+
+
+	if (!std::filesystem::exists(this->SourceDir.string() + CASE_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("Cases.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + CASE_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + CASE_INI_LOC, ResourcePaths::Cases);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + SCENE_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("Scene Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + SCENE_DIRECTORY);
+	}
+
+	if (!std::filesystem::exists(this->SourceDir.string() + SCENEOBJ_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("Scene Obj Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + SCENEOBJ_DIRECTORY);
+	}
+
+	if (!std::filesystem::exists(this->SourceDir.string() + SCENE_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("Scenes.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + SCENE_INI_LOC);
+	}
+
+	
+	this->setPath(this->SourceDir.string() + SCENE_INI_LOC, ResourcePaths::Scenes);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + SCENEOBJ_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("ScenesObj.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + SCENEOBJ_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + SCENEOBJ_INI_LOC, ResourcePaths::ScnObj);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + MATERIAL_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("Material Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + MATERIAL_DIRECTORY);
+	}
+	if (!std::filesystem::exists(this->SourceDir.string() + MATERIALTEXTURE_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("MaterialTexture Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + MATERIALTEXTURE_DIRECTORY);
+	}
+
+	if (!std::filesystem::exists(this->SourceDir.string() + MATERIAL_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("Materials.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + MATERIAL_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + MATERIAL_INI_LOC, ResourcePaths::MaterialPath);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + MATERIALTEXTURE_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("MaterialTextures.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + MATERIALTEXTURE_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + MATERIALTEXTURE_INI_LOC, ResourcePaths::MaterialTexture);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + RENDERMESH_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("RenderMesh Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + RENDERMESH_DIRECTORY);
+	}
+	if (!std::filesystem::exists(this->SourceDir.string() + RENDERMESH_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("RenderMeshes.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + RENDERMESH_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + RENDERMESH_INI_LOC, ResourcePaths::RenderMeshPath);
+
+
+	if (!std::filesystem::exists(this->SourceDir.string() + SHADER_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("Shader Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + SHADER_DIRECTORY);
+	}
+	if (!std::filesystem::exists(this->SourceDir.string() + SHADERVAR_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("ShaderVar Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + SHADERVAR_DIRECTORY);
+	}
+
+	if (!std::filesystem::exists(this->SourceDir.string() + SHADER_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("Shaders.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + SHADER_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + SHADER_INI_LOC, ResourcePaths::Shaders);
+
+
+	if (!std::filesystem::exists(this->SourceDir.string() + SHADERVARS_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("ShaderVars.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + SHADERVARS_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + SHADERVARS_INI_LOC, ResourcePaths::ShaderVars);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + SHADERVALUES_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("ShaderValues.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + SHADERVALUES_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + SHADERVALUES_INI_LOC, ResourcePaths::ShaderValues);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + IMAGE_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("Image Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + IMAGE_DIRECTORY);
+	}
+
+	if (!std::filesystem::exists(this->SourceDir.string() + IMAGE_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("Images.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + IMAGE_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + IMAGE_INI_LOC, ResourcePaths::ImagePath);
+
+	if (!std::filesystem::exists(this->SourceDir.string() + OBJECT_DIRECTORY))
+	{
+		ToastComponent::GetInstance()->addMessage("Object Directory does not exists. Creating");
+		std::filesystem::create_directory(this->SourceDir.string() + OBJECT_DIRECTORY);
+	}
+
+	if (!std::filesystem::exists(this->SourceDir.string() + OBJECT_INI_LOC))
+	{
+		ToastComponent::GetInstance()->addMessage("Objects.ini does not exsits. Creating");
+		_LoadIniFile(this->SourceDir.string() + OBJECT_INI_LOC);
+	}
+
+	this->setPath(this->SourceDir.string() + OBJECT_INI_LOC, ResourcePaths::Objects);
+
+}
+
+void ResourceHandler::loadResources()
+{
+	this->loadMaterialsDp(this->MaterialDp, ".material", false, true);
+	this->loadShadersDp(this->ShaderDp, ".hlsl", true, true);
+	this->loadMeshesDp(this->MeshDp);
+	this->loadTexturesDp(this->TextureDp, ".png");
+
+	// loading saved data
+	//this->loadSavedCases(*this->getPath(ResourcePaths::Cases));
+	//this->loadSavedScenes(*this->getPath(ResourcePaths::Scenes));
+
+
+}
+
+RLFetchedResource* ResourceHandler::fetchResourcesFromMesh(ResID meshID)
+{
+	_fetchedResourcesFromMesh(meshID, allResourceParentPaths);
+}
+
+
+void ResourceHandler::saveResources()
+{
+ // TODO IMPLEMENT SAVE FUNCTION!!!!!!!!
+
+}
+
+std::filesystem::path ResourceHandler::fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p)
+{
+	std::vector<std::filesystem::path>* group = fetchResourcesByEnum(group_p);
+
+	if (group){
+		for (int i = 0; i < group->size(); i++)
+		{
+			if (group->at(i).filename().string() == filename_p)
+			{
+				return group->at(i);
+			}
+		}
+		ToastComponent::GetInstance()->addMessage("No such filename exists");
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Unable to find group");
+	}
+
+}
+
 void ResourceHandler::findAll(std::string location, ResourceHandlerType type = ResourceHandlerType::GLOBAL) {
 
 	if (location.empty()) {
@@ -215,7 +429,7 @@ void ResourceHandler::findAll(std::string location, ResourceHandlerType type = R
 	try {
 		for (const auto& entry : fs::directory_iterator(location)) {
 			//std::cout << "Adding resource : " << entry.path().string() << std::endl;
-			this->addResource(entry.path().string(),type);
+			//this->addResource(entry.path().string(),type);
 		}
 	}
 	catch (const std::exception& e) {
@@ -250,28 +464,28 @@ std::filesystem::path ResourceHandler::find(std::string fileName, std::string lo
 
 std::filesystem::path ResourceHandler::findAllInLocation(std::string filename, ResourceHandlerType type = ResourceHandlerType::GLOBAL)
 {
-	in_stream.open(RESOURCE_DEFAULT_LOC);
-	std::string line;
+	//in_stream.open(RESOURCE_DEFAULT_LOC);
+	//std::string line;
 
-	if (in_stream.is_open()) {
+	//if (in_stream.is_open()) {
 
-		// Searching in Default Resource Loc
-		while (std::getline(in_stream, line)) {
-			try {
-				std::filesystem::path path = this->find(filename, line);
-				in_stream.close();
-				return path;
-			}
-			catch (const std::exception&) {
-				in_stream.close();
-				throw ResourceHandlerFileNotFound();
-			}
-			
-		}
-		in_stream.close();
-		throw ResourceHandlerFileNotFound();
-		
-	}
+	//	// Searching in Default Resource Loc
+	//	while (std::getline(in_stream, line)) {
+	//		try {
+	//			std::filesystem::path path = this->find(filename, line);
+	//			in_stream.close();
+	//			return path;
+	//		}
+	//		catch (const std::exception&) {
+	//			in_stream.close();
+	//			throw ResourceHandlerFileNotFound();
+	//		}
+	//		
+	//	}
+	//	in_stream.close();
+	//	throw ResourceHandlerFileNotFound();
+	//	
+	//}
 
 }
 
@@ -296,38 +510,37 @@ std::string ResourceHandler::getResourceFile(std::string fileName, ResourceHandl
 void ResourceHandler::getAllResources()
 {
 
-	std::cout << "Loading All Resources" << std::endl;
+	//std::cout << "Loading All Resources" << std::endl;
 
-	// open Resource default location file
-	this->in_stream.open(SourceDir.string() + "/" + RESOURCE_DEFAULT_LOC);
-	
-	std::filesystem::current_path(SourceDir);
+	//// open Resource default location file
+	//this->in_stream.open(SourceDir.string() + "/" + RESOURCE_DEFAULT_LOC);
+	//
+	//std::filesystem::current_path(SourceDir);
 
 
-	std::cout << "Current Working Path : " << std::filesystem::current_path() << std::endl;
-	
-	std::string line;
-	ResourceHandlerType resourceType = ResourceHandlerType::GLOBAL;
-	if (in_stream.is_open()) {
-		while (std::getline(in_stream, line)) {
-			try {
-				//std::cout << "Finding At : " << line << std::endl;
-				this->findAll(line,resourceType);
-			}
-			catch (const std::exception&e) {
-				//std::cout << "Resource error " << e.what() << std::endl;
-				resourceType = this->_getResourceLocationGroup(line);
-			}
+	//std::cout << "Current Working Path : " << std::filesystem::current_path() << std::endl;
+	//
+	//std::string line;
+	//ResourceHandlerType resourceType = ResourceHandlerType::GLOBAL;
+	//if (in_stream.is_open()) {
+	//	while (std::getline(in_stream, line)) {
+	//		try {
+	//			//std::cout << "Finding At : " << line << std::endl;
+	//			this->findAll(line,resourceType);
+	//		}
+	//		catch (const std::exception&e) {
+	//			//std::cout << "Resource error " << e.what() << std::endl;
+	//			resourceType = this->_getResourceLocationGroup(line);
+	//		}
 
-		}
-		in_stream.close();
-	}
-	else {
-		std::cout << std::endl <<  "Error Finding Resource Loc File";
-	}
+	//	}
+	//	in_stream.close();
+	//}
+	//else {
+	//	std::cout << std::endl <<  "Error Finding Resource Loc File";
+	//}
 
 }
-
 
 //void ResourceHandler::addOgreRenderMeshResourceLocation()
 //{
@@ -368,177 +581,13 @@ void ResourceHandler::getAllResources()
 //
 //}
 
-void ResourceHandler::addOgreRenderMeshResourceLocation()
-{
 
-	if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(RENDER_MESH_LOC)) {
-		Ogre::ResourceGroupManager::getSingleton().createResourceGroup(RENDER_MESH_LOC);
-	}
-	if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(COLLIDER_MESH_LOC)) {
-		Ogre::ResourceGroupManager::getSingleton().createResourceGroup(COLLIDER_MESH_LOC);
-	}
-	if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(MESH_MATERIAL_LOC)) {
-		Ogre::ResourceGroupManager::getSingleton().createResourceGroup(MESH_MATERIAL_LOC);
-	}
-	if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(IMAGES_LOC)) {
-		Ogre::ResourceGroupManager::getSingleton().createResourceGroup(IMAGES_LOC);
-	}
-	// Adds Meshes to Ogre
-	for (int i = 0; i < renderMeshes->size(); i++)
-	{
-
-		std::string loc = renderMeshes->at(i).parent_path().string();
-
-		if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(loc,RENDER_MESH_LOC)) {
-			std::cout << "path added : " << loc << std::endl;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(loc, "FileSystem", RENDER_MESH_LOC);
-		}
-
-	} 
-
-	// Adds Collider Meshes to Ogre , for conversion into physx
-	for (int i = 0; i < colliderMeshes->size(); i++)
-	{
-		std::string loc = colliderMeshes->at(i).parent_path().string();
-
-		if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(loc, COLLIDER_MESH_LOC)) {
-			std::cout << "path added : " << loc << std::endl;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(loc, "FileSystem", COLLIDER_MESH_LOC);
-		}
-	}
-
-	// Adds Materials to Ogre
-	for (int i = 0; i < meshMaterials->size(); i++)
-	{
-		std::string loc = meshMaterials->at(i).parent_path().string();
-
-		if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(loc, MESH_MATERIAL_LOC)) {
-			std::cout << "path added : " << loc << std::endl;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(loc, "FileSystem", MESH_MATERIAL_LOC);
-		}
-	}
-
-	// Adds Images to Ogre
-	for (int i = 0; i < images->size(); i++)
-	{
-		std::string loc = images->at(i).parent_path().string();
-
-		if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceLocationExists(loc, IMAGES_LOC)) {
-			std::cout << "path added : " << loc << std::endl;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(loc, "FileSystem", IMAGES_LOC);
-		}
-	}
-
-	std::cout << "added meshes : " << Ogre::ResourceGroupManager::getSingleton().listResourceNames(RENDER_MESH_LOC).get()->size() << std::endl;
-	std::cout << "added materials : " << Ogre::ResourceGroupManager::getSingleton().listResourceNames(MESH_MATERIAL_LOC).get()->size() << std::endl;
-	std::cout << "added images : " << Ogre::ResourceGroupManager::getSingleton().listResourceNames(IMAGES_LOC).get()->size() << std::endl;
-	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-	this->getOgreRenderMeshes();
-
-}
-
-void ResourceHandler::addOgreResourceLocation(std::filesystem::path location, std::string group = GENERAL_RESOURCE_LOC)
-{
-	try {
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation(location.filename().string(), location.string(), group);
-	}
-	catch (const std::exception&) {
-		std::cout << "unable to add Resource to Ogre";
-	}
-
-}
-
-void ResourceHandler::getOgreRenderMeshes()
-{
-	try
-	{
-
-		Ogre::StringVectorPtr render_meshes = Ogre::ResourceGroupManager::getSingleton().listResourceNames(RENDER_MESH_LOC);
-		
-		for (int i = 0; i < render_meshes.get()->size(); i++)
-		{
-			if (render_meshes.get()->at(i).substr(render_meshes.get()->at(i).find(".")) != ".mesh") {
-				render_meshes.get()->erase(render_meshes.get()->begin() + i);
-			}
-		}
-		
-		this->ogreRenderMeshes = render_meshes;
-		// Add Material through resource handler to each render mesh!!
-	}
-	catch (const std::exception&)
-	{
-		
-	}
-	
-}
-
-void ResourceHandler::updateOgreMaterials()
-{
-	if (!OgreMaterials) {
-		OgreMaterials = new std::vector<std::string>();
-	}
-
-	Ogre::ResourceManager::ResourceMapIterator it = Ogre::MaterialManager::getSingleton().getResourceIterator();
-
-	while (it.hasMoreElements()) {
-		Ogre::ResourcePtr res = it.getNext();
-
-		OgreMaterials->push_back(res.get()->getName());
-	}
-
-}
-
-
-bool vectorContains(std::string term, std::vector<std::string>* vec) {
-
-	if (vec) {
-
-		for (int i = 0; i < vec->size(); i++)
-		{
-			std::cout << term.c_str() << "  :  " << vec->at(i).c_str() << std::endl;
-			if (!strcmp(term.c_str(), vec->at(i).c_str())) {
-				std::cout << "Already Exists" << std::endl;
-				return true;
-			}
-		}
-		return false;
-	}
-	else {
-		return false;
-	}
-}
-
-bool vectorContains(std::string term, std::vector<std::filesystem::path>* vec) {
-
-	if (vec->empty()) {
-		return false;
-	}
-	else {
-		for (int i = 0; i < vec->size(); i++)
-		{
-			if (!strcmp(term.c_str(),vec->at(i).string().c_str())) {
-				std::cout << "Already Exists" << std::endl;
-				return true;
-			}
-		}
-		return false;
-	}
-}
-
-
-
-void ResourceHandler::readFile(std::string filename)
-{
-
-	// NOT YET USED
-	
-}
 
 
 
 ResourceHandler* ResourceHandler::GetInstance() {
 
-	//ToastComponent::GetInstance()->addMessage("Starting Resource Handler");
+	
 
 	// locks storage 
 	std::lock_guard<std::mutex> lock(mutex_);
@@ -547,7 +596,6 @@ ResourceHandler* ResourceHandler::GetInstance() {
 		pinstance_->ini.SetUnicode();
 
 	}
-	mutex_.unlock();
 	return pinstance_;
 
 
@@ -571,60 +619,16 @@ void ResourceHandler::getCases(std::vector<Ogre::String>* outputVec)
 
 }
 
-void ResourceHandler::readShaderFiles(Ogre::MaterialPtr mat)
-{
-	Ogre::String fragFileName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();
-	Ogre::String vertFileName = mat.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getSourceFile();
-	Ogre::GpuProgramParametersPtr fragParam = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-	Ogre::GpuProgramParametersPtr vertParam = mat.get()->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-
-	if (!fragShaderVariables) {
-		fragShaderVariables = new std::vector<std::string>();
-	}
-	else {
-		fragShaderVariables->clear();
-	}
-	if (!vertShaderVariables) {
-		vertShaderVariables = new std::vector<std::string>();
-	}
-	else {
-		vertShaderVariables->clear();
-	}
-
-	std::filesystem::path vertfilepath;
-	std::filesystem::path fragfilepath;
-
-	for (int i = 0; i < meshMaterials->size(); i++)
-	{
-		if (meshMaterials->at(i).filename().string() == vertFileName)
-		{
-			vertfilepath = meshMaterials->at(i);
-		}
-		if (meshMaterials->at(i).filename().string() == fragFileName)
-		{
-			fragfilepath = meshMaterials->at(i);
-		}
-	}
-
-	std::cout << "vert File loc : " << vertfilepath.relative_path().string() << std::endl;
-	std::cout << "frag File loc : " << fragfilepath.relative_path().string() << std::endl;
-	_readShaderFile(fragShaderVariables, fragfilepath);
-	_readShaderFile(vertShaderVariables, vertfilepath);
-
-	
-
-
-}
 
 
 // single value
 void ResourceHandler::writeToFile(std::string key, std::string value , std::string section, std::string filename)
 {
-	_LoadIniFile(_getSaveFileLoc(filename).string());
+	//_LoadIniFile(_getSaveFileLoc(filename).string());
 
-	ini.SetValue(section.c_str(), key.c_str(), value.c_str());
+	/*ini.SetValue(section.c_str(), key.c_str(), value.c_str());
 
-	ini.SaveFile(_getSaveFileLoc(filename).string().c_str());
+	ini.SaveFile(_getSaveFileLoc(filename).string().c_str());*/
 
 
 
@@ -632,36 +636,36 @@ void ResourceHandler::writeToFile(std::string key, std::string value , std::stri
 
 void ResourceHandler::writeToFile(std::vector<SaveData>* data, std::string filename)
 {
-	_LoadIniFile(_getSaveFileLoc(filename).string());
+	/*_LoadIniFile(_getSaveFileLoc(filename).string());
 
 	for (int i = 0; i < data->size(); i++)
 	{
 		ini.SetValue(data->at(i).section.c_str(), data->at(i).key.c_str(), data->at(i).value.c_str());
 	}
 	ini.SaveFile(_getSaveFileLoc(filename).string().c_str());
-	ini.Reset();
+	ini.Reset();*/
 }
 
 void ResourceHandler::clearFile(std::string filename)
 {
-	std::ofstream outStream(_getSaveFileLoc(filename));
+	/*std::ofstream outStream(_getSaveFileLoc(filename));
 	if (out_stream.is_open()) {
 		out_stream.clear();
 		out_stream.close();
-	}
+	}*/
 	
 }
 
 bool ResourceHandler::fileExists(std::string filename)
 {
-	return std::filesystem::exists(_getSaveFileLoc(filename));
+	//return std::filesystem::exists(_getSaveFileLoc(filename));
 }
 
 
 
 std::string ResourceHandler::readFromFile(std::string key, std::string section, std::string filename)
 {
-	_LoadIniFile(_getSaveFileLoc(filename).string());
+	/*_LoadIniFile(_getSaveFileLoc(filename).string());
 
 	const char* value = ini.GetValue(section.c_str(), key.c_str());
 
@@ -669,7 +673,7 @@ std::string ResourceHandler::readFromFile(std::string key, std::string section, 
 		return value;
 	}
 	
-	return "";
+	return "";*/
 
 }
 
@@ -692,58 +696,58 @@ std::filesystem::path ResourceHandler::getSourceDir()
 bool ResourceHandler::materialSaved(Ogre::String objectName, Ogre::String Material)
 {
 	
-	return std::filesystem::exists(_getSaveFileLoc(objectName));
+	//return std::filesystem::exists(_getSaveFileLoc(objectName));
 	
 }
 
-void ResourceHandler::saveScene(std::string scnName, std::string caseName, std::string Filename, int scnType)
-{
-
-	std::string masterLoc;
-	
-	if (scnType == 0) {
-		masterLoc = DYNAMIC_NODES_LOC;
-	}
-	else if (scnType == 1)
-	{
-		masterLoc = STATIC_NODES_LOC;
-	}
-	else if (scnType == 2)
-	{
-		masterLoc = MESH_NODES_LOC;
-	}
-	else {
-		throw ResourceHandlerFileNotFound();
-	}
-
-	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
-	{
-		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
-	}
-
-	if (!std::filesystem::exists(SourceDir.string() + "/Scenes/" + caseName))
-	{
-		std::filesystem::create_directory(SourceDir.string() + "/Scenes/" + caseName);
-	}
-
-	if (!std::filesystem::exists(SourceDir.string() + masterLoc))
-	{
-		std::filesystem::create_directory(SourceDir.string() + masterLoc);
-	}
-
-	std::string loc = masterLoc + Filename;
-
-	_LoadIniFile(loc);
-	
-	ini.SetValue(SECTION_SCENE, scnName.c_str(), "");
-	
-
-	ini.SaveFile(loc.c_str());
-
-	ini.Reset();
-
-
-}
+//void ResourceHandler::saveScene(std::string scnName, std::string caseName, std::string Filename, int scnType)
+//{
+//
+//	std::string masterLoc;
+//	
+//	if (scnType == 0) {
+//		masterLoc = DYNAMIC_NODES_LOC;
+//	}
+//	else if (scnType == 1)
+//	{
+//		masterLoc = STATIC_NODES_LOC;
+//	}
+//	else if (scnType == 2)
+//	{
+//		masterLoc = MESH_NODES_LOC;
+//	}
+//	else {
+//		throw ResourceHandlerFileNotFound();
+//	}
+//
+//	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
+//	{
+//		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
+//	}
+//
+//	if (!std::filesystem::exists(SourceDir.string() + "/Scenes/" + caseName))
+//	{
+//		std::filesystem::create_directory(SourceDir.string() + "/Scenes/" + caseName);
+//	}
+//
+//	if (!std::filesystem::exists(SourceDir.string() + masterLoc))
+//	{
+//		std::filesystem::create_directory(SourceDir.string() + masterLoc);
+//	}
+//
+//	std::string loc = masterLoc + Filename;
+//
+//	_LoadIniFile(loc);
+//	
+//	ini.SetValue(SECTION_SCENE, scnName.c_str(), "");
+//	
+//
+//	ini.SaveFile(loc.c_str());
+//
+//	ini.Reset();
+//
+//
+//}
 
 void ResourceHandler::saveSceneObject(std::string filename, std::string caseName, SceneObject obj , int scnType)
 {
@@ -936,15 +940,6 @@ SceneObject ResourceHandler::loadObject(std::string filename, int scnType)
 	//ini.Reset();
 
 	return obj;
-}
-
-void ResourceHandler::loadImgToTex()
-{
-	for (int i = 0; i < images->size(); i++)
-	{
-		Ogre::TextureManager::getSingleton().load(images->at(i).filename().string().c_str(), "Images");
-	}
-
 }
 
 

@@ -1,14 +1,12 @@
 
 #include <GDHandler/GDHandler.h>
-
-#include <cons.h>
 #include <timer/glock.h>
+#include <cons.h>
 
 
 // Rendering
 // Physics
 // GUI
-
 
 // 16 millisec in each frame for 60FPS
 const double MS_PER_FRAME = 16;
@@ -23,47 +21,47 @@ int main() {
 	std::cout << "Ogre started : " << std::endl;
 
 	ResourceHandler::GetInstance()->getAllResources();
-	ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
-
-	// Ogre Overlay INIT
-	std::cout << "Initializing monster" << std::endl;
-	Monster* monster = new Monster(ctx.getRoot(),ctx.getRenderWindow(), ctx.getOverlaySystem());
-
-	std::cout << "Initializing kint" << std::endl;
-	Kint* kint = new Kint();
-	
-	Ogre::Root* oRoot = monster->oRoot;
+	//ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
 
 	// Ogre AND ImGui
 	std::cout << "Setting up ImGui" << std::endl;
 	Ogre::ImGuiOverlay* imOverlay = ctx.initialiseImGui(); // initalizes imgui before InitMonster! else will pop errors in renderOneFrame in Loop.
 	ctx.addInputListener(ctx.getImGuiInputListener());
 
+	// Ogre Overlay INIT
+	std::cout << "Initializing monster" << std::endl;
+	Monster* monster = new Monster(ctx.getRoot(),ctx.getRenderWindow(), ctx.getOverlaySystem(),imOverlay);
+
+	std::cout << "Initializing kint" << std::endl;
+	Kint* kint = new Kint();
+	
+	Ogre::Root* oRoot = monster->oRoot;
+
+	
+
 	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, 0.4), 2);
+
+
+
 
 	std::cout << "Setting up Kint" << std::endl;
 	// Physics INIT
 	kint = new Kint();
 	kint->InitPhysics();
 
+	Feel* feel = new Feel();
+
 	//GDHANDLER
 	
-	GDHandler gdhandler = GDHandler(monster,kint);
-	gdhandler.preSetup();
-	std::cout << "GDHandler setup!" << std::endl;
-	gdhandler.initGui(imOverlay); // initaliz Gui Seperately from monster as it conflicts with Stuff
-	std::cout << "Gui Initialized !" << std::endl;
-	//gdhandler.addPlayerNode(); // NEW FRAME WORK FOR GUI. THE FUNCTION IS NO LONGER REQUIRED
-	std::cout << "Player initialized!" << std::endl;
+	GDHandler* gdHandler = new GDHandler(ResourceHandler::GetInstance(),monster,kint,feel); // TODO integrate Feel with GDHandler itself
+
+	//monster->setGrid();
 	
 
-
-	std::cout << "Setting up Skybox" << std::endl;
-	monster->setSkyBox();
-	monster->setGrid();
-
-	
-	
+	// TODO SETUP BETTER STARTUP
+	//std::cout << "Setting up Skybox" << std::endl;
+	//monster->setSkyBox();
+	//monster->setGrid();
 
 	//monster->_createGrassBlade(0.3, 1);
 
@@ -83,21 +81,11 @@ int main() {
 		elapsed = startTime - lastTime;
 		deltaTime = elapsed / 100;
 
-		// FIX IN FUTURE IF GUI AND THE RENDERING IS OUT OF SYNC!!
-		// SEPERATE THE GUI UPDATE FUNCTION IN GDHANDLER AND UPDATE NEAR RENDERING
-
 		// Input / GUI Update
-		gdhandler.updateGDHandler(deltaTime);
+		gdHandler->update(deltaTime);
 
 		
-		// Physics Update
-		kint->updatePhysics(deltaTime);
-
 		renderTime = getCurrentTime();
-
-		oRoot->renderOneFrame();
-		monster->updateMonster();
-
 
 
 		lastTime = startTime;
@@ -111,9 +99,13 @@ int main() {
 
 	std::cout << "loop ended : " << std::endl;
 
+	ResourceHandler::GetInstance()->saveResources();
+
 	// Shutdown
-	kint->Shutdown();
+	//kint->Shutdown();
 	monster->Shutdown();
+
+	ResourceHandler::GetInstance()->shutdown();
 
 	std::cout << "HEllOS";
 

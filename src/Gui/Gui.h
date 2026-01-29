@@ -4,19 +4,7 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include<Gui/GuiTabs.h>
-
-#include<Gui/GuiComponents/_SceneTabComponent.h>
-#include<Gui/GuiComponents/ReourceTabComponent.h>
-#include<Gui/GuiComponents/StatusTabComponent.h>
-#include<Gui/GuiComponents/AddTabComponent.h>
-#include<Gui/GuiComponents/ObjectTabComponent.h>
-#include<Gui/GuiComponents/ScenePanel.h>
-#include<Gui/GuiComponents/RSUSTabComponent.h>
-#include<Gui/GuiComponents/HUD.cpp>
-#include<Gui/GuiComponents/TestingTab.h>
-
-//#include<Gui/GuiComponents/ToastTabComponent.h>
+#include <Gui/GuiComponents.h>
 
 
 // Components
@@ -55,6 +43,7 @@ private:
 
 	void addModelComponent(ModelComponent* modelComponent) override {
 		modelComponent->setFramework(this);
+		modelComponent->windowSize = this->getGdSystem()->getWindowSize();
 		modelComponent->setSource(this);
 		modelComponent->init();
 		Models.push_back(modelComponent);
@@ -64,8 +53,11 @@ private:
 
 public:
 
-	Gui(SceneHandler* scnhan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
-		GuiFramework(scnhan, stuffhan,resourcehan, rsus) {}
+	Gui(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus, GDSystem* system_p) : 
+		GuiFramework(casehan, stuffhan,resourcehan, rsus,system_p) 
+	{
+			
+	}
 
 	//void setPlayerObserver(PlayerObserver* pObserver);
 	ImGuiViewport* viewport;

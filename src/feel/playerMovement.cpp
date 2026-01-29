@@ -21,64 +21,62 @@ Ogre::Quaternion horQ;
 
 Ogre::Math mathunDa = Ogre::Math();
 
-void updatePosition(float deltaTime , PlayerSubject* playerSub)
+void PlayerSubject::updatePosition(float deltatime)
 {
-	IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
 
-	if (inputKeys->SPRINT_KEY) {
+	if (input->sprint) {
 		PLAYERSPEED = 3;
 	}
 	else {
 		PLAYERSPEED = 1;
 	}
 	
-	Ogre::Radian Yaxis = playerSub->getPlayerRotation().getYaw();
+	Ogre::Radian Yaxis = getPlayerRotation().getYaw();
 
-	double Zcos = (mathunDa.Cos(Yaxis) * PLAYERSPEED) * deltaTime;
-	double XSin = (mathunDa.Sin(Yaxis) * PLAYERSPEED) * deltaTime;
+	double Zcos = (mathunDa.Cos(Yaxis) * PLAYERSPEED) * deltatime;
+	double XSin = (mathunDa.Sin(Yaxis) * PLAYERSPEED) * deltatime;
 
-	double YSin = (playerSub->getCamera()->getRealDirection().y * PLAYERSPEED) * deltaTime;
+	double YSin = (getCamera()->getRealDirection().y * PLAYERSPEED) * deltatime;
 
 	// PICASSO !!!!!!!!!!!!
 	//double Pitch = ((playerSub->getPlayerRotation().yAxis().x * mathunDa.Sin(Yaxis)) + (playerSub->getPlayerRotation().yAxis().z * mathunDa.Cos(Yaxis))) / PLAYERSPEED * deltaTime;
 
 
-	if (inputKeys->S_UP_KEY) {
-		playerSub->setPlayerPosition(
-			playerSub->getPlayerPosition() + Ogre::Vector3(-XSin, YSin, -Zcos)
+	if (input->forward) {
+		setPlayerPosition(
+			getPlayerPosition() + Ogre::Vector3(-XSin, YSin, -Zcos)
 		);
 	}
 
-	else if (inputKeys->S_DOWN_KEY) {
-		playerSub->setPlayerPosition(
-			playerSub->getPlayerPosition() + Ogre::Vector3(XSin, -YSin, Zcos)
+	else if (input->backward) {
+		setPlayerPosition(
+			getPlayerPosition() + Ogre::Vector3(XSin, -YSin, Zcos)
 		);
 	}
 
-	if (inputKeys->S_LEFT_KEY) {
-		playerSub->setPlayerPosition(
-			playerSub->getPlayerPosition() + Ogre::Vector3(Zcos, 0, -XSin)
+	if (input->right) {
+		setPlayerPosition(
+			getPlayerPosition() + Ogre::Vector3(Zcos, 0, -XSin)
 		);
 	}
 
-	else if (inputKeys->S_RIGHT_KEY) {
-		playerSub->setPlayerPosition(
-			playerSub->getPlayerPosition() + Ogre::Vector3(-Zcos, 0, XSin)
+	else if (input->left) {
+		setPlayerPosition(
+			getPlayerPosition() + Ogre::Vector3(-Zcos, 0, XSin)
 		);
 	}
 
 }
 
-void updateRotation(float deltaTime, PlayerSubject* playerSub)
-{
-	MOUSEIN* mInput = InputHandler::GetInstance()->getMouseInput();
+void PlayerSubject::updateRotation(float deltaTime)
+{;
 
 	// If Mouse moved
-	if (mInput->MouseXrel != 0 || mInput->MouseYrel != 0) {
+	if (*input->MouseXrel != 0 || *input->MouseYrel != 0) {
 
 		// collect values
-		mouseX -= (mInput->MouseXrel / MOUSESENS) * deltaTime;
-		mouseY -= (mInput->MouseYrel / MOUSESENS) * deltaTime;
+		mouseX -= (*input->MouseXrel / MOUSESENS) * deltaTime;
+		mouseY -= (*input->MouseYrel / MOUSESENS) * deltaTime;
 
 		//RollOver
 		if (mouseX <= -1) {
@@ -123,7 +121,7 @@ void updateRotation(float deltaTime, PlayerSubject* playerSub)
 		verQ.normalise();
 		horQ.normalise();
 
-		playerSub->setPlayerRotation(horQ * verQ);
+		setPlayerRotation(horQ * verQ);
 
 	}
 }

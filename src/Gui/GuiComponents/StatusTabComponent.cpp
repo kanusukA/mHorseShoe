@@ -7,7 +7,7 @@ void StatusTabComponent::view()
 
 	ImGui::Begin("Status", 0, ImGuiWindowFlags_NoMove && ImGuiWindowFlags_NoCollapse && ImGuiWindowFlags_NoResize);
 
-	if (this->statusModel->isPlayerObserverSet())
+	/*if (this->statusModel->isPlayerObserverSet())
 	{
 		ImGui::Text("Position");
 		ImGui::Value("X", this->statusModel->getPlayerPosition().x);
@@ -28,7 +28,7 @@ void StatusTabComponent::view()
 	else {
 		ImGui::Text("No Player Observer Set");
 	}
-	
+	*/
 
 	ImGui::End();
 

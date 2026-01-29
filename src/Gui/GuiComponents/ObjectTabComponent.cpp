@@ -2,74 +2,101 @@
 
 void ObjectTabComponent::view()
 {
-	ImGui::SetNextWindowPos(ImVec2(0, 200));
-	ImGui::SetNextWindowSize(ImVec2(250, 500));
+	ImGui::SetNextWindowSize(ImVec2(350,400));
+	ImGui::SetNextWindowPos(ImVec2(0, 600));
+	ImGui::Begin("Object");
 
-	ImGui::Begin("Selected Object", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	// Refresh when object is deleted and setup grid !!
+	if (!ModelComponent::selectedObject->selObject.expired())
+	{
+		ImGui::Text("Object Name : ");
+		ImGui::SameLine();
+		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getName().c_str());
 
-	if(objectModel->selectable){
-
-		ImGui::Text(objectModel->selectable->selectingName->c_str());
+		
 
 		ImGui::Spacing();
 
-		if (objectModel->selectable->selectedStuff) {
+		// Mesh
+		ImGui::Text("Mesh : ");
+		ImGui::SameLine();
+		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getMeshName().c_str());
 
-			ImGui::Text("Name : ");
-			ImGui::SameLine();
-			ImGui::Text(objectModel->selectable->selectedStuff->name.c_str());
+		// Materials
+		ImGui::InputText("Material Name",objectModel->materialName);
 
-			ImGui::Text("Position : ");
-			ImGui::Text("X : ");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(objectModel->selectable->selectedStuff->scnNode->getPosition().x).c_str());
-			ImGui::Text("Y : ");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(objectModel->selectable->selectedStuff->scnNode->getPosition().y).c_str());
-			ImGui::Text("Z : ");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(objectModel->selectable->selectedStuff->scnNode->getPosition().z).c_str());
-
-			ImGui::Text("Rotation : ");
-			ImGui::Text("W : ");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(objectModel->selectable->selectedStuff->scnNode->getOrientation().w).c_str());
-			ImGui::Text("X : ");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(objectModel->selectable->selectedStuff->scnNode->getOrientation().x).c_str());
-			ImGui::Text("Y : ");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(objectModel->selectable->selectedStuff->scnNode->getOrientation().y).c_str());
-			ImGui::Text("Z : ");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(objectModel->selectable->selectedStuff->scnNode->getOrientation().z).c_str());
-
-			if (ImGui::Button("GetFragShader"))
+		if(ModelComponent::materialDpVec && !ModelComponent::materialDpVec->empty()) {
+			if (ImGui::BeginCombo("Materials", ModelComponent::materialDpVec->at(objectModel->selectedMaterial).filename().string().c_str()))
 			{
-				objectModel->getFragShader();
+				for (int i = 0; i < ModelComponent::materialDpVec->size(); i++)
+				{
+					if (ImGui::Selectable(ModelComponent::materialDpVec->at(i).filename().string().c_str(),objectModel->selectedMaterial == i))
+					{
+						objectModel->selectedMaterial = i;
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Set"))
+		{
+			objectModel->setMaterial();
+		}
+
+		ImGui::Text("Mesh Material : "); ImGui::SameLine();
+		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getMeshMaterialName().c_str());
+
+		/*ImGui::Text("Current Material : "); ImGui::SameLine();
+		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getwMaterial().lock()->getName().c_str());*/
+
+		ImGui::Text("Material : ");
+		ImGui::SameLine();
+		if (!ModelComponent::selectedMaterial->selMaterial.expired()) {
+
+			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getName().c_str());
+			
+			ImGui::Text("Vertex Shader : ");
+			ImGui::SameLine();
+			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()->getName().c_str());
+
+			ImGui::Text("Fragment Shader : ");
+			ImGui::SameLine();
+			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()->getName().c_str());
+
+			if (ImGui::Checkbox("WireFrame Mode", &objectModel->wireframeMode))
+			{
+				ModelComponent::selectedMaterial->selMaterial.lock()->setWireFrameMode(objectModel->wireframeMode);
 			}
 
-			if (ImGui::Button("Delete"))
+			ImGui::Text("Culling Mode");
+
+			if (ImGui::RadioButton("Anti-Clockwise", ModelComponent::selectedMaterial->selMaterial.lock()->getCullingMode() == Ogre::CullingMode::CULL_ANTICLOCKWISE))
 			{
-				objectModel->deleteObject();
+				ModelComponent::selectedMaterial->selMaterial.lock()->setCullingMode(Ogre::CullingMode::CULL_ANTICLOCKWISE);
 			}
+			if (ImGui::RadioButton("Clockwise", ModelComponent::selectedMaterial->selMaterial.lock()->getCullingMode() == Ogre::CullingMode::CULL_CLOCKWISE))
+			{
+				ModelComponent::selectedMaterial->selMaterial.lock()->setCullingMode(Ogre::CullingMode::CULL_CLOCKWISE);
+			}
+			if (ImGui::RadioButton("None", ModelComponent::selectedMaterial->selMaterial.lock()->getCullingMode() == Ogre::CullingMode::CULL_NONE))
+			{
+				ModelComponent::selectedMaterial->selMaterial.lock()->setCullingMode(Ogre::CullingMode::CULL_NONE);
+			}
+			
+
 
 		}
 		else {
-			ImGui::Text("No Object Selected!");
+			ImGui::Text("No Material Selected!");
 		}
+
+
 	}
 	else {
-		ImGui::Text("No Selectable Set!");
+		ImGui::Text("No Object Selected!");
 	}
-
-	
-
-	// SHADOW MAPPING IS ENABLED SO ALL OBJECTS CAST AS WELL AS RECIEVE SHADOWS
-	/*if (ImGui::Checkbox("Cast Shadow",)
-	{
-
-	}*/
 
 
 	ImGui::End();

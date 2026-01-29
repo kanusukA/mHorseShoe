@@ -1,5 +1,9 @@
 
+// Local
+
+// Third
 #include <Ogre.h>
+// STL
 #include <iostream>
 
 #define TERRAIN_MOBJ_NAME "terrain_manual_object"

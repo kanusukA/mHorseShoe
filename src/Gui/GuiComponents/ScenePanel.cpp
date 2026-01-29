@@ -4,7 +4,7 @@ void ScenePanelTabComponent::view()
 {
 	ImGui::Begin("Stuffs");
 
-	ImGui::Text("Dynamic");
+	/*ImGui::Text("Dynamic");
 	ImGui::Spacing();
 
 	if (sceneModel->DynamicScenes)
@@ -83,7 +83,7 @@ void ScenePanelTabComponent::view()
 
 			}
 		}
-	}
+	}*/
 
 	ImGui::End();
 

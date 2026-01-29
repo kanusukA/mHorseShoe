@@ -3,10 +3,9 @@
 #ifndef STUFF_H
 #define STUFF_H
 
-
+// Local
 #include <monster/Monster.h>
 #include <kint/Kint.h>
-
 
 
 using namespace physx;
@@ -18,30 +17,6 @@ enum StuffType {
 };
 
 PxVec3* mtkVectors(Ogre::Vector3* vec);
-
-
-class Case : public CaseResource {
-	
-public:
-
-	Case(std::string name_p ,ResourceHandlerBuilderContext* context) : CaseResource(context,name_p) {
-		
-	}
-	
-};
-
-class Scene : public SceneResource {
-public:
-	Scene(ResourceHandlerBuilderContext* context, std::string name_p, int scnType,
-		Ogre::Vector3 position_p, Ogre::Vector3 scale_p, Ogre::Vector4 Orientation_p) : SceneResource(context, name_p, scnType, position_p, Orientation_p, scale_p) {
-
-	}
-
-	Ogre::Vector3 getScnPosition() { return this->position; }
-	Ogre::Vector3 getScnScale() { return this->scale; }
-	Ogre::Vector4 getScnOrientation() { return this->orientation; }
-
-};
 
 class Stuff
 {
@@ -193,8 +168,6 @@ struct  GuiSelectableObject {
 class StuffHandler {
 private:
 
-
-
 	// Kint
 	bool showingOgreRendering = true;
 	bool showingColliderDebug = false;
@@ -210,7 +183,7 @@ private:
 	// KEY STUFFS
 	Terrain* terrainStuff;
 
-	IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
+	//IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
 
 	// last object
 	LastObject* lastObject = new LastObject();
@@ -323,85 +296,7 @@ public:
 // SCENE HANDLER -------------------------------------------------------------------------------------------
 
 
-enum SceneType {
-	STATIC,
-	DYNAMIC,
-	MESH
-};
 
-
-class SceneHandler {
-private:
-
-	// Multi-Thread Shit
-	static SceneHandler* pinstance_;
-	static std::mutex mutex_;
-
-	StuffHandler* stuffhandler;
-	Ogre::SceneManager* oScnManager;
-
-	std::vector<Ogre::SceneNode*> StaticScenes = std::vector<Ogre::SceneNode*>();
-	std::vector<Ogre::SceneNode*> DynamicScenes = std::vector<Ogre::SceneNode*>();
-	std::vector<Ogre::SceneNode*> MeshScenes = std::vector<Ogre::SceneNode*>();
-	std::vector<Ogre::String>* Cases = new std::vector<Ogre::String>();
-
-	Ogre::Vector3 objPosToVecPos(std::string pos);
-	Ogre::Vector4 objRotToVecRot(std::string orientation);
-
-	void _getCases();
-
-	void _travSceneNode(Ogre::SceneNode* node, int pos,std::vector<Ogre::SceneNode*>* sceNodes,int scnType);
-	void _loadSceneNodes(Ogre::SceneNode* parNode, std::string scnNode, int scnType);
-	// scnNode - The object is added to this node
-	void _loadObject(SceneObject obj,std::string scnNode);
-
-	void _clearPrevSave() {
-		ResourceHandler::GetInstance()->clearPrevSave();
-	}
-
-	void _saveObject(std::string scnName, SceneObject obj);
-	void _saveScene(Ogre::SceneNode* scn);
-
-protected:
-
-	SceneHandler() {};
-	~SceneHandler() {};
-
-public:
-
-
-
-	std::vector<Ogre::SceneNode*>* getStaticScenes() { return &StaticScenes; }
-	std::vector<Ogre::SceneNode*>* getDynamicScenes() { return &DynamicScenes; }
-	std::vector<Ogre::SceneNode*>* getMeshScenes() { return &MeshScenes; }
-	std::vector<Ogre::String>* getCases() { return Cases; }
-
-	std::string caseName = "Test case 1";
-
-	// Creates 3 Main Scene Nodes
-	void setStuffHandler(StuffHandler* stuff);
-	
-	void loadScenes();
-
-	void saveScene(std::string scnName);
-
-	void CreateScene(SceneType typ, std::string scnName);
-
-	void loadCases() {
-		_getCases();
-	}
-
-	// Class should not be clonable
-	SceneHandler(SceneHandler& copy) = delete;
-
-	// Class should not be assignable
-	void operator=(const SceneHandler&) = delete;
-
-	static SceneHandler* GetInstance();
-
-
-
-};
 
 
 #endif // !STUFF_H

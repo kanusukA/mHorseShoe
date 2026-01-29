@@ -10,6 +10,8 @@ public:
 
 	RSUShader* rsusObj;
 
+//	Material* selectedMaterial;
+
 	std::vector<std::filesystem::path>* images;
 
 	Ogre::TexturePtr Diffuse;
@@ -24,7 +26,8 @@ public:
 	int selectedParallaxIndex = 0;
 
 	Ogre::StringVector* ogreMaterials;
-	int selectedMaterial = 0;
+	int selectedMaterialIndex = 0;
+
 
 	RSUSTabModelComponent(const char* name_p) : ModelComponent(name_p) {
 
@@ -32,17 +35,15 @@ public:
 
 	void init() override {
 
-		ogreMaterials = this->gdSource->getResourceHandler()->OgreMaterials;
-		rsusObj = this->gdSource->getShaderHandler()->rsusObj;
-		images = this->gdSource->getResourceHandler()->images;
+
 	}
 
 	void sendMaterialRsus() {
-		this->gdSource->getShaderHandler()->readMaterial(ogreMaterials->at(selectedMaterial));
+		//this->gdSource->getShaderHandler()->readMaterial(ogreMaterials->at(selectedMaterial));
 	}
 	
 	void getMaterials() {
-		this->gdSource->getResourceHandler()->updateOgreMaterials();
+		//this->gdSource->getResourceHandler()->updateOgreMaterials();
 	}
 
 	void setTexture() {
@@ -72,7 +73,11 @@ public:
 		sendMaterialRsus();
 	}
 
-	void updateFragRsusInt(Ogre::String varName, int val) {
+	void updateShaderVar(ShaderVar var, ShaderType shaderType) {
+		this->gdSource->getShaderHandler()->updateShaderVar(var, shaderType);
+	}
+
+	/*void updateFRsusInt(Ogre::String varName, int val) {
 		this->gdSource->getShaderHandler()->updateFragParameterInt(varName,val);
 	}
 	void updateFragRsusFloat(Ogre::String varName, float* val) {
@@ -102,7 +107,7 @@ public:
 	}
 	void updateVertRsusFloat4(Ogre::String varName, float val1, float val2, float val3, float val4) {
 		this->gdSource->getShaderHandler()->updateVertParameterFloat4(varName, Ogre::Vector4(val1, val2, val3, val4));
-	}
+	}*/
 
 };
 

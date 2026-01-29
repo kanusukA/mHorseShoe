@@ -2,9 +2,15 @@
 
 #ifndef KEYHANDLER_H
 #define KEYHANDLER_H
+// Local
+#include <feel/Keys.h>
 
+// Third
+
+
+//STL
 #include <mutex>
-#include <SDL3/SDL.h>
+
 
 struct MOUSEIN {
 
@@ -63,6 +69,9 @@ struct IKEYS {
 
 	int MOUSE_LEFT_CLICK = 0;
 	int MOUSE_RIGHT_CLICK = 0;
+
+	// GENERAL Functions
+	bool FULLSCREEN = false;
 
 };
 
@@ -135,6 +144,8 @@ struct KEYBINDS {
 
 	int ENTER_KEY = SDLK_RETURN;
 
+	int FULLSCREEN = SDLK_F;
+
 };
 
 struct WINDOW_UTILS {
@@ -146,11 +157,24 @@ struct WINDOW_UTILS {
 class KeyHandler {
 public:
 
+	HeldKeys* heldKeys = new HeldKeys();
+
+	PlayerInput* pInput;
+
+	GDBuilderContext* builderCxt;
+
+	KeyHandler(GDBuilderContext* builderCxt_p);
+
 	InputHandler* inputHandler = InputHandler::GetInstance();
 	IKEYS* inputKeys = inputHandler->getInputKeys();
 	MOUSEIN* mouseKeys = inputHandler->getMouseInput();
 	KEYBINDS* keyBinds = new KEYBINDS();
 	WINDOW_UTILS* winUtils = new WINDOW_UTILS();
+
+	std::vector<Key*>* keys = new std::vector<Key*>();
+
+	void setPlayerInput(PlayerInput* pInput_p);
+
 
 
 	// IMPLEMENT IN FUTURE

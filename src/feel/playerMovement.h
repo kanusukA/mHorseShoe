@@ -3,11 +3,30 @@
 #ifndef PLAYERMOVEMENT_H
 #define PLAYERMOVEMENT_H
 
-#include <iostream>
+//#include <iostream>
+
+
 
 #include <Ogre.h>
-#include <feel/KeyHandler.h>
+
 #include <base/Observer.h>
+//#include <feel/KeyHandler.h>
+
+class PlayerInput {
+public:
+
+	bool forward = false;
+	bool backward = false;
+	bool left = false;
+	bool right = false;
+
+	bool sprint = false;
+
+	double* MouseXrel = new double(0.0f);
+	double* MouseYrel = new double(0.0f);
+
+};
+
 
 // Observer class to subscribe to player variables
 
@@ -49,13 +68,16 @@ private:
 	Ogre::SceneNode* _playerNode;
 	Ogre::Camera* cam;
 
+	PlayerInput* input;
+
 public:
 
-	PlayerSubject(Ogre::SceneNode* playerNode , Ogre::Camera* camera) {
+	PlayerSubject(Ogre::SceneNode* playerNode , Ogre::Camera* camera, PlayerInput* input_p) {
 		this->_playerNode = playerNode;
 		cam = camera;
 		*this->pPosition = playerNode->getPosition();
 		*this->pRotation = playerNode->getOrientation();
+		input = input_p;
 	}
 
 	Ogre::Vector3 getPlayerPosition() {
@@ -98,12 +120,14 @@ public:
 		}
 	}
 
+
+	void updatePosition(float deltatime);
+
+	void updateRotation(float deltatime);
+
 };
 
 
-void updatePosition(float deltaTime, PlayerSubject* playerSub);
-
-void updateRotation(float deltaTime, PlayerSubject* playerSub);
 
 
 #endif // !PLAYERMOVEMENT_H

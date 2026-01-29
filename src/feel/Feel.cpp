@@ -1,12 +1,12 @@
 #include "Feel.h"
 
 
-void Feel::initFeel(SDL_Window* sdlWindow)
+void Feel::initFeel(SDL_Window* sdlWindow, KeyHandler* keyHandler_p)
 {
 	window = sdlWindow;
 	SDL_SetWindowMouseGrab(window, true);
 
-	keyHandler = new KeyHandler();
+	keyHandler = keyHandler_p;
 }
 
 void Feel::hideMouse() {
@@ -51,8 +51,19 @@ void Feel::updateInput(float deltaTime) {
 
 	while (SDL_PollEvent(&event) != 0)
 	{
+		// NEW IMPLEMENTATION
+		if(event.key.type == SDL_EVENT_KEY_DOWN || event.key.type == SDL_EVENT_KEY_UP){
+			for (int i = 0; i < keyHandler->keys->size(); i++)
+			{
+				if(event.key.key == keyHandler->keys->at(i)->getSDL_Key()){
+					std::cout << "event key pressed" << std::endl;
+					keyHandler->keys->at(i)->click(event.key.type);
+				}
+			}
+		}
+
 		if (event.type == SDL_EVENT_WINDOW_RESIZED) {
-			SDL_GetWindowSize(window, &keyHandler->winUtils->WINDOW_WIDTH, &keyHandler->winUtils->WINDOW_HEIGHT);
+			this->keyHandler->builderCxt->resized();
 		}
 		
 		// Quit Check
@@ -135,7 +146,7 @@ void Feel::updateInput(float deltaTime) {
 			if (event.key.key == keyHandler->keyBinds->ENTER_KEY) {
 				keyHandler->inputKeys->ENTER_KEY = true;
 			}
-
+			
 
 
 
@@ -176,18 +187,18 @@ void Feel::updateInput(float deltaTime) {
 
 			// HELD KEYS
 			if (event.key.key == keyHandler->keyBinds->CTRL_L_KEY) {
-				keyHandler->inputKeys->CTRL_L_KEY = true;
+				keyHandler->heldKeys->lCrtl = true;
 			}
 			
 			if (event.key.key == keyHandler->keyBinds->ALT_L_KEY) {
-				keyHandler->inputKeys->ALT_L_KEY = true;
+				keyHandler->heldKeys->lAlt = true;
 			}
 			if (event.key.key == keyHandler->keyBinds->CTRL_R_KEY) {
-				keyHandler->inputKeys->CTRL_R_KEY = true;
+				keyHandler->heldKeys->rCrtl = true;
 			}
 			
 			if (event.key.key == keyHandler->keyBinds->ALT_R_KEY) {
-				keyHandler->inputKeys->ALT_R_KEY = true;
+				keyHandler->heldKeys->rAlt = true;
 			}
 
 			// ACTION KEYS
@@ -201,6 +212,10 @@ void Feel::updateInput(float deltaTime) {
 		// Key Up
 		if (event.type == SDL_EVENT_KEY_UP)
 		{
+			if (event.key.key == keyHandler->keyBinds->FULLSCREEN)
+			{
+				keyHandler->inputKeys->FULLSCREEN = !keyHandler->inputKeys->FULLSCREEN;
+			}
 			
 			if (event.key.key == keyHandler->keyBinds->CONSOL_KEY) {
 				keyHandler->inputKeys->CONSOL_KEY = true;
@@ -277,19 +292,19 @@ void Feel::updateInput(float deltaTime) {
 
 			// HELD KEYS
 			if (event.key.key == keyHandler->keyBinds->CTRL_L_KEY) {
-				keyHandler->inputKeys->CTRL_L_KEY = false;
+				keyHandler->heldKeys->lCrtl = false;
 			}
 			
 			if (event.key.key == keyHandler->keyBinds->ALT_L_KEY) {
-				keyHandler->inputKeys->ALT_L_KEY = false;
+				keyHandler->heldKeys->lAlt = false;
 			}
 
 			if (event.key.key == keyHandler->keyBinds->CTRL_R_KEY) {
-				keyHandler->inputKeys->CTRL_R_KEY = false;
+				keyHandler->heldKeys->rCrtl = false;
 			}
 
 			if (event.key.key == keyHandler->keyBinds->ALT_R_KEY) {
-				keyHandler->inputKeys->ALT_R_KEY = false;
+				keyHandler->heldKeys->rAlt = false;
 			}
 
 			// ACTION KEYS

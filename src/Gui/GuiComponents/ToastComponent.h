@@ -1,11 +1,10 @@
 #pragma once
 
 
+//STL Headers
 #include <stdio.h>
 #include <vector>
 #include <string>
-
-
 #include <mutex>
 
 
@@ -33,7 +32,11 @@ protected:
 public:
 
 	void addMessage(std::string msg) {
-		messages->push_back(msg);
+		if (!msg.empty())
+		{
+			messages->push_back(msg);
+		}
+		
 	}
 
 	std::vector<std::string>* getMessages() {
