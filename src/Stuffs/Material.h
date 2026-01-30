@@ -56,6 +56,8 @@ public:
 		return fragmentShader;
 	}
 
+	void readTextures();
+
 	void setCullingMode(Ogre::CullingMode culling_p);
 	const Ogre::CullingMode& const getCullingMode() {
 		return culling;

@@ -697,6 +697,8 @@ protected:
 
 	ShaderType shaderType;
 
+	std::vector<ShaderTexture>* ShaderTextures = new std::vector<ShaderTexture>();
+
 	// These Parameters contain pre-saved values of Material and must be cross checked with Ogre's Shader parameters for consistancy
 	std::vector<ShaderVar>* ShaderParameters = new std::vector<ShaderVar>();
 
@@ -724,15 +726,19 @@ public:
 	}
 
 	void addShaderParameter(ShaderVar variable) {
-			ShaderParameters->push_back(variable);	
+		ShaderParameters->push_back(variable);	
 	}
 
 
 
 	std::vector<ShaderVar>* getShaderVars() {
 
-			return ShaderParameters;
+		return ShaderParameters;
 
+	}
+
+	std::vector<ShaderTexture>* getShaderTextures() {
+		return ShaderTextures;
 	}
 
 
