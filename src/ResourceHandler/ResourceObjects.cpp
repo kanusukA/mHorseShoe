@@ -1,5 +1,17 @@
 #include "ResourceObjects.h"
 
+bool vectorPathContains(std::vector<std::filesystem::path>* checkVec, std::string file)
+{
+	for (int i = 0; i < checkVec->size(); i++)
+	{
+		if (checkVec->at(i).filename().string() == file)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 // TOOLS
 
 std::string convertVec3ToString(Ogre::Vector3 vec3) {

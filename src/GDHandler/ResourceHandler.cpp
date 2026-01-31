@@ -187,13 +187,13 @@ ResourceHandler::ResourceHandler()
 {
 	ToastComponent::GetInstance()->addMessage("Starting Resource Handler");
 	this->SourceDir = getSourceDir();
-
+	ToastComponent::GetInstance()->addMessage("Source Dir : " + this->SourceDir.string());
 	checkFileStructure();
 	
 	this->ini.SetUnicode();
 	this->initResourceSaver(&ini, this->SourceDir.string() + DATA_DIRECTORY);
 
-	this->initResourceLoader(&ini, SourceDir.string() + DATA_DIRECTORY , this->SourceDir.string() + RESOURCELOADER_DATA);
+	this->initResourceLoader(&ini,SourceDir , SourceDir.string() + DATA_DIRECTORY , this->SourceDir.string() + RESOURCELOADER_DATA);
 
 	this->loadResources();
 
@@ -380,6 +380,8 @@ void ResourceHandler::loadResources()
 	this->loadShadersDp(this->ShaderDp, ".hlsl", true, true);
 	this->loadMeshesDp(this->MeshDp);
 	this->loadTexturesDp(this->TextureDp, ".png");
+	this->loadTexturesDp(this->TextureDp, ".jpg");
+	this->loadTexturesDp(this->TextureDp, ".jpeg");
 
 	// loading saved data
 	//this->loadSavedCases(*this->getPath(ResourcePaths::Cases));

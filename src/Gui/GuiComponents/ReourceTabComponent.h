@@ -9,7 +9,6 @@ class ResourceTabModelComponent : public ModelComponent {
 public:
 
 	std::vector<std::filesystem::path>* renderMeshes;
-	std::vector<std::filesystem::path>* colliderMeshes;
 	std::vector<std::filesystem::path>* materials;
 	std::vector<std::filesystem::path>* images;
 	std::vector<std::filesystem::path>* shaders;
@@ -87,6 +86,9 @@ public:
 		editLoadPathpos = -1;
 	}
 
+	void saveLoadPaths() {
+		this->gdSource->getResourceHandler()->saveLoadPaths();
+	}
 
 };
 

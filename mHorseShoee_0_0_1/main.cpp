@@ -105,7 +105,7 @@ int main() {
 	//kint->Shutdown();
 	monster->Shutdown();
 
-	ResourceHandler::GetInstance()->shutdown();
+	//ResourceHandler::GetInstance()->shutdown();
 
 	std::cout << "HEllOS";
 

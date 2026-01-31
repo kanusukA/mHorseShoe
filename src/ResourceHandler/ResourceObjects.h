@@ -85,6 +85,7 @@ class ColliderMeshResource;
 class ImageResource;
 
 
+bool vectorPathContains(std::vector<std::filesystem::path>* checkVec, std::string file);
 
 // MASTER RESOURCE CLASS. HANDLES STORAGE OF RESOURCE IDS and RESOURCES
 class ResourceHandlerBuilderContext {

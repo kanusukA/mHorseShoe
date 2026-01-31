@@ -9,6 +9,7 @@ void ResourceLoader::loadSavedPaths()
 	ini->GetAllKeys("LoadPaths", loadPaths);
 
 
+
 	for (const auto& entry : loadPaths )
 	{
 		try
@@ -19,13 +20,31 @@ void ResourceLoader::loadSavedPaths()
 
 			if (!value.empty())
 			{
-				if (pos < 7)
+				if(std::filesystem::exists(value))
 				{
-					load_paths->at(pos) = value;
+					if (pos < 7)
+					{
+						load_paths->at(pos) = value;
+					}
+					else {
+						load_paths->push_back(value);
+					}
+				}
+				else if (std::filesystem::exists(this->sourceDir.string() + value)) {
+					if (pos < 7)
+					{
+						load_paths->at(pos) = this->sourceDir.string() + value;
+					}
+					else {
+						load_paths->push_back(this->sourceDir.string() + value);
+					}
 				}
 				else {
-					load_paths->push_back(value);
+					ToastComponent::GetInstance()->addMessage("ResourceLoad Path : " + value + "\n Does not exists.");
+					continue;
 				}
+
+				
 			}
 			
 
@@ -68,7 +87,14 @@ void ResourceLoader::addLoadPath(ResourceLoaderEnums::ResourceLoadPaths pathType
 		this->load_paths->at(pathType_p) = path_p;
 	}
 	else {
-		throw ResourceHandlerLoaderError("Load path SET invalid");
+		if (std::filesystem::exists(this->sourceDir.string() + path_p))
+		{
+			this->load_paths->at(pathType_p) = this->sourceDir.string() + path_p;
+		}
+		else {
+			throw ResourceHandlerLoaderError("Load path SET invalid");
+		}
+		
 	}
 	
 }
@@ -78,6 +104,12 @@ void ResourceLoader::addLoadPath(std::string path_p)
 	if (std::filesystem::exists(path_p))
 	{
 		this->load_paths->push_back(path_p);
+	}
+	else if (std::filesystem::exists(this->sourceDir.string() + path_p)) {
+		this->load_paths->push_back(this->sourceDir.string() + path_p);
+	}
+	else {
+		throw ResourceHandlerLoaderError("Load path SET invalid");
 	}
 }
 
@@ -646,19 +678,28 @@ void ResourceLoader::loadTexturesDp(std::vector<std::filesystem::path>* output, 
 
 void ResourceLoader::fetchPathContents(std::string path,std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders)
 {
-	for (const auto& entry : std::filesystem::directory_iterator(path))
-	{
-		if (searchFolders && entry.is_directory())
+	if(std::filesystem::exists(path)) {
+		for (const auto& entry : std::filesystem::directory_iterator(path))
 		{
-			fetchPathContents(entry.path().string(), extension, output, true);
-		}
-		else if (!entry.is_directory()) {
-			std::cout << "Extension:" << entry.path().extension() << std::endl;
-			if (entry.path().extension() == extension)
+			if (searchFolders && entry.is_directory())
 			{
-				output->push_back(entry.path());
+				fetchPathContents(entry.path().string(), extension, output, true);
+			}
+			else if (!entry.is_directory()) {
+				std::cout << "Extension:" << entry.path().extension() << std::endl;
+				if (entry.path().extension() == extension)
+				{
+					if (!vectorPathContains(output,entry.path().filename().string()))
+					{
+						output->push_back(entry.path());
+					}
+					
+				}
 			}
 		}
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Invalid path provided : " + path);
 	}
 
 }

@@ -67,6 +67,7 @@ private:
 	CSimpleIniA* ini;
 	std::filesystem::path resourceLoaderIniPath;
 	std::filesystem::path dataDirPath;
+	std::filesystem::path sourceDir;
 
 
 	void loadSavedPaths();
@@ -88,7 +89,7 @@ protected:
 	// The save formate uses ResourcePaths scheme
 	std::vector<std::string>* load_paths = new std::vector<std::string>(7);
 
-	void saveLoadPaths();
+
 
 	
 
@@ -111,6 +112,8 @@ public:
 	std::vector<RLScene>* RLScenes = new std::vector<RLScene>();
 	std::vector<RLObject>* RLObjects = new std::vector<RLObject>();
 
+	void saveLoadPaths();
+
 
 	~ResourceLoader() {
 		saveLoadPaths();
@@ -126,8 +129,9 @@ public:
 	void addLoadPath(std::string path_p);
 
 	// loadLocation_p - Resource Loader's path saving directory
-	void initResourceLoader(CSimpleIniA* ini_p,std::filesystem::path dataDirPath_p , std::string resourceLoaderIniPath_p) {
+	void initResourceLoader(CSimpleIniA* ini_p,std::filesystem::path sourceDir_p,std::filesystem::path dataDirPath_p , std::string resourceLoaderIniPath_p) {
 		ini = ini_p;
+		sourceDir = sourceDir_p;
 		resourceLoaderIniPath = resourceLoaderIniPath_p;
 		dataDirPath = dataDirPath_p;
 		loadSavedPaths();

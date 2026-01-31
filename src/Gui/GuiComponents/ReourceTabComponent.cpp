@@ -41,6 +41,10 @@ void addLoadPath(ResourceTabModelComponent* model) {
 
 	if (ImGui::CollapsingHeader("Load Paths")) {
 
+		if (ImGui::Button("Save"))
+		{
+			model->saveLoadPaths();
+		}
 
 		for (int i = 0; i < model->loadPaths->size(); i++)
 		{
@@ -124,13 +128,6 @@ void ResourceTabComponent::view()
 		for (int i = 0; i < resourceTabModel->renderMeshes->size(); i++)
 		{
 			ImGui::Text(resourceTabModel->renderMeshes->at(i).filename().string().c_str());
-		}
-	}
-	if (ImGui::CollapsingHeader("Collider Meshs"))
-	{
-		for (int i = 0; i < resourceTabModel->colliderMeshes->size(); i++)
-		{
-			ImGui::Text(resourceTabModel->colliderMeshes->at(i).filename().string().c_str());
 		}
 	}
 	if (ImGui::CollapsingHeader("Images"))

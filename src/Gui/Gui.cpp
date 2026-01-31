@@ -48,8 +48,8 @@ void Gui::initGuiComponents()
 	SceneTabModelComponent* scnTabModel = new SceneTabModelComponent("Scene tab Model");
 	this->addModelComponent(scnTabModel);
 
-	//ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent("Resource Tab Model");
-	//this->addModelComponent(resourceTabModel);
+	ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent("Resource Tab Model");
+	this->addModelComponent(resourceTabModel);
 
 	///*StatusTabModelComponent* statusModel = new StatusTabModelComponent("Status tab Model");
 	//this->addModelComponent(statusModel);*/
@@ -69,15 +69,15 @@ void Gui::initGuiComponents()
 	TestingTabModelComponent* testModel = new TestingTabModelComponent("Testing tab model");
 	this->addModelComponent(testModel);
 
-	/*ToastTabModelComponent* toastModel = new ToastTabModelComponent("Toast tab model");
-	this->addModelComponent(toastModel);*/
+	ToastTabModelComponent* toastModel = new ToastTabModelComponent("Toast tab model");
+	this->addModelComponent(toastModel);
 
 	// Views
 	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab",scnTabModel);
 	this->addViewComponent(scnTab);
 
-	//ResourceTabComponent* resourceTab = new ResourceTabComponent("Resource Tab", resourceTabModel);
-	//this->addViewComponent(resourceTab);
+	ResourceTabComponent* resourceTab = new ResourceTabComponent("Resource Tab", resourceTabModel);
+	this->addViewComponent(resourceTab);
 
 	///*StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
 	//this->addViewComponent(statusTab);*/
@@ -100,8 +100,8 @@ void Gui::initGuiComponents()
 	TestingTabComponent* testingTab = new TestingTabComponent("Test tab", testModel);
 	this->addViewComponent(testingTab);
 
-	/*ToastTabViewComponent* toastView = new ToastTabViewComponent("Toast tab", toastModel);
-	this->addViewComponent(toastView);*/
+	ToastTabViewComponent* toastView = new ToastTabViewComponent("Toast tab", toastModel);
+	this->addViewComponent(toastView);
 
 }
 
