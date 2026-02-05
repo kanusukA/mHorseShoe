@@ -41,6 +41,10 @@ public:
 		sceneVec->erase(sceneVec->begin() + index);
 	}
 
+	void removeAllScenes() {
+		sceneVec->clear();
+	}
+
 	const std::vector<std::shared_ptr<Scene>>* getScenes() {
 		return sceneVec;
 	}

@@ -52,7 +52,12 @@ Ogre::MaterialPtr GDBuilderContext::monCreateMaterial(std::string name_p)
 
 Ogre::MaterialPtr GDBuilderContext::monCreateNewMaterial(std::string name_p)
 {
-	return monster->createEmptyMaterial(name_p, OGRE_MATERIAL_GROUP);
+	Ogre::MaterialPtr mat_p =  monster->createEmptyMaterial(name_p, OGRE_MATERIAL_GROUP);
+	if (!mat_p)
+	{
+		return monster->getMaterial(name_p, OGRE_MATERIAL_GROUP);
+	}
+	return mat_p;
 }
 
 Ogre::SceneNode* GDBuilderContext::monCreateSceneNode(std::string name_p, Ogre::SceneNode* parentNode_p)
@@ -79,6 +84,8 @@ void GDBuilderContext::monDeleteEntity(Ogre::Entity* entity_p)
 	
 }
 
+
+
 RSUS* GDBuilderContext::monProvideRsus()
 {
 	return RSUS::GetInstance();
@@ -91,7 +98,8 @@ void GDBuilderContext::monSetShaderVars(std::vector<ShaderVar> vars_p, Ogre::Gpu
 
 bool GDBuilderContext::sceneExists(std::string scnName_p)
 {
-	return monster->oScnManager->hasSceneNode(scnName_p);
+	//return monster->oScnManager->hasSceneNode(scnName_p);
+	return false;
 }
 
 bool GDBuilderContext::objectExists(std::string objName_p)

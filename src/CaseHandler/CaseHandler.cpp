@@ -33,6 +33,16 @@ void CaseHandler::checkIntegrity()
 }
 
 
+void CaseHandler::clearCaseVec()
+{
+	for (int i = 0; i < caseVec->size(); i++)
+	{
+		caseVec->at(i)->removeAllScenes();
+		caseVec->at(i).reset();
+	}
+	this->caseVec->clear();
+}
+
 std::weak_ptr<Case> CaseHandler::CreateCase(std::string caseName_p)
 {
 	std::shared_ptr<Case> sCase = std::make_shared<Case>(this,caseName_p);
@@ -244,6 +254,9 @@ void CaseHandler::loadSavedResource()
 
 void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 {
+
+	this->clearCaseVec();
+
 	RLCase rlCase = resourceHandler->fetchCaseData(yamlFilePath);
 	
 	std::weak_ptr<Case> wCase = CreateCase(rlCase.name);

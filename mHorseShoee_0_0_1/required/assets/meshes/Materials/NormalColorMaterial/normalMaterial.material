@@ -1,0 +1,46 @@
+vertex_program normalVertProgram hlsl
+{
+    source normalVertProgram.hlsl
+    entry_point mainVS
+    target vs_4_0
+    default_params {
+		param_named_auto worldViewProj worldviewproj_matrix
+    
+	}
+}
+
+fragment_program normalFragProgram hlsl
+{
+    source normalFragProgram.hlsl
+    entry_point mainPS
+    target ps_4_0
+    default_params{
+
+        param_named color float4 0.3 0.9 0.1 1.0
+        
+
+    }
+}
+
+material normalMaterial{
+    receive_shadows off
+    technique{
+        pass{
+            
+            lighting off
+		   // depth_write off
+            //lighting on
+            
+            //scene_blend alpha_blend
+
+            vertex_program_ref normalVertProgram{
+
+            }
+            fragment_program_ref normalFragProgram{
+
+            }
+
+        }
+    }
+}
+

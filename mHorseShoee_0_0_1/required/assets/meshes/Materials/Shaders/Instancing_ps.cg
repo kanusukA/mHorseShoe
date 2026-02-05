@@ -1,0 +1,14 @@
+//---------------------------------------------------------------------------
+//These materials/shaders are part of the NEW InstanceManager implementation
+//Written by Matias N. Goldberg ("dark_sylinc")
+//---------------------------------------------------------------------------
+
+
+void main_ps(float4 position          : POSITION, 
+						  float2 uv                : TEXCOORD0,
+						  float4 diffuse           : COLOR,
+						  out float4 colour        : COLOR,
+						  uniform sampler2D texMap : register(s0))
+{
+	colour = tex2D(texMap,uv) * diffuse;
+}

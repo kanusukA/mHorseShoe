@@ -111,6 +111,11 @@ void RSUSTabComponent::view()
 		ImGui::Text("Material : "); ImGui::SameLine();
 		ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getName().c_str());
 
+		if (ImGui::Button("Read textures"))
+		{
+			ModelComponent::selectedMaterial->selMaterial.lock()->readTextures();
+		}
+
 		ImGui::Spacing();
 
 		if(ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()){

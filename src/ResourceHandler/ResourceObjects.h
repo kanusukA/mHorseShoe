@@ -679,7 +679,7 @@ public:
 struct ShaderTexture
 {
 	std::string textureName = "";
-	ResID texture = 0;
+	std::string texture = std::string("");
 	int texturePosition; // Position of texture in Shader
 
 	ShaderTexture() {
@@ -761,7 +761,10 @@ public:
 class MaterialResource : public Resource
 {
 
+
 public:
+
+	std::vector<ShaderTexture>* textures = new std::vector<ShaderTexture>();
 
 	std::string materialFilePath; // file name of material
 

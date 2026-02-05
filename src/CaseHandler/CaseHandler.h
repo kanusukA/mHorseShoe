@@ -54,6 +54,7 @@ public:
 
 	};
 
+	void clearCaseVec();
 
 	std::vector<std::shared_ptr<Case>>* fetchAllCases() { return caseVec; }
 
@@ -73,7 +74,7 @@ public:
 
 	// old method
 	//RenderMesh* CreateRenderMesh(std::string meshName_p);
-
+	
 	
 
 
