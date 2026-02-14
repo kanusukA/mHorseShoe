@@ -10,7 +10,7 @@ double getCurrentTime() {
 }
 
 std::string getTimeStamp() {
-	
+	return "";
 }
 
 int getFPS(int framesPerMilli) {

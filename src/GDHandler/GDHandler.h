@@ -18,7 +18,7 @@ public:
 
 	Gui* gui;
 
-	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Kint* physics, Feel* feel_p) : CaseHandler(renderer, physics) {
+	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Feel* feel_p) : CaseHandler(renderer) {
 
 		// Init resources
 		ResourceHandler::GetInstance();
@@ -38,10 +38,6 @@ public:
 
 		gui->initGui(this->monster->imguiOverlay);
 
-
-
-		
-	
 		//this->setResources();
 
 	};
@@ -69,11 +65,11 @@ public:
 	// If PhysicsType : eRIGID_DYNAMIC the same mesh is used for collision.
 	// NOTE : SHAPE IS NOT CONSIDERED IN THE INFO.
 	// OLD COMPONENTS DO NOT USE
-	void createStuffRigidDynamic(std::string name, Ogre::String meshName, PxTransform position, PxReal mass, PxGeometry* geo) {};
+	/*void createStuffRigidDynamic(std::string name, Ogre::String meshName, PxTransform position, PxReal mass, PxGeometry* geo) {};
 	void createStuffRigidDynamic(std::string name, Ogre::SceneNode* sNode, PxTransform position, PxReal mass, PxGeometry* geo) {};
 
 	void createStuffRigidStatic(std::string name, Ogre::String meshName, PxTransform position, PxGeometry* geo) {};
-	void createStuffRigidStatic(std::string name, Ogre::SceneNode* sNode, PxTransform position, PxGeometry* geo) {};
+	void createStuffRigidStatic(std::string name, Ogre::SceneNode* sNode, PxTransform position, PxGeometry* geo) {};*/
 
 	void update(float deltatime) override;
 

@@ -392,7 +392,7 @@ void ResourceHandler::loadResources()
 
 RLFetchedResource* ResourceHandler::fetchResourcesFromMesh(ResID meshID)
 {
-	_fetchedResourcesFromMesh(meshID, allResourceParentPaths);
+	return _fetchedResourcesFromMesh(meshID, allResourceParentPaths);
 }
 
 
@@ -466,6 +466,8 @@ std::filesystem::path ResourceHandler::find(std::string fileName, std::string lo
 
 std::filesystem::path ResourceHandler::findAllInLocation(std::string filename, ResourceHandlerType type = ResourceHandlerType::GLOBAL)
 {
+
+	return std::filesystem::path();
 	//in_stream.open(RESOURCE_DEFAULT_LOC);
 	//std::string line;
 
@@ -660,6 +662,7 @@ void ResourceHandler::clearFile(std::string filename)
 
 bool ResourceHandler::fileExists(std::string filename)
 {
+	return false;
 	//return std::filesystem::exists(_getSaveFileLoc(filename));
 }
 
@@ -667,6 +670,8 @@ bool ResourceHandler::fileExists(std::string filename)
 
 std::string ResourceHandler::readFromFile(std::string key, std::string section, std::string filename)
 {
+
+	return "";
 	/*_LoadIniFile(_getSaveFileLoc(filename).string());
 
 	const char* value = ini.GetValue(section.c_str(), key.c_str());
@@ -697,7 +702,7 @@ std::filesystem::path ResourceHandler::getSourceDir()
 
 bool ResourceHandler::materialSaved(Ogre::String objectName, Ogre::String Material)
 {
-	
+	return false;
 	//return std::filesystem::exists(_getSaveFileLoc(objectName));
 	
 }

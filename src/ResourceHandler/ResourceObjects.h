@@ -561,8 +561,8 @@ private:
 protected:
 
 	float* position = new float[3]{};
-	float* orientation = new float[4] {};
-	float* scale = new float[3] {1,1,1};
+	float* orientation = new float[4] {1.0,0.0,0.0,0.0};
+	float* scale = new float[3] {1.0,1.0,1.0};
 
 
 public:
@@ -610,6 +610,18 @@ public:
 		scale[0] = scale_p[0];
 		scale[1] = scale_p[1];
 		scale[2] = scale_p[2];
+
+		this->setName(name_p);
+
+		setId(context->generateSceneID());
+		context->AddIndexToMaster(getId());
+
+	};
+
+	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, SceneType sceneType) {
+		this->resourceHandlerCxt = context;
+
+		scnType = sceneType;
 
 		this->setName(name_p);
 
@@ -679,16 +691,9 @@ public:
 struct ShaderTexture
 {
 	std::string textureName = "";
-	std::string texture = std::string("");
+	Ogre::TexturePtr texture = 0;
 	int texturePosition; // Position of texture in Shader
-
-	ShaderTexture() {
-
-	}
-
-	ShaderTexture(ResID textureImgID) {
-		texture = textureImgID;
-	}
+	
 };
 
 class ShaderResource : public Resource {
@@ -761,10 +766,13 @@ public:
 class MaterialResource : public Resource
 {
 
-
 public:
 
-	std::vector<ShaderTexture>* textures = new std::vector<ShaderTexture>();
+	std::vector<ShaderTexture>* textures;
+
+	Ogre::CullingMode culling = Ogre::CULL_CLOCKWISE;
+
+	bool wireFrameMode = false;
 
 	std::string materialFilePath; // file name of material
 

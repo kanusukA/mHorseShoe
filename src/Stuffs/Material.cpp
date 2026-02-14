@@ -3,15 +3,27 @@
 
 void Material::readTextures()
 {
-	for (int i = 0; i < material->getTechnique(0)->getPass(0)->getNumTextureUnitStates(); i++)
+	textures = new std::vector<ShaderTexture>(material->getTechnique(0)->getPass(0)->getNumTextureUnitStates());
+	for (int texIndex = 0; texIndex < material->getTechnique(0)->getPass(0)->getNumTextureUnitStates(); texIndex++)
 	{
-		ToastComponent::GetInstance()->addMessage("MaterialTexture : " + material->getTechnique(0)->getPass(0)->getTextureUnitState(i)->getTextureName());
-		ShaderTexture texture = ShaderTexture();
+		ShaderTexture tex = ShaderTexture();
 
-		texture.textureName = material->getTechnique(0)->getPass(0)->getTextureUnitState(i)->getName();
-		texture.texturePosition = i;
-		texture.texture = material->getTechnique(0)->getPass(0)->getTextureUnitState(i)->getTextureName();
+		tex.textureName = material->getTechnique(0)->getPass(0)->getTextureUnitState(texIndex)->getName();
+		tex.texturePosition = texIndex;
+		tex.texture = material->getTechnique(0)->getPass(0)->getTextureUnitState(texIndex)->_getTexturePtr();
 
+		textures->push_back(tex);
+	}
+}
+
+void Material::setTexture(int texturePosition_p, Ogre::TexturePtr tex_p)
+{
+	if (material->getTechnique(0)->getPass(0)->getTextureUnitState(texturePosition_p))
+	{
+		material->getTechnique(0)->getPass(0)->getTextureUnitState(texturePosition_p)->setTexture(tex_p);
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Error Setting texture");
 	}
 }
 
@@ -24,9 +36,4 @@ void Material::setWireFrameMode(bool mode_p)
 {
 	wireFrameMode = mode_p;
 	material->getTechnique(0)->getPass(0)->setPolygonMode( wireFrameMode ? Ogre::PM_WIREFRAME : Ogre::PM_SOLID);
-}
-
-void MaterialDeletor(Material* material_p)
-{
-
 }

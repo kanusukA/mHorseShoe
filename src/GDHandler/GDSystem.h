@@ -26,6 +26,7 @@ protected:
 	void setWindowSize();
 
 	GDSun::WINDOW_STATE winState = GDSun::GUI;
+	bool GuiVisibility = true;
 	
 
 public:
@@ -62,6 +63,14 @@ public:
 
 	GDSun::WINDOW_STATE getWindowState() {
 		return winState;
+	}
+
+	void setGuiVisibility(bool visible) {
+		GuiVisibility = visible;
+	}
+
+	bool getGuiVisibility() {
+		return GuiVisibility;
 	}
 
 };

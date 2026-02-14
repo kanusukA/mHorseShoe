@@ -77,6 +77,10 @@ public:
 		this->gdSource->getShaderHandler()->updateShaderVar(var, shaderType);
 	}
 
+	void refreshTexture() {
+		ModelComponent::selectedMaterial->selMaterial.lock()->readTextures();
+	}
+
 	/*void updateFRsusInt(Ogre::String varName, int val) {
 		this->gdSource->getShaderHandler()->updateFragParameterInt(varName,val);
 	}

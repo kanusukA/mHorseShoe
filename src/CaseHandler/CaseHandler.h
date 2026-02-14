@@ -39,22 +39,21 @@ public:
 
 	// CASE FUNCTIONS
 
-	CaseHandler(Monster* monster, Kint * kint) : GDBuilderContext(ResourceHandler::GetInstance(), monster,kint) {
+	CaseHandler(Monster* monster) : GDBuilderContext(ResourceHandler::GetInstance(), monster) {
 		//stuffHandler = std::make_unique<StuffHandler>(monster, kint);
-		stuffHandler = new StuffHandler(monster, kint);
+		stuffHandler = new StuffHandler(monster);
 		oScnManager = monster->oScnManager;
 
 	};
 	// Used to start CaseHandler with a predefined case as the program starts
-	CaseHandler(Monster* monster, Kint* kint, Case* case_p) : GDBuilderContext(ResourceHandler::GetInstance(), monster, kint) {
+	CaseHandler(Monster* monster, Case* case_p) : GDBuilderContext(ResourceHandler::GetInstance(), monster) {
 
 		//stuffHandler = std::make_unique<StuffHandler>(monster, kint);
-		stuffHandler = new StuffHandler(monster, kint);
+		stuffHandler = new StuffHandler(monster);
 		oScnManager = monster->oScnManager;
 
 	};
 
-	void clearCaseVec();
 
 	std::vector<std::shared_ptr<Case>>* fetchAllCases() { return caseVec; }
 
@@ -74,7 +73,7 @@ public:
 
 	// old method
 	//RenderMesh* CreateRenderMesh(std::string meshName_p);
-	
+
 	
 
 

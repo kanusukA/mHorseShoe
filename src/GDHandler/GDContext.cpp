@@ -3,11 +3,11 @@
 void GDBuilderContext::startEngine()
 {	
 	// Start PhysX
-	kint->InitPhysics();
+	//kint->InitPhysics();
 
 	// Start Resource Group initialization
 	std::vector<std::filesystem::path>* MaterialPaths = ResourceHandler::GetInstance()->getMaterialsLoaded();
-	
+
 	// Material
 	for (int index = 0; index < MaterialPaths->size(); index++)
 	{
@@ -15,20 +15,20 @@ void GDBuilderContext::startEngine()
 	}
 	monster->initalizeResourceGroup(OGRE_MATERIAL_GROUP);
 	
-	//monster->setGrid();
+	// monster->setGrid();
 	// implement saving and loading
 
 }
 
-PxRigidDynamic* GDBuilderContext::getPxRigidDynamic(std::string name_p,PxTransform transform, PxGeometry* geometry, float mass)
-{
-	return kint->createRigidBody(name_p, transform, mass, geometry);
-}
-
-PxRigidStatic* GDBuilderContext::getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry)
-{
-	return kint->createStaticBody(name_p, transform, geometry);
-}
+//PxRigidDynamic* GDBuilderContext::getPxRigidDynamic(std::string name_p,PxTransform transform, PxGeometry* geometry, float mass)
+//{
+//	return kint->createRigidBody(name_p, transform, mass, geometry);
+//}
+//
+//PxRigidStatic* GDBuilderContext::getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry)
+//{
+//	return kint->createStaticBody(name_p, transform, geometry);
+//}
 
 void GDBuilderContext::monSetLocation(std::filesystem::path parentPath_p, std::string OgreGroup)
 {
@@ -52,12 +52,7 @@ Ogre::MaterialPtr GDBuilderContext::monCreateMaterial(std::string name_p)
 
 Ogre::MaterialPtr GDBuilderContext::monCreateNewMaterial(std::string name_p)
 {
-	Ogre::MaterialPtr mat_p =  monster->createEmptyMaterial(name_p, OGRE_MATERIAL_GROUP);
-	if (!mat_p)
-	{
-		return monster->getMaterial(name_p, OGRE_MATERIAL_GROUP);
-	}
-	return mat_p;
+	return monster->createEmptyMaterial(name_p, OGRE_MATERIAL_GROUP);
 }
 
 Ogre::SceneNode* GDBuilderContext::monCreateSceneNode(std::string name_p, Ogre::SceneNode* parentNode_p)
@@ -84,8 +79,6 @@ void GDBuilderContext::monDeleteEntity(Ogre::Entity* entity_p)
 	
 }
 
-
-
 RSUS* GDBuilderContext::monProvideRsus()
 {
 	return RSUS::GetInstance();
@@ -98,8 +91,7 @@ void GDBuilderContext::monSetShaderVars(std::vector<ShaderVar> vars_p, Ogre::Gpu
 
 bool GDBuilderContext::sceneExists(std::string scnName_p)
 {
-	//return monster->oScnManager->hasSceneNode(scnName_p);
-	return false;
+	return monster->oScnManager->hasSceneNode(scnName_p);
 }
 
 bool GDBuilderContext::objectExists(std::string objName_p)

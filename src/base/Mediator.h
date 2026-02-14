@@ -136,7 +136,6 @@ public:
 class ModelComponent {
 private:
 	ModelComponent();
-
 protected:
 	GuiFramework* guiFramework;
 	GDSource* gdSource;
@@ -211,7 +210,6 @@ public:
 		selectedMaterial->selMaterial = material_p;
 	}
 
-
 	// USED TO INITALIZE PREDEFINED DATA AND VARIABLE OF THE COMPONENT
 	// USE THIS INSTED OF CONSTRUCTOR AS GDSOURCE IS INITALIZED AFTER THE OBJECT IS CREATED
 	virtual void init() {};
@@ -254,6 +252,7 @@ public:
 
 	// GUI FUNCTIONS
 	
+
 	// CONVERTING OGRE::VECTORS TO FLOAT* 
 	float* convertOgreVec2(Ogre::Vector2 vec2_p) {
 		float float2[2] = {vec2_p[0],vec2_p[1]};

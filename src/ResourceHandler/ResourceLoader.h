@@ -22,6 +22,8 @@ struct RLMaterial {
 	RLShader vertShader;
 	RLShader fragShader;
 	std::vector<ShaderTexture> textures;
+	Ogre::CullingMode culling;
+	bool wireframe;
 };
 
 struct RLMesh {

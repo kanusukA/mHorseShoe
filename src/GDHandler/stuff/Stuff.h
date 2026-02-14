@@ -8,7 +8,7 @@
 #include <kint/Kint.h>
 
 
-using namespace physx;
+//using namespace physx;
 
 enum StuffType {
 	STUFF_DYNAMIC,
@@ -16,7 +16,7 @@ enum StuffType {
 	STUFF_MESH_ONLY
 };
 
-PxVec3* mtkVectors(Ogre::Vector3* vec);
+//PxVec3* mtkVectors(Ogre::Vector3* vec);
 
 class Stuff
 {
@@ -37,9 +37,8 @@ public:
 
 	void setCastShadow(bool value);
 
-
-	virtual void setPxRigidDynamic(PxRigidDynamic* dynActor) {};
-	virtual void setPxRigidStatic(PxRigidStatic* staActor) {};
+	//virtual void setPxRigidDynamic(PxRigidDynamic* dynActor) {};
+	//virtual void setPxRigidStatic(PxRigidStatic* staActor) {};
 
 	virtual void setPosition(Ogre::Vector3 position) {};
 	virtual void setRotation(Ogre::Vector3 rotation) {};
@@ -60,15 +59,13 @@ private:
 
 public:
 
-
-
 	StuffStatic() {
 		this->type = STUFF_STATIC;
 	}
 
-	PxRigidStatic* sActor;
+	//PxRigidStatic* sActor;
 
-	void setPxRigidStatic(PxRigidStatic* staActor) override;
+	//void setPxRigidStatic(PxRigidStatic* staActor) override;
 
 	void setRotation(Ogre::Vector3 rot) override;
 	void setPosition(Ogre::Vector3 pos) override;
@@ -97,9 +94,9 @@ public:
 		this->type = STUFF_DYNAMIC;
 	}
 
-	PxRigidDynamic* sActor;
+	//PxRigidDynamic* sActor;
 
-	void setPxRigidDynamic(PxRigidDynamic* dynActor) override;
+	//void setPxRigidDynamic(PxRigidDynamic* dynActor) override;
 
 	bool update(float deltaTime) override;
 
@@ -136,11 +133,11 @@ public:
 };
 
 // Until functions
-Ogre::Vector3 ktmPositionVec3(PxVec3 position);
-Ogre::Quaternion ktmOrientation(PxQuat quat);
-
-PxVec3 mtkPositionVec3(Ogre::Vector3 position);
-PxQuat mtkOrientation(Ogre::Quaternion quat);
+//Ogre::Vector3 ktmPositionVec3(PxVec3 position);
+//Ogre::Quaternion ktmOrientation(PxQuat quat);
+//
+//PxVec3 mtkPositionVec3(Ogre::Vector3 position);
+//PxQuat mtkOrientation(Ogre::Quaternion quat);
 
 // test
 struct LastObject
@@ -192,7 +189,7 @@ private:
 	GuiSelectableObject* selectedObj = new GuiSelectableObject();
 
 	Monster* monster = nullptr;
-	Kint* kint = nullptr;
+	//Kint* kint = nullptr;
 
 	void _addObject(
 		std::string scnNodeName,
@@ -232,9 +229,9 @@ public:
 
 	Monster* getMonsterRef() { return monster; }
 
-	StuffHandler(Monster* ogre_monster, Kint* physx_kint) {
+	StuffHandler(Monster* ogre_monster) {
 		monster = ogre_monster;
-		kint = physx_kint;
+		//kint = physx_kint;
 		debugScnNode = monster->oScnManager->getRootSceneNode()->createChildSceneNode("Gizomo");
 	}
 

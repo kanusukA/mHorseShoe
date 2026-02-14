@@ -571,6 +571,10 @@ void Monster::addOgreResourceLocation(std::string path_p, std::string OgreResour
 
 void Monster::initalizeResourceGroup(std::string OgreResourceGroup)
 {
+	if (!Ogre::ResourceGroupManager::getSingletonPtr()->resourceGroupExists(OgreResourceGroup))
+	{
+		Ogre::ResourceGroupManager::getSingletonPtr()->createResourceGroup(OgreResourceGroup);
+	}
 	Ogre::ResourceGroupManager::getSingletonPtr()->initialiseResourceGroup(OgreResourceGroup);
 }
 

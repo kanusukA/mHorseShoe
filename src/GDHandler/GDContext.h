@@ -31,17 +31,15 @@ protected:
 
 	ResourceHandler* resourceHandler;
 	Monster* monster;
-	Kint* kint;
 
 	void startEngine();
 
 
 public:
 
-	GDBuilderContext(ResourceHandler* resourceHan_p, Monster* monster_p, Kint* kint_p) : GDSystem(monster_p) {
+	GDBuilderContext(ResourceHandler* resourceHan_p, Monster* monster_p) : GDSystem(monster_p) {
 		resourceHandler = resourceHan_p;
 		monster = monster_p;
-		kint = kint_p;
 
 		startEngine();
 		
@@ -49,8 +47,8 @@ public:
 
 	virtual void update(float deltaTime) {};
 
-	PxRigidDynamic* getPxRigidDynamic(std::string name_p, PxTransform transform, PxGeometry* geometry, float mass);
-	PxRigidStatic* getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry);
+	//PxRigidDynamic* getPxRigidDynamic(std::string name_p, PxTransform transform, PxGeometry* geometry, float mass);
+	//PxRigidStatic* getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry);
 
 	// Monster functions
 	void monSetLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);

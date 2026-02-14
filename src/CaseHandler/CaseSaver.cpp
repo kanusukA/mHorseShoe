@@ -21,6 +21,7 @@ void CaseHandler::saveAll() {
 	}
 
 	resourceHandler->closeSaveFile();
+	ToastComponent::GetInstance()->addMessage("Case Saved!");
 
 }
 
@@ -35,7 +36,7 @@ void CaseHandler::saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes)
 	for (int sceneIndex = 0; sceneIndex < scenes->size(); sceneIndex++)
 	{
 
-		resourceHandler->saveScene(scenes->at(sceneIndex).get(),out);
+		resourceHandler->saveScene(scenes->at(sceneIndex).get(),out); // SCENE BEGIN
 
 
 		if (scenes->at(sceneIndex)->getObjects())
@@ -48,7 +49,7 @@ void CaseHandler::saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes)
 			out << YAML::EndSeq;
 		}
 
-		out << YAML::EndMap; // used to end Scene Map
+		out << YAML::EndMap; // SCENE END
 
 		/*resourceHandler->resetIni();
 		resourceHandler->saveScene(scenes->at(sceneIndex).get(), caseID, parentNode);
@@ -67,6 +68,7 @@ void CaseHandler::saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes)
 	}
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
+	std::cout << out.c_str() << std::endl;
 	resourceHandler->writeToSaveFile(out.c_str());
 }
 
@@ -79,18 +81,20 @@ void CaseHandler::saveObjects(const std::vector<std::shared_ptr<Object>>* object
 	for (int objectIndex = 0; objectIndex < objects->size(); objectIndex++)
 	{
 		
-		resourceHandler->saveObject(objects->at(objectIndex).get(),out);
+		resourceHandler->saveObject(objects->at(objectIndex).get(), out); // OBJECT BEGIN
 
 		if (!objects->at(objectIndex)->getwMaterial().expired())
 		{
 			out << YAML::Key << OBJECT_MATERIAL_KEY;
 			out << YAML::Value;
 			resourceHandler->saveMaterial(objects->at(objectIndex)->getwMaterial().lock().get(), objects->at(objectIndex)->getwMaterial().lock()->getVertexShader().get(),
-				objects->at(objectIndex)->getwMaterial().lock()->getFragmentShader().get(),out);
+				objects->at(objectIndex)->getwMaterial().lock()->getFragmentShader().get(), out); // MATERIAL BEGIN
+
+			out << YAML::EndMap; // MATERIAL END
 		}
 		
 
-		out << YAML::EndMap; // Objects map end
+		out << YAML::EndMap; // OBJECT END
 
 	}
 	//resourceHandler->saveIni(*resourceHandler->getPath(ResourcePaths::Objects));

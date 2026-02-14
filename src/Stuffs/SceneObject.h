@@ -18,7 +18,7 @@ private:
 
 public:
 	Scene(GDBuilderContext* GDBuilderCxt_p,SceneType scnType, std::string name_p,Ogre::SceneNode* sceneNode_p) :
-		SceneResource(ResourceHandler::GetInstance(), name_p, scnType, Ogre::Vector3(0,0,0), Ogre::Vector4(0,0,0,0), Ogre::Vector3(0,0,0)) {
+		SceneResource(ResourceHandler::GetInstance(), name_p, scnType) {
 		GDBuilderCxt = GDBuilderCxt_p;
 		scene = sceneNode_p;
 		
@@ -37,6 +37,7 @@ public:
 		Object* newObject = GDBuilderCxt->CreateObject(objectName_p, meshPath_p, type);
 		std::shared_ptr<Object> sObject(newObject);
 		scene->attachObject(sObject->entity.get());
+		
 		objVec.push_back(std::move(sObject));
 		return objVec.at(objVec.size() - 1);
 	}
@@ -70,6 +71,7 @@ public:
 	}
 
 	void setPosition(Ogre::Vector3 pos_p) {
+		//std::cout << position[0] << " " << position[1] << " " << position[2] << std::endl;
 		this->position[0] = pos_p[0];
 		this->position[1] = pos_p[1];
 		this->position[2] = pos_p[2];
@@ -77,10 +79,19 @@ public:
 	}
 
 	void setOrientation(Ogre::Quaternion orientation_p) {
+		orientation_p.normalise();
+		if (orientation_p.isNaN())
+		{
+			std::cout << "NaN Detected in Quaternion! Resetting to default orientation" << std::endl;
+			return;
+		}
+		
 		this->orientation[0] = orientation_p[0];
 		this->orientation[1] = orientation_p[1];
 		this->orientation[2] = orientation_p[2];
 		this->orientation[3] = orientation_p[3];
+		std::cout << orientation[0] << " " << orientation[1] << " " << orientation[2] << " " << orientation[3] << std::endl;
+
 		scene->setOrientation(orientation_p);
 
 	}
@@ -89,7 +100,8 @@ public:
 		this->scale[0] = scale_p[0];
 		this->scale[1] = scale_p[1];
 		this->scale[2] = scale_p[2];
-		scene->setScale(scale_p);
+		
+		updateScale();
 	}
 
 	void updatePosition() override {

@@ -213,6 +213,12 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p
 	out << YAML::Key << MATERIAL_NAME_KEY;
 	out << YAML::Value << mat_p->getName();
 
+	out << YAML::Key << MATERIAL_WIREFRAME_KEY;
+	out << YAML::Value << mat_p->wireFrameMode;
+
+	out << YAML::Key << MATERIAL_CULLING_KEY;
+	out << YAML::Value << static_cast<int>(mat_p->culling);
+
 	out << YAML::Key << MATERIAL_FILENAME_KEY;
 	out << YAML::Value << mat_p->materialFilePath;
 

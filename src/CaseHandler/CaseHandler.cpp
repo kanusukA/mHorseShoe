@@ -33,16 +33,6 @@ void CaseHandler::checkIntegrity()
 }
 
 
-void CaseHandler::clearCaseVec()
-{
-	for (int i = 0; i < caseVec->size(); i++)
-	{
-		caseVec->at(i)->removeAllScenes();
-		caseVec->at(i).reset();
-	}
-	this->caseVec->clear();
-}
-
 std::weak_ptr<Case> CaseHandler::CreateCase(std::string caseName_p)
 {
 	std::shared_ptr<Case> sCase = std::make_shared<Case>(this,caseName_p);
@@ -254,9 +244,6 @@ void CaseHandler::loadSavedResource()
 
 void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 {
-
-	this->clearCaseVec();
-
 	RLCase rlCase = resourceHandler->fetchCaseData(yamlFilePath);
 	
 	std::weak_ptr<Case> wCase = CreateCase(rlCase.name);
@@ -272,6 +259,9 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 			std::weak_ptr<Object> wObj =  wScene.lock()->attachNewObject(obj.name, obj.mesh.filepath, PhysXType(obj.ObjectPhysxType));
 
 			wObj.lock()->setMaterial(obj.material.materialFilePath, obj.material.name);
+			ToastComponent::GetInstance()->addMessage("culling - " + std::to_string(obj.material.culling));
+			wObj.lock()->getwMaterial().lock()->setCullingMode(obj.material.culling);
+			wObj.lock()->getwMaterial().lock()->setWireFrameMode(obj.material.wireframe);
 
 			if (!obj.material.vertShader.shaderVars.empty())
 			{
@@ -284,6 +274,21 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 			}
 
 		}
+
+		// Scene Scale/Position/Rotation is set after objects have been added. As Objects under the scene will not reflect value set to the scene prior.
+
+		
+
+		wScene.lock()->setScale(Ogre::Vector3(rlCase.Scenes.at(scenesIndex).scale[0], rlCase.Scenes.at(scenesIndex).scale[1],
+			rlCase.Scenes.at(scenesIndex).scale[2]));
+
+		wScene.lock()->setPosition(Ogre::Vector3(rlCase.Scenes.at(scenesIndex).position[0], rlCase.Scenes.at(scenesIndex).position[1],
+			rlCase.Scenes.at(scenesIndex).position[2]));
+
+		wScene.lock()->setOrientation(Ogre::Quaternion(rlCase.Scenes.at(scenesIndex).rotation[0], rlCase.Scenes.at(scenesIndex).rotation[1],
+			rlCase.Scenes.at(scenesIndex).rotation[2], rlCase.Scenes.at(scenesIndex).rotation[3]));
+
+		
 
 	}
 

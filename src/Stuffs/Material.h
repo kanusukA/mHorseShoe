@@ -3,7 +3,6 @@
 #include <Stuffs/ShaderObject.h>
 
 // TODO DELETE MATERIAL_PTR ??
-void MaterialDeletor(Material* material_p);
 
 class Material : public  MaterialResource {
 protected:
@@ -11,12 +10,10 @@ protected:
 
 	Ogre::MaterialPtr material;
 
+	
 	std::unique_ptr<Shader> vertexShader;
 	std::unique_ptr<Shader> fragmentShader;
 
-	Ogre::CullingMode culling = Ogre::CULL_CLOCKWISE;
-
-	bool wireFrameMode = false;
 	
 public:
 
@@ -37,7 +34,7 @@ public:
 		else {
 			ToastComponent::GetInstance()->addMessage("Failed to create Material Shaders, for Material : " + material->getName());
 		}
-
+		readTextures();
 
 	};
 
@@ -58,6 +55,8 @@ public:
 	}
 
 	void readTextures();
+
+	void setTexture(int texturePosition_p, Ogre::TexturePtr tex_p);
 
 	void setCullingMode(Ogre::CullingMode culling_p);
 	const Ogre::CullingMode& const getCullingMode() {

@@ -107,9 +107,11 @@ void Gui::initGuiComponents()
 
 void Gui::updateGuiComponents()
 {
-	for (int i = 0; i < Views.size(); i++)
-	{
-		Views.at(i)->view();
+	if(this->getGdSystem()->getGuiVisibility()){
+		for (int i = 0; i < Views.size(); i++)
+		{
+			Views.at(i)->view();
+		}
 	}
 }
 

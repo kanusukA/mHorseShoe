@@ -32,62 +32,62 @@ void Stuff::moveStuffBy(Ogre::Vector3 addPosition)
 
 
 
-PxVec3* mtkVectors(Ogre::Vector3* vec, int vec_size)
-{
-	PxVec3* physxVec = new PxVec3[vec_size];
+//PxVec3* mtkVectors(Ogre::Vector3* vec, int vec_size)
+//{
+//	PxVec3* physxVec = new PxVec3[vec_size];
+//
+//	for (int i = 0; i < vec_size; i++)
+//	{
+//		physxVec[i] = mtkPositionVec3(vec[i]);
+//	}
+//
+//	return physxVec;
+//
+//}
+//
+//Ogre::Vector3 ktmPositionVec3(PxVec3 position) {
+//	return Ogre::Vector3(position.x, position.y, position.z);
+//}
+//
+//Ogre::Quaternion ktmOrientation(PxQuat quat) {
+//	return Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z);
+//}
+//
+//PxVec3 mtkPositionVec3(Ogre::Vector3 position)
+//{
+//	return PxVec3(position.x,position.y,position.z);
+//}
+//
+//PxQuat mtkOrientation(Ogre::Quaternion quat)
+//{
+//	return PxQuat(quat.w,quat.x,quat.y,quat.z);
+//}
 
-	for (int i = 0; i < vec_size; i++)
-	{
-		physxVec[i] = mtkPositionVec3(vec[i]);
-	}
-
-	return physxVec;
-
-}
-
-Ogre::Vector3 ktmPositionVec3(PxVec3 position) {
-	return Ogre::Vector3(position.x, position.y, position.z);
-}
-
-Ogre::Quaternion ktmOrientation(PxQuat quat) {
-	return Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z);
-}
-
-PxVec3 mtkPositionVec3(Ogre::Vector3 position)
-{
-	return PxVec3(position.x,position.y,position.z);
-}
-
-PxQuat mtkOrientation(Ogre::Quaternion quat)
-{
-	return PxQuat(quat.w,quat.x,quat.y,quat.z);
-}
 
 
-
-void StuffStatic::setPxRigidStatic(PxRigidStatic* staActor) {
-	sActor = staActor;
-}
+//void StuffStatic::setPxRigidStatic(PxRigidStatic* staActor) {
+//	sActor = staActor;
+//}
 
 void StuffStatic::setRotation(Ogre::Vector3 rot)
 {
 	// do quaternions
 	setObjRotation(this->scnNode, rot);
 
-	this->sActor->setGlobalPose(PxTransform(mtkOrientation(this->scnNode->getOrientation())));
+	//this->sActor->setGlobalPose(PxTransform(mtkOrientation(this->scnNode->getOrientation())));
 
 }
 
 void StuffStatic::setPosition(Ogre::Vector3 pos)
 {
-	this->sActor->setGlobalPose(PxTransform(mtkPositionVec3(pos), this->sActor->getGlobalPose().q));
+	//this->sActor->setGlobalPose(PxTransform(mtkPositionVec3(pos), this->sActor->getGlobalPose().q));
 	this->scnNode->setPosition(pos);
 }
 
 void StuffStatic::setOrientation(Ogre::Quaternion quaternion)
 {
 	this->scnNode->setOrientation(quaternion);
-	this->sActor->setGlobalPose(PxTransform(mtkOrientation(this->scnNode->getOrientation())));
+	//this->sActor->setGlobalPose(PxTransform(mtkOrientation(this->scnNode->getOrientation())));
 	
 }
 
@@ -96,33 +96,33 @@ void StuffStatic::moveStuffBy(Ogre::Vector3 addPos)
 	this->setPosition(this->scnNode->getPosition() + addPos);
 }
 
-void StuffDynamic::setPxRigidDynamic(PxRigidDynamic* dynActor) {
-	sActor = dynActor;
-}
+//void StuffDynamic::setPxRigidDynamic(PxRigidDynamic* dynActor) {
+//	sActor = dynActor;
+//}
 
 bool StuffDynamic::update(float deltaTime) {
 
-	scnNode->setPosition(ktmPositionVec3(this->sActor->getGlobalPose().p));
-	scnNode->setOrientation(ktmOrientation(this->sActor->getGlobalPose().q));
+	/*scnNode->setPosition(ktmPositionVec3(this->sActor->getGlobalPose().p));
+	scnNode->setOrientation(ktmOrientation(this->sActor->getGlobalPose().q));*/
 
 	return true;
 }
 
 void StuffDynamic::setRotation(Ogre::Vector3 rot)
 {
-	this->sActor->setGlobalPose(PxTransform(this->sActor->getGlobalPose().p, mtkOrientation(this->scnNode->getOrientation())));
+	//this->sActor->setGlobalPose(PxTransform(this->sActor->getGlobalPose().p, mtkOrientation(this->scnNode->getOrientation())));
 	this->update(0.1f);
 }
 
 void StuffDynamic::setPosition(Ogre::Vector3 pos)
 {
-	this->sActor->setGlobalPose(PxTransform(mtkPositionVec3(pos),this->sActor->getGlobalPose().q));
+	//this->sActor->setGlobalPose(PxTransform(mtkPositionVec3(pos),this->sActor->getGlobalPose().q));
 	this->update(0.1f);
 }
 
 void StuffDynamic::setOrientation(Ogre::Quaternion quaternion)
 {
-	this->sActor->setGlobalPose(PxTransform(this->sActor->getGlobalPose().p, mtkOrientation(quaternion)));
+	//this->sActor->setGlobalPose(PxTransform(this->sActor->getGlobalPose().p, mtkOrientation(quaternion)));
 	this->update(0.1f);
 
 }
@@ -157,7 +157,7 @@ void StuffHandler::updateVisualDebug()
 {
 
 	
-	const PxDebugLine* lines = kint->getDebugLines();
+	/*const PxDebugLine* lines = kint->getDebugLines();
 	int nbLines = kint->getNbDebugLine();
 	if(nbLines > 0) {
 		this->debugLines->beginUpdate(0);
@@ -169,7 +169,7 @@ void StuffHandler::updateVisualDebug()
 			
 		}
 		this->debugLines->end();
-	}
+	}*/
 	
 }
 
@@ -208,7 +208,7 @@ void StuffHandler::_addObjectDynamic(std::string scnNodeName,std::string objName
 	stuffDynamic->_setColliderMesh(colliderName);
 	stuffDynamic->_setMass(mass);
 
-	PxGeometry* geo;
+	//PxGeometry* geo;
 
 	size_t vertex_count, index_count;
 	Ogre::Vector3* vertices;
@@ -218,7 +218,7 @@ void StuffHandler::_addObjectDynamic(std::string scnNodeName,std::string objName
 	monsterNode->getUserObjectBindings().setUserAny(stuffDynamic);
 
 	if (colliderName == "box") {
-		geo = new PxBoxGeometry(mtkPositionVec3(colliderSize));
+		//geo = new PxBoxGeometry(mtkPositionVec3(colliderSize));
 	}
 	else {
 		this->monster->getMeshInfoFromColName(colliderName,
@@ -231,19 +231,19 @@ void StuffHandler::_addObjectDynamic(std::string scnNodeName,std::string objName
 			monsterNode->getScale()
 		);
 
-		PxConvexMesh* convexMesh = kint->createConvexCollisionMesh(vertex_count, mtkVectors(vertices,vertex_count));
-		geo = new PxConvexMeshGeometry(convexMesh);
+		/*PxConvexMesh* convexMesh = kint->createConvexCollisionMesh(vertex_count, mtkVectors(vertices,vertex_count));
+		geo = new PxConvexMeshGeometry(convexMesh);*/
 
 		/*PxTriangleMesh* triMesh = kint->createTriangleCollisionMesh(vertex_count, mtkVectors(vertices, vertex_count), index_count, indices);
 		geo = new PxTriangleMeshGeometry(triMesh);*/
 	}
 
 
-	physx::PxRigidDynamic* dynamic = this->kint->createRigidBody(objName, PxTransform(PxVec3(0,0,0)), mass, geo);
+	//physx::PxRigidDynamic* dynamic = this->kint->createRigidBody(objName, PxTransform(PxVec3(0,0,0)), mass, geo);
 
 	
 	stuffDynamic->setSceneNode(monsterNode);
-	stuffDynamic->setPxRigidDynamic(dynamic);
+	//stuffDynamic->setPxRigidDynamic(dynamic);
 
 	stuffDynamic->setPosition(position);
 	stuffDynamic->setOrientation(rotation);
@@ -265,13 +265,13 @@ void StuffHandler::_addObjectStatic(std::string scnNodeName, std::string objName
 	Ogre::SceneNode* monsterNode = this->monster->loadMeshScnNode(STATIC_SCN_NODE, scnNodeName,objName, meshName);
 	monsterNode->getUserObjectBindings().setUserAny(stuffStatic);
 
-	PxGeometry* geo;
+	//PxGeometry* geo;
 	size_t vertex_count, index_count;
 	Ogre::Vector3* vertices;
 	unsigned long* indices;
 
 	if (colliderName == "box") {
-		geo = new PxBoxGeometry(mtkPositionVec3(colliderSize));
+		//geo = new PxBoxGeometry(mtkPositionVec3(colliderSize));
 	}
 	else {
 		this->monster->getMeshInfoFromColName(colliderName,
@@ -284,16 +284,16 @@ void StuffHandler::_addObjectStatic(std::string scnNodeName, std::string objName
 			monsterNode->getScale()
 		);
 
-		PxConvexMesh* convexMesh = kint->createConvexCollisionMesh(vertex_count, mtkVectors(vertices, vertex_count));
-		geo = new PxConvexMeshGeometry(convexMesh);
+		/*PxConvexMesh* convexMesh = kint->createConvexCollisionMesh(vertex_count, mtkVectors(vertices, vertex_count));
+		geo = new PxConvexMeshGeometry(convexMesh);*/
 
 		/*PxTriangleMesh* triMesh = kint->createTriangleCollisionMesh(vertex_count, mtkVectors(vertices, vertex_count), index_count, indices);
 		geo = new PxTriangleMeshGeometry(triMesh);*/
 	}
 	
-	physx::PxRigidStatic* pxStatic = this->kint->createStaticBody(objName, PxTransform(mtkPositionVec3(position), physx::PxQuat()), geo);
+	//physx::PxRigidStatic* pxStatic = this->kint->createStaticBody(objName, PxTransform(mtkPositionVec3(position), physx::PxQuat()), geo);
 
-	stuffStatic->setPxRigidStatic(pxStatic);
+	//stuffStatic->setPxRigidStatic(pxStatic);
 	stuffStatic->setSceneNode(monsterNode);
 
 	stuffStatic->setPosition(position);
@@ -304,7 +304,7 @@ void StuffHandler::_addObjectStatic(std::string scnNodeName, std::string objName
 	stuffStatic->indexId = stuffStatics->size();
 	this->stuffStatics->push_back(stuffStatic);
 
-	std::cout << "position : " << stuffStatic->sActor->getGlobalPose().p.x << " " << stuffStatic->sActor->getGlobalPose().p.y << " " << stuffStatic->sActor->getGlobalPose().p.z << std::endl;
+	//std::cout << "position : " << stuffStatic->sActor->getGlobalPose().p.x << " " << stuffStatic->sActor->getGlobalPose().p.y << " " << stuffStatic->sActor->getGlobalPose().p.z << std::endl;
 
 	
 
@@ -334,7 +334,7 @@ void StuffHandler::deleteObj(Stuff* stuff)
 	switch (stuff->type) {
 
 	case STUFF_DYNAMIC:
-		this->stuffDynamics->at(stuff->indexId)->sActor->release();
+		//this->stuffDynamics->at(stuff->indexId)->sActor->release();
 		
 		this->stuffDynamics->erase(stuffDynamics->begin() + stuff->indexId);
 		break;
@@ -480,9 +480,9 @@ void StuffHandler::showDebugPhysxMeshes()
 	
 
 	showingColliderDebug = !showingColliderDebug;
-	kint->setGlobalVisualization(showingColliderDebug);
+	//kint->setGlobalVisualization(showingColliderDebug);
 
-	const PxDebugLine* lines = kint->getDebugLines();
+	//const PxDebugLine* lines = kint->getDebugLines();
 
 	
 
@@ -493,16 +493,16 @@ void StuffHandler::showDebugPhysxMeshes()
 		debugLines = new Ogre::ManualObject("mo");
 		debugLines->begin("Blade_mat", Ogre::RenderOperation::OT_LINE_LIST, "Render_Mesh");
 		
-		for (int i = 0; i < kint->getNbDebugLine(); i++)
-		{
-			debugLines->position(ktmPositionVec3(lines[i].pos0));
-			debugLines->normal(0, 1, 0);
-			debugLines->textureCoord(0, 0);
+		//for (int i = 0; i < kint->getNbDebugLine(); i++)
+		//{
+		//	//debugLines->position(ktmPositionVec3(lines[i].pos0));
+		//	debugLines->normal(0, 1, 0);
+		//	debugLines->textureCoord(0, 0);
 
-			debugLines->position(ktmPositionVec3(lines[i].pos1));
-			debugLines->normal(0, 1, 0);
-			debugLines->textureCoord(1, 1);
-		}
+		//	debugLines->position(ktmPositionVec3(lines[i].pos1));
+		//	debugLines->normal(0, 1, 0);
+		//	debugLines->textureCoord(1, 1);
+		//}
 		debugLines->end();
 
 		this->debugScnNode = monster->addManualObject("this_moze", debugLines);

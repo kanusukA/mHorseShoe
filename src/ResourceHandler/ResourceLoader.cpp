@@ -138,20 +138,20 @@ RLCase ResourceLoader::fetchCaseData(std::filesystem::path yamlFilePath)
 			{
 				scene.name = yamDoc[CASE_SCENES_KEY][i][SCENE_NAME_KEY].as<std::string>();
 				
-				if (yamDoc[CASE_SCENES_KEY][i][SCENE_POS_KEY].IsMap())
+				if (yamDoc[CASE_SCENES_KEY][i][SCENE_POS_KEY].IsSequence())
 				{
 					scene.position = new float[3]{ yamDoc[CASE_SCENES_KEY][i][SCENE_POS_KEY][0].as<float>(),
 						yamDoc[CASE_SCENES_KEY][i][SCENE_POS_KEY][1].as<float>() ,
 						yamDoc[CASE_SCENES_KEY][i][SCENE_POS_KEY][2].as<float>() };
 				}
-				if (yamDoc[CASE_SCENES_KEY][i][SCENE_ROT_KEY].IsMap())
+				if (yamDoc[CASE_SCENES_KEY][i][SCENE_ROT_KEY].IsSequence())
 				{
 					scene.rotation = new float[4] { yamDoc[CASE_SCENES_KEY][i][SCENE_ROT_KEY][0].as<float>(),
 						yamDoc[CASE_SCENES_KEY][i][SCENE_ROT_KEY][1].as<float>(),
 						yamDoc[CASE_SCENES_KEY][i][SCENE_ROT_KEY][2].as<float>(),
 						yamDoc[CASE_SCENES_KEY][i][SCENE_ROT_KEY][3].as<float>()};
 				}
-				if (yamDoc[CASE_SCENES_KEY][i][SCENE_SCALE_KEY].IsMap())
+				if (yamDoc[CASE_SCENES_KEY][i][SCENE_SCALE_KEY].IsSequence())
 				{
 					scene.scale = new float[3] { yamDoc[CASE_SCENES_KEY][i][SCENE_SCALE_KEY][0].as<float>(),
 						yamDoc[CASE_SCENES_KEY][i][SCENE_SCALE_KEY][1].as<float>(),
@@ -183,6 +183,8 @@ RLCase ResourceLoader::fetchCaseData(std::filesystem::path yamlFilePath)
 
 							material.name = materialNode[MATERIAL_NAME_KEY].as<std::string>();
 							material.materialFilePath = materialNode[MATERIAL_FILENAME_KEY].as<std::string>();
+							material.culling = Ogre::CullingMode(materialNode[MATERIAL_CULLING_KEY].as<int>());
+							material.wireframe = materialNode[MATERIAL_WIREFRAME_KEY].as<bool>();
 
 							if (materialNode[MATERIAL_VERTEX_KEY].IsSequence())
 							{
@@ -438,6 +440,7 @@ RLFetchedResource* ResourceLoader::_fetchedResourcesFromMesh(ResID meshID, std::
 	//	
 	//}
 	//return resources;
+	return nullptr;
 
 }
 
@@ -462,6 +465,7 @@ RLMesh* ResourceLoader::_fetchMesh(ResID id, std::string path_p)
 		}
 	}
 	ini->Reset();*/
+	return nullptr;
 }
 
 RLMaterial* ResourceLoader::_fetchMaterial(ResID id, std::string path_p, std::string matTexPath_p)
@@ -545,6 +549,7 @@ RLMaterial* ResourceLoader::_fetchMaterial(ResID id, std::string path_p, std::st
 
 
 	return nullptr;*/
+	return nullptr;
 
 }
 

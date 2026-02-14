@@ -1,5 +1,24 @@
 #include "RSUSTabComponent.h"
 
+inline bool ImageComboView(std::vector<std::filesystem::path>& imagesPath,int* selectedImgIndex) {
+	bool selected = false;
+	if(!imagesPath.empty()){
+		if (ImGui::BeginCombo("Images",imagesPath.at(0).filename().string().c_str()))
+		{
+			for (int imageIndex = 0; imageIndex < imagesPath.size(); imageIndex++)
+			{
+				if (ImGui::Selectable(imagesPath.at(imageIndex).filename().string().c_str(),*selectedImgIndex == imageIndex))
+				{
+					*selectedImgIndex = imageIndex;
+					selected = true;
+				}
+			}
+			ImGui::EndCombo();
+		}
+		
+	}
+	return selected;
+}
 
 inline void textureViewComponent(
 	Ogre::String name,
@@ -111,11 +130,6 @@ void RSUSTabComponent::view()
 		ImGui::Text("Material : "); ImGui::SameLine();
 		ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getName().c_str());
 
-		if (ImGui::Button("Read textures"))
-		{
-			ModelComponent::selectedMaterial->selMaterial.lock()->readTextures();
-		}
-
 		ImGui::Spacing();
 
 		if(ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()){
@@ -151,6 +165,29 @@ void RSUSTabComponent::view()
 		}
 		else {
 			ImGui::Text("No Fragment Shader Found!");
+		}
+
+		
+
+		ImGui::Text("Texture");
+		if (ImGui::Button("Refresh Textures"))
+		{
+			RSUSModel->refreshTexture();
+		}
+		if (ModelComponent::selectedMaterial->selMaterial.lock()->textures && !ModelComponent::selectedMaterial->selMaterial.lock()->textures->empty())
+		{
+			for (int texIndex = 0; texIndex < ModelComponent::selectedMaterial->selMaterial.lock()->textures->size(); texIndex++)
+			{
+				if (ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texture)
+				{
+					ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
+					ImGui::Image((ImTextureID)ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texture->getHandle(), ImVec2(250, 250));
+				}
+			}
+			
+		}
+		else {
+			ImGui::Text("No Textures found");
 		}
 
 	}
