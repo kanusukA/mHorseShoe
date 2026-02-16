@@ -42,22 +42,21 @@ An custom implementation of **BRDF** (Bidirectional Reflectance Distribution Fun
 
 # Installation
 
-The project is built using cmake.
+The project **NO LONGER USES** cmake as its buildsystem. (cmake will be implemented in future build) <br>
+Manual setup is required to build this project, as such refer to build guides and setup instructions of respective dependencies.
 
 ## Dependencies
 <ul>
   <li> <a href="https://github.com/OGRECave/ogre">OGRE</a> </li>
   <li> <a href="https://github.com/ocornut/imgui">ImGui</a> </li>
   <li> <a href="https://github.com/libsdl-org/SDL">SDL</a> </li>
-  <li> <a href="https://github.com/NVIDIAGameWorks/PhysX">PHYSX</a> </li>
+  <li> <s>PHYSX</s> </li>
 </ul>
+<br>
+Imgui is optional as its installed along with OGRE.
+SDL2 is also installed with OGRE but the project is built using SDL3, as such SDL3 is recommended. <br>
 
-## Requirements
+After cloning the repo and setting up headers , libs and dlls. The program requires an **asset** folder (provided in the repo) to exists in a directory previous to the executables directory.(This is the recommended way but other path setup can be used) <br>
+During the first launch, in the Resource Tab enter the directories in load path. Note some load paths search recursively and some don't.
+A restart is required for the load path directories to take effect.
 
-cmake <br>
-msbuild <br>
-visual studio <br>
-python <br>
-gcc <br>
-
-Copy the contents of the required folder to the binary and ensure the paths are consistent.
