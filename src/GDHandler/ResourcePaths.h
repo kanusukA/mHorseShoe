@@ -5,6 +5,7 @@
 
 #define OGRE_MATERIAL_GROUP "og_materials_grp"
 #define OGRE_MESH_GROUP "og_meshes_grp"
+#define OGRE_TEXTURE_GROUP "og_texture_grp"
 
 
 // Resource Handler ini stuff

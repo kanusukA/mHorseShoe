@@ -1,23 +1,22 @@
 #include "RSUSTabComponent.h"
 
-inline bool ImageComboView(std::vector<std::filesystem::path>& imagesPath,int* selectedImgIndex) {
-	bool selected = false;
-	if(!imagesPath.empty()){
-		if (ImGui::BeginCombo("Images",imagesPath.at(0).filename().string().c_str()))
+inline int ImageComboView() {
+	int selValue = -1;
+	if(!ModelComponent::imageTextures->empty()){
+		if (ImGui::BeginCombo("Images",ModelComponent::imageTextures->at(0)->getName().c_str()))
 		{
-			for (int imageIndex = 0; imageIndex < imagesPath.size(); imageIndex++)
+			for (int imageIndex = 0; imageIndex < ModelComponent::imageTextures->size(); imageIndex++)
 			{
-				if (ImGui::Selectable(imagesPath.at(imageIndex).filename().string().c_str(),*selectedImgIndex == imageIndex))
+				if (ImGui::Selectable(ModelComponent::imageTextures->at(imageIndex)->getName().c_str(), false))
 				{
-					*selectedImgIndex = imageIndex;
-					selected = true;
+					selValue = imageIndex;
 				}
 			}
 			ImGui::EndCombo();
 		}
 		
 	}
-	return selected;
+	return selValue;
 }
 
 inline void textureViewComponent(
@@ -183,6 +182,12 @@ void RSUSTabComponent::view()
 					ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
 					ImGui::Image((ImTextureID)ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texture->getHandle(), ImVec2(250, 250));
 				}
+
+				int selectedImage = ImageComboView();
+				if (selectedImage >= 0) {
+					ModelComponent::selectedMaterial->selMaterial.lock()->setTexture(texIndex, ModelComponent::imageTextures->at(selectedImage));
+				}
+
 			}
 			
 		}

@@ -156,7 +156,9 @@ public:
 	static std::vector<std::filesystem::path>* meshDpVec;
 	static std::vector<std::filesystem::path>* materialDpVec;
 	static std::vector<std::filesystem::path>* shaderDpVec;
+
 	static std::vector<std::filesystem::path>* textureDpVec;
+	static std::vector<Ogre::TexturePtr>* imageTextures;
 
 	static std::vector<std::filesystem::path>* savedCaseFiles;
 
@@ -182,6 +184,8 @@ public:
 		materialDpVec = gdSource->getResourceHandler()->getMaterialsLoaded();
 		shaderDpVec = gdSource->getResourceHandler()->getShadersLoaded();
 		textureDpVec = gdSource->getResourceHandler()->getTexturesLoaded();
+		imageTextures = new std::vector<Ogre::TexturePtr>(textureDpVec->size());
+		refreshImageTextures();
 
 		caseVec = gdSource->getCaseHandler()->caseVec;
 
@@ -209,6 +213,8 @@ public:
 	void selectMaterial(const std::weak_ptr<Material>& material_p) {
 		selectedMaterial->selMaterial = material_p;
 	}
+
+	void refreshImageTextures();
 
 	// USED TO INITALIZE PREDEFINED DATA AND VARIABLE OF THE COMPONENT
 	// USE THIS INSTED OF CONSTRUCTOR AS GDSOURCE IS INITALIZED AFTER THE OBJECT IS CREATED

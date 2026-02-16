@@ -199,7 +199,7 @@ void SceneTabComponent::view()
 
 			// ADD OBJECT
 			ImGui::Text("Add Object : ");
-			if (ModelComponent::meshDpVec) {
+			if (ModelComponent::meshDpVec && ModelComponent::meshDpVec->size() > 0) {
 
 				ImGui::InputText("Object Name", scnTabModel->inputObjectname);
 

@@ -672,9 +672,9 @@ void ResourceLoader::loadTexturesDp(std::vector<std::filesystem::path>* output, 
 		}
 	}
 	else {
-		if (!load_paths->at(ResourceLoaderEnums::MaterialTexture).empty())
+		if (!load_paths->at(ResourceLoaderEnums::ImagePath).empty())
 		{
-			fetchPathContents(load_paths->at(ResourceLoaderEnums::MaterialTexture), extension, output, searchFolders);
+			fetchPathContents(load_paths->at(ResourceLoaderEnums::ImagePath), extension, output, searchFolders);
 		}
 	}
 }

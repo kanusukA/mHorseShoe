@@ -71,7 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\lenovo\source\repos\Yaml\build\Debug;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\sdl3-build\Debug;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-build\bin\debug;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-build\lib\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>D:\source\repos\YAML-CPP\yaml-cpp\.buildShared\RelWithDebInfo;D:\source\repos\SDL3_13_9_24\SDL\.build\RelWithDebInfo;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-build\lib\Release;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LibraryPath>D:\source\repos\YAML-CPP\yaml-cpp\.buildShared\RelWithDebInfo;D:\source\repos\SDL3_13_9_24\SDL\.build\RelWithDebInfo;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-build\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -105,13 +108,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1;..\src;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-src\Components\Bites\include;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-src\Components\Overlay\include;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-src\Components\RTShaderSystem\include;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-src\Components\OgreMain\include;C:\Users\lenovo\source\repos\Yaml\include;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\sdl3-src\include\SDL3;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-src\OgreMain\include;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-build\include;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-src\OgreMain\src\zip;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\ogre-build\imgui-1.91.9b;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\sdl3-build\include-revision;C:\Users\lenovo\source\repos\kanusukA\mHorseShoe\mHorseShoee_0_0_1\.build_nonGlob\_deps\sdl3-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\Components\Bites\include;..\src;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\Components\Overlay\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\Components\RTShaderSystem\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\Components\OgreMain\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\OgreMain\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-build\include;D:\source\repos\YAML-CPP\yaml-cpp\include;D:\source\repos\SDL3_13_9_24\SDL\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-build\imgui-1.91.9b;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>yaml-cppd.lib;OgreBites_d.lib;OgreOverlay_d.lib;OgreMain_d.lib;OgreRTShaderSystem_d.lib;SDL3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>yaml-cpp.lib;OgreBites.lib;OgreOverlay.lib;OgreMain.lib;OgreRTShaderSystem.lib;SDL3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -122,10 +125,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\Components\Bites\include;..\src;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\Components\Overlay\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\Components\RTShaderSystem\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\Components\OgreMain\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-src\OgreMain\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-build\include;D:\source\repos\YAML-CPP\yaml-cpp\include;D:\source\repos\SDL3_13_9_24\SDL\include;D:\source\repos\mHorseShoe_cmake\mHorseShoee_0_0_1\.build\_deps\ogre-build\imgui-1.91.9b;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>yaml-cpp.lib;OgreBites.lib;OgreOverlay.lib;OgreMain.lib;OgreRTShaderSystem.lib;SDL3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
