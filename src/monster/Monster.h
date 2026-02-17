@@ -239,6 +239,7 @@ public:
 	Ogre::MaterialPtr getMaterial(Ogre::String matName_p, Ogre::String groupName);
 	Ogre::MaterialPtr createEmptyMaterial(std::string name_p, Ogre::String groupName);
 	Ogre::SceneNode* addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode);
+	Ogre::TexturePtr getImageTexture(std::string textureName, Ogre::String groupName);
 
 	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::String scnNodeName, Ogre::Entity* ent);
 	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::Entity* ent);

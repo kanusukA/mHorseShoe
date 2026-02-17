@@ -45,6 +45,11 @@ Ogre::Entity* GDBuilderContext::monCreateEntity(std::string name_p, Ogre::MeshPt
 	return monster->createEntity(name_p, mesh_p);
 }
 
+Ogre::TexturePtr GDBuilderContext::monGetTexture(std::string textureName)
+{
+	return monster->getImageTexture(textureName, OGRE_TEXTURE_GROUP);
+}
+
 Ogre::MaterialPtr GDBuilderContext::monCreateMaterial(std::string name_p)
 {
 	return monster->getMaterial(name_p, OGRE_MATERIAL_GROUP);

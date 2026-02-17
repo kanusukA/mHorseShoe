@@ -122,6 +122,15 @@ Ogre::MeshPtr CaseHandler::fetchMeshById(ResID meshID_p)
 	return nullptr;
 }
 
+Ogre::TexturePtr CaseHandler::fetchImageByName(std::filesystem::path imagePath_p)
+{
+	this->monSetLocation(imagePath_p.parent_path(), OGRE_TEXTURE_GROUP);
+	this->monster->initalizeResourceGroup(OGRE_TEXTURE_GROUP);
+
+	return this->monGetTexture(imagePath_p.filename().string());
+
+}
+
 
 Material* CaseHandler::CreateMaterial(std::filesystem::path materialPath_p, std::string materialName)
 {

@@ -56,6 +56,8 @@ public:
 	Ogre::MeshPtr monGetMesh(std::string meshName_p);
 	Ogre::Entity* monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p);
 
+	Ogre::TexturePtr monGetTexture(std::string textureName);
+
 	Ogre::MaterialPtr monCreateMaterial(std::string name_p);
 	Ogre::MaterialPtr monCreateNewMaterial(std::string name_p);
 

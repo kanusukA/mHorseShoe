@@ -13,7 +13,6 @@
 class CaseHandler : public GDBuilderContext{
 
 private:
-	
 
 
 protected:
@@ -67,16 +66,14 @@ public:
 	Ogre::MeshPtr fetchMeshByName(std::filesystem::path meshPath_p) override;
 	Ogre::MeshPtr fetchMeshById(ResID meahID_p) override;
 
+	Ogre::TexturePtr fetchImageByName(std::filesystem::path imagePath_p);
+
 	//RenderMesh* CreateRenderMesh(std::filesystem::path path_p);
 	
 	Material* CreateMaterial( std::filesystem::path materialPath_p, std::string materialName);
 
 	// old method
 	//RenderMesh* CreateRenderMesh(std::string meshName_p);
-
-	
-
-
 
 	//ColliderMesh* CreateColliderMesh(std::string MeshName_p);
 	//Shader* CreateShader(Ogre::MaterialPtr mat_p, ShaderType type); Shaders are created by Materials themselves!

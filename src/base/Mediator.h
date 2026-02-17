@@ -184,7 +184,7 @@ public:
 		materialDpVec = gdSource->getResourceHandler()->getMaterialsLoaded();
 		shaderDpVec = gdSource->getResourceHandler()->getShadersLoaded();
 		textureDpVec = gdSource->getResourceHandler()->getTexturesLoaded();
-		imageTextures = new std::vector<Ogre::TexturePtr>(textureDpVec->size());
+		
 		refreshImageTextures();
 
 		caseVec = gdSource->getCaseHandler()->caseVec;

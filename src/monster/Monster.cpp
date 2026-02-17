@@ -187,6 +187,12 @@ Ogre::SceneNode* Monster::addToScnNode(Ogre::String meshName, Ogre::SceneNode* t
 	return scnNode;
 }
 
+Ogre::TexturePtr Monster::getImageTexture(std::string textureName, Ogre::String groupName)
+{
+	Ogre::TexturePtr texture = Ogre::TextureManager::getSingleton().load(textureName, groupName);
+	return texture;
+}
+
 Ogre::SceneNode* Monster::loadMeshScnNodeFromEnt(Ogre::String scnNodeName, Ogre::Entity* ent)
 {
 	Ogre::SceneNode* scnNode = oScnManager->getRootSceneNode()->createChildSceneNode(scnNodeName);

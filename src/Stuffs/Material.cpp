@@ -18,11 +18,12 @@ void Material::readTextures()
 
 void Material::setTexture(int texturePosition_p, Ogre::TexturePtr tex_p)
 {
-	if (material->getTechnique(0)->getPass(0)->getTextureUnitState(texturePosition_p))
+	try
 	{
 		material->getTechnique(0)->getPass(0)->getTextureUnitState(texturePosition_p)->setTexture(tex_p);
 	}
-	else {
+	catch (const std::exception&)
+	{
 		ToastComponent::GetInstance()->addMessage("Error Setting texture");
 	}
 }

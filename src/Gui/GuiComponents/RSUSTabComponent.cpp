@@ -1,9 +1,9 @@
 #include "RSUSTabComponent.h"
 
-inline int ImageComboView() {
+inline int ImageComboView(int index) {
 	int selValue = -1;
 	if(!ModelComponent::imageTextures->empty()){
-		if (ImGui::BeginCombo("Images",ModelComponent::imageTextures->at(0)->getName().c_str()))
+		if (ImGui::BeginCombo(("Images##" + std::to_string(index)).c_str(), ModelComponent::imageTextures->at(0)->getName().c_str()))
 		{
 			for (int imageIndex = 0; imageIndex < ModelComponent::imageTextures->size(); imageIndex++)
 			{
@@ -181,12 +181,15 @@ void RSUSTabComponent::view()
 				{
 					ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
 					ImGui::Image((ImTextureID)ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texture->getHandle(), ImVec2(250, 250));
+
+					int selectedImage = ImageComboView(texIndex);
+					if (selectedImage >= 0) {
+						ModelComponent::selectedMaterial->selMaterial.lock()->setTexture(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition,
+							ModelComponent::imageTextures->at(selectedImage));
+					}
 				}
 
-				int selectedImage = ImageComboView();
-				if (selectedImage >= 0) {
-					ModelComponent::selectedMaterial->selMaterial.lock()->setTexture(texIndex, ModelComponent::imageTextures->at(selectedImage));
-				}
+				
 
 			}
 			

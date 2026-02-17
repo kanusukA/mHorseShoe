@@ -18,6 +18,7 @@ std::vector<std::filesystem::path>* ModelComponent::savedCaseFiles;
 
 void ModelComponent::refreshImageTextures()
 {
+	imageTextures = new std::vector<Ogre::TexturePtr>(textureDpVec->size());
 	for (int i = 0; i < textureDpVec->size(); i++) {
 		
 		if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(OGRE_TEXTURE_GROUP))
@@ -25,15 +26,17 @@ void ModelComponent::refreshImageTextures()
 			Ogre::ResourceGroupManager::getSingleton().createResourceGroup(OGRE_TEXTURE_GROUP);
 		}
 		
-		Ogre::TexturePtr tex = Ogre::TextureManager::getSingleton().load(textureDpVec->at(i).string().c_str(), OGRE_TEXTURE_GROUP);
+		
+		Ogre::TexturePtr tex = this->gdSource->getCaseHandler()->fetchImageByName(textureDpVec->at(i));
 		if (tex)
 		{
-			imageTextures->push_back(tex);
+			imageTextures->at(i) = tex;
 		}
 		else
 		{
 			ToastComponent::GetInstance()->addMessage("Error Loading Texture");
 		}
+		
 		
 
 		
