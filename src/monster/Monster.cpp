@@ -60,10 +60,35 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	
 
 	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-	oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
+	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
 
 	//Ogre::MaterialPtr casterMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowCaster");
 	//Ogre::MaterialPtr receiverMat = Ogre::MaterialManager::getSingleton().getByName("MyShadowReceiver");
+
+	// if caster and receiverMat is found execute SHADOWTYPE_TEXTURE
+	if (Ogre::MaterialManager::getSingleton().resourceExists("ShadowCasterV5", OGRE_MATERIAL_GROUP)
+		&& Ogre::MaterialManager::getSingleton().resourceExists("ShadowReceiverV5", OGRE_MATERIAL_GROUP)
+			)
+	{
+		ToastComponent::GetInstance()->addMessage("ShadowCaster and ShadowReceiver found. Initalizing ShadowTexture...");
+
+		Ogre::MaterialPtr shadowCastMat = Ogre::MaterialManager::getSingleton().getByName("ShadowCasterV5");
+		Ogre::MaterialPtr shadowReceiverMat = Ogre::MaterialManager::getSingleton().getByName("ShadowReceiverV5");
+
+		oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+
+		oScnManager->setShadowTextureCasterMaterial(shadowCastMat);
+		oScnManager->setShadowTextureReceiverMaterial(shadowReceiverMat);
+		// TODO RESOURCES ARE SETUP LATER THAN MONSTER's INIT. MAKE RESOURCE LOAD FIRST IN THE PIPELINE.
+
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Error setting up shadow texture Technique. using fallback.");
+
+		oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
+
+	}
+
 
 	//oScnManager->setShadowTextureCasterMaterial(casterMat);
 	//oScnManager->setShadowTextureReceiverMaterial(receiverMat);
