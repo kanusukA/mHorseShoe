@@ -201,6 +201,8 @@ public:
 	// INITIALISES SDL3 WINDOW / ADDS DEFAULT CAMERAMAN / GUI SYSTEM
 	void InitMonster();
 
+	void setShadowTechnique();
+
 	// Use this function to add input listner to the application context
 	int* FPS;
 

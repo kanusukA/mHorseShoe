@@ -93,8 +93,6 @@ protected:
 
 
 
-	
-
 	// LOADING FILES AND FOLDERS
 	void fetchPathContents(std::string path, std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders = false);
 
@@ -159,8 +157,6 @@ public:
 	void loadShadersDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
 	void loadMeshesDp(std::vector<std::filesystem::path>* output, std::string extension = ".mesh", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
 	void loadTexturesDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
-
-
 
 	
 

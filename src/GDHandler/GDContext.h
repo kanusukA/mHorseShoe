@@ -47,8 +47,8 @@ public:
 
 	virtual void update(float deltaTime) {};
 
-	//PxRigidDynamic* getPxRigidDynamic(std::string name_p, PxTransform transform, PxGeometry* geometry, float mass);
-	//PxRigidStatic* getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry);
+	//Ogre
+	void loadMaterialsDpToOgre();
 
 	// Monster functions
 	void monSetLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);

@@ -390,6 +390,8 @@ void ResourceHandler::loadResources()
 
 }
 
+
+
 RLFetchedResource* ResourceHandler::fetchResourcesFromMesh(ResID meshID)
 {
 	return _fetchedResourcesFromMesh(meshID, allResourceParentPaths);
@@ -510,7 +512,7 @@ std::string ResourceHandler::getResourceFile(std::string fileName, ResourceHandl
 
 }
 
-
+//DEPRICATED
 void ResourceHandler::getAllResources()
 {
 

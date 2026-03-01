@@ -2,10 +2,16 @@
 
 void GDBuilderContext::startEngine()
 {	
-	// Start PhysX
-	//kint->InitPhysics();
+	
+	loadMaterialsDpToOgre();
 
-	// Start Resource Group initialization
+	monster->setShadowTechnique();
+
+}
+
+
+void GDBuilderContext::loadMaterialsDpToOgre()
+{
 	std::vector<std::filesystem::path>* MaterialPaths = ResourceHandler::GetInstance()->getMaterialsLoaded();
 
 	// Material
@@ -14,21 +20,7 @@ void GDBuilderContext::startEngine()
 		monster->addOgreResourceLocation(MaterialPaths->at(index).parent_path().string(), OGRE_MATERIAL_GROUP);
 	}
 	monster->initalizeResourceGroup(OGRE_MATERIAL_GROUP);
-	
-	// monster->setGrid();
-	// implement saving and loading
-
 }
-
-//PxRigidDynamic* GDBuilderContext::getPxRigidDynamic(std::string name_p,PxTransform transform, PxGeometry* geometry, float mass)
-//{
-//	return kint->createRigidBody(name_p, transform, mass, geometry);
-//}
-//
-//PxRigidStatic* GDBuilderContext::getPxRigidStatic(std::string name_p, PxTransform transform, PxGeometry* geometry)
-//{
-//	return kint->createStaticBody(name_p, transform, geometry);
-//}
 
 void GDBuilderContext::monSetLocation(std::filesystem::path parentPath_p, std::string OgreGroup)
 {

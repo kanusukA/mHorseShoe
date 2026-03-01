@@ -681,8 +681,11 @@ void ResourceLoader::loadTexturesDp(std::vector<std::filesystem::path>* output, 
 
 
 
+
+
 void ResourceLoader::fetchPathContents(std::string path,std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders)
 {
+	
 	if(std::filesystem::exists(path)) {
 		for (const auto& entry : std::filesystem::directory_iterator(path))
 		{

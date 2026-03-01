@@ -21,6 +21,7 @@ int main() {
 	std::cout << "Ogre started : " << std::endl;
 
 	ResourceHandler::GetInstance()->getAllResources();
+
 	//ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
 
 	// Ogre AND ImGui
@@ -31,6 +32,8 @@ int main() {
 	// Ogre Overlay INIT
 	std::cout << "Initializing monster" << std::endl;
 	Monster* monster = new Monster(ctx.getRoot(),ctx.getRenderWindow(), ctx.getOverlaySystem(),imOverlay);
+	//setup materials to ogre
+
 
 	std::cout << "Initializing kint" << std::endl;
 	//Kint* kint = new Kint();
