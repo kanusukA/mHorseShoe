@@ -687,11 +687,28 @@ public:
 };
 
 
+enum TextureMapType {
+	DIFFUSE_MAP,
+	AO_MAP,
+	NORMAL_MAP,
+	EDGE_MAP,
+	HEIGHT_MAP,
+	SMOOTHNESS_MAP,
+	METALLIC_MAP
+};
 
+// hTexture hold the texture image path, loaded texture pointer and the texture position from which ShaderTexture can extract values
+struct hTexture {
+	std::filesystem::path imagePath;
+	Ogre::TexturePtr texturePtr;
+};
+
+// ShaderTexture does not hold the Texture it self but referes to it as multiple maps can be packed and extracted using this method
 struct ShaderTexture
 {
 	std::string textureName = "";
 	Ogre::TexturePtr texture = 0;
+	TextureMapType textureType;
 	int texturePosition; // Position of texture in Shader
 	
 };
