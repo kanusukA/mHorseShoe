@@ -4,6 +4,7 @@
 #define MEDIATOR_H
 
 //Local
+#include<Gui/GuiConsts.h>
 #include <GDHandler/Connector/MasterB.h>
 #include <Gui/GuiComponents/ToastComponent.h>
 
@@ -216,6 +217,10 @@ public:
 
 	void refreshImageTextures();
 
+	const char* getName() {
+		return name;
+	}
+
 	// USED TO INITALIZE PREDEFINED DATA AND VARIABLE OF THE COMPONENT
 	// USE THIS INSTED OF CONSTRUCTOR AS GDSOURCE IS INITALIZED AFTER THE OBJECT IS CREATED
 	virtual void init() {};
@@ -236,7 +241,14 @@ protected:
 	std::vector<ViewComponent*> Views = std::vector<ViewComponent*>();
 
 	ModelComponent* getModelByName(std::string name) {
-
+		for (int i = 0; i < Models.size(); i++)
+		{
+			if (Models[i]->getName() == name)
+			{
+				return Models[i];
+			}
+		}
+		return nullptr;
 	};
 	ModelComponent* getModelById(int id) {
 
@@ -300,6 +312,19 @@ public:
 	// MUST NOT BE RUN FROM OUTSIDE
 	// MODEL COMPONENTS MUST BE ADDED TO BE RENDERED
 	virtual void addModelComponent(ModelComponent* modelComponent) {};
+
+	// Notifier functions
+	void updateLoadCase() {
+		ModelComponent* model = getModelByName(GD_SCENE_TAB_MODEL_COMP_NAME);
+		if (model) {
+			model->selectCase(0);
+		}
+		else {
+			ToastComponent::GetInstance()->addMessage("Unable to fecth GUI_Model : " + std::string( GD_SCENE_TAB_MODEL_COMP_NAME));
+		}
+
+	}
+
 		
 
 };

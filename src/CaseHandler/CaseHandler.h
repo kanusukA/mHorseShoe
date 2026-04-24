@@ -37,7 +37,6 @@ public:
 	
 
 	// CASE FUNCTIONS
-
 	CaseHandler(Monster* monster) : GDBuilderContext(ResourceHandler::GetInstance(), monster) {
 		//stuffHandler = std::make_unique<StuffHandler>(monster, kint);
 		stuffHandler = new StuffHandler(monster);
@@ -69,7 +68,6 @@ public:
 	Ogre::TexturePtr fetchImageByName(std::filesystem::path imagePath_p);
 
 	//RenderMesh* CreateRenderMesh(std::filesystem::path path_p);
-	
 	Material* CreateMaterial( std::filesystem::path materialPath_p, std::string materialName);
 
 	// old method

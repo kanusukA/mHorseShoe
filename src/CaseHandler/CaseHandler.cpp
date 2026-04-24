@@ -257,6 +257,9 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 	
 	std::weak_ptr<Case> wCase = CreateCase(rlCase.name);
 
+	// notify GDNotifier that new csae has been create, which will trigger GUI update to reflect new case in the UI.
+	this->notifyLoadCase();
+
 	for (int scenesIndex = 0; scenesIndex < rlCase.Scenes.size(); scenesIndex++)
 	{
 		std::weak_ptr<Scene> wScene = wCase.lock()->attachNewSceneToRoot(rlCase.Scenes.at(scenesIndex).name,SceneType(rlCase.Scenes.at(scenesIndex).scnType));

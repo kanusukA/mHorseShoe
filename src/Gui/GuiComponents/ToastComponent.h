@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <mutex>
+#include <iostream>
 
 
 
@@ -32,8 +33,10 @@ protected:
 public:
 
 	void addMessage(std::string msg) {
+
 		if (!msg.empty())
 		{
+			std::cout << "Toast Message : " << msg << std::endl;
 			messages->push_back(msg);
 		}
 		

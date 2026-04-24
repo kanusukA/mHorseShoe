@@ -57,6 +57,8 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 
 	oScnManager->setAmbientLight(Ogre::ColourValue(0.53, 0.2, 0.12));
 	oScnManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
+
+	
 	
 
 	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);

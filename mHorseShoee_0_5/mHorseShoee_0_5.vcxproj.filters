@@ -111,9 +111,6 @@
     <ClCompile Include="..\src\Gui\GuiComponents\RSUSTabComponent.cpp">
       <Filter>Gui\GuiComponent</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Gui\GuiComponents\ScenePanel.cpp">
-      <Filter>Gui\GuiComponent</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Gui\GuiComponents\StatusTabComponent.cpp">
       <Filter>Gui\GuiComponent</Filter>
     </ClCompile>
@@ -173,6 +170,9 @@
     </ClCompile>
     <ClCompile Include="..\src\timer\glock.cpp">
       <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GDHandler\GDNotifierHandler.cpp">
+      <Filter>GDHandler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -248,9 +248,6 @@
     <ClInclude Include="..\src\Gui\GuiComponents\RSUSTabComponent.h">
       <Filter>Gui\GuiComponent</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Gui\GuiComponents\ScenePanel.h">
-      <Filter>Gui\GuiComponent</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Gui\GuiComponents\StatusTabComponent.h">
       <Filter>Gui\GuiComponent</Filter>
     </ClInclude>
@@ -307,6 +304,12 @@
     </ClInclude>
     <ClInclude Include="..\src\timer\glock.h">
       <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\GDHandler\GDNotifier.h">
+      <Filter>GDHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Gui\GuiConsts.h">
+      <Filter>Gui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,6 +7,7 @@
 #include <Gui/GuiComponents.h>
 
 
+
 // Components
 
 struct GUI_WINDOW_POS {
@@ -53,8 +54,8 @@ private:
 
 public:
 
-	Gui(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus, GDSystem* system_p) : 
-		GuiFramework(casehan, stuffhan,resourcehan, rsus,system_p) 
+	Gui(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
+		GuiFramework(casehan, stuffhan,resourcehan, rsus,casehan) 
 	{
 			
 	}

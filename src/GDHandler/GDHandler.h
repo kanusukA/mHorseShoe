@@ -33,14 +33,17 @@ public:
 
 		feel->initFeel(renderer->sdlWindow, keyHandler);
 
-
-		gui = new Gui(this, this->stuffHandler, ResourceHandler::GetInstance(), RSUS::GetInstance(),this);
+		gui = new Gui(this, this->stuffHandler, ResourceHandler::GetInstance(), RSUS::GetInstance());
 
 		gui->initGui(this->monster->imguiOverlay);
 
-		//this->setResources();
 
 	};
+
+	// NOTIFIER FUNCTIONS
+	virtual void notifyLoadCase() override;
+	virtual void notifySaveCase() override;
+
 
 	// RESOURCE WORK
 

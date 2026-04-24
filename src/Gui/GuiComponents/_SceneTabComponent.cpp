@@ -68,7 +68,7 @@ void SceneTabComponent::view()
 		{
 			for (int i = 0; i < ModelComponent::caseVec->size(); i++)
 			{
-				if (ImGui::Selectable(ModelComponent::caseVec->at(i)->getName().c_str(),scnTabModel->selectedCase == i))
+				if (ImGui::Selectable((ModelComponent::caseVec->at(i)->getName() + "##Cases_" + std::to_string(i)).c_str(), scnTabModel->selectedCase == i))
 				{
 					scnTabModel->selectedCase = i;
 					scnTabModel->selectCase(i);
@@ -103,7 +103,7 @@ void SceneTabComponent::view()
 		
 
 		ImGui::SameLine();
-		ImGui::Text(ModelComponent::selectedCase->selCase.lock()->getName().c_str());
+		ImGui::Text((ModelComponent::selectedCase->selCase.lock()->getName() + "##Selected_Case").c_str());
 
 
 		ImGui::Text("Selected Scene : ");
@@ -125,7 +125,7 @@ void SceneTabComponent::view()
 
 		ImGui::Text("Scene Name : ");
 		ImGui::SetNextItemWidth(180);
-		ImGui::InputText("", scnTabModel->inputSceneName);
+		ImGui::InputText("Scene Name", scnTabModel->inputSceneName);
 
 		// SCENE TYPE SELECTION
 		if (ImGui::RadioButton("Static", scnTabModel->scnType == SceneType::STATIC))

@@ -22,9 +22,7 @@ vertex_program horseMaterialVert hlsl
     default_params
     {
         param_named_auto worldviewproj worldviewproj_matrix
-        param_named_auto worldview worldview_matrix
-        
-        
+        param_named_auto worldview worldview_matrix  
          
     }
 }

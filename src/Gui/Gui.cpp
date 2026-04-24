@@ -2,6 +2,7 @@
 
 
 
+
 void Gui::initGui(Ogre::ImGuiOverlay* overlay) {
 
 	overlay->setZOrder(300);
@@ -45,10 +46,10 @@ void Gui::shutdown()
 void Gui::initGuiComponents()
 {
 	// Models
-	SceneTabModelComponent* scnTabModel = new SceneTabModelComponent("Scene tab Model");
+	SceneTabModelComponent* scnTabModel = new SceneTabModelComponent(GD_SCENE_TAB_MODEL_COMP_NAME);
 	this->addModelComponent(scnTabModel);
 
-	ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent("Resource Tab Model");
+	ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent(GD_RESOURCE_TAB_MODEL_COMP_NAME);
 	this->addModelComponent(resourceTabModel);
 
 	///*StatusTabModelComponent* statusModel = new StatusTabModelComponent("Status tab Model");
@@ -57,26 +58,26 @@ void Gui::initGuiComponents()
 	//AddTabModelComponent* addModel = new AddTabModelComponent("Add tab Model");
 	//this->addModelComponent(addModel);
 
-	ObjectTabModelComponent* objectModel = new ObjectTabModelComponent("Object tab Model");
+	ObjectTabModelComponent* objectModel = new ObjectTabModelComponent(GD_OBJECT_TAB_MODEL_COMP_NAME);
 	this->addModelComponent(objectModel);
 
 	//ScenePanelTabModelComponent* scenePanelModel = new ScenePanelTabModelComponent("Scene Panel tab Model");
 	//this->addModelComponent(scenePanelModel);
 
-	RSUSTabModelComponent* rsusModel = new RSUSTabModelComponent("Rsus tab Model");
+	RSUSTabModelComponent* rsusModel = new RSUSTabModelComponent(GD_RSUS_MODEL_COMP_NAME);
 	this->addModelComponent(rsusModel);
 
 	TestingTabModelComponent* testModel = new TestingTabModelComponent("Testing tab model");
 	this->addModelComponent(testModel);
 
-	ToastTabModelComponent* toastModel = new ToastTabModelComponent("Toast tab model");
+	ToastTabModelComponent* toastModel = new ToastTabModelComponent(GD_TOAST_MODEL_COMP_NAME);
 	this->addModelComponent(toastModel);
 
 	// Views
-	SceneTabComponent* scnTab = new SceneTabComponent("Scene Tab",scnTabModel);
+	SceneTabComponent* scnTab = new SceneTabComponent(GD_SCENE_TAB_VIEW_COMP_NAME,scnTabModel);
 	this->addViewComponent(scnTab);
 
-	ResourceTabComponent* resourceTab = new ResourceTabComponent("Resource Tab", resourceTabModel);
+	ResourceTabComponent* resourceTab = new ResourceTabComponent(GD_RESOURCE_TAB_VIEW_COMP_NAME, resourceTabModel);
 	this->addViewComponent(resourceTab);
 
 	///*StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
@@ -85,13 +86,13 @@ void Gui::initGuiComponents()
 	//AddTabComponent* addTab = new AddTabComponent("Add Tab", addModel);
 	//this->addViewComponent(addTab);
 
-	ObjectTabComponent* objectTab = new ObjectTabComponent("Object Tab", objectModel);
+	ObjectTabComponent* objectTab = new ObjectTabComponent(GD_OBJECT_TAB_VIEW_COMP_NAME, objectModel);
 	this->addViewComponent(objectTab);
 
 	//ScenePanelTabComponent* scenePanelTab = new ScenePanelTabComponent("Scene Panel Tab", scenePanelModel);
 	//this->addViewComponent(scenePanelTab);
 
-	RSUSTabComponent* rsusTab = new RSUSTabComponent("RSUS tab", rsusModel);
+	RSUSTabComponent* rsusTab = new RSUSTabComponent(GD_RSUS_COMP_NAME, rsusModel);
 	this->addViewComponent(rsusTab);
 
 	//HUDComponent* hudTab = new HUDComponent("Hud tab");
@@ -100,7 +101,7 @@ void Gui::initGuiComponents()
 	TestingTabComponent* testingTab = new TestingTabComponent("Test tab", testModel);
 	this->addViewComponent(testingTab);
 
-	ToastTabViewComponent* toastView = new ToastTabViewComponent("Toast tab", toastModel);
+	ToastTabViewComponent* toastView = new ToastTabViewComponent(GD_TOAST_COMP_NAME, toastModel);
 	this->addViewComponent(toastView);
 
 }

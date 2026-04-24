@@ -2,6 +2,8 @@
 
 #include <GDHandler/stuff/Stuff.h>
 
+#include <GDHandler/GDNotifier.h>
+
 struct SunWindowSize
 {
 	int* height = new int(0);
@@ -16,7 +18,7 @@ namespace GDSun {
 	};
 }
 
-class GDSystem {
+class GDSystem : public GDNotifier {
 
 protected:
 	SDL_Window* window;
@@ -30,7 +32,7 @@ protected:
 	
 
 public:
-	GDSystem(Monster* monster) {
+	GDSystem(Monster* monster) : GDNotifier() {
 		monster->InitMonster();
 
 		window = monster->sdlWindow;
