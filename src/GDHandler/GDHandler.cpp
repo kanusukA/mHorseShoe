@@ -101,7 +101,7 @@ void GDHandler::update(float deltatime)
 	// kint->updatePhysics(deltatime);
 
 	// updates Monster and Kint
-	stuffHandler->update(deltatime);
+	//stuffHandler->update(deltatime);
 
 	monster->updateMonster();
 

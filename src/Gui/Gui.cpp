@@ -67,8 +67,8 @@ void Gui::initGuiComponents()
 	RSUSTabModelComponent* rsusModel = new RSUSTabModelComponent(GD_RSUS_MODEL_COMP_NAME);
 	this->addModelComponent(rsusModel);
 
-	TestingTabModelComponent* testModel = new TestingTabModelComponent("Testing tab model");
-	this->addModelComponent(testModel);
+	/*TestingTabModelComponent* testModel = new TestingTabModelComponent("Testing tab model");
+	this->addModelComponent(testModel);*/
 
 	ToastTabModelComponent* toastModel = new ToastTabModelComponent(GD_TOAST_MODEL_COMP_NAME);
 	this->addModelComponent(toastModel);
@@ -98,8 +98,8 @@ void Gui::initGuiComponents()
 	//HUDComponent* hudTab = new HUDComponent("Hud tab");
 	//this->addViewComponent(hudTab);
 
-	TestingTabComponent* testingTab = new TestingTabComponent("Test tab", testModel);
-	this->addViewComponent(testingTab);
+	/*TestingTabComponent* testingTab = new TestingTabComponent("Test tab", testModel);
+	this->addViewComponent(testingTab);*/
 
 	ToastTabViewComponent* toastView = new ToastTabViewComponent(GD_TOAST_COMP_NAME, toastModel);
 	this->addViewComponent(toastView);

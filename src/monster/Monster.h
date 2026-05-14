@@ -19,6 +19,7 @@
 // STL headers
 #include <Windows.h>
 #include <random>
+#include <cons.h>
 
 
 const Ogre::String TRAY_SYSTEM_NAME = "Default_Tray_Man";
@@ -213,8 +214,8 @@ public:
 	Ogre::ManualObject* terrainObj;
 	Ogre::SceneNode* terrainScnNode;
 
-	Ogre::SceneNode* skySphere;
-	Ogre::SceneNode* skyHighNode;
+	Ogre::SceneNode* skySphere = nullptr;
+	Ogre::SceneNode* skyHighNode = nullptr;
 
 
 	Ogre::ManualObject* visualManualObj;
@@ -315,8 +316,6 @@ public:
 	void createGrass();
 
 	void setupTestTrack();
-
-	void getShaderVariables();
 
 
 	HWND* getHWND();

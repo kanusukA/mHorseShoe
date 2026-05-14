@@ -1142,7 +1142,7 @@ void Monster::deleteScnNode(Ogre::SceneNode* scnNode)
 }
 
 
-//DEPRICATED OGRE'S SDL INPUT SYSTEM IS USED AS VULKAN DOESN'T PROVIDE HWND
+//THE SETUP SDL3 Now Works with vulkan!
 void Monster::_setupSDL3(INT64 windowWidth, INT64 windowHeight, Ogre::String windowName) {
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -1152,10 +1152,11 @@ void Monster::_setupSDL3(INT64 windowWidth, INT64 windowHeight, Ogre::String win
 
 	HWND window = 0;
 
-	window = FindWindowA(NULL, "OGRE_HORESESHOE");
+	window = FindWindowA(NULL, INSTANCE_NAME);
 
 	if (!window) {
 		std::cout << std::endl << "Window was not found" << std::endl;
+		return;
 	}
 
 	SDL_PropertiesID props = SDL_CreateProperties();

@@ -46,11 +46,11 @@ public:
 		fragmentShader = std::make_unique<Shader>(GDBuilderCxt, material, ShaderType::Fragment);
 	}
 
-	const std::unique_ptr<Shader>& const getVertexShader() {
+	std::unique_ptr<Shader>& getVertexShader() {
 		return vertexShader;
 	}
 
-	const std::unique_ptr<Shader>& const getFragmentShader() {
+	std::unique_ptr<Shader>& getFragmentShader() {
 		return fragmentShader;
 	}
 
@@ -59,11 +59,11 @@ public:
 	void setTexture(int texturePosition_p, Ogre::TexturePtr tex_p);
 
 	void setCullingMode(Ogre::CullingMode culling_p);
-	const Ogre::CullingMode& const getCullingMode() {
+	Ogre::CullingMode&  getCullingMode() {
 		return culling;
 	}
 	void setWireFrameMode(bool mode_p);
-	const bool& const getWireFrameMode() {
+	bool& getWireFrameMode() {
 		return wireFrameMode;
 	}
 

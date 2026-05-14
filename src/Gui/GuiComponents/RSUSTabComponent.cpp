@@ -187,6 +187,7 @@ void RSUSTabComponent::view()
 						ModelComponent::selectedMaterial->selMaterial.lock()->setTexture(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition,
 							ModelComponent::imageTextures->at(selectedImage));
 					}
+
 				}
 
 				

@@ -33,6 +33,11 @@ void CaseHandler::checkIntegrity()
 }
 
 
+bool CaseHandler::resourceExists(std::string resourceName)
+{
+	return Ogre::ResourceGroupManager::getSingleton().resourceExistsInAnyGroup(resourceName);
+}
+
 std::weak_ptr<Case> CaseHandler::CreateCase(std::string caseName_p)
 {
 	std::shared_ptr<Case> sCase = std::make_shared<Case>(this,caseName_p);
@@ -97,6 +102,12 @@ Ogre::MeshPtr CaseHandler::fetchMeshByName(std::filesystem::path meshPath_p)
 			return meshVec->at(i)->getMesh();
 		}
 	}*/
+
+	/*if (resourceExists(meshPath_p.filename().string()))
+	{
+		ToastComponent::GetInstance()->addMessage("Resource : " + meshPath_p.filename().string() + " already exists!");
+		return nullptr;
+	}*/
 	
 	// Create if it does not exist
 	this->monSetLocation(meshPath_p.parent_path(), OGRE_MESH_GROUP);
@@ -127,7 +138,15 @@ Ogre::TexturePtr CaseHandler::fetchImageByName(std::filesystem::path imagePath_p
 	this->monSetLocation(imagePath_p.parent_path(), OGRE_TEXTURE_GROUP);
 	this->monster->initalizeResourceGroup(OGRE_TEXTURE_GROUP);
 
+	if (resourceExists(imagePath_p.filename().string()))
+	{
+		ToastComponent::GetInstance()->addMessage("Resource : " + imagePath_p.filename().string() + " already exists!");
+		return nullptr;
+	}
+
+
 	return this->monGetTexture(imagePath_p.filename().string());
+
 
 }
 
@@ -147,6 +166,7 @@ Material* CaseHandler::CreateMaterial(std::filesystem::path materialPath_p, std:
 	//		return mat;
 	//	}
 	//}
+
 
 	// if not stored
 	//this->monSetLocation(materialPath_p.parent_path(), OGRE_MATERIAL_GROUP);

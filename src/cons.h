@@ -6,7 +6,7 @@
 
 constexpr const char* WINDOW_NAME = "Psycho";
 
-constexpr const char* INSTANCE_NAME = "OGRE_HORESESHOE";
+constexpr const char* INSTANCE_NAME = "OGRE_HORESESHOE_CMAKE";
 
 constexpr const char* TRAYS_INSTANCE_NAME = "OGRE_HORESESHOE";
 

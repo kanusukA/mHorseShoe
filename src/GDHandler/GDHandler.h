@@ -85,29 +85,29 @@ public:
 
 
 // Mediator implementation
-class GDMediator : public Mediator {
-private:
-	StuffHandler* stuffHandler = nullptr;
-
-public:
-
-	GDMediator(StuffHandler* stuff) {
-		stuffHandler = stuff;
-	}
-
-	// Initalises GuiComponents and there values
-	void initGuiComponents(MediatorComponent* component,InitEvents events);
-
-	void NotifyView(InitEvents componentType, int compFuncEvent) const override {
-
-	}
-
-	void Notify(MediatorComponent* component, std::string event) const override {
-
-	}
-
-
-};
+//class GDMediator : public Mediator {
+//private:
+//	StuffHandler* stuffHandler = nullptr;
+//
+//public:
+//
+//	GDMediator(StuffHandler* stuff) {
+//		stuffHandler = stuff;
+//	}
+//
+//	// Initalises GuiComponents and there values
+//	void initGuiComponents(MediatorComponent* component,InitEvents events);
+//
+//	void NotifyView(InitEvents componentType, int compFuncEvent) const override {
+//
+//	}
+//
+//	void Notify(MediatorComponent* component, std::string event) const override {
+//
+//	}
+//
+//
+//};
 
 #endif // !GDHANDLER_H
 

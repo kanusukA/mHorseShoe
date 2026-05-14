@@ -21,7 +21,6 @@ protected:
 	void checkIntegrity();
 
 
-
 public:
 	StuffHandler* stuffHandler;
 	Ogre::SceneManager* oScnManager;
@@ -43,6 +42,7 @@ public:
 		oScnManager = monster->oScnManager;
 
 	};
+
 	// Used to start CaseHandler with a predefined case as the program starts
 	CaseHandler(Monster* monster, Case* case_p) : GDBuilderContext(ResourceHandler::GetInstance(), monster) {
 
@@ -51,6 +51,8 @@ public:
 		oScnManager = monster->oScnManager;
 
 	};
+
+	bool resourceExists(std::string resourceName);
 
 
 	std::vector<std::shared_ptr<Case>>* fetchAllCases() { return caseVec; }
@@ -64,8 +66,8 @@ public:
 	// DEPENDENT RESOURCE
 	Ogre::MeshPtr fetchMeshByName(std::filesystem::path meshPath_p) override;
 	Ogre::MeshPtr fetchMeshById(ResID meahID_p) override;
-
 	Ogre::TexturePtr fetchImageByName(std::filesystem::path imagePath_p);
+
 
 	//RenderMesh* CreateRenderMesh(std::filesystem::path path_p);
 	Material* CreateMaterial( std::filesystem::path materialPath_p, std::string materialName);
@@ -97,7 +99,7 @@ class CaseErrorHandler : public std::exception {
 
 public:
 
-	CaseErrorHandler(const char* what) : std::exception(what) {
-	}
+//	CaseErrorHandler(const char* what) : std::exception(what) {
+//	}
 
 };

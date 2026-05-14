@@ -56,15 +56,15 @@ public:
 		
 	}
 
-	const std::weak_ptr<Material> const getwMaterial() {
+	const std::weak_ptr<Material> getwMaterial() {
 		return sMaterial;
 	}
 
-	const std::string const getMeshName() {
+	const std::string getMeshName() {
 		return entity->getMesh().get()->getName();
 	}
 
-	const std::string const getMeshMaterialName() {
+	const std::string getMeshMaterialName() {
 		return entity->getMesh().get()->getSubMesh(0)->getMaterialName();
 	}
 

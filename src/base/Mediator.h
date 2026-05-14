@@ -14,7 +14,8 @@
 
 //STL
 //#include <string>
-
+#include <ShObjIdl.h>
+#include <atlbase.h>
 
 
 // CODE CLEAN UP SHIFT TO NEW GUI FRAMEWORK!!
@@ -34,7 +35,7 @@ private:
 
 protected:
 
-	GuiFramework* guiFramework;
+	GuiFramework* guiFramework = nullptr;
 
 	bool show = true;
 	int id = 0;
@@ -43,8 +44,9 @@ protected:
 
 public:
 
-	ViewComponent(const char* name_p) {
+	ViewComponent(const char* name_p,GuiFramework* framework = nullptr) {
 		name = name_p;
+		guiFramework = framework;
 	}
 
 	// FRAMEWORK METHOD! NOT TO BE USED OUTSIDE
@@ -80,6 +82,13 @@ struct SelectedMaterial
 };
 
 
+// USED TO HANDLE FILE DIALOG 
+struct ComInit
+{
+	ComInit() { CoInitialize(nullptr); }
+	~ComInit() { CoUninitialize(); }
+};
+
 
 // GDSource - IT IS THE CONNECTOR CLASS FOR THE GUI FRAMEWORK.
 // IT PROVIDES ACCESS TO OTHER PARTS OF THE SOFTWARE/
@@ -98,6 +107,9 @@ protected:
 	RSUS* shaderHandler = nullptr;
 	GDSystem* system = nullptr;
 
+	// FILE DIALOG
+	CComPtr<IFileDialog> fileDialog;
+
 	//PlayerObserver* playerObserver = nullptr;
 
 public:
@@ -110,6 +122,24 @@ public:
 		//this->feel = feelhan;
 		this->shaderHandler = rsus;
 		this->system = system_p;
+
+
+		// initalize the file dialog COM library
+		ComInit com;
+		
+		fileDialog.CoCreateInstance(CLSID_FileOpenDialog);
+
+		FILEOPENDIALOGOPTIONS opt{};
+		
+		fileDialog->GetOptions(&opt);
+		fileDialog->SetOptions(opt | FOS_PICKFOLDERS | FOS_PATHMUSTEXIST | FOS_FORCEFILESYSTEM);
+
+		// SETS DEFUALT FOLDER TO THE SOURCE DIR.
+		CComPtr<IShellItem> psi;
+
+		SHCreateItemFromParsingName(this->resourceHandler->SourceDir.wstring().c_str(), nullptr, IID_PPV_ARGS(&psi));
+		fileDialog->SetFolder(psi);
+
 	};
 
 	CaseHandler* getCaseHandler() {
@@ -132,6 +162,34 @@ public:
 		return system;
 	}
 
+	std::string openFolderSelectionDialog() {
+		
+		if (SUCCEEDED( fileDialog.p->Show(nullptr) ))
+		{
+			
+
+			CComPtr<IShellItem> pSelectedItem;
+			fileDialog->GetResult(&pSelectedItem);
+
+			CComHeapPtr<wchar_t> pPath;
+			pSelectedItem->GetDisplayName(SIGDN_FILESYSPATH, &pPath);
+			
+			size_t size = wcstombs(nullptr, pPath.m_pData, 0);
+			std::vector<char> buffer(size + 1);
+			// Perform conversion
+			wcstombs(buffer.data(), pPath.m_pData, size);
+			std::string str(buffer.data());
+			
+
+			std::wcout << L"Selected folder: " << pPath.m_pData << std::endl;
+
+			return str;
+
+		}
+
+		return "";
+
+	}
 };
 
 class ModelComponent {
@@ -192,6 +250,10 @@ public:
 
 		savedCaseFiles = gdSource->getResourceHandler()->getSavedCaseFiles();
 
+	}
+
+	std::string openFolderSelection() {
+		return gdSource->openFolderSelectionDialog();
 	}
 
 	// SETTERS
@@ -301,8 +363,6 @@ public:
 		float4[3] = vec4_p[3];
 	}
 
-	ImVec2 fetchScreenSize();
-
 	// RUNS AT INIT, USED DURING THE CREATION OF VIEW COMPONENTS
 	// MUST NOT BE RUN FROM OUTSIDE
 	// VIEW COMPONENTS MUST BE ADDED TO BE RENDERED!
@@ -328,11 +388,6 @@ public:
 		
 
 };
-
-
-
-void imGuiVec3Viewer(std::string label, Ogre::Vector3 vec3_p, Ogre::Vector3* output_p = nullptr);
-void imGuiVec4Viewer(std::string label, Ogre::Vector4 vec4_p, Ogre::Vector4* output_p = nullptr);
 
 
 // DEPRICATED STUFF ----------------------------------------------------------------------------------------------------------------
