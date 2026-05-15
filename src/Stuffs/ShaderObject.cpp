@@ -4,19 +4,29 @@
 void Shader::_initShader(Ogre::MaterialPtr mat_p)
 {
 
-	if(mat_p.get()->getTechnique(0)->getPass(0)->hasVertexProgram()){
+	// SET TECHNIQUE TO 0 IF USING HLSL PROGRAMMING.
+	// SET TECHNIQUE TO 1 IF USING GLSL PROGRAMMING. (I CREATE SECOND TECHNIQUE FOR GLSL PROGRAMS, WITH THE SAME SHADER VARS, BUT WITH GLSL SOURCE FILES INSTEAD OF HLSL) 
+	int technique = mat_p.get()->getTechniques().size() > 1 ? 1 : 0;
+
+	if(mat_p.get()->getTechnique(technique)->getPass(0)->hasVertexProgram()){
 		switch (shaderType)
 		{
 		case Vertex:
-			shader = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgramParameters(); // humm
-			this->ShaderName = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgramName();
-			this->fileName = mat_p.get()->getTechnique(0)->getPass(0)->getVertexProgram().get()->getSourceFile();
+			mat_p.get()->getTechnique(technique)->getPass(0)->getFragmentProgramParameters().get()->getSharedParameters();
+			shaderParams = mat_p.get()->getTechnique(technique)->getPass(0)->getVertexProgramParameters(); // humm
+			shaderProgram = mat_p.get()->getTechnique(technique)->getPass(0)->getVertexProgram();	
+			this->ShaderName = mat_p.get()->getTechnique(technique)->getPass(0)->getVertexProgramName();
+			this->fileName = mat_p.get()->getTechnique(technique)->getPass(0)->getVertexProgram().get()->getSourceFile();
 			
 			break;
+
 		case Fragment:
-			shader = mat_p.get()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-			this->ShaderName = mat_p.get()->getTechnique(0)->getPass(0)->getFragmentProgramName();
-			this->fileName = mat_p.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();
+			
+			shaderParams = mat_p.get()->getTechnique(technique)->getPass(0)->getFragmentProgramParameters();
+			shaderProgram = mat_p.get()->getTechnique(technique)->getPass(0)->getFragmentProgram();
+			this->ShaderName = mat_p.get()->getTechnique(technique)->getPass(0)->getFragmentProgramName();
+			this->fileName = mat_p.get()->getTechnique(technique)->getPass(0)->getFragmentProgram().get()->getSourceFile();
+
 			break;
 		default:
 			break;
@@ -31,13 +41,17 @@ void Shader::_initShader(Ogre::MaterialPtr mat_p)
 
 }
 
+
 void Shader::_setShaderVars()
 {
+	std::cout << "LOAD SHADER STARTED!" << this->fileName << std::endl;
+
 	std::filesystem::path shaderLoc = ResourceHandler::GetInstance()->fetchLocByFileName(this->fileName,ResourceLoaderEnums::Shaders);
 
+	// TODO ADD AUTO SWITCH BETWEEN GLSL AND HLSL READER
 	//Reading Shader File
-	ResourceHandler::GetInstance()->readShaderFile(shaderLoc, this->ShaderParameters);
-
+	//ResourceHandler::GetInstance()->readShaderFile(shaderLoc, this->ShaderParameters);
+	ResourceHandler::GetInstance()->readGLSLShaderFile(shaderLoc, this->ShaderParameters);
 	// Implement a system by which shader value can be integrated at initialization!
 
 
@@ -100,7 +114,7 @@ void Shader::loadShaderVar(std::vector<ShaderVar> vars_p)
 		}
 	}
 
-	GDBuilderCxt->monSetShaderVars(vars_p, shader);
+	GDBuilderCxt->monSetShaderVars(vars_p, shaderParams);
 	// try this
 
 }

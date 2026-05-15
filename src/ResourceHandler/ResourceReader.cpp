@@ -47,6 +47,7 @@ std::string ResourceReader::readMaterialName(std::filesystem::path mat_path_p)
 
 }
 
+// HLSL SPECIFIC!
 void ResourceReader::readShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p)
 {
 	
@@ -162,6 +163,114 @@ void ResourceReader::readShaderFile(std::filesystem::path shaderPath_p, std::vec
 				}
 			}
 
+		}
+	}
+
+	inStream.close();
+
+
+}
+
+void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p)
+{
+
+	if (inStream.is_open())
+	{
+		inStream.close();
+	}
+
+
+	inStream.open(shaderPath_p);
+	std::string line;
+
+	std::string word = "";
+
+	bool OgreUniformsFound = false;
+	int type;
+
+	ShaderVar shaderVar = ShaderVar();
+
+	if (inStream.is_open()) {
+		while (std::getline(inStream, line))
+		{
+			//std::cout << line << std::endl;
+			if (!OgreUniformsFound && line.find("OgreUniforms") != std::string::npos)
+			{
+				OgreUniformsFound = true;
+				continue;
+			}
+
+			if (OgreUniformsFound && line.find("}") != std::string::npos)
+			{
+				break;
+			}
+
+			if (OgreUniformsFound)
+			{
+				// ltrim
+				line.erase(line.begin(), std::ranges::find_if_not(line, [](unsigned char c) {
+					return std::isspace(c);
+				}));
+				// rtrim
+				line.erase(std::find_if_not(line.rbegin(), line.rend(), [](unsigned char c) {
+					return std::isspace(c);
+					}).base(), line.end());
+
+				if (line.length() == 0 || line.at(0) == '/') 
+				{
+					//comment line hit.
+					continue;
+				}
+
+				std::string type = line.substr(0, line.find_first_of(' '));
+
+				std::string name = line.substr(line.find_first_of(' ') + 1, line.find_first_of(';') - line.find_first_of(' ') - 1);
+
+				std::cout << "Name : " << name << " Type : " << type << std::endl;
+
+				if (type == "int")
+				{
+					shaderVar.varType = ShaderVarType::INTEGER;
+					*shaderVar.varInt = 0;
+					
+				}
+				else if (type == "float")
+				{
+					shaderVar.varType = ShaderVarType::FLOAT0;
+					shaderVar.varFloat = new float(0.0);
+				}
+				else if (type == "vec2")
+				{
+					shaderVar.varType = ShaderVarType::FLOAT2;
+					shaderVar.varFloat2[0] = 0.0f;
+					shaderVar.varFloat2[1] = 0.0f;
+				}
+				else if (type == "vec3")
+				{
+					shaderVar.varType = ShaderVarType::FLOAT3;
+					shaderVar.varFloat3[0] = 0.0f;
+					shaderVar.varFloat3[1] = 0.0f;
+					shaderVar.varFloat3[2] = 0.0f;
+				}
+				else if (type == "vec4")
+				{
+					shaderVar.varType = ShaderVarType::FLOAT4;
+					shaderVar.varFloat4[0] = 0.0f;
+					shaderVar.varFloat4[1] = 0.0f;
+					shaderVar.varFloat4[2] = 0.0f;
+					shaderVar.varFloat4[3] = 0.0f;
+				}
+				else {
+					ToastComponent::GetInstance()->addMessage("invalid type : " + type + " in shader file : " + shaderPath_p.string());
+					continue;
+				}
+
+				shaderVar.varName = name;
+				output_p->push_back(shaderVar);
+				shaderVar = ShaderVar();
+				
+			}
+			
 		}
 	}
 

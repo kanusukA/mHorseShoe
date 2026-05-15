@@ -378,6 +378,9 @@ void ResourceHandler::loadResources()
 {
 	this->loadMaterialsDp(this->MaterialDp, ".material", false, true);
 	this->loadShadersDp(this->ShaderDp, ".hlsl", true, true);
+	this->loadShadersDp(this->ShaderDp, ".glsl", true, true);
+	this->loadShadersDp(this->ShaderDp, ".vert", true, true);
+	this->loadShadersDp(this->ShaderDp, ".frag", true, true);
 	this->loadMeshesDp(this->MeshDp);
 	this->loadTexturesDp(this->TextureDp, ".png");
 	this->loadTexturesDp(this->TextureDp, ".jpg");
@@ -416,7 +419,7 @@ std::filesystem::path ResourceHandler::fetchLocByFileName(std::string filename_p
 				return group->at(i);
 			}
 		}
-		ToastComponent::GetInstance()->addMessage("No such filename exists");
+		ToastComponent::GetInstance()->addMessage("No such filename exists : " + filename_p);
 	}
 	else {
 		ToastComponent::GetInstance()->addMessage("Unable to find group");

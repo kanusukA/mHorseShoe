@@ -138,13 +138,7 @@ Ogre::TexturePtr CaseHandler::fetchImageByName(std::filesystem::path imagePath_p
 	this->monSetLocation(imagePath_p.parent_path(), OGRE_TEXTURE_GROUP);
 	this->monster->initalizeResourceGroup(OGRE_TEXTURE_GROUP);
 
-	if (resourceExists(imagePath_p.filename().string()))
-	{
-		ToastComponent::GetInstance()->addMessage("Resource : " + imagePath_p.filename().string() + " already exists!");
-		return nullptr;
-	}
-
-
+	// Duplicate Resource is checked!
 	return this->monGetTexture(imagePath_p.filename().string());
 
 
@@ -171,6 +165,11 @@ Material* CaseHandler::CreateMaterial(std::filesystem::path materialPath_p, std:
 	// if not stored
 	//this->monSetLocation(materialPath_p.parent_path(), OGRE_MATERIAL_GROUP);
 	Ogre::MaterialPtr ogreMaterial = monCreateMaterial(resourceHandler->readMaterialName(materialPath_p));
+
+	if (ogreMaterial.isNull())
+	{
+		return nullptr;
+	}
 	/*std::unique_ptr<Material> uMat = std::make_unique<Material>(this, ogreMaterial);
 	materialVec->push_back(std::move(uMat));*/
 
@@ -290,20 +289,23 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 
 			std::weak_ptr<Object> wObj =  wScene.lock()->attachNewObject(obj.name, obj.mesh.filepath, PhysXType(obj.ObjectPhysxType));
 
-			wObj.lock()->setMaterial(obj.material.materialFilePath, obj.material.name);
-			ToastComponent::GetInstance()->addMessage("culling - " + std::to_string(obj.material.culling));
-			wObj.lock()->getwMaterial().lock()->setCullingMode(obj.material.culling);
-			wObj.lock()->getwMaterial().lock()->setWireFrameMode(obj.material.wireframe);
-
-			if (!obj.material.vertShader.shaderVars.empty())
+			if (wObj.lock()->setMaterial(obj.material.materialFilePath, obj.material.name))
 			{
-				wObj.lock()->getwMaterial().lock()->getVertexShader()->loadShaderVar(obj.material.vertShader.shaderVars);
+				ToastComponent::GetInstance()->addMessage("culling - " + std::to_string(obj.material.culling));
+				wObj.lock()->getwMaterial().lock()->setCullingMode(obj.material.culling);
+				wObj.lock()->getwMaterial().lock()->setWireFrameMode(obj.material.wireframe);
+
+				if (!obj.material.vertShader.shaderVars.empty())
+				{
+					wObj.lock()->getwMaterial().lock()->getVertexShader()->loadShaderVar(obj.material.vertShader.shaderVars);
+				}
+
+				if (!obj.material.fragShader.shaderVars.empty())
+				{
+					wObj.lock()->getwMaterial().lock()->getFragmentShader()->loadShaderVar(obj.material.fragShader.shaderVars);
+				}
 			}
 			
-			if (!obj.material.fragShader.shaderVars.empty())
-			{
-				wObj.lock()->getwMaterial().lock()->getFragmentShader()->loadShaderVar(obj.material.fragShader.shaderVars);
-			}
 
 		}
 

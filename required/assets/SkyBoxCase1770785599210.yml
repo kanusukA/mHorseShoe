@@ -1,0 +1,108 @@
+CASE_NAME: SkyBoxCase
+SCENES:
+  - SCENE_NAME: SkyBoxScn
+    TYPE: 0
+    POSITION: [0, 0, 0]
+    ORIENTATION: [0, 0, 0, 0]
+    SCALE: [1000, 1000, 1000]
+    OBJECTS:
+      - OBJECT_NAME: Sphere_up_obj
+        OBJECT_TYPE: 0
+        MASS: 0
+        RENDER_MESH: Sphere_up_obj
+        MESH_PATH: C:\Users\lenovo\source\repos\mHoreshoe_2\x64\assets\meshes\RenderMeshes\Sphere_up.mesh
+        MATERIAL:
+          MATERIAL_NAME: Sphere_up_mat
+          WIREFRAME: false
+          CULLING: 1
+          FILE_PATH: C:\Users\lenovo\source\repos\mHoreshoe_2\x64\assets\meshes\Materials\MySkyHighMaterial\mySkyHigh.material
+          VERTEX:
+            - SHADER_NAME: this
+              KEY: 0
+              SHADER_TYPE: 1
+            - SHADER_NAME: that
+              KEY: 0
+              SHADER_TYPE: 1
+          FRAGMENT:
+            - SHADER_NAME: time
+              KEY: 0
+              SHADER_TYPE: 1
+            - SHADER_NAME: windSpeed
+              KEY: 0.156000003
+              SHADER_TYPE: 1
+            - SHADER_NAME: baseColor
+              KEY: [0.173999995, 0.25999999, 0.564999998, 0.564999998]
+              SHADER_TYPE: 4
+            - SHADER_NAME: highlightCol
+              KEY: [0.34799999, 0.34799999, 0, 0]
+              SHADER_TYPE: 4
+            - SHADER_NAME: highlightOffset
+              KEY: 0.386000007
+              SHADER_TYPE: 1
+            - SHADER_NAME: highlightSmoothness
+              KEY: 0.123000003
+              SHADER_TYPE: 1
+            - SHADER_NAME: middleColor
+              KEY: [0.217999995, 0.0869999975, 0.477999985, 0.477999985]
+              SHADER_TYPE: 4
+            - SHADER_NAME: middleOffset
+              KEY: 0.418000013
+              SHADER_TYPE: 1
+            - SHADER_NAME: middleSmoothness
+              KEY: 0.156000003
+              SHADER_TYPE: 1
+            - SHADER_NAME: coreColor
+              KEY: [0.65200001, -0.261000007, 0.65200001, 0.65200001]
+              SHADER_TYPE: 4
+            - SHADER_NAME: coreOffset
+              KEY: 0.442000002
+              SHADER_TYPE: 1
+            - SHADER_NAME: coreSmoothness
+              KEY: 0.196999997
+              SHADER_TYPE: 1
+            - SHADER_NAME: bumpOffset
+              KEY: 0
+              SHADER_TYPE: 1
+            - SHADER_NAME: bumpRange
+              KEY: 0
+              SHADER_TYPE: 1
+            - SHADER_NAME: bumpHeight
+              KEY: 0
+              SHADER_TYPE: 1
+            - SHADER_NAME: starsOffset
+              KEY: 0.123000003
+              SHADER_TYPE: 1
+            - SHADER_NAME: farFogCol
+              KEY: [0.217999995, 0, 0.130999997, 0.130999997]
+              SHADER_TYPE: 4
+            - SHADER_NAME: farFogOffset
+              KEY: 0.467000008
+              SHADER_TYPE: 1
+            - SHADER_NAME: farFogSmoothness
+              KEY: 0.230000004
+              SHADER_TYPE: 1
+  - SCENE_NAME: GridScn
+    TYPE: 0
+    POSITION: [0, 0, 0]
+    ORIENTATION: [0, 0, 0, 0]
+    SCALE: [1, 1, 1]
+    OBJECTS:
+      - OBJECT_NAME: GridObj
+        OBJECT_TYPE: 0
+        MASS: 0
+        RENDER_MESH: GridObj
+        MESH_PATH: C:\Users\lenovo\source\repos\mHoreshoe_2\x64\assets\meshes\RenderMeshes\GridPlane.mesh
+        MATERIAL:
+          MATERIAL_NAME: GridFMat
+          WIREFRAME: false
+          CULLING: 2
+          FILE_PATH: C:\Users\lenovo\source\repos\mHoreshoe_2\x64\assets\meshes\Materials\GridFwidthMaterial\gridfWidth.material
+          VERTEX:
+            []
+          FRAGMENT:
+            - SHADER_NAME: cameraPos
+              KEY: [0, 0, 0]
+              SHADER_TYPE: 3
+            - SHADER_NAME: scale
+              KEY: 350
+              SHADER_TYPE: 1

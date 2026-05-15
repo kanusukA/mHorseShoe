@@ -3,17 +3,25 @@
 inline int ImageComboView(int index) {
 	int selValue = -1;
 	if(!ModelComponent::imageTextures->empty()){
-		if (ImGui::BeginCombo(("Images##" + std::to_string(index)).c_str(), ModelComponent::imageTextures->at(0)->getName().c_str()))
-		{
-			for (int imageIndex = 0; imageIndex < ModelComponent::imageTextures->size(); imageIndex++)
-			{
-				if (ImGui::Selectable(ModelComponent::imageTextures->at(imageIndex)->getName().c_str(), false))
-				{
-					selValue = imageIndex;
-				}
-			}
-			ImGui::EndCombo();
+		if(ModelComponent::imageTextures->at(0) == nullptr){
+			ImGui::Text("No images found.");
+			return selValue;
 		}
+		else {
+			if (ImGui::BeginCombo(("Images##" + std::to_string(index)).c_str(), ModelComponent::imageTextures->at(0)->getName().c_str()))
+			{
+				for (int imageIndex = 0; imageIndex < ModelComponent::imageTextures->size(); imageIndex++)
+				{
+					if (ImGui::Selectable(ModelComponent::imageTextures->at(imageIndex)->getName().c_str(), false))
+					{
+						selValue = imageIndex;
+					}
+				}
+				ImGui::EndCombo();
+			}
+		}
+
+		
 		
 	}
 	return selValue;

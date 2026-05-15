@@ -1,9 +1,9 @@
-struct VSInput
-{
-    float4 pos : POSITION;
-    float4 uv : TEXCOORD0;
-   // uint vertID : SV_VertexID;
-};
+// struct VSInput
+// {
+    
+//     float4 uv : TEXCOORD0;
+//    // uint vertID : SV_VertexID;
+// };
 
 
 struct VSOutput
@@ -20,10 +20,11 @@ struct VSOutput
 //    { 0.5, 0.0, -0.5, 1.0}
 //};
 
+float4x4 worldViewProj;
 
 VSOutput mainVS(
-    VSInput input,
-    uniform float4x4 worldViewProj
+    float4 pos : SV_POSITION,
+    float4 tex : TEXCOORD0
     //uniform float gridSize
 
 ){

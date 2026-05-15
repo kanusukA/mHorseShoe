@@ -91,6 +91,7 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	mRayScnQuery->setQueryMask(~QueryMask::SKY & ~QueryMask::GRID);
 	
 
+
 //	inputkeys = InputHandler::GetInstance()->getInputKeys();
 
 	imguiOverlay = imguiOverlay_p;
@@ -201,6 +202,11 @@ Ogre::Mesh* Monster::getColliderMesh(Ogre::String meshName, Ogre::String groupNa
 Ogre::MaterialPtr Monster::getMaterial(Ogre::String matName_p, Ogre::String groupName)
 {
 	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(matName_p,groupName);
+	if (mat.isNull())
+	{
+		ToastComponent::GetInstance()->addMessage("Material " + matName_p + " not found in group " + groupName);
+		return nullptr;
+	}
 	if (!mat.get()->isLoaded())
 	{
 		mat.get()->load();
@@ -226,8 +232,12 @@ Ogre::SceneNode* Monster::addToScnNode(Ogre::String meshName, Ogre::SceneNode* t
 
 Ogre::TexturePtr Monster::getImageTexture(std::string textureName, Ogre::String groupName)
 {
-	Ogre::TexturePtr texture = Ogre::TextureManager::getSingleton().load(textureName, groupName);
-	return texture;
+	if (!Ogre::TextureManager::getSingleton().resourceExists(textureName))
+	{
+		return Ogre::TextureManager::getSingleton().load(textureName, groupName);
+	}
+		
+	return Ogre::TextureManager::getSingleton().getByName(textureName);
 }
 
 Ogre::SceneNode* Monster::loadMeshScnNodeFromEnt(Ogre::String scnNodeName, Ogre::Entity* ent)
@@ -1205,8 +1215,11 @@ void Monster::windowUpdate()
 
 void Monster::_setupRTShader() {
 	Ogre::RTShader::ShaderGenerator* rtGen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+	rtGen->setTargetLanguage("glslang");
 	rtGen->addSceneManager(oScnManager);
+	
 }
+
 
 
 void Monster::_loadResource()
@@ -1415,7 +1428,6 @@ void RSUS::readMaterial(Ogre::String matName , Ogre::String objectName)
 
 
 	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(matName);
-
 
 	Ogre::String fragProgramName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getName();
 	Ogre::String fragProgramFileName = mat.get()->getTechnique(0)->getPass(0)->getFragmentProgram().get()->getSourceFile();

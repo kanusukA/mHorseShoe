@@ -93,6 +93,8 @@ public:
 	/*void saveMaterial();
 	void saveShader();*/
 
+	void unload() {};
+
 };
 
 class CaseErrorHandler : public std::exception {
