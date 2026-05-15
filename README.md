@@ -42,21 +42,29 @@ An custom implementation of **BRDF** (Bidirectional Reflectance Distribution Fun
 
 # Installation
 
-The project **NO LONGER USES** cmake as its buildsystem. (cmake will be implemented in future build) <br>
-Manual setup is required to build this project, as such refer to build guides and setup instructions of respective dependencies.
+## NOTE : THIS IS AN HOBBY PROJECT. RECOMMENDING MHORSESHOE FOR DEVELOPMENT IS LIKE RECOMMENDING CANCER.
+
+The project uses cmake as its build system. 
+Dependencies are installed in the build EXCEPT FOR FREEIMAGE, install that independently.
+
+It is highly recommanded to set RelWithDebInfo Build type, Ogre has a hard time managing debug build.
+
+Ogre is an very integrated part of mHorseshoee but it will be removed in far future due to its mind numbing build.
 
 ## Dependencies
 <ul>
   <li> <a href="https://github.com/OGRECave/ogre">OGRE</a> </li>
   <li> <a href="https://github.com/ocornut/imgui">ImGui</a> </li>
   <li> <a href="https://github.com/libsdl-org/SDL">SDL</a> </li>
+  <li> <a href="https://vulkan.lunarg.com/sdk/home">VULKAN SDK</a> </li>
+  <li> <a href="https://freeimage.sourceforge.io/">FREEIMAGE</a> This is temporary dependency (Codec_STBI in OGRE is not working in this build) </li>
   <li> <s>PHYSX</s> </li>
 </ul>
 <br>
 Imgui is optional as its installed along with OGRE.
 SDL2 is also installed with OGRE but the project is built using SDL3, as such SDL3 is recommended. <br>
 
-After cloning the repo and setting up headers , libs and dlls. The program requires an **asset** folder (provided in the repo) to exists in a directory previous to the executables directory.(This is the recommended way but other path setup can be used) <br>
+The program requires an **asset** folder (provided in the repo) <br>
 During the first launch, in the Resource Tab enter the directories in load path. Note some load paths search recursively and some don't.
 A restart is required for the load path directories to take effect.
 
