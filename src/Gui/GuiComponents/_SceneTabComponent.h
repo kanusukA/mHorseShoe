@@ -13,7 +13,6 @@ public:
 
 	int selectedSavedCaseFile = 0;
 
-
 	std::string* inputSceneName = new std::string("");
 	SceneType scnType = SceneType::STATIC;
 
@@ -99,6 +98,16 @@ public:
 		{
 			inputCaseName->clear();
 			inputCaseName->append(ModelComponent::selectedCase->selCase.lock()->getName());
+		}
+		if (!ModelComponent::selectedScene->selScene.expired())
+		{
+			inputSceneName->clear();
+			inputSceneName->append(ModelComponent::selectedScene->selScene.lock()->getName());
+		}
+		if (!ModelComponent::selectedObject->selObject.expired())
+		{
+			inputObjectname->clear();
+			inputObjectname->append(ModelComponent::selectedObject->selObject.lock()->getMeshName());
 		}
 	}
 	

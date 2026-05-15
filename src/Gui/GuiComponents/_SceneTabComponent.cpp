@@ -47,6 +47,8 @@ void SceneTabComponent::view()
 	ImGui::SetNextWindowSize(ImVec2(350, 600));
 	ImGui::Begin("Cases",0,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
+	ImGui::BeginChild("Load / Save", ImVec2(350, 100));
+
 	if (ModelComponent::savedCaseFiles && !ModelComponent::savedCaseFiles->empty())
 	{
 		if (ImGui::BeginCombo("Saved Cases", ModelComponent::savedCaseFiles->at(scnTabModel->selectedSavedCaseFile).filename().string().c_str()))
@@ -87,6 +89,10 @@ void SceneTabComponent::view()
 	{
 		scnTabModel->loadCase();
 	}
+
+	ImGui::EndChild();
+
+	ImGui::Separator();
 
 	ImGui::InputText("Case Name", scnTabModel->inputCaseName);
 	if (ImGui::Button("Create Case"))

@@ -57,7 +57,11 @@ public:
 	Gui(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
 		GuiFramework(casehan, stuffhan,resourcehan, rsus,casehan) 
 	{
-			
+		ImGui::StyleColorsDark();
+		// INITALIZE SPECTER
+		ImGui::Spectrum::StyleColorsSpectrum();
+		
+		ImGui::Spectrum::LoadFont();
 	}
 
 	//void setPlayerObserver(PlayerObserver* pObserver);

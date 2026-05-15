@@ -14,6 +14,7 @@
 
 // Third-party header
 #include <SDL3/SDL.h>
+#include <imgui_spectrum.h>
 //#include <PxPhysicsAPI.h>
 
 // STL headers
