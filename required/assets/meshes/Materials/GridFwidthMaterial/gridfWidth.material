@@ -22,9 +22,9 @@ fragment_program gridfWidthFragProgram glslang
         
        // param_named_auto cameraPos camera_position
 
-        //param_named scale float 300.0
-        //param_named radius float 0.1
-        param_named color float4 0.0 1.0 0.0 1.0
+        param_named scale float 300.0
+        param_named radius float 0.1
+        //param_named color float4 0.0 1.0 0.0 1.0
 
     }
 }

@@ -93,6 +93,14 @@ public:
 	// Button functions
 	void refresh();
 	//void loadCase();
+
+	virtual void update() override {
+		if (!ModelComponent::selectedCase->selCase.expired())
+		{
+			inputCaseName->clear();
+			inputCaseName->append(ModelComponent::selectedCase->selCase.lock()->getName());
+		}
+	}
 	
 
 };

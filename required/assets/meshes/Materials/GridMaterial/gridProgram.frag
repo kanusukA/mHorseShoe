@@ -7,7 +7,7 @@ layout (location = 0) out vec4 FragColor;
 
 layout (location = 1) in vec2 uv;
   
-layout (set = 0, binding = 0,row_major) uniform OgreUniforms{
+layout (std140, binding = 1,row_major) uniform OgreUniforms{
     //vec3 cameraPos;
 
     float fade_radius;
@@ -46,7 +46,7 @@ void main()
 
     FragColor = (fill_col + sub_fill_col) * fade;
     
-    
+
     //float2 subcell_coords = mod( uv + half_subcell_size, subcell_size);
     
 }

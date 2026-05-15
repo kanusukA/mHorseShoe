@@ -259,10 +259,12 @@ public:
 	// SETTERS
 	void selectCase(const int index) {
 		selectedCase->selCase = caseVec->at(index);
+		update();
 	}
 
 	void selectScene(const std::weak_ptr<Scene>& scene_p) {
 		selectedScene->selScene = scene_p;
+		update();
 	}
 
 	void selectObject(const std::weak_ptr<Object>& object_p) {
@@ -271,10 +273,12 @@ public:
 		{
 			this->selectMaterial(object_p.lock()->getwMaterial());
 		}
+		update();
 	}
 
 	void selectMaterial(const std::weak_ptr<Material>& material_p) {
 		selectedMaterial->selMaterial = material_p;
+		update();
 	}
 
 	void refreshImageTextures();
