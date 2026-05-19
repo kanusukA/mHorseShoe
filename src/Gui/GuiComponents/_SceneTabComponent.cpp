@@ -47,8 +47,11 @@ void SceneTabComponent::view()
 	ImGui::SetNextWindowSize(ImVec2(350, 600));
 	ImGui::Begin("Cases",0,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
-	ImGui::ShowStyleEditor();
+	//ImGui::ShowStyleEditor();
+	
+	ImTitleText("Cases");
 	ImGui::BeginChild("Load / Save", ImVec2(350, 100));
+	
 	//ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.929, 0.906, 0.941, 1.0));
 
 	if (ModelComponent::savedCaseFiles && !ModelComponent::savedCaseFiles->empty())

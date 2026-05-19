@@ -48,6 +48,8 @@ enum ResourceHandlerType
 
 
 
+
+
 // Integrate it into gdhandler with Ogre 
 
 class ResourceHandler : public ResourceHandlerBuilderContext, public ResourceSaver , public ResourceLoader, public ResourceReader
@@ -64,10 +66,13 @@ private:
 
 	// RESOURCES STORE
 	// HERE GENERAL RESOURCES ARE STORED.
+
 	std::vector<std::filesystem::path>* MaterialDp = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* ShaderDp = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* TextureDp = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* MeshDp = new std::vector<std::filesystem::path>();
+
+	std::vector<ResourceLoadPath>* resourceLoadPaths = new std::vector<ResourceLoadPath>();
 
 	std::vector<std::filesystem::path>* fetchResourcesByEnum(ResourceLoaderEnums::ResourceLoadPaths group_p);
 
@@ -122,6 +127,9 @@ public:
 	std::vector<std::filesystem::path>* getShadersLoaded() { return ShaderDp; }
 	std::vector<std::filesystem::path>* getTexturesLoaded() { return TextureDp; }
 	std::vector<std::filesystem::path>* getRenderMeshLoaded() { return MeshDp; }
+
+	// REOURCE LOADER FUNCTIONS
+	void saveLoadPaths(std::vector<ResourceLoadPath>* loadPaths) override;
 
 
 	//Searching fullpath

@@ -23,10 +23,10 @@ namespace ImGui {
 			style->FrameRounding = 4.0f;
 
             ImVec4* colors = style->Colors;
-            colors[ImGuiCol_Text] = ColorConvertU32ToFloat4(Spectrum::GRAY800); // text on hovered controls is gray900
+            colors[ImGuiCol_Text] = ImVec4(0.13f, 0.13f, 0.13f, 1.00f); // text on hovered controls is gray900
             colors[ImGuiCol_TextDisabled] = ColorConvertU32ToFloat4(Spectrum::GRAY500);
             colors[ImGuiCol_WindowBg] = ColorConvertU32ToFloat4(Spectrum::GRAY100);
-            colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+            colors[ImGuiCol_ChildBg] = ImVec4(0.92f, 0.90f, 0.93f, 0.89f);
             colors[ImGuiCol_PopupBg] = ColorConvertU32ToFloat4(Spectrum::GRAY50); // not sure about this. Note: applies to tooltips too.
             colors[ImGuiCol_Border] = ColorConvertU32ToFloat4(Spectrum::GRAY300);
             colors[ImGuiCol_BorderShadow] = ColorConvertU32ToFloat4(Spectrum::Static::NONE); // We don't want shadows. Ever.
