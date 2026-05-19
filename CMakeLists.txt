@@ -31,8 +31,7 @@ include(FetchContent)
 include(CPM.cmake)
 
 
-## ADD YOUR FREEIMAGE PATH HERE, STBI IS NOT WORKING!
-set(CMAKE_PREFIX_PATH "C:/Users/lenovo/source/repos/FreeImage")
+
 
 
 
@@ -90,6 +89,11 @@ CPMADDPACKAGE(
 	GIT_TAG "v14.5.2"
 	
 )
+
+
+
+
+
 
 #target_compile_options(Plugin_GLSLangProgramManager PRIVATE $<$<CONFIG:Debug>:/MD>)
 
@@ -206,13 +210,9 @@ target_link_libraries(mHorseShoee PRIVATE Plugin_OctreeSceneManager)
 target_link_libraries(mHorseShoee PRIVATE yaml-cpp)
 target_link_libraries(mHorseShoee PRIVATE SDL3::SDL3)
 target_link_libraries(mHorseShoee PRIVATE Codec_FreeImage)
-
-
-
-
-
 #target_link_libraries(mHorseShoee PRIVATE Plugin_DotScene)
 target_link_libraries(mHorseShoee PRIVATE Plugin_GLSLangProgramManager)
+
 
 message("Path ${ogre_BINARY_DIR}/bin/release")
 
