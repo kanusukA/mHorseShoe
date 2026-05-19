@@ -47,7 +47,12 @@ void SceneTabComponent::view()
 	ImGui::SetNextWindowSize(ImVec2(350, 600));
 	ImGui::Begin("Cases",0,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
+	//ImGui::ShowStyleEditor();
+	
+	ImTitleText("Cases");
 	ImGui::BeginChild("Load / Save", ImVec2(350, 100));
+	
+	//ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.929, 0.906, 0.941, 1.0));
 
 	if (ModelComponent::savedCaseFiles && !ModelComponent::savedCaseFiles->empty())
 	{
@@ -89,7 +94,7 @@ void SceneTabComponent::view()
 	{
 		scnTabModel->loadCase();
 	}
-
+	
 	ImGui::EndChild();
 
 	ImGui::Separator();
@@ -100,7 +105,7 @@ void SceneTabComponent::view()
 		scnTabModel->addCase();
 	}
 
-	ImGui::Text("Current Case : ");
+	//ImGui::Text("Current Case : ");
 	if (ModelComponent::selectedCase->selCase.expired())
 	{
 		ImGui::Text("No Case Selected");
@@ -108,53 +113,8 @@ void SceneTabComponent::view()
 	else {
 		
 
-		ImGui::SameLine();
-		ImGui::Text((ModelComponent::selectedCase->selCase.lock()->getName() + "##Selected_Case").c_str());
-
-
-		ImGui::Text("Selected Scene : ");
-		if (!ModelComponent::selectedScene->selScene.expired() && !scnTabModel->isRootScnNodeSelected())
-		{
-			ImGui::SameLine();
-			ImGui::Text(ModelComponent::selectedScene->selScene.lock()->getName().c_str());
-		}
-
-		if (ImGui::Button("Select Root"))
-		{
-			scnTabModel->selectRootSceneNode();
-		}
-
-
-		ImGui::Spacing();
-
-		// ADD SCENE
-
-		ImGui::Text("Scene Name : ");
-		ImGui::SetNextItemWidth(180);
-		ImGui::InputText("Scene Name", scnTabModel->inputSceneName);
-
-		// SCENE TYPE SELECTION
-		if (ImGui::RadioButton("Static", scnTabModel->scnType == SceneType::STATIC))
-		{
-			scnTabModel->scnType = SceneType::STATIC;
-		}
-		ImGui::SameLine();
-
-		if (ImGui::RadioButton("Dynamic", scnTabModel->scnType == SceneType::DYNAMIC)) {
-			scnTabModel->scnType = SceneType::DYNAMIC;
-		}
-		ImGui::SameLine();
-
-		if (ImGui::RadioButton("Mesh", scnTabModel->scnType == SceneType::MESH)) {
-			scnTabModel->scnType = SceneType::MESH;
-		}
-
-		if (ImGui::Button("Add Scene"))
-		{
-			scnTabModel->addScene();
-		}
-
-		ImGui::Spacing(); ImGui::Spacing();
+		//ImGui::SameLine();
+		//ImGui::Text((ModelComponent::selectedCase->selCase.lock()->getName() + "##Selected_Case").c_str());
 
 		ImGui::Text("Scenes");
 
@@ -163,100 +123,149 @@ void SceneTabComponent::view()
 		ImGui::Spacing(); ImGui::Spacing();
 
 
-		// ADD SCENE OBJECTS CREATIONS AND OBJECTS VIEW!!
-
-
-		ImGui::Text("SCENE : ");
-		ImGui::SameLine();
-		if (!ModelComponent::selectedScene->selScene.expired()) // SCENE IS SELECTED
+		//ImGui::Text("Selected Scene : ");
+		if (!ModelComponent::selectedScene->selScene.expired() && !scnTabModel->isRootScnNodeSelected())
 		{
-			// Scene Name
-			ImGui::Text(ModelComponent::selectedScene->selScene.lock()->getName().c_str());
+			//ImGui::SameLine();
+			//ImGui::Text(ModelComponent::selectedScene->selScene.lock()->getName().c_str());
 
-			ImGui::Text("TYPE : "); ImGui::SameLine();
-			switch (ModelComponent::selectedScene->selScene.lock()->getSceneType())
+			if (ImGui::Button("Select Root"))
 			{
-			case SceneType::STATIC:
-				ImGui::Text("STATIC");
-				break;
-			case SceneType::DYNAMIC:
-				ImGui::Text("DYNAMIC");
-				break;
-			case SceneType::MESH:
-				ImGui::Text("MESH");
-				break;
-			default:
-				break;
+				scnTabModel->selectRootSceneNode();
 			}
 
-			// Scene position , rotation, scale
-			if (ImGui::InputFloat3("Position", ModelComponent::selectedScene->selScene.lock()->_getPosition())) {
-				// _setPosition function ,create it!!
-				ModelComponent::selectedScene->selScene.lock()->updatePosition();
+			ImGui::Spacing();
+
+			// ADD SCENE
+
+			//ImGui::Text("Scene Name : ");
+			ImGui::SetNextItemWidth(180);
+			ImGui::InputText("Scene Name", scnTabModel->inputSceneName);
+
+			// SCENE TYPE SELECTION
+			if (ImGui::RadioButton("Static", scnTabModel->scnType == SceneType::STATIC))
+			{
+				scnTabModel->scnType = SceneType::STATIC;
 			}
-			if (ImGui::InputFloat4("Rotation", ModelComponent::selectedScene->selScene.lock()->_getOrientation())) {
-				ModelComponent::selectedScene->selScene.lock()->updateOrientation();
+			ImGui::SameLine();
+
+			if (ImGui::RadioButton("Dynamic", scnTabModel->scnType == SceneType::DYNAMIC)) {
+				scnTabModel->scnType = SceneType::DYNAMIC;
 			}
-			if (ImGui::InputFloat3("Scale", ModelComponent::selectedScene->selScene.lock()->_getScale())) {
-				ModelComponent::selectedScene->selScene.lock()->updateScale();
+			ImGui::SameLine();
+
+			if (ImGui::RadioButton("Mesh", scnTabModel->scnType == SceneType::MESH)) {
+				scnTabModel->scnType = SceneType::MESH;
+			}
+
+			if (ImGui::Button("Add Scene"))
+			{
+				scnTabModel->addScene();
 			}
 
 			ImGui::Spacing(); ImGui::Spacing();
 
-			// ADD OBJECT
-			ImGui::Text("Add Object : ");
-			if (ModelComponent::meshDpVec && ModelComponent::meshDpVec->size() > 0) {
 
-				ImGui::InputText("Object Name", scnTabModel->inputObjectname);
+			// ADD SCENE OBJECTS CREATIONS AND OBJECTS VIEW!!
 
-				if (ImGui::BeginCombo("Render Meshes", ModelComponent::meshDpVec->at(scnTabModel->selectedMesh).filename().string().c_str()))
+
+			ImGui::Text("SCENE : ");
+			ImGui::SameLine();
+			if (!ModelComponent::selectedScene->selScene.expired()) // SCENE IS SELECTED
+			{
+				// Scene Name
+				//ImGui::Text(ModelComponent::selectedScene->selScene.lock()->getName().c_str());
+
+				ImGui::Text("TYPE : "); ImGui::SameLine();
+				switch (ModelComponent::selectedScene->selScene.lock()->getSceneType())
 				{
-					for (int i = 0; i < ModelComponent::meshDpVec->size(); i++)
+				case SceneType::STATIC:
+					ImGui::Text("STATIC");
+					break;
+				case SceneType::DYNAMIC:
+					ImGui::Text("DYNAMIC");
+					break;
+				case SceneType::MESH:
+					ImGui::Text("MESH");
+					break;
+				default:
+					break;
+				}
+
+				// Scene position , rotation, scale
+				if (ImGui::InputFloat3("Position", ModelComponent::selectedScene->selScene.lock()->_getPosition())) {
+					// _setPosition function ,create it!!
+					ModelComponent::selectedScene->selScene.lock()->updatePosition();
+				}
+				if (ImGui::InputFloat4("Rotation", ModelComponent::selectedScene->selScene.lock()->_getOrientation())) {
+					ModelComponent::selectedScene->selScene.lock()->updateOrientation();
+				}
+				if (ImGui::InputFloat3("Scale", ModelComponent::selectedScene->selScene.lock()->_getScale())) {
+					ModelComponent::selectedScene->selScene.lock()->updateScale();
+				}
+
+				ImGui::Spacing(); ImGui::Spacing();
+
+				// ADD OBJECT
+				ImGui::Text("Add Object : ");
+				if (ModelComponent::meshDpVec && ModelComponent::meshDpVec->size() > 0) {
+
+					ImGui::InputText("Object Name", scnTabModel->inputObjectname);
+
+					if (ImGui::BeginCombo("Render Meshes", ModelComponent::meshDpVec->at(scnTabModel->selectedMesh).filename().string().c_str()))
 					{
-						if (ImGui::Selectable(ModelComponent::meshDpVec->at(i).filename().string().c_str(), scnTabModel->selectedMesh == i))
+						for (int i = 0; i < ModelComponent::meshDpVec->size(); i++)
 						{
-							scnTabModel->selectedMesh = i;
+							if (ImGui::Selectable(ModelComponent::meshDpVec->at(i).filename().string().c_str(), scnTabModel->selectedMesh == i))
+							{
+								scnTabModel->selectedMesh = i;
+							}
+						}
+
+						ImGui::EndCombo();
+					}
+
+					if (ImGui::Button("Add Object"))
+					{
+						// TODO ADD OBJECT
+						scnTabModel->addObject();
+					}
+
+				}
+				else
+				{
+					ImGui::Text("No Render Mesh available");
+				}
+
+				// Objects
+				if (ModelComponent::selectedScene->selScene.lock()->getObjects())
+				{
+					for (int i = 0; i < ModelComponent::selectedScene->selScene.lock()->getObjects()->size(); i++)
+					{
+						ImGui::SetNextItemWidth(180);
+						ImGui::Text(ModelComponent::selectedScene->selScene.lock()->getObjects()->at(i)->getName().c_str());
+						ImGui::SameLine(180);
+						if (ImGui::Button(("Select##" + std::to_string(i)).c_str()))
+						{
+							scnTabModel->selectObject(ModelComponent::selectedScene->selScene.lock()->getObjects()->at(i));
+
+						}
+						ImGui::SameLine();
+						if (ImGui::Button(("Delete##" + std::to_string(i)).c_str()))
+						{
+							scnTabModel->deleteObject(i);
+
 						}
 					}
-
-					ImGui::EndCombo();
-				}
-
-				if (ImGui::Button("Add Object"))
-				{
-					// TODO ADD OBJECT
-					scnTabModel->addObject();
 				}
 
 			}
-			else
-			{
-				ImGui::Text("No Render Mesh available");
-			}
-
-			// Objects
-			if (ModelComponent::selectedScene->selScene.lock()->getObjects())
-			{
-				for (int i = 0; i < ModelComponent::selectedScene->selScene.lock()->getObjects()->size(); i++)
-				{
-					ImGui::SetNextItemWidth(180);
-					ImGui::Text(ModelComponent::selectedScene->selScene.lock()->getObjects()->at(i)->getName().c_str());
-					ImGui::SameLine(180);
-					if (ImGui::Button(("Select##" + std::to_string(i)).c_str()))
-					{
-						scnTabModel->selectObject(ModelComponent::selectedScene->selScene.lock()->getObjects()->at(i));
-
-					}
-					ImGui::SameLine();
-					if (ImGui::Button(("Delete##" + std::to_string(i)).c_str()))
-					{
-						scnTabModel->deleteObject(i);
-
-					}
-				}
-			}
-
 		}
+
+		
+
+
+		
 		else { // NO SCENE IS SELECTED
 			ImGui::Text("No Scene Selected");
 		}

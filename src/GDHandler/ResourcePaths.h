@@ -10,6 +10,12 @@
 
 // Resource Handler ini stuff
 
+
+// LOAD PATHS
+#define LOAD_PATH_GROUP_NAME_KEY "LOAD_PATH"
+#define LOAD_PATH_EXTENSION_KEY "EXTENSIONS"
+#define LOAD_PATHS_KEY "PATHS"
+
 // save / load names
 
 #define CASE_NAME_KEY "CASE_NAME"

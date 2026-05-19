@@ -407,6 +407,11 @@ void ResourceHandler::saveResources()
 
 }
 
+void ResourceHandler::saveLoadPaths(std::vector<ResourceLoadPath>* loadPaths)
+{
+	this->saveResourceLoadPaths(loadPaths, this->SourceDir.string() + RESOURCELOADER_DATA);
+}
+
 std::filesystem::path ResourceHandler::fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p)
 {
 	std::vector<std::filesystem::path>* group = fetchResourcesByEnum(group_p);

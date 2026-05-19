@@ -2,7 +2,7 @@
 
 void ResourceLoader::loadSavedPaths()
 {
-	ini->Reset();
+	/*ini->Reset();
 	ini->LoadFile(this->resourceLoaderIniPath.string().c_str());
 
 	CSimpleIniA::TNamesDepend loadPaths;
@@ -58,31 +58,32 @@ void ResourceLoader::loadSavedPaths()
 			
 		
 		
-	}
+	}*/
 
 }
 
 
-void ResourceLoader::saveLoadPaths()
-{
-	ini->Reset();
-
-	for (int i = 0; i < this->load_paths->size(); i++)
-	{
-		if (!load_paths->at(i).empty())
-		{
-			ini->SetValue("LoadPaths",std::to_string(i).c_str(), this->load_paths->at(i).c_str());
-		}
-		
-	}
-	ini->SaveFile(this->resourceLoaderIniPath.string().c_str());
-
-	ini->Reset();
-}
+//void ResourceLoader::saveLoadPaths()
+//{
+//	ini->Reset();
+//
+//
+//
+//	/*for (int i = 0; i < this->load_paths->size(); i++)
+//	{
+//
+//		ini->SetValue("LoadPaths",load_paths->at(i).pathGroupName.c_str(), this->load_paths->at(i).c_str());
+//		
+//		
+//	}
+//	ini->SaveFile(this->resourceLoaderIniPath.string().c_str());*/
+//
+//	ini->Reset();
+//}
 
 void ResourceLoader::addLoadPath(ResourceLoaderEnums::ResourceLoadPaths pathType_p, std::string path_p)
 {
-	if (std::filesystem::exists(path_p))
+	/*if (std::filesystem::exists(path_p))
 	{
 		this->load_paths->at(pathType_p) = path_p;
 	}
@@ -95,13 +96,13 @@ void ResourceLoader::addLoadPath(ResourceLoaderEnums::ResourceLoadPaths pathType
 			throw ResourceHandlerLoaderError("Load path SET invalid");
 		}
 		
-	}
+	}*/
 	
 }
 
 void ResourceLoader::addLoadPath(std::string path_p)
 {
-	if (std::filesystem::exists(path_p))
+	/*if (std::filesystem::exists(path_p))
 	{
 		this->load_paths->push_back(path_p);
 	}
@@ -110,7 +111,7 @@ void ResourceLoader::addLoadPath(std::string path_p)
 	}
 	else {
 		throw ResourceHandlerLoaderError("Load path SET invalid");
-	}
+	}*/
 }
 
 
@@ -555,7 +556,7 @@ RLMaterial* ResourceLoader::_fetchMaterial(ResID id, std::string path_p, std::st
 
 void ResourceLoader::loadMaterialsDp(std::vector<std::filesystem::path>* output,std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
-	if (clearOutput)
+	/*if (clearOutput)
 	{
 		output->clear();
 	}
@@ -575,13 +576,13 @@ void ResourceLoader::loadMaterialsDp(std::vector<std::filesystem::path>* output,
 		{
 			fetchPathContents(load_paths->at(ResourceLoaderEnums::MaterialPath), extension, output, searchFolders);
 		}
-	}
+	}*/
 
 }
 
 void ResourceLoader::loadShadersDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
-	if (clearOutput)
+	/*if (clearOutput)
 	{
 		output->clear();
 	}
@@ -601,12 +602,12 @@ void ResourceLoader::loadShadersDp(std::vector<std::filesystem::path>* output, s
 		{
 			fetchPathContents(load_paths->at(ResourceLoaderEnums::Shaders), extension, output, searchFolders);
 		}
-	}
+	}*/
 }
 
 void ResourceLoader::loadMeshesDp(std::vector<std::filesystem::path>* output,std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
-	if (clearOutput)
+	/*if (clearOutput)
 	{
 		output->clear();
 	}
@@ -626,7 +627,7 @@ void ResourceLoader::loadMeshesDp(std::vector<std::filesystem::path>* output,std
 		{
 			fetchPathContents(load_paths->at(ResourceLoaderEnums::RenderMeshPath), extension, output, searchFolders);
 		}
-	}
+	}*/
 }
 
 //void ResourceLoader::loadColliderMesh(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
@@ -656,7 +657,7 @@ void ResourceLoader::loadMeshesDp(std::vector<std::filesystem::path>* output,std
 
 void ResourceLoader::loadTexturesDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
-	if (clearOutput)
+	/*if (clearOutput)
 	{
 		output->clear();
 	}
@@ -676,7 +677,7 @@ void ResourceLoader::loadTexturesDp(std::vector<std::filesystem::path>* output, 
 		{
 			fetchPathContents(load_paths->at(ResourceLoaderEnums::ImagePath), extension, output, searchFolders);
 		}
-	}
+	}*/
 }
 
 

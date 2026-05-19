@@ -7,7 +7,7 @@ void pathViewComponent(
 
 	if (ImGui::CollapsingHeader("Paths")) {
 
-		
+
 
 		for (int i = 0; i < model->paths->size(); i++)
 		{
@@ -27,11 +27,11 @@ void pathViewComponent(
 				ImGui::SameLine();
 				if (ImGui::Button(("Edit##" + std::to_string(i)).c_str()))
 				{
-					model->addPath(i);
+					model->editPath(i);
 				}
 			}
 
-			
+
 		}
 	}
 
@@ -41,12 +41,43 @@ void addLoadPath(ResourceTabModelComponent* model) {
 
 	if (ImGui::CollapsingHeader("Load Paths")) {
 
+		if (model->emptyLoadPaths)
+		{
+			for (int i = 0; i < model->emptyLoadPaths->size(); i++)
+			{
+				ImGui::Text("Path Name");
+				ImGui::InputText(("##pathNames" + std::to_string(i)).c_str(), &model->emptyLoadPaths->at(i).pathGroupName);
+				if (model->emptyLoadPaths->at(i).paths)
+				{
+					ImGui::Text("Paths");
+					for (int j = 0; j < model->emptyLoadPaths->at(i).paths->size(); j++)
+					{
+						ImGui::InputText(("##loadPaths" + std::to_string(i) + "_" + std::to_string(j)).c_str(), &model->emptyLoadPaths->at(i).paths->at(j));
+					}
+				}
+				if (model->emptyLoadPaths->at(i).extensions)
+				{
+					ImGui::Text("Extensions");
+					for (int j = 0; j < model->emptyLoadPaths->at(i).extensions->size(); j++)
+					{
+						ImGui::InputText(("##loadExtensions" + std::to_string(i) + "_" + std::to_string(j)).c_str(), &model->emptyLoadPaths->at(i).extensions->at(j));
+					}
+				}
+
+			}
+		}
+
+		if (ImGui::Button("Add Load Path"))
+		{
+			model->addLoadPath();
+		}
+
 		if (ImGui::Button("Save"))
 		{
 			model->saveLoadPaths();
 		}
 
-		for (int i = 0; i < model->loadPaths->size(); i++)
+		/*for (int i = 0; i < model->loadPaths->size(); i++)
 		{
 
 			switch (ResourceLoaderEnums::ResourceLoadPaths(i))
@@ -75,17 +106,7 @@ void addLoadPath(ResourceTabModelComponent* model) {
 			}
 			ImGui::SameLine();
 
-			ImGui::Text(model->loadPaths->at(i).c_str(), 500.0);
-
-			ImGui::SameLine();
-
-			if (ImGui::Button(("EditLoadPath##" + std::to_string(i)).c_str()))
-			{
-				model->addPath(i);
-
-			}
-
-			/*if (model->editLoadPathpos == i)
+			if (model->editLoadPathpos == i)
 			{
 
 				if (ImGui::InputText(("##" + std::to_string(i)).c_str(), model->inputPath, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue)) {
@@ -101,12 +122,19 @@ void addLoadPath(ResourceTabModelComponent* model) {
 			}
 			else {
 
-				
+				ImGui::Text(model->loadPaths->at(i).c_str(), 500.0);
 
-			}*/
+				ImGui::SameLine();
+
+				if (ImGui::Button(("EditLoadPath##" + std::to_string(i)).c_str()))
+				{
+					model->editLoadPath(i);
+				}
+
+			}
 
 
-		}
+		}*/
 	}
 }
 
@@ -147,7 +175,7 @@ void ResourceTabComponent::view()
 			ImGui::Text(resourceTabModel->shaders->at(i).filename().string().c_str());
 		}
 	}
-	
+
 
 	ImGui::End();
 }

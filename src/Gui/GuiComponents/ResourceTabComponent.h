@@ -20,6 +20,8 @@ public:
 	//Load paths
 	std::vector<std::string>* loadPaths;
 
+	std::vector<ResourceLoadPath>* emptyLoadPaths;
+
 	std::string* inputPath = new std::string("");
 
 	int edit = -1;
@@ -30,7 +32,7 @@ public:
 
 	}
 
-	void init() override{
+	void init() override {
 		renderMeshes = gdSource->getResourceHandler()->getRenderMeshLoaded();
 		//colliderMeshes = gdSource->getResourceHandler()->getColliderMeshLoaded();
 		materials = gdSource->getResourceHandler()->getMaterialsLoaded();
@@ -38,7 +40,7 @@ public:
 		shaders = gdSource->getResourceHandler()->getShadersLoaded();
 
 		paths = gdSource->getResourceHandler()->getPaths();
-		loadPaths = gdSource->getResourceHandler()->getLoadPaths();
+		//loadPaths = gdSource->getResourceHandler()->getLoadPaths();
 
 	}
 
@@ -55,22 +57,9 @@ public:
 		edit = pathPos;
 	}
 
-	void addPath(int pathPos) {
-		std::string path = this->openFolderSelection();
-		ToastComponent::GetInstance()->addMessage("Selected Path - " + path);
-		try
-		{
-			loadPaths->at(pathPos) = path;
-		}
-		catch (...)
-		{
-			ToastComponent::GetInstance()->addMessage("Invalid path - " + *inputPath);
-		}
-	}
-
 	void editLoadPath(int pathPos) {
-		*inputPath = loadPaths->at(pathPos);
-		editLoadPathpos = pathPos;
+		//*inputPath = loadPaths->at(pathPos);
+		//editLoadPathpos = pathPos;
 	}
 
 	void setPath() {
@@ -82,8 +71,17 @@ public:
 		{
 			ToastComponent::GetInstance()->addMessage("Invalid path - " + *inputPath);
 		}
-		
+
 		edit = -1;
+	}
+
+	void addLoadPath() {
+		ResourceLoadPath newLoadPath = ResourceLoadPath();
+		newLoadPath.paths = new std::vector<std::string>();
+		newLoadPath.paths->push_back("");
+		newLoadPath.extensions = new std::vector<std::string>();
+		newLoadPath.extensions->push_back("");
+		emptyLoadPaths->push_back(newLoadPath);
 	}
 
 	void setLoadPath() {
@@ -100,7 +98,7 @@ public:
 	}
 
 	void saveLoadPaths() {
-		this->gdSource->getResourceHandler()->saveLoadPaths();
+		//this->gdSource->getResourceHandler()->saveLoadPaths();
 	}
 
 };
@@ -111,7 +109,7 @@ private:
 	ResourceTabModelComponent* resourceTabModel;
 
 public:
-	ResourceTabComponent(const char* name_p,ResourceTabModelComponent* recModel) :
+	ResourceTabComponent(const char* name_p, ResourceTabModelComponent* recModel) :
 		ViewComponent(name_p) {
 		resourceTabModel = recModel;
 	}

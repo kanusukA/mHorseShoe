@@ -74,6 +74,13 @@ public:
 
 };
 
+// Load Paths
+// These paths are fetched when the application starts.
+struct ResourceLoadPath {
+	std::string pathGroupName;
+	std::vector<std::string>* extensions;
+	std::vector<std::string>* paths;
+};
 
 class CaseResource;
 class SceneResource;

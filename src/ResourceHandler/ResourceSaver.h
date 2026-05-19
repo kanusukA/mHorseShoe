@@ -66,6 +66,9 @@ public:
 	void saveImage(ImageResource* image_p);
 	void saveObject(ObjectResource* obj_p, YAML::Emitter& out);
 
+	// LOAD PATHS
+	void saveResourceLoadPaths(std::vector<ResourceLoadPath>* loadPaths, std::string path);
+
 
 
 	void saveMasterList(std::string instanceName, std::vector<ResID>* master_p, std::string path, bool overwrite = true);

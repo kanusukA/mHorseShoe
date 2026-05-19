@@ -33,6 +33,8 @@ class ViewComponent {
 private:
 	ViewComponent();
 
+	
+
 protected:
 
 	GuiFramework* guiFramework = nullptr;
@@ -47,6 +49,9 @@ public:
 	ViewComponent(const char* name_p,GuiFramework* framework = nullptr) {
 		name = name_p;
 		guiFramework = framework;
+
+		/*titleFont = *ImGui::GetFont();
+		titleFont->FontSize = 28;*/
 	}
 
 	// FRAMEWORK METHOD! NOT TO BE USED OUTSIDE
@@ -55,6 +60,20 @@ public:
 	}
 
 	virtual void view() {};
+
+	// HELPING WIDGETS
+	void ImTitleText(const char* text) {
+		/*if(titleFont)
+		{
+			ImGui::PushFont(titleFont);
+			ImGui::Text(text, 1.8f);
+			ImGui::PopFont();
+		}
+		else {
+			ImGui::Text(text);
+		}*/
+		
+	}
 };
 
 // ModelComponent is the mediator layer between ViewComponent and GDSource
@@ -392,6 +411,11 @@ public:
 		
 
 };
+
+
+// HELLPING WIDGETS
+
+
 
 
 // DEPRICATED STUFF ----------------------------------------------------------------------------------------------------------------
