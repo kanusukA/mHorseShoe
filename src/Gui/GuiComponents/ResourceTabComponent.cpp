@@ -41,32 +41,27 @@ void addLoadPath(ResourceTabModelComponent* model) {
 
 	if (ImGui::CollapsingHeader("Load Paths")) {
 
-		if (model->emptyLoadPaths)
+		
+			
+		if (model->showLoadPath)
 		{
-			for (int i = 0; i < model->emptyLoadPaths->size(); i++)
-			{
-				ImGui::Text("Path Name");
-				ImGui::InputText(("##pathNames" + std::to_string(i)).c_str(), &model->emptyLoadPaths->at(i).pathGroupName);
-				if (model->emptyLoadPaths->at(i).paths)
+			ImGui::Text("Path Name");
+			ImGui::InputText("##pathNames", &model->emptyLoadPathName);
+			
+			
+				ImGui::Text("Paths");
+				ImGui::InputText("##loadPaths" , &model->emptyLoadPaths);
+				if (ImGui::Button("Add Path"))
 				{
-					ImGui::Text("Paths");
-					for (int j = 0; j < model->emptyLoadPaths->at(i).paths->size(); j++)
-					{
-						ImGui::InputText(("##loadPaths" + std::to_string(i) + "_" + std::to_string(j)).c_str(), &model->emptyLoadPaths->at(i).paths->at(j));
-					}
+					model->addPathTo(&model->emptyLoadPaths);
+					model->emptyLoadPaths =  model->emptyLoadPaths + ",";
 				}
-				if (model->emptyLoadPaths->at(i).extensions)
-				{
-					ImGui::Text("Extensions");
-					for (int j = 0; j < model->emptyLoadPaths->at(i).extensions->size(); j++)
-					{
-						ImGui::InputText(("##loadExtensions" + std::to_string(i) + "_" + std::to_string(j)).c_str(), &model->emptyLoadPaths->at(i).extensions->at(j));
-					}
-				}
-
-			}
+				
+				ImGui::Text("Extensions (separate with ',' no spaces)");
+				ImGui::InputText("##loadExtensions", &model->emptyLoadPathExtensions);
 		}
 
+			
 		if (ImGui::Button("Add Load Path"))
 		{
 			model->addLoadPath();
@@ -75,6 +70,24 @@ void addLoadPath(ResourceTabModelComponent* model) {
 		if (ImGui::Button("Save"))
 		{
 			model->saveLoadPaths();
+		}
+
+		if (model->loadPaths)
+		{
+			for (size_t i = 0; i < model->loadPaths->size(); i++)
+			{
+				ImGui::Text(model->loadPaths->at(i).pathGroupName.c_str());
+				for (size_t j = 0; j < model->loadPaths->at(i).paths->size(); j++)
+				{
+					ImGui::Text(model->loadPaths->at(i).paths->at(j).c_str());
+				}
+				for (size_t j = 0; j < model->loadPaths->at(i).extensions->size(); j++)
+				{
+					ImGui::Text(model->loadPaths->at(i).extensions->at(j).c_str());
+				}
+				
+				ImGui::Spacing();
+			}
 		}
 
 		/*for (int i = 0; i < model->loadPaths->size(); i++)

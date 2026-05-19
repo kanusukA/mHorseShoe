@@ -407,8 +407,9 @@ void ResourceHandler::saveResources()
 
 }
 
-void ResourceHandler::saveLoadPaths(std::vector<ResourceLoadPath>* loadPaths)
+void ResourceHandler::saveLoadPaths()
 {
+	std::vector<ResourceLoadPath>* loadPaths = this->getLoadPaths();
 	this->saveResourceLoadPaths(loadPaths, this->SourceDir.string() + RESOURCELOADER_DATA);
 }
 
@@ -670,11 +671,7 @@ void ResourceHandler::clearFile(std::string filename)
 	
 }
 
-bool ResourceHandler::fileExists(std::string filename)
-{
-	return false;
-	//return std::filesystem::exists(_getSaveFileLoc(filename));
-}
+
 
 
 

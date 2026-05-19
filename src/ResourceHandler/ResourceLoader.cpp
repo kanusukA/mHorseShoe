@@ -114,6 +114,11 @@ void ResourceLoader::addLoadPath(std::string path_p)
 	}*/
 }
 
+void ResourceLoader::addLoadPath(ResourceLoadPath path)
+{
+	load_paths->push_back(path);
+}
+
 
 
 RLCase ResourceLoader::fetchCaseData(std::filesystem::path yamlFilePath)

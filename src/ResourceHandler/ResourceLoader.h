@@ -87,7 +87,7 @@ protected:
 
 	// These paths are used to search objects and contents when using fetchAll function
 	// The save formate uses ResourcePaths scheme
-	std::vector<ResourceLoadPath>* load_paths = new std::vector<ResourceLoadPath>(7);
+	std::vector<ResourceLoadPath>* load_paths = new std::vector<ResourceLoadPath>();
 
 
 
@@ -110,11 +110,7 @@ public:
 	std::vector<RLScene>* RLScenes = new std::vector<RLScene>();
 	std::vector<RLObject>* RLObjects = new std::vector<RLObject>();
 
-	virtual void saveLoadPaths(std::vector<ResourceLoadPath>* loadPaths) {};
-
-
 	~ResourceLoader() {
-		saveLoadPaths(load_paths);
 		delete load_paths;
 	}
 
@@ -125,6 +121,7 @@ public:
 
 	void addLoadPath(ResourceLoaderEnums::ResourceLoadPaths pathType_p, std::string path_p);
 	void addLoadPath(std::string path_p);
+	void addLoadPath(ResourceLoadPath path);
 
 	// loadLocation_p - Resource Loader's path saving directory
 	void initResourceLoader(CSimpleIniA* ini_p,std::filesystem::path sourceDir_p,std::filesystem::path dataDirPath_p , std::string resourceLoaderIniPath_p) {

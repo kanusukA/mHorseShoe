@@ -129,7 +129,7 @@ public:
 	std::vector<std::filesystem::path>* getRenderMeshLoaded() { return MeshDp; }
 
 	// REOURCE LOADER FUNCTIONS
-	void saveLoadPaths(std::vector<ResourceLoadPath>* loadPaths) override;
+	void saveLoadPaths();
 
 
 	//Searching fullpath
@@ -165,6 +165,9 @@ public:
 	// Resources
 
 	std::filesystem::path SourceDir;
+
+	//HELPING FUNCTIONS
+	bool fileExists(std::string path) { return std::filesystem::exists(path); }
 
 
 	// Class should not be cloneable
@@ -203,7 +206,6 @@ public:
 	void writeToFile(std::string key, std::string value,std::string section, std::string filename);
 	void writeToFile(std::vector<SaveData>* data, std::string filename);
 	void clearFile(std::string filename);
-	bool fileExists(std::string filename);
 	std::string readFromFile(std::string key, std::string section, std::string filename);
 
 	std::filesystem::path getSourceDir();
@@ -225,6 +227,7 @@ public:
 	/*void loadImgToTex();*/
 
 	void shutdown() {
+		this->saveLoadPaths();
 		this->resource_loader_shutdown();
 	}
 };

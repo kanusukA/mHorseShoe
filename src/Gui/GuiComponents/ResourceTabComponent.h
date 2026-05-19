@@ -18,9 +18,12 @@ public:
 	std::vector<std::string>* paths;
 
 	//Load paths
-	std::vector<std::string>* loadPaths;
+	std::vector<ResourceLoadPath>* loadPaths;
 
-	std::vector<ResourceLoadPath>* emptyLoadPaths;
+	std::string emptyLoadPathName = "";
+	std::string emptyLoadPaths = "";
+	std::string emptyLoadPathExtensions = "";
+	bool showLoadPath = false;
 
 	std::string* inputPath = new std::string("");
 
@@ -40,7 +43,8 @@ public:
 		shaders = gdSource->getResourceHandler()->getShadersLoaded();
 
 		paths = gdSource->getResourceHandler()->getPaths();
-		//loadPaths = gdSource->getResourceHandler()->getLoadPaths();
+		
+		loadPaths = gdSource->getResourceHandler()->getLoadPaths();
 
 	}
 
@@ -62,6 +66,11 @@ public:
 		//editLoadPathpos = pathPos;
 	}
 
+	void addPathTo(std::string* output) {
+		std::string path =  this->openFolderSelection();
+		*output = path;
+	}
+
 	void setPath() {
 		try
 		{
@@ -76,12 +85,70 @@ public:
 	}
 
 	void addLoadPath() {
-		ResourceLoadPath newLoadPath = ResourceLoadPath();
-		newLoadPath.paths = new std::vector<std::string>();
-		newLoadPath.paths->push_back("");
-		newLoadPath.extensions = new std::vector<std::string>();
-		newLoadPath.extensions->push_back("");
-		emptyLoadPaths->push_back(newLoadPath);
+		ResourceLoadPath loadPath = ResourceLoadPath();
+		loadPath.paths = new std::vector<std::string>();
+		loadPath.extensions = new std::vector<std::string>();
+		if (showLoadPath == false) {
+			showLoadPath = true;
+		}
+		else {
+			if (emptyLoadPathName.empty())
+			{
+				ToastComponent::GetInstance()->addMessage("Load Path not added : Add Name!");
+				return;
+			}
+
+			loadPath.pathGroupName = emptyLoadPathName;
+
+			// check paths
+			std::string path = "";
+			for (size_t i = 0; i < emptyLoadPaths.size(); i++)
+			{
+				if (emptyLoadPaths.at(i) != ',')
+				{
+					path += emptyLoadPaths.at(i);
+				}
+				else {
+					if (this->gdSource->getResourceHandler()->fileExists(path))
+					{
+						loadPath.paths->push_back(path);
+					}
+					else {
+						ToastComponent::GetInstance()->addMessage("Invalid File path : " + path);
+					}
+					path = "";
+				}
+			}
+
+			if (loadPath.paths->size()  == 0)
+			{
+				ToastComponent::GetInstance()->addMessage("Load Path not added : Add Paths!");
+				return;
+			}
+
+			//extensions
+			std::string extension = "";
+			for (size_t i = 0; i < emptyLoadPathExtensions.size(); i++)
+			{
+				if (emptyLoadPathExtensions.at(i) != ',')
+				{
+					extension += emptyLoadPathExtensions.at(i);
+				}
+				else {
+
+					loadPath.extensions->push_back(extension);
+					extension = "";
+					
+				}
+			}
+
+			this->gdSource->getResourceHandler()->addLoadPath(loadPath);
+			emptyLoadPathExtensions = "";
+			emptyLoadPathName = "";
+			emptyLoadPaths = "";
+			showLoadPath = false;
+
+		}
 	}
 
 	void setLoadPath() {
