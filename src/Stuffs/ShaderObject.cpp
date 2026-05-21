@@ -46,12 +46,12 @@ void Shader::_setShaderVars()
 {
 	std::cout << "LOAD SHADER STARTED!" << this->fileName << std::endl;
 
-	std::filesystem::path shaderLoc = ResourceHandler::GetInstance()->fetchLocByFileName(this->fileName,ResourceLoaderEnums::Shaders);
+	//std::filesystem::path shaderLoc = ResourceHandler::GetInstance()->fetchLocByFileName(this->fileName,ResourceLoaderEnums::Shaders);
 
 	// TODO ADD AUTO SWITCH BETWEEN GLSL AND HLSL READER
 	//Reading Shader File
 	//ResourceHandler::GetInstance()->readShaderFile(shaderLoc, this->ShaderParameters);
-	ResourceHandler::GetInstance()->readGLSLShaderFile(shaderLoc, this->ShaderParameters);
+	//ResourceHandler::GetInstance()->readGLSLShaderFile(shaderLoc, this->ShaderParameters);
 	// Implement a system by which shader value can be integrated at initialization!
 
 

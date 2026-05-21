@@ -12,15 +12,27 @@ public:
 	std::vector<std::filesystem::path>* materials;
 	std::vector<std::filesystem::path>* images;
 	std::vector<std::filesystem::path>* shaders;
+	
+	int selectedMasterGroup = 0;
 
+	
 
 	// PATHS
 	std::vector<std::string>* paths;
 
-	//Load paths
-	std::vector<std::string>* loadPaths;
+	std::vector<ResourceMasterGroup*>* masterResourceVector;
 
-	std::vector<ResourceLoadPath>* emptyLoadPaths;
+	
+
+	//Load paths
+	std::vector<ResourceLoadPath>* loadPaths;
+
+	//std::vector<ResourceLoadPath>* emptyLoadPaths;
+
+	std::string emptyLoadPathName = "";
+	std::string emptyLoadPaths = "";
+	std::string emptyLoadPathExtensions = "";
+	bool showAddLoadPath = false;
 
 	std::string* inputPath = new std::string("");
 
@@ -40,8 +52,13 @@ public:
 		shaders = gdSource->getResourceHandler()->getShadersLoaded();
 
 		paths = gdSource->getResourceHandler()->getPaths();
-		//loadPaths = gdSource->getResourceHandler()->getLoadPaths();
+		loadPaths = gdSource->getResourceHandler()->getLoadPaths();
+		masterResourceVector = gdSource->getResourceHandler()->getMasterResourceVector();
 
+	}
+
+	std::string openFolderSelection() {
+		return gdSource->openFolderSelectionDialog();
 	}
 
 	void RenderMeshToOgreBtn() {
@@ -76,12 +93,108 @@ public:
 	}
 
 	void addLoadPath() {
-		ResourceLoadPath newLoadPath = ResourceLoadPath();
-		newLoadPath.paths = new std::vector<std::string>();
-		newLoadPath.paths->push_back("");
-		newLoadPath.extensions = new std::vector<std::string>();
-		newLoadPath.extensions->push_back("");
-		emptyLoadPaths->push_back(newLoadPath);
+		if (showAddLoadPath)
+		{
+			ResourceLoadPath newLoadPath = ResourceLoadPath();
+			newLoadPath.paths = new std::vector<std::string>();
+			newLoadPath.extensions = new std::vector<std::string>();
+
+			if (emptyLoadPathName.empty())
+			{
+				ToastComponent::GetInstance()->addMessage("Load path name cannot be empty!");
+				return;
+			}
+
+			newLoadPath.pathGroupName = emptyLoadPathName;
+
+			newLoadPath.masterGroupName = ResourceMasterGroups.at(selectedMasterGroup);
+
+			// PATHS
+			if (emptyLoadPaths.empty())
+			{
+				ToastComponent::GetInstance()->addMessage("Load path cannot be empty!");
+				return;
+			}
+			else {
+				std::string path = "";
+				for (size_t i = 0; i < emptyLoadPaths.size(); i++)
+				{
+					if (emptyLoadPaths.at(i) != ',')
+					{
+						path += emptyLoadPaths.at(i);
+					}
+					else {
+						if (!path.empty() && gdSource->getResourceHandler()->fileExists(path))
+						{
+							newLoadPath.paths->push_back(path);
+						}
+						else {
+							ToastComponent::GetInstance()->addMessage("Invalid path - " + path);
+						}
+						path = "";
+					}
+				}
+			}
+			if (newLoadPath.paths->empty())
+			{
+				ToastComponent::GetInstance()->addMessage("No valid paths added!");
+				return;
+			}
+
+			//EXTENSIONS
+			if (emptyLoadPathExtensions.empty())
+			{
+				ToastComponent::GetInstance()->addMessage("Load path extensions cannot be empty!");
+				return;
+			}
+			else {
+				std::string extension = "";
+				for (size_t i = 0; i < emptyLoadPathExtensions.size(); i++)
+				{
+					if (emptyLoadPathExtensions.at(i) != ',')
+					{
+						extension += emptyLoadPathExtensions.at(i);
+					}
+					else {
+						if (!extension.empty())
+						{
+							newLoadPath.extensions->push_back(extension);
+						}
+						else {
+							ToastComponent::GetInstance()->addMessage("Invalid extension - " + extension);
+						}
+						extension = "";
+					}
+				}
+				if (!extension.empty())
+				{
+					newLoadPath.extensions->push_back(extension);
+				}
+			}
+			
+			if (newLoadPath.extensions->empty())
+			{
+				ToastComponent::GetInstance()->addMessage("No valid extensions added!");
+				return;
+			}
+			
+
+			gdSource->getResourceHandler()->addLoadPath(newLoadPath);
+
+
+			showAddLoadPath = false;
+			emptyLoadPathName = "";
+			emptyLoadPaths = "";
+			emptyLoadPathExtensions = "";
+
+		}
+		else
+		{
+			showAddLoadPath = true;
+
+		}
+
+		
 	}
 
 	void setLoadPath() {
@@ -98,7 +211,7 @@ public:
 	}
 
 	void saveLoadPaths() {
-		//this->gdSource->getResourceHandler()->saveLoadPaths();
+		
 	}
 
 };

@@ -2,63 +2,37 @@
 
 void ResourceLoader::loadSavedPaths()
 {
-	/*ini->Reset();
-	ini->LoadFile(this->resourceLoaderIniPath.string().c_str());
-
-	CSimpleIniA::TNamesDepend loadPaths;
-	ini->GetAllKeys("LoadPaths", loadPaths);
-
-
-
-	for (const auto& entry : loadPaths )
+	
+	YAML::Node loadPathsNode = YAML::LoadFile(this->resourceLoaderIniPath.string());
+	if (loadPathsNode.IsSequence())
 	{
-		try
+		for (size_t i = 0; i < loadPathsNode.size(); i++)
 		{
-			int pos = std::stoi(entry.pItem);
+			ResourceLoadPath path = ResourceLoadPath();
 
-			std::string value = ini->GetValue("LoadPaths", entry.pItem);
-
-			if (!value.empty())
+			path.pathGroupName = loadPathsNode[i][LOAD_PATH_GROUP_NAME_KEY].as<std::string>();
+			path.masterGroupName = loadPathsNode[i][LOAD_PATH_GROUPS_KEY].as<std::string>();
+			if (loadPathsNode[i][LOAD_PATH_EXTENSION_KEY].IsSequence())
 			{
-				if(std::filesystem::exists(value))
+				path.extensions = new std::vector<std::string>();
+				for (size_t extIndex = 0; extIndex < loadPathsNode[i][LOAD_PATH_EXTENSION_KEY].size(); extIndex++)
 				{
-					if (pos < 7)
-					{
-						load_paths->at(pos) = value;
-					}
-					else {
-						load_paths->push_back(value);
-					}
+					path.extensions->push_back(loadPathsNode[i][LOAD_PATH_EXTENSION_KEY][extIndex].as<std::string>());
 				}
-				else if (std::filesystem::exists(this->sourceDir.string() + value)) {
-					if (pos < 7)
-					{
-						load_paths->at(pos) = this->sourceDir.string() + value;
-					}
-					else {
-						load_paths->push_back(this->sourceDir.string() + value);
-					}
-				}
-				else {
-					ToastComponent::GetInstance()->addMessage("ResourceLoad Path : " + value + "\n Does not exists.");
-					continue;
-				}
-
-				
 			}
-			
+			if (loadPathsNode[i][LOAD_PATHS_KEY].IsSequence())
+			{
+				path.paths = new std::vector<std::string>();
+				for (size_t pathIndex = 0; pathIndex < loadPathsNode[i][LOAD_PATHS_KEY].size(); pathIndex++)
+				{
+					path.paths->push_back(loadPathsNode[i][LOAD_PATHS_KEY][pathIndex].as<std::string>());
+				}
+			}
+
+			load_paths->push_back(path);
 
 		}
-		catch (...)
-		{
-			std::cout << "Error loading ResourceSaved Path : " << entry.pItem << std::endl;
-
-		}
-		
-			
-		
-		
-	}*/
+	}
 
 }
 
@@ -112,6 +86,13 @@ void ResourceLoader::addLoadPath(std::string path_p)
 	else {
 		throw ResourceHandlerLoaderError("Load path SET invalid");
 	}*/
+}
+
+void ResourceLoader::addLoadPath(ResourceLoadPath path_p)
+{
+	
+	load_paths->push_back(path_p);
+	
 }
 
 

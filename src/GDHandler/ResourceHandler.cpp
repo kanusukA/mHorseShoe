@@ -33,7 +33,7 @@ ResourceHandlerType ResourceHandler::_getResourceLocationGroup(std::string group
 
 std::vector<std::filesystem::path>* ResourceHandler::fetchResourcesByEnum(ResourceLoaderEnums::ResourceLoadPaths group_p)
 {
-	switch (group_p)
+	/*switch (group_p)
 	{
 	case ResourceLoaderEnums::Objects:
 		return nullptr;
@@ -56,7 +56,9 @@ std::vector<std::filesystem::path>* ResourceHandler::fetchResourcesByEnum(Resour
 	default:
 		return nullptr;
 		break;
-	}
+	}*/
+
+	return nullptr;
 }
 
 
@@ -189,11 +191,16 @@ ResourceHandler::ResourceHandler()
 	this->SourceDir = getSourceDir();
 	ToastComponent::GetInstance()->addMessage("Source Dir : " + this->SourceDir.string());
 	checkFileStructure();
+
+	// Load contents in load_path
+	this->initResourceLoader(&ini, SourceDir, SourceDir.string() + DATA_DIRECTORY, this->SourceDir.string() + RESOURCELOADER_DATA);
+
+	// SETUP MASTER RESOURCE VECTOR
+	this->setMasterLoadPaths();
 	
 	this->ini.SetUnicode();
 	this->initResourceSaver(&ini, this->SourceDir.string() + DATA_DIRECTORY);
 
-	this->initResourceLoader(&ini,SourceDir , SourceDir.string() + DATA_DIRECTORY , this->SourceDir.string() + RESOURCELOADER_DATA);
 
 	this->loadResources();
 
@@ -376,6 +383,9 @@ void ResourceHandler::checkFileStructure()
 
 void ResourceHandler::loadResources()
 {
+
+
+
 	this->loadMaterialsDp(this->MaterialDp, ".material", false, true);
 	this->loadShadersDp(this->ShaderDp, ".hlsl", true, true);
 	this->loadShadersDp(this->ShaderDp, ".glsl", true, true);
@@ -407,10 +417,7 @@ void ResourceHandler::saveResources()
 
 }
 
-void ResourceHandler::saveLoadPaths(std::vector<ResourceLoadPath>* loadPaths)
-{
-	this->saveResourceLoadPaths(loadPaths, this->SourceDir.string() + RESOURCELOADER_DATA);
-}
+
 
 std::filesystem::path ResourceHandler::fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p)
 {
@@ -672,8 +679,7 @@ void ResourceHandler::clearFile(std::string filename)
 
 bool ResourceHandler::fileExists(std::string filename)
 {
-	return false;
-	//return std::filesystem::exists(_getSaveFileLoc(filename));
+	return std::filesystem::exists(filename);
 }
 
 
@@ -692,6 +698,63 @@ std::string ResourceHandler::readFromFile(std::string key, std::string section, 
 	
 	return "";*/
 
+}
+
+void ResourceHandler::saveLoadPaths() {
+	std::vector<ResourceLoadPath>* loadPaths = this->getLoadPaths();
+	this->saveResourceLoadPaths(loadPaths, this->SourceDir.string() + RESOURCELOADER_DATA);
+}
+
+void ResourceHandler::setMasterLoadPaths()
+{
+	std::vector<ResourceLoadPath>* loadPaths = this->getLoadPaths();
+
+	if (!loadPaths || loadPaths->empty())
+	{
+		ToastComponent::GetInstance()->addMessage("No Load Paths to set in Master Resource Vector");
+		return;
+	}
+
+	masterResourceVector->clear();
+	for (size_t i = 0; i < ResourceMasterGroups.size(); i++)
+	{
+		masterResourceVector->push_back(new ResourceMasterGroup(ResourceMasterGroups.at(i)));
+	}
+
+	for (size_t i = 0; i < loadPaths->size(); i++)
+	{
+		
+		for (size_t j = 0; j < masterResourceVector->size(); j++)
+		{
+			if (loadPaths->at(i).masterGroupName == masterResourceVector->at(j)->GroupName)
+			{
+				masterResourceVector->at(j)->loadPath = loadPaths->at(i).pathGroupName;
+				masterResourceVector->at(j)->loadPathIndex = i;	
+			}
+		}
+	}
+
+	syncMasterLoadPaths();
+
+}
+
+void ResourceHandler::syncMasterLoadPaths()
+{
+	std::vector<ResourceLoadPath>* loadPaths = this->getLoadPaths();
+	for (size_t i = 0; i < masterResourceVector->size(); i++)
+	{
+		if (masterResourceVector->at(i)->loadPathIndex < loadPaths->size())
+		{
+			for (size_t pathsIndex = 0; pathsIndex < loadPaths->at(masterResourceVector->at(i)->loadPathIndex).paths->size(); pathsIndex++)
+			{
+				for (size_t extIndex = 0; extIndex < loadPaths->at(masterResourceVector->at(i)->loadPathIndex).extensions->size(); extIndex++)
+				{
+					fetchPathContents(loadPaths->at(masterResourceVector->at(i)->loadPathIndex).paths->at(pathsIndex), 
+						loadPaths->at(masterResourceVector->at(i)->loadPathIndex).extensions->at(extIndex), masterResourceVector->at(i)->ResourcePaths,true);
+				}
+			}
+		}
+	}
 }
 
 std::filesystem::path ResourceHandler::getSourceDir()

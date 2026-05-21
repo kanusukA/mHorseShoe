@@ -222,6 +222,8 @@ protected:
 
 public:
 
+	bool buttonLock = false; // used to lock buttons when a process is running to prevent multiple clicks and process overlapping
+
 	// INDEPENDENT RESOURCE DATA
 	static	std::vector<std::shared_ptr<Case>>* caseVec;
 

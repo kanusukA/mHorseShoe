@@ -67,12 +67,15 @@ private:
 	// RESOURCES STORE
 	// HERE GENERAL RESOURCES ARE STORED.
 
+	// SOON TO BE DEPRICATED
 	std::vector<std::filesystem::path>* MaterialDp = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* ShaderDp = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* TextureDp = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* MeshDp = new std::vector<std::filesystem::path>();
 
-	std::vector<ResourceLoadPath>* resourceLoadPaths = new std::vector<ResourceLoadPath>();
+	// MASTER RESOURCE VECTOR
+	// THIS VECTOR STORES ALL THE RESOURCE PATHS. THAT HAS BEEN INITALIZED! i.e. THE PATHS THAT HASS BEEN CONNECTED TO THE ENUM GROUP AND THE RESOURCE_LOAD_PATHS.
+	std::vector<ResourceMasterGroup*>* masterResourceVector = new std::vector<ResourceMasterGroup*>();
 
 	std::vector<std::filesystem::path>* fetchResourcesByEnum(ResourceLoaderEnums::ResourceLoadPaths group_p);
 
@@ -129,7 +132,13 @@ public:
 	std::vector<std::filesystem::path>* getRenderMeshLoaded() { return MeshDp; }
 
 	// REOURCE LOADER FUNCTIONS
-	void saveLoadPaths(std::vector<ResourceLoadPath>* loadPaths) override;
+	void saveLoadPaths();
+
+	// Assigns paths from ResourceMasterGruops and load_paths
+	// requires ResourceLoader initalized.
+	void setMasterLoadPaths();
+	// fetches the data from load_paths and re-sets the ResourceMasterGruops
+	void syncMasterLoadPaths();
 
 
 	//Searching fullpath
@@ -174,6 +183,10 @@ public:
 	void operator=(const ResourceHandler&) = delete;
 
 	std::string getResourceFile(std::string fileName, ResourceHandlerType type, bool addToOgre);
+
+	std::vector<ResourceMasterGroup*>* getMasterResourceVector() {
+		return masterResourceVector;
+	}
 
 	// Used for testing only
 	void getAllResources();
@@ -225,6 +238,7 @@ public:
 	/*void loadImgToTex();*/
 
 	void shutdown() {
+		this->saveLoadPaths();
 		this->resource_loader_shutdown();
 	}
 };
