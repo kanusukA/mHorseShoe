@@ -45,7 +45,7 @@ An custom implementation of **BRDF** (Bidirectional Reflectance Distribution Fun
 ## NOTE : THIS IS AN HOBBY PROJECT. RECOMMENDING MHORSESHOE FOR DEVELOPMENT IS LIKE RECOMMENDING CANCER.
 
 The project uses cmake as its build system. 
-Dependencies are installed in the build EXCEPT FOR FREEIMAGE, install that independently.
+The sdl2.dll and zlib.dll files along with the config files must be extracted manually from the respective build folder of the ogre-build.
 
 It is highly recommanded to set RelWithDebInfo Build type, Ogre has a hard time managing debug build.
 
@@ -57,7 +57,7 @@ Ogre is an very integrated part of mHorseshoee but it will be removed in far fut
   <li> <a href="https://github.com/ocornut/imgui">ImGui</a> </li>
   <li> <a href="https://github.com/libsdl-org/SDL">SDL</a> </li>
   <li> <a href="https://vulkan.lunarg.com/sdk/home">VULKAN SDK</a> </li>
-  <li> <a href="https://freeimage.sourceforge.io/">FREEIMAGE</a> This is temporary dependency (Codec_STBI in OGRE is not working in this build) </li>
+  <li> <s><a href="https://freeimage.sourceforge.io/">FREEIMAGE</a> This is temporary dependency (Codec_STBI in OGRE is not working in this build) </s> </li>
   <li> <s>PHYSX</s> </li>
 </ul>
 <br>
