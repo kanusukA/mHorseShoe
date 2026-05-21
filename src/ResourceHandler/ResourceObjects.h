@@ -33,7 +33,8 @@ enum ResourcePaths {
 	ImagePath
 };
 
-const std::vector < std::string > ResourceMasterGroups = {
+namespace ResourceGroup {
+	const std::vector < std::string > ResourceMasterGroups = {
 	"Global",
 		"Objects",
 		"Shaders",
@@ -42,7 +43,19 @@ const std::vector < std::string > ResourceMasterGroups = {
 		"RenderMeshPath",
 		"ImagePath",
 		"Font"
-};
+	};
+
+	enum RESOURCE_MASTER_GROUP_INDEX { // MUST BE IN THE SAME ORDER AS ResourceMasterGroups
+		GLOBAL,
+		OBJECT,
+		SHADER,
+		MATERIAL_PATH,
+		MATERIAL_TEXTURE,
+		RENDER_MESH_PATH,
+		IMAGE_PATH,
+		FONT
+	};
+}
 
 struct ResourceMasterGroup {
 

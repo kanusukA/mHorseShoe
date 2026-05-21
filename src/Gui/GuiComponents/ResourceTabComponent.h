@@ -107,7 +107,7 @@ public:
 
 			newLoadPath.pathGroupName = emptyLoadPathName;
 
-			newLoadPath.masterGroupName = ResourceMasterGroups.at(selectedMasterGroup);
+			newLoadPath.masterGroupName = ResourceGroup::ResourceMasterGroups.at(selectedMasterGroup);
 
 			// PATHS
 			if (emptyLoadPaths.empty())
@@ -195,6 +195,14 @@ public:
 		}
 
 		
+	}
+
+	void syncMasterVector() {
+		this->gdSource->getResourceHandler()->setMasterLoadPaths();
+	}
+
+	void deleteLoadPath(int index) {
+		this->gdSource->getResourceHandler()->removeLoadPath(index);
 	}
 
 	void setLoadPath() {

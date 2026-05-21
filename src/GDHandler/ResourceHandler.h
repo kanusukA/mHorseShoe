@@ -117,6 +117,7 @@ public:
 	// Checks if the folder structure and required files exists for Resource Tasks
 	void checkFileStructure();
 
+	// DEPRICATED - RECOURCES ARE NOT LOADED USING THE MASTER_RECOURCE_VECTOR. WHICH PROVIDES VEC POINTERS TO THE DP VECTORS.
 	// Loads all the resources - Mesh, texture, Material, shader. Using the paths that are set on ResourceLoader.
 	void loadResources();
 
@@ -139,6 +140,10 @@ public:
 	void setMasterLoadPaths();
 	// fetches the data from load_paths and re-sets the ResourceMasterGruops
 	void syncMasterLoadPaths();
+
+	// Used to fetch Resource Paths for a specific group. Use RESOURCE_MASTER_GROUP_INDEX to fecth predefined groups.
+	std::vector<std::filesystem::path>* fetchResourceGroupVecByIndex(int masterIndex);
+	std::vector<std::filesystem::path>* fetchResourceGroupVecByName(std::string groupName);
 
 
 	//Searching fullpath

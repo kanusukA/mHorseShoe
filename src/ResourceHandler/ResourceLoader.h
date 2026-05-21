@@ -136,6 +136,10 @@ public:
 
 	RLCase fetchCaseData(std::filesystem::path yamlFilePath);
 
+	void removeLoadPath(int index) {
+		load_paths->erase(load_paths->begin() + index);
+	}
+
 	// LOADING FILES AND FOLDERS
 	void fetchPathContents(std::string path, std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders = false);
 

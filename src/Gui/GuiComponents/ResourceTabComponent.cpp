@@ -60,11 +60,11 @@ void addLoadPath(ResourceTabModelComponent* model) {
 			ImGui::InputText("##loadPathExtensions", &model->emptyLoadPathExtensions);
 
 
-			if (ImGui::BeginCombo("Master Group",ResourceMasterGroups.at(model->selectedMasterGroup).c_str()))
+			if (ImGui::BeginCombo("Master Group",ResourceGroup::ResourceMasterGroups.at(model->selectedMasterGroup).c_str()))
 			{
-				for (size_t i = 0; i < ResourceMasterGroups.size(); i++)
+				for (size_t i = 0; i < ResourceGroup::ResourceMasterGroups.size(); i++)
 				{
-					if (ImGui::Selectable(ResourceMasterGroups.at(i).c_str(),model->selectedMasterGroup == i))
+					if (ImGui::Selectable(ResourceGroup::ResourceMasterGroups.at(i).c_str(),model->selectedMasterGroup == i))
 					{
 						model->selectedMasterGroup = i;
 					}
@@ -97,7 +97,13 @@ void addLoadPath(ResourceTabModelComponent* model) {
 					for (int j = 0; j < model->loadPaths->at(i).extensions->size(); j++)
 					{
 						ImGui::Text(model->loadPaths->at(i).extensions->at(j).c_str());
+						ImGui::SameLine();
 					}
+					ImGui::Text("");
+				}
+				if (ImGui::Button(("Delete Path##LoadPath" + std::to_string(i)).c_str()))
+				{
+					model->deleteLoadPath(i);
 				}
 
 			}
@@ -177,6 +183,11 @@ void addLoadPath(ResourceTabModelComponent* model) {
 void masterResourcePaths(ResourceTabModelComponent* model) {
 
 	if (ImGui::CollapsingHeader("Master Resource Groups")) {
+
+		if (ImGui::Button("Sync with Load Path"))
+		{
+			model->syncMasterVector();
+		}
 
 		if (model->masterResourceVector && !model->masterResourceVector->empty())
 		{

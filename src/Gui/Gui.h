@@ -59,9 +59,10 @@ public:
 	{
 		ImGui::StyleColorsDark();
 		// INITALIZE SPECTER
-		ImGui::Spectrum::StyleColorsSpectrum();
+		//ImGui::Spectrum::StyleColorsSpectrum();
 		
 		ImGui::Spectrum::LoadFont();
+
 	}
 
 	//void setPlayerObserver(PlayerObserver* pObserver);
