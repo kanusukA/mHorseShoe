@@ -43,22 +43,6 @@ void ModelComponent::refreshImageTextures()
 	}
 }
 
-void ViewComponent::loadFonts()
-{
-	ImGuiIO& io = ImGui::GetIO();
-	std::vector<std::filesystem::path>* fontsPath = this->guiFramework->getResourceHandler()->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::FONT);
-	if (fontsPath)
-	{
-		for (size_t i = 0; i < fontsPath->size(); i++)
-		{
-			if (fontsPath->at(i).filename() == "UbuntuMono-Bold.ttf")
-			{
-				this->titleFont = io.Fonts->AddFontFromFileTTF(fontsPath->at(i).string().c_str(), 28.0);
-				IM_ASSERT(this->titleFont != nullptr);
-				this->titleFont->FontSize = 28;
-				
-			}
-			
-		}
-	}
-}
+
+
+

@@ -32,13 +32,15 @@ class Gui : public GuiFramework
 {
 private:
 
+	mFontSet* fontSet = new mFontSet();
+
 
 	Ogre::ImGuiOverlay* imOverlay = nullptr;
 
 	GUI_WINDOW_POS* guiWPos = new GUI_WINDOW_POS();
 
 	void addViewComponent(ViewComponent* viewComponent) override {
-		viewComponent->setFramework(this);
+		viewComponent->setFramework(this,fontSet);
 		Views.push_back(viewComponent);
 	}
 
@@ -60,10 +62,14 @@ public:
 		ImGui::StyleColorsDark();
 		// INITALIZE SPECTER
 		//ImGui::Spectrum::StyleColorsSpectrum();
+
+		this->loadFonts();
 		
 		ImGui::Spectrum::LoadFont();
 
 	}
+
+	void loadFonts();
 
 	//void setPlayerObserver(PlayerObserver* pObserver);
 	ImGuiViewport* viewport;

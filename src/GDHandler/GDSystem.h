@@ -33,8 +33,6 @@ protected:
 
 public:
 	GDSystem(Monster* monster) : GDNotifier() {
-		monster->InitMonster();
-
 		window = monster->sdlWindow;
 
 	}

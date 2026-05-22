@@ -26,12 +26,19 @@ int main() {
 
 	// Ogre AND ImGui
 	std::cout << "Setting up ImGui" << std::endl;
+
+	// Setup fonts for IMGUI Overlay in Monster
+	// This process cannot be done in GUI itself as it requires Imgui to be uninitalized. This was changed in Imgui version 1.92+ but Ogre uses 1.91.9b currently.
+	// TODO CHANGE THIS METHOD TO RUN AT GUI VIEW COMPONENT WHEN IMGUI VERSION IS UPDATED TO 1.92+
+	Monster* monster = new Monster();
+	monster->setupFonts();
+
 	Ogre::ImGuiOverlay* imOverlay = ctx.initialiseImGui(); // initalizes imgui before InitMonster! else will pop errors in renderOneFrame in Loop.
 	ctx.addInputListener(ctx.getImGuiInputListener());
 
 	// Ogre Overlay INIT
-	std::cout << "Initializing monster" << std::endl;
-	Monster* monster = new Monster(ctx.getRoot(),ctx.getRenderWindow(), ctx.getOverlaySystem(),imOverlay);
+	monster->InitMonster(ctx.getRoot(), ctx.getRenderWindow(), ctx.getOverlaySystem(), imOverlay);
+	
 	//setup materials to ogre
 
 

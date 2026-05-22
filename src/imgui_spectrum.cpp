@@ -1,17 +1,19 @@
 #include "imgui_spectrum.h"
 
+
 #include "imgui.h"
 
 namespace ImGui {
     namespace Spectrum {
         extern const unsigned int SourceSansProRegular_compressed_size = 149392;
         extern const unsigned int SourceSansProRegular_compressed_data[]; // defined later in the file
+        
 
         void LoadFont(float size) {
-            ImGuiIO& io = ImGui::GetIO();
-            ImFont* font = io.Fonts->AddFontFromMemoryCompressedTTF(SourceSansProRegular_compressed_data, SourceSansProRegular_compressed_size, size);
+           /* ImGuiIO& io = ImGui::GetIO();
+            ImFont* font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFont_compressed_data, ubuntuFont_compressed_size, size);
             IM_ASSERT(font != nullptr);
-            io.FontDefault = font;
+            io.FontDefault = font;*/
         }
 
         void StyleColorsSpectrum() {
@@ -73,6 +75,15 @@ namespace ImGui {
             colors[ImGuiCol_TabDimmed] = ColorConvertU32ToFloat4(Spectrum::GRAY400);
             colors[ImGuiCol_TabDimmedSelected] = ColorConvertU32ToFloat4(Spectrum::BLUE700);
         }
+
+        // File: '.\UbuntuMono-Bold.ttf' (174860 bytes)
+// Exported using binary_to_compressed_c.exe -u8 ".\UbuntuMono-Bold.ttf" ubuntuFont
+        
+        
+
+
+
+
 
         const unsigned int SourceSansProRegular_compressed_data[149392 / 4] =
         {

@@ -81,6 +81,11 @@ RSUS* GDBuilderContext::monProvideRsus()
 	return RSUS::GetInstance();
 }
 
+ImguiFonts* GDBuilderContext::monProvideFonts()
+{
+	return monster->fonts;
+}
+
 void GDBuilderContext::monSetShaderVars(std::vector<ShaderVar> vars_p, Ogre::GpuProgramParametersPtr shaderPrgm)
 {
 	RSUS::GetInstance()->updateShaderVars(vars_p, shaderPrgm);
