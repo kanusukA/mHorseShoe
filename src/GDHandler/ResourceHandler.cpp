@@ -33,7 +33,7 @@ ResourceHandlerType ResourceHandler::_getResourceLocationGroup(std::string group
 
 std::vector<std::filesystem::path>* ResourceHandler::fetchResourcesByEnum(ResourceLoaderEnums::ResourceLoadPaths group_p)
 {
-	switch (group_p)
+	/*switch (group_p)
 	{
 	case ResourceLoaderEnums::Objects:
 		return nullptr;
@@ -56,7 +56,9 @@ std::vector<std::filesystem::path>* ResourceHandler::fetchResourcesByEnum(Resour
 	default:
 		return nullptr;
 		break;
-	}
+	}*/
+
+	return nullptr;
 }
 
 
@@ -189,13 +191,18 @@ ResourceHandler::ResourceHandler()
 	this->SourceDir = getSourceDir();
 	ToastComponent::GetInstance()->addMessage("Source Dir : " + this->SourceDir.string());
 	checkFileStructure();
+
+	// Load contents in load_path
+	this->initResourceLoader(&ini, SourceDir, SourceDir.string() + DATA_DIRECTORY, this->SourceDir.string() + RESOURCELOADER_DATA);
+
+	// SETUP MASTER RESOURCE VECTOR
+	this->setMasterLoadPaths();
 	
 	this->ini.SetUnicode();
 	this->initResourceSaver(&ini, this->SourceDir.string() + DATA_DIRECTORY);
 
-	this->initResourceLoader(&ini,SourceDir , SourceDir.string() + DATA_DIRECTORY , this->SourceDir.string() + RESOURCELOADER_DATA);
-
-	this->loadResources();
+	
+	//this->loadResources();
 
 }
 
@@ -376,7 +383,11 @@ void ResourceHandler::checkFileStructure()
 
 void ResourceHandler::loadResources()
 {
-	this->loadMaterialsDp(this->MaterialDp, ".material", false, true);
+
+	
+
+	// DEPRECATED
+	/*this->loadMaterialsDp(this->MaterialDp, ".material", false, true);
 	this->loadShadersDp(this->ShaderDp, ".hlsl", true, true);
 	this->loadShadersDp(this->ShaderDp, ".glsl", true, true);
 	this->loadShadersDp(this->ShaderDp, ".vert", true, true);
@@ -384,7 +395,7 @@ void ResourceHandler::loadResources()
 	this->loadMeshesDp(this->MeshDp);
 	this->loadTexturesDp(this->TextureDp, ".png");
 	this->loadTexturesDp(this->TextureDp, ".jpg");
-	this->loadTexturesDp(this->TextureDp, ".jpeg");
+	this->loadTexturesDp(this->TextureDp, ".jpeg");*/
 
 	// loading saved data
 	//this->loadSavedCases(*this->getPath(ResourcePaths::Cases));
@@ -407,9 +418,8 @@ void ResourceHandler::saveResources()
 
 }
 
-void ResourceHandler::saveLoadPaths()
+void ResourceHandler::saveLoadPaths(std::vector<ResourceLoadPath>* loadPaths)
 {
-	std::vector<ResourceLoadPath>* loadPaths = this->getLoadPaths();
 	this->saveResourceLoadPaths(loadPaths, this->SourceDir.string() + RESOURCELOADER_DATA);
 }
 
@@ -671,7 +681,11 @@ void ResourceHandler::clearFile(std::string filename)
 	
 }
 
-
+bool ResourceHandler::fileExists(std::string filename)
+{
+	return std::filesystem::exists(filename);
+}
+}
 
 
 
@@ -689,6 +703,104 @@ std::string ResourceHandler::readFromFile(std::string key, std::string section, 
 	
 	return "";*/
 
+}
+
+void ResourceHandler::saveLoadPaths() {
+	std::vector<ResourceLoadPath>* loadPaths = this->getLoadPaths();
+	this->saveResourceLoadPaths(loadPaths, this->SourceDir.string() + RESOURCELOADER_DATA);
+}
+
+void ResourceHandler::setMasterLoadPaths()
+{
+	std::vector<ResourceLoadPath>* loadPaths = this->getLoadPaths();
+
+	if (!loadPaths || loadPaths->empty())
+	{
+		ToastComponent::GetInstance()->addMessage("No Load Paths to set in Master Resource Vector");
+		return;
+	}
+
+	masterResourceVector->clear();
+	for (size_t i = 0; i < ResourceGroup::ResourceMasterGroups.size(); i++)
+	{
+		masterResourceVector->push_back(new ResourceMasterGroup(ResourceGroup::ResourceMasterGroups.at(i)));
+	}
+
+	for (size_t i = 0; i < loadPaths->size(); i++)
+	{
+		
+		for (size_t j = 0; j < masterResourceVector->size(); j++)
+		{
+			if (loadPaths->at(i).masterGroupName == masterResourceVector->at(j)->GroupName)
+			{
+				masterResourceVector->at(j)->loadPath = loadPaths->at(i).pathGroupName;
+				masterResourceVector->at(j)->loadPathIndex = i;
+			}
+		}
+	}
+
+	syncMasterLoadPaths();
+
+}
+
+// Syncs the load_paths internal path! If load_path vector itself is changed then run setMasterLoadPath()!
+void ResourceHandler::syncMasterLoadPaths()
+{
+	std::vector<ResourceLoadPath>* loadPaths = this->getLoadPaths();
+	for (size_t i = 0; i < masterResourceVector->size(); i++)
+	{
+		if (masterResourceVector->at(i)->loadPath.empty())
+		{
+			continue;
+		}
+		if (masterResourceVector->at(i)->loadPathIndex < loadPaths->size() && masterResourceVector->at(i)->loadPath == loadPaths->at(masterResourceVector->at(i)->loadPathIndex).pathGroupName)
+		{
+			for (size_t pathsIndex = 0; pathsIndex < loadPaths->at(masterResourceVector->at(i)->loadPathIndex).paths->size(); pathsIndex++)
+			{
+				for (size_t extIndex = 0; extIndex < loadPaths->at(masterResourceVector->at(i)->loadPathIndex).extensions->size(); extIndex++)
+				{
+					fetchPathContents(loadPaths->at(masterResourceVector->at(i)->loadPathIndex).paths->at(pathsIndex), 
+						loadPaths->at(masterResourceVector->at(i)->loadPathIndex).extensions->at(extIndex), masterResourceVector->at(i)->ResourcePaths,true);
+				}
+			}
+		}
+	}
+
+	// ASSIGN POINTERS TO THE DP VECTORS.
+	if (this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::MATERIAL_PATH))
+	{
+		*this->MaterialDp = *this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::MATERIAL_PATH);
+	}
+	if (this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::MATERIAL_TEXTURE))
+	{
+		*this->TextureDp = *this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::MATERIAL_TEXTURE);
+	}
+	if (this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::RENDER_MESH_PATH))
+	{
+		*this->MeshDp = *this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::RENDER_MESH_PATH);
+	}
+	if (this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::SHADER))
+	{
+		*this->ShaderDp = *this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::SHADER);
+	}
+
+}
+
+std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByName(std::string groupName)
+{
+	for (size_t i = 0; i < masterResourceVector->size(); i++)
+	{
+		if (masterResourceVector->at(i)->GroupName == groupName)
+		{
+			return masterResourceVector->at(i)->ResourcePaths;
+		}
+	}
+	return nullptr;
+}
+
+std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByIndex(int masterIndex)
+{
+	return masterResourceVector->at(masterIndex)->ResourcePaths;
 }
 
 std::filesystem::path ResourceHandler::getSourceDir()

@@ -33,15 +33,57 @@ enum ResourcePaths {
 	ImagePath
 };
 
+namespace ResourceGroup {
+	const std::vector < std::string > ResourceMasterGroups = {
+	"Global",
+		"Objects",
+		"Shaders",
+		"MaterialPath",
+		"MaterialTexture",
+		"RenderMeshPath",
+		"ImagePath",
+		"Font"
+	};
+
+	enum RESOURCE_MASTER_GROUP_INDEX { // MUST BE IN THE SAME ORDER AS ResourceMasterGroups
+		GLOBAL,
+		OBJECT,
+		SHADER,
+		MATERIAL_PATH,
+		MATERIAL_TEXTURE,
+		RENDER_MESH_PATH,
+		IMAGE_PATH,
+		FONT
+	};
+}
+
+struct ResourceMasterGroup {
+
+	ResourceMasterGroup(std::string name_p) {
+		GroupName = name_p;
+	}
+
+	std::string GroupName;
+	std::string loadPath;
+	int loadPathIndex;
+	std::vector<std::filesystem::path>* ResourcePaths = new std::vector<std::filesystem::path>();
+};
+
+
+
 namespace ResourceLoaderEnums {
 
+	
+
+	// DEPRICATED - use RESOURCE MASTER GROUP
 	enum ResourceLoadPaths {
-		Objects,
-		Shaders,
-		MaterialPath,
-		MaterialTexture,
-		RenderMeshPath,
-		ImagePath
+		OBJECT,
+		SHADERS,
+		MATERIAL_PATH,
+		MATERIAL_TEXTURE,
+		RENDER_MESH_PATH,
+		IMAGE_PATH,
+		FONT
 	};
 
 }
@@ -80,6 +122,8 @@ struct ResourceLoadPath {
 	std::string pathGroupName;
 	std::vector<std::string>* extensions;
 	std::vector<std::string>* paths;
+
+	std::string masterGroupName = "";
 };
 
 class CaseResource;

@@ -101,11 +101,12 @@ int main() {
 
 	ResourceHandler::GetInstance()->saveResources();
 
+
 	// Shutdown
 	//kint->Shutdown();
 	monster->Shutdown();
 
-	//ResourceHandler::GetInstance()->shutdown();
+	ResourceHandler::GetInstance()->shutdown();
 
 	std::cout << "HEllOS";
 

@@ -43,9 +43,11 @@ protected:
 	int id = 0;
 	const char* name = "";
 	// Set type
-
+	ImFont* titleFont = nullptr;
 public:
 
+	//GUIFRAMEWORK IS ALWAYS NULL UNTIL SETFRAMEWORK()!
+	// USE THAT FUNCTION IS FRAMEWORK IS REQUIRED
 	ViewComponent(const char* name_p,GuiFramework* framework = nullptr) {
 		name = name_p;
 		guiFramework = framework;
@@ -55,23 +57,27 @@ public:
 	}
 
 	// FRAMEWORK METHOD! NOT TO BE USED OUTSIDE
+	// USE THIS FUNCTION AS A INIT REPLACEMENT
 	void setFramework(GuiFramework* framework) {
 		guiFramework = framework;
+		loadFonts();
 	}
 
 	virtual void view() {};
 
+	void loadFonts();
+
 	// HELPING WIDGETS
 	void ImTitleText(const char* text) {
-		/*if(titleFont)
+		if(titleFont)
 		{
 			ImGui::PushFont(titleFont);
-			ImGui::Text(text, 1.8f);
+			ImGui::Text(text);
 			ImGui::PopFont();
 		}
 		else {
 			ImGui::Text(text);
-		}*/
+		}
 		
 	}
 };
@@ -222,7 +228,10 @@ protected:
 
 public:
 
-	// INDEPENDENT RESOURCE DATA
+	bool buttonLock = false; // used to lock buttons when a process is running to prevent multiple clicks and process overlapping
+
+	// INDEPENDENT RESOURCE DATA - These vectors are generated during runtime!
+
 	static	std::vector<std::shared_ptr<Case>>* caseVec;
 
 	static SelectedCase* selectedCase;
@@ -230,7 +239,8 @@ public:
 	static SelectedObject* selectedObject;
 	static SelectedMaterial* selectedMaterial;
 
-	// DEPENDENT RESOURCE DATA
+	// DEPENDENT RESOURCE DATA - These vectors are fetched from the resourcehandler!
+
 	static std::vector<std::filesystem::path>* meshDpVec;
 	static std::vector<std::filesystem::path>* materialDpVec;
 	static std::vector<std::filesystem::path>* shaderDpVec;

@@ -10,7 +10,7 @@ void Gui::initGui(Ogre::ImGuiOverlay* overlay) {
 
 	imOverlay = overlay;
 
-	std::cout << "ImGui version" << ImGui::GetCurrentContext() << std::endl;
+	std::cout << "ImGui version" << ImGui::GetVersion() << std::endl;
 
 	this->viewport = ImGui::GetMainViewport();
 

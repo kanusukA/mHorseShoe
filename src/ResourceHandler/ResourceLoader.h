@@ -91,8 +91,7 @@ protected:
 
 
 
-	// LOADING FILES AND FOLDERS
-	void fetchPathContents(std::string path, std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders = false);
+	
 
 
 
@@ -110,6 +109,7 @@ public:
 	std::vector<RLScene>* RLScenes = new std::vector<RLScene>();
 	std::vector<RLObject>* RLObjects = new std::vector<RLObject>();
 
+
 	~ResourceLoader() {
 		delete load_paths;
 	}
@@ -121,7 +121,7 @@ public:
 
 	void addLoadPath(ResourceLoaderEnums::ResourceLoadPaths pathType_p, std::string path_p);
 	void addLoadPath(std::string path_p);
-	void addLoadPath(ResourceLoadPath path);
+	void addLoadPath(ResourceLoadPath path_p);
 
 	// loadLocation_p - Resource Loader's path saving directory
 	void initResourceLoader(CSimpleIniA* ini_p,std::filesystem::path sourceDir_p,std::filesystem::path dataDirPath_p , std::string resourceLoaderIniPath_p) {
@@ -135,6 +135,13 @@ public:
 	}
 
 	RLCase fetchCaseData(std::filesystem::path yamlFilePath);
+
+	void removeLoadPath(int index) {
+		load_paths->erase(load_paths->begin() + index);
+	}
+
+	// LOADING FILES AND FOLDERS
+	void fetchPathContents(std::string path, std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders = false);
 
 	// Loading Saved Data
 	//void loadSavedCases(std::string path_p);

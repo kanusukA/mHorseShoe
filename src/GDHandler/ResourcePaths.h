@@ -15,6 +15,7 @@
 #define LOAD_PATH_GROUP_NAME_KEY "LOAD_PATH"
 #define LOAD_PATH_EXTENSION_KEY "EXTENSIONS"
 #define LOAD_PATHS_KEY "PATHS"
+#define LOAD_PATH_GROUPS_KEY "GROUPS"
 
 // save / load names
 
@@ -69,7 +70,7 @@
 // ini paths
 #define DATA_DIRECTORY "/Data"
 #define MASTERLIST_LOC DATA_DIRECTORY + "/MasterList.ini"
-#define RESOURCELOADER_DATA DATA_DIRECTORY + "/ResourceLoad.ini"
+#define RESOURCELOADER_DATA DATA_DIRECTORY + "/ResourceLoad.yaml"
 
 #define CASE_DIRECTORY DATA_DIRECTORY + "/Case"
 #define CASE_INI_LOC CASE_DIRECTORY + "/Cases.ini"

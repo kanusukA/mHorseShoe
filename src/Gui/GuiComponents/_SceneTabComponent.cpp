@@ -122,6 +122,32 @@ void SceneTabComponent::view()
 
 		ImGui::Spacing(); ImGui::Spacing();
 
+		ImGui::SetNextItemWidth(180);
+		ImGui::InputText("Scene Name", scnTabModel->inputSceneName);
+
+		// SCENE TYPE SELECTION
+		if (ImGui::RadioButton("Static", scnTabModel->scnType == SceneType::STATIC))
+		{
+			scnTabModel->scnType = SceneType::STATIC;
+		}
+		ImGui::SameLine();
+
+		if (ImGui::RadioButton("Dynamic", scnTabModel->scnType == SceneType::DYNAMIC)) {
+			scnTabModel->scnType = SceneType::DYNAMIC;
+		}
+		ImGui::SameLine();
+
+		if (ImGui::RadioButton("Mesh", scnTabModel->scnType == SceneType::MESH)) {
+			scnTabModel->scnType = SceneType::MESH;
+		}
+
+		if (ImGui::Button("Add Scene"))
+		{
+			scnTabModel->addScene();
+		}
+
+		ImGui::Spacing(); ImGui::Spacing();
+
 
 		//ImGui::Text("Selected Scene : ");
 		if (!ModelComponent::selectedScene->selScene.expired() && !scnTabModel->isRootScnNodeSelected())
@@ -139,31 +165,7 @@ void SceneTabComponent::view()
 			// ADD SCENE
 
 			//ImGui::Text("Scene Name : ");
-			ImGui::SetNextItemWidth(180);
-			ImGui::InputText("Scene Name", scnTabModel->inputSceneName);
-
-			// SCENE TYPE SELECTION
-			if (ImGui::RadioButton("Static", scnTabModel->scnType == SceneType::STATIC))
-			{
-				scnTabModel->scnType = SceneType::STATIC;
-			}
-			ImGui::SameLine();
-
-			if (ImGui::RadioButton("Dynamic", scnTabModel->scnType == SceneType::DYNAMIC)) {
-				scnTabModel->scnType = SceneType::DYNAMIC;
-			}
-			ImGui::SameLine();
-
-			if (ImGui::RadioButton("Mesh", scnTabModel->scnType == SceneType::MESH)) {
-				scnTabModel->scnType = SceneType::MESH;
-			}
-
-			if (ImGui::Button("Add Scene"))
-			{
-				scnTabModel->addScene();
-			}
-
-			ImGui::Spacing(); ImGui::Spacing();
+			
 
 
 			// ADD SCENE OBJECTS CREATIONS AND OBJECTS VIEW!!

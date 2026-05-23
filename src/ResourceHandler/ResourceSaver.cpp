@@ -400,6 +400,11 @@ void ResourceSaver::saveObject(ObjectResource* obj_p, YAML::Emitter& out)
 
 void ResourceSaver::saveResourceLoadPaths(std::vector<ResourceLoadPath>* loadPaths, std::string path)
 {
+	if (!loadPaths || loadPaths->size() == 0)
+	{
+		return;
+	}
+
 	this->openSaveFile(path);
 
 	YAML::Emitter out;
@@ -409,6 +414,9 @@ void ResourceSaver::saveResourceLoadPaths(std::vector<ResourceLoadPath>* loadPat
 		out << YAML::BeginMap;
 		out << YAML::Key << LOAD_PATH_GROUP_NAME_KEY;
 		out << YAML::Value << loadPaths->at(i).pathGroupName;
+
+		out << YAML::Key << LOAD_PATH_GROUPS_KEY;
+		out << YAML::Value << loadPaths->at(i).masterGroupName;
 
 		out << YAML::Key << LOAD_PATH_EXTENSION_KEY;
 		out << YAML::Value << YAML::BeginSeq;

@@ -12,18 +12,27 @@ public:
 	std::vector<std::filesystem::path>* materials;
 	std::vector<std::filesystem::path>* images;
 	std::vector<std::filesystem::path>* shaders;
+	
+	int selectedMasterGroup = 0;
 
+	
 
 	// PATHS
 	std::vector<std::string>* paths;
 
+	std::vector<ResourceMasterGroup*>* masterResourceVector;
+
+	
+
 	//Load paths
 	std::vector<ResourceLoadPath>* loadPaths;
+
+	//std::vector<ResourceLoadPath>* emptyLoadPaths;
 
 	std::string emptyLoadPathName = "";
 	std::string emptyLoadPaths = "";
 	std::string emptyLoadPathExtensions = "";
-	bool showLoadPath = false;
+	bool showAddLoadPath = false;
 
 	std::string* inputPath = new std::string("");
 
@@ -43,9 +52,13 @@ public:
 		shaders = gdSource->getResourceHandler()->getShadersLoaded();
 
 		paths = gdSource->getResourceHandler()->getPaths();
-		
 		loadPaths = gdSource->getResourceHandler()->getLoadPaths();
+		masterResourceVector = gdSource->getResourceHandler()->getMasterResourceVector();
 
+	}
+
+	std::string openFolderSelection() {
+		return gdSource->openFolderSelectionDialog();
 	}
 
 	void RenderMeshToOgreBtn() {
@@ -85,70 +98,116 @@ public:
 	}
 
 	void addLoadPath() {
-		ResourceLoadPath loadPath = ResourceLoadPath();
-		loadPath.paths = new std::vector<std::string>();
-		loadPath.extensions = new std::vector<std::string>();
-		if (showLoadPath == false) {
-			showLoadPath = true;
-		}
-		else {
+		if (showAddLoadPath)
+		{
+			ResourceLoadPath newLoadPath = ResourceLoadPath();
+			newLoadPath.paths = new std::vector<std::string>();
+			newLoadPath.extensions = new std::vector<std::string>();
+
 			if (emptyLoadPathName.empty())
 			{
-				ToastComponent::GetInstance()->addMessage("Load Path not added : Add Name!");
+				ToastComponent::GetInstance()->addMessage("Load path name cannot be empty!");
 				return;
 			}
 
-			loadPath.pathGroupName = emptyLoadPathName;
+			newLoadPath.pathGroupName = emptyLoadPathName;
 
-			// check paths
-			std::string path = "";
-			for (size_t i = 0; i < emptyLoadPaths.size(); i++)
+			newLoadPath.masterGroupName = ResourceGroup::ResourceMasterGroups.at(selectedMasterGroup);
+
+			// PATHS
+			if (emptyLoadPaths.empty())
 			{
-				if (emptyLoadPaths.at(i) != ',')
+				ToastComponent::GetInstance()->addMessage("Load path cannot be empty!");
+				return;
+			}
+			else {
+				std::string path = "";
+				for (size_t i = 0; i < emptyLoadPaths.size(); i++)
 				{
-					path += emptyLoadPaths.at(i);
-				}
-				else {
-					if (this->gdSource->getResourceHandler()->fileExists(path))
+					if (emptyLoadPaths.at(i) != ',')
 					{
-						loadPath.paths->push_back(path);
+						path += emptyLoadPaths.at(i);
 					}
 					else {
-						ToastComponent::GetInstance()->addMessage("Invalid File path : " + path);
+						if (!path.empty() && gdSource->getResourceHandler()->fileExists(path))
+						{
+							newLoadPath.paths->push_back(path);
+						}
+						else {
+							ToastComponent::GetInstance()->addMessage("Invalid path - " + path);
+						}
+						path = "";
 					}
-					path = "";
 				}
 			}
-
-			if (loadPath.paths->size()  == 0)
+			if (newLoadPath.paths->empty())
 			{
-				ToastComponent::GetInstance()->addMessage("Load Path not added : Add Paths!");
+				ToastComponent::GetInstance()->addMessage("No valid paths added!");
 				return;
 			}
 
-			//extensions
-			std::string extension = "";
-			for (size_t i = 0; i < emptyLoadPathExtensions.size(); i++)
+			//EXTENSIONS
+			if (emptyLoadPathExtensions.empty())
 			{
-				if (emptyLoadPathExtensions.at(i) != ',')
+				ToastComponent::GetInstance()->addMessage("Load path extensions cannot be empty!");
+				return;
+			}
+			else {
+				std::string extension = "";
+				for (size_t i = 0; i < emptyLoadPathExtensions.size(); i++)
 				{
-					extension += emptyLoadPathExtensions.at(i);
+					if (emptyLoadPathExtensions.at(i) != ',')
+					{
+						extension += emptyLoadPathExtensions.at(i);
+					}
+					else {
+						if (!extension.empty())
+						{
+							newLoadPath.extensions->push_back(extension);
+						}
+						else {
+							ToastComponent::GetInstance()->addMessage("Invalid extension - " + extension);
+						}
+						extension = "";
+					}
 				}
-				else {
-
-					loadPath.extensions->push_back(extension);
-					extension = "";
-					
+				if (!extension.empty())
+				{
+					newLoadPath.extensions->push_back(extension);
 				}
 			}
+			
+			if (newLoadPath.extensions->empty())
+			{
+				ToastComponent::GetInstance()->addMessage("No valid extensions added!");
+				return;
+			}
+			
 
-			this->gdSource->getResourceHandler()->addLoadPath(loadPath);
-			emptyLoadPathExtensions = "";
+			gdSource->getResourceHandler()->addLoadPath(newLoadPath);
+
+
+			showAddLoadPath = false;
 			emptyLoadPathName = "";
 			emptyLoadPaths = "";
-			showLoadPath = false;
+			emptyLoadPathExtensions = "";
 
 		}
+		else
+		{
+			showAddLoadPath = true;
+
+		}
+
+		
+	}
+
+	void syncMasterVector() {
+		this->gdSource->getResourceHandler()->setMasterLoadPaths();
+	}
+
+	void deleteLoadPath(int index) {
+		this->gdSource->getResourceHandler()->removeLoadPath(index);
 	}
 
 	void setLoadPath() {
@@ -165,7 +224,7 @@ public:
 	}
 
 	void saveLoadPaths() {
-		//this->gdSource->getResourceHandler()->saveLoadPaths();
+		
 	}
 
 };
