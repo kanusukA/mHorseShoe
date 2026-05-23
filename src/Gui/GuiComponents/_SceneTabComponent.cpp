@@ -49,7 +49,7 @@ void SceneTabComponent::view()
 
 	//ImGui::ShowStyleEditor();
 	
-	ImTitleText("Cases");
+	ImVariableText("Case", mFontType::TTITLE32);
 	ImGui::BeginChild("Load / Save", ImVec2(350, 100));
 	
 	//ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.929, 0.906, 0.941, 1.0));

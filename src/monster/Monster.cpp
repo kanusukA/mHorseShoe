@@ -45,10 +45,20 @@ std::mutex RSUS::mutex_;
 	}
 }
 
-Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay,Ogre::ImGuiOverlay* imguiOverlay_p)
+Monster::Monster()
 {
-	oRoot = root;
 	
+
+	
+	
+}
+
+
+
+void Monster::InitMonster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p) {
+
+	oRoot = root;
+
 	renderWindow = rWin;
 
 	oScnManager = root->createSceneManager();
@@ -58,8 +68,8 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 	oScnManager->setAmbientLight(Ogre::ColourValue(0.53, 0.2, 0.12));
 	oScnManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
 
-	
-	
+
+
 
 	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 	//oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
@@ -69,44 +79,33 @@ Monster::Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem
 
 	// if caster and receiverMat is found execute SHADOWTYPE_TEXTURE
 
-	
+
 
 	//oScnManager->setShadowTextureCasterMaterial(casterMat);
 	//oScnManager->setShadowTextureReceiverMaterial(receiverMat);
 	////oScnManager->setShadowCasterRenderBackFaces(false);
 	//
 	//oScnManager->setShadowTextureSelfShadow(true);
-	
-	
+
+
 	//oScnManager->setShowDebugShadows(true);
 
-	
+
 
 	oScnManager->addRenderQueueListener(overlay);
-	
-	
+
+
 	// raycast setup
-	mRayScnQuery =  oScnManager->createRayQuery(Ogre::Ray(), Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
+	mRayScnQuery = oScnManager->createRayQuery(Ogre::Ray(), Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
 
 	mRayScnQuery->setQueryMask(~QueryMask::SKY & ~QueryMask::GRID);
-	
 
 
-//	inputkeys = InputHandler::GetInstance()->getInputKeys();
+
+	//	inputkeys = InputHandler::GetInstance()->getInputKeys();
 
 	imguiOverlay = imguiOverlay_p;
-
 	
-	
-}
-
-
-
-void Monster::InitMonster() {
-
-	
-
-	// DOESN'T WORK WITH VULKAN RENDERER
 	
 	_setupSDL3(1600,900,"Psycho");
 
@@ -392,6 +391,27 @@ void Monster::addMainDirectionalLight(std::string lightName, Ogre::Vector3 dir ,
 	//RSUS::GetInstance()->readMaterial("mySky");
 	//RSUS::GetInstance()->updateFragParameterFloat3("worldSpaceLightPos", dir);
 
+}
+
+void Monster::setupFonts()
+{
+	
+	/*ImGuiIO& io = ImGui::GetIO();
+	std::vector<std::filesystem::path>* fontsPath = ResourceHandler::GetInstance()->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::FONT);
+	if (fontsPath)
+	{
+		for (size_t i = 0; i < fontsPath->size(); i++)
+		{
+			if (fontsPath->at(i).filename() == "UbuntuMono-Bold.ttf")
+			{
+				fonts->title = io.Fonts->AddFontFromFileTTF(fontsPath->at(i).string().c_str(), 28.0);
+				IM_ASSERT(this->titleFont != nullptr);
+				fonts->title->FontSize = 28;
+
+			}
+
+		}
+	}*/
 }
 
 

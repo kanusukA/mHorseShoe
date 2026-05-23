@@ -8,9 +8,12 @@
 #include <GDHandler/Connector/MasterB.h>
 #include <Gui/GuiComponents/ToastComponent.h>
 
+// Fonts
+#include <defaultFonts/Ubuntu_bold.h>
+#include <defaultFonts/Ubuntu_Regular.h>
+
 //Third
-#include <OgreImGuiOverlay.h>
-#include <imgui_stdlib.h>
+
 
 //STL
 //#include <string>
@@ -18,7 +21,27 @@
 #include <atlbase.h>
 
 
-// CODE CLEAN UP SHIFT TO NEW GUI FRAMEWORK!!
+enum mFontType
+{
+	TTITLE48,
+	TTITLE32,
+	TTITLE16,
+	BODY48,
+	BODY32,
+	BODY16
+};
+
+// Used to propogate fonts to view components
+struct mFontSet {
+	ImFont* title32Font = nullptr;
+	ImFont* title48Font = nullptr;
+	ImFont* title16Font = nullptr;
+	ImFont* body48Font = nullptr;
+	ImFont* body32Font = nullptr;
+	ImFont* body16Font = nullptr;
+};
+
+
 
 // GuiFRAMEWORK IMPLEMENTATION
 // HERE ARE THE CLASS USED TO CREATE VIEW AND MODEL COMPONENTS FOR THE GUI
@@ -42,34 +65,81 @@ protected:
 	bool show = true;
 	int id = 0;
 	const char* name = "";
-	// Set type
-	ImFont* titleFont = nullptr;
+
+	mFontSet* fonts = nullptr;
+	
 public:
 
 	//GUIFRAMEWORK IS ALWAYS NULL UNTIL SETFRAMEWORK()!
 	// USE THAT FUNCTION IS FRAMEWORK IS REQUIRED
-	ViewComponent(const char* name_p,GuiFramework* framework = nullptr) {
+	ViewComponent(const char* name_p,mFontSet* fonts_p = nullptr ,GuiFramework* framework = nullptr) {
 		name = name_p;
 		guiFramework = framework;
 
+		fonts = fonts_p;
 		/*titleFont = *ImGui::GetFont();
 		titleFont->FontSize = 28;*/
 	}
 
 	// FRAMEWORK METHOD! NOT TO BE USED OUTSIDE
 	// USE THIS FUNCTION AS A INIT REPLACEMENT
-	void setFramework(GuiFramework* framework) {
+	void setFramework(GuiFramework* framework, mFontSet* fonts_p = nullptr) {
 		guiFramework = framework;
-		loadFonts();
+		fonts = fonts_p;
+		//loadFonts();
 	}
 
 	virtual void view() {};
 
-	void loadFonts();
+	
 
 	// HELPING WIDGETS
-	void ImTitleText(const char* text) {
-		if(titleFont)
+	void ImVariableText(const char* text,mFontType type) {
+
+		if (!fonts)
+		{
+			ImGui::Text(text);
+			return;
+		}
+		switch (type) {
+		case mFontType::TTITLE16:
+			if (fonts->title16Font)
+			{
+				ImGui::PushFont(fonts->title16Font);
+				ImGui::Text(text);
+				ImGui::PopFont();
+			}
+			else {
+				ImGui::Text(text);
+			}
+			break;
+		case mFontType::TTITLE32:
+			if (fonts->title32Font)
+			{
+				ImGui::PushFont(fonts->title32Font);
+				ImGui::Text(text);
+				ImGui::PopFont();
+			}
+			else {
+				ImGui::Text(text);
+			}
+			break;
+		case mFontType::TTITLE48:
+			if (fonts->title48Font)
+			{
+				ImGui::PushFont(fonts->title48Font);
+				ImGui::Text(text);
+				ImGui::PopFont();
+			}
+			else {
+				ImGui::Text(text);
+			}
+			break;
+		default:
+			ImGui::Text(text);
+		}
+		
+		/*if(titleFont)
 		{
 			ImGui::PushFont(titleFont);
 			ImGui::Text(text);
@@ -77,7 +147,7 @@ public:
 		}
 		else {
 			ImGui::Text(text);
-		}
+		}*/
 		
 	}
 };
@@ -137,7 +207,11 @@ protected:
 
 	//PlayerObserver* playerObserver = nullptr;
 
+	
+
+
 public:
+
 	GDSource(CaseHandler* casehan, StuffHandler* stuffhan, 
 		ResourceHandler* resourceHan,
 		RSUS* rsus,GDSystem* system_p) {
@@ -148,6 +222,7 @@ public:
 		this->shaderHandler = rsus;
 		this->system = system_p;
 
+		//loadFonts();
 
 		// initalize the file dialog COM library
 		ComInit com;
@@ -166,6 +241,8 @@ public:
 		fileDialog->SetFolder(psi);
 
 	};
+
+	//void loadFonts();
 
 	CaseHandler* getCaseHandler() {
 		return scnHandler;
@@ -334,6 +411,8 @@ protected:
 
 	std::vector<ModelComponent*> Models = std::vector<ModelComponent*>();
 	std::vector<ViewComponent*> Views = std::vector<ViewComponent*>();
+
+	
 
 	ModelComponent* getModelByName(std::string name) {
 		for (int i = 0; i < Models.size(); i++)

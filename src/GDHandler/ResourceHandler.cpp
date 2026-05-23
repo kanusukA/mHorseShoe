@@ -712,18 +712,20 @@ void ResourceHandler::saveLoadPaths() {
 
 void ResourceHandler::setMasterLoadPaths()
 {
+	
+
+	masterResourceVector->clear();
+	for (size_t i = 0; i < ResourceGroup::ResourceMasterGroups.size(); i++)
+	{
+		masterResourceVector->push_back(new ResourceMasterGroup(ResourceGroup::ResourceMasterGroups.at(i)));
+	}
+
 	std::vector<ResourceLoadPath>* loadPaths = this->getLoadPaths();
 
 	if (!loadPaths || loadPaths->empty())
 	{
 		ToastComponent::GetInstance()->addMessage("No Load Paths to set in Master Resource Vector");
 		return;
-	}
-
-	masterResourceVector->clear();
-	for (size_t i = 0; i < ResourceGroup::ResourceMasterGroups.size(); i++)
-	{
-		masterResourceVector->push_back(new ResourceMasterGroup(ResourceGroup::ResourceMasterGroups.at(i)));
 	}
 
 	for (size_t i = 0; i < loadPaths->size(); i++)
@@ -800,7 +802,11 @@ std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByName
 
 std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByIndex(int masterIndex)
 {
-	return masterResourceVector->at(masterIndex)->ResourcePaths;
+	if (masterResourceVector && masterResourceVector->size() > masterIndex)
+	{
+		return masterResourceVector->at(masterIndex)->ResourcePaths;
+	}
+	return nullptr;
 }
 
 std::filesystem::path ResourceHandler::getSourceDir()

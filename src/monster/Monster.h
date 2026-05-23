@@ -14,6 +14,8 @@
 
 // Third-party header
 #include <SDL3/SDL.h>
+#include <OgreImGuiOverlay.h>
+#include <imgui_stdlib.h>
 #include <imgui_spectrum.h>
 //#include <PxPhysicsAPI.h>
 
@@ -67,6 +69,10 @@ enum QueryMask
 	SKY = 1 << 0,
 	GRID = 1 << 1
 
+};
+
+struct ImguiFonts {
+	ImFont* title;
 };
 
 
@@ -196,12 +202,14 @@ public:
 
 	Ogre::ImGuiOverlay* imguiOverlay;
 
+	ImguiFonts* fonts = new ImguiFonts();
+
 	// INITIALIZE OGRE3D AND CREATE A RENDERWINDOW
 	// name  -  NAME OF THE RENDERWINDOW
-	Monster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p);
+	Monster();
 
 	// INITIALISES SDL3 WINDOW / ADDS DEFAULT CAMERAMAN / GUI SYSTEM
-	void InitMonster();
+	void InitMonster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p);
 
 	void setShadowTechnique();
 
@@ -267,6 +275,10 @@ public:
 		Ogre::Vector3 position,
 		Ogre::Vector3 direction);
 	void addMainDirectionalLight(std::string lightName, Ogre::Vector3 dir, int power);
+
+
+	// IMGUI OVERLAY
+	void setupFonts();
 
 	// adds a resource location 
 	// loc - location from current working directory

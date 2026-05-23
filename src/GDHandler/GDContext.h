@@ -66,6 +66,8 @@ public:
 	void monDeleteEntity(Ogre::Entity* entity_p);
 
 	RSUS* monProvideRsus();
+	ImguiFonts* monProvideFonts();
+
 	void monSetShaderVars(std::vector<ShaderVar> vars_p, Ogre::GpuProgramParametersPtr shaderPrgm);
 
 	// Check Functions

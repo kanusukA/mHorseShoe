@@ -41,6 +41,41 @@ void Gui::shutdown()
 {
 }
 
+void Gui::loadFonts()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	fontSet->title48Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFont_compressed_data, ubuntuFont_compressed_size, 28);
+	if (!fontSet->title48Font->IsLoaded()) {
+		fontSet->title48Font->FontSize = 48;
+	}
+	fontSet->title32Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFont_compressed_data, ubuntuFont_compressed_size, 16);
+	
+	fontSet->title16Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFont_compressed_data, ubuntuFont_compressed_size, 8);
+
+	fontSet->body48Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFontRegular_compressed_data, ubuntuFontRegular_compressed_size, 28);
+	fontSet->body32Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFontRegular_compressed_data, ubuntuFontRegular_compressed_size, 16);
+	fontSet->body16Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFontRegular_compressed_data, ubuntuFontRegular_compressed_size, 8);
+	
+	io.Fonts.
+	io.FontDefault = fontSet->body32Font;
+
+	/*std::vector<std::filesystem::path>* fontsPath = this->guiFramework->getResourceHandler()->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::FONT);
+	if (fontsPath)
+	{
+		for (size_t i = 0; i < fontsPath->size(); i++)
+		{
+			if (fontsPath->at(i).filename() == "UbuntuMono-Bold.ttf")
+			{
+				this->titleFont = io.Fonts->AddFontFromFileTTF(fontsPath->at(i).string().c_str(), 28.0);
+				IM_ASSERT(this->titleFont != nullptr);
+				this->titleFont->FontSize = 28;
+
+			}
+
+		}
+	}*/
+}
+
 
 // NEW FRAMEWORK
 void Gui::initGuiComponents()
