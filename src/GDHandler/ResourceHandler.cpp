@@ -418,10 +418,6 @@ void ResourceHandler::saveResources()
 
 }
 
-void ResourceHandler::saveLoadPaths(std::vector<ResourceLoadPath>* loadPaths)
-{
-	this->saveResourceLoadPaths(loadPaths, this->SourceDir.string() + RESOURCELOADER_DATA);
-}
 
 std::filesystem::path ResourceHandler::fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p)
 {
@@ -681,11 +677,7 @@ void ResourceHandler::clearFile(std::string filename)
 	
 }
 
-bool ResourceHandler::fileExists(std::string filename)
-{
-	return std::filesystem::exists(filename);
-}
-}
+
 
 
 
@@ -802,7 +794,7 @@ std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByName
 
 std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByIndex(int masterIndex)
 {
-	if (masterResourceVector && masterResourceVector->size() > masterIndex)
+	if (masterResourceVector && masterIndex < masterResourceVector->size())
 	{
 		return masterResourceVector->at(masterIndex)->ResourcePaths;
 	}

@@ -60,19 +60,19 @@ void addLoadPath(ResourceTabModelComponent* model) {
 			ImGui::InputText("##loadPathExtensions", &model->emptyLoadPathExtensions);
 
 
-			if (ImGui::BeginCombo("Master Group",ResourceGroup::ResourceMasterGroups.at(model->selectedMasterGroup).c_str()))
+			if (ImGui::BeginCombo("Master Group", ResourceGroup::ResourceMasterGroups.at(model->selectedMasterGroup).c_str()))
 			{
 				for (size_t i = 0; i < ResourceGroup::ResourceMasterGroups.size(); i++)
 				{
-					if (ImGui::Selectable(ResourceGroup::ResourceMasterGroups.at(i).c_str(),model->selectedMasterGroup == i))
+					if (ImGui::Selectable(ResourceGroup::ResourceMasterGroups.at(i).c_str(), model->selectedMasterGroup == i))
 					{
 						model->selectedMasterGroup = i;
 					}
-					
+
 				}
 				ImGui::EndCombo();
 			}
-			
+
 
 		}
 		if (model->loadPaths)
@@ -82,7 +82,7 @@ void addLoadPath(ResourceTabModelComponent* model) {
 				ImGui::Text(("Path Name : " + model->loadPaths->at(i).pathGroupName).c_str());
 
 				ImGui::Text(("Group : " + model->loadPaths->at(i).masterGroupName).c_str());
-				
+
 				if (model->loadPaths->at(i).paths)
 				{
 					ImGui::Text("Paths");
@@ -106,128 +106,133 @@ void addLoadPath(ResourceTabModelComponent* model) {
 					model->deleteLoadPath(i);
 				}
 
-			
-		if (ImGui::Button("Add Load Path"))
-		{
-			model->addLoadPath();
-		}
 
-		if (ImGui::Button("Save"))
-		{
-			model->saveLoadPaths();
-		}
-
-		if (model->loadPaths)
-		{
-			for (size_t i = 0; i < model->loadPaths->size(); i++)
-			{
-				ImGui::Text(model->loadPaths->at(i).pathGroupName.c_str());
-				for (size_t j = 0; j < model->loadPaths->at(i).paths->size(); j++)
+				if (ImGui::Button("Add Load Path"))
 				{
-					ImGui::Text(model->loadPaths->at(i).paths->at(j).c_str());
-				}
-				for (size_t j = 0; j < model->loadPaths->at(i).extensions->size(); j++)
-				{
-					ImGui::Text(model->loadPaths->at(i).extensions->at(j).c_str());
-				}
-				
-				ImGui::Spacing();
-			}
-		}
-
-		/*for (int i = 0; i < model->loadPaths->size(); i++)
-		{
-
-			switch (ResourceLoaderEnums::ResourceLoadPaths(i))
-			{
-			case ResourceLoaderEnums::Objects:
-				ImGui::Text("Objects : ");
-				break;
-			case ResourceLoaderEnums::Shaders:
-				ImGui::Text("Shaders : ");
-				break;
-			case ResourceLoaderEnums::MaterialPath:
-				ImGui::Text("Material : ");
-				break;
-			case ResourceLoaderEnums::MaterialTexture:
-				ImGui::Text("MaterialTexture : ");
-				break;
-			case ResourceLoaderEnums::RenderMeshPath:
-				ImGui::Text("RenderMeshPath : ");
-				break;
-			case ResourceLoaderEnums::ImagePath:
-				ImGui::Text("Images : ");
-				break;
-			default:
-				ImGui::Text(("Unknown : " + std::to_string(i)).c_str());
-				break;
-			}
-			ImGui::SameLine();
-
-			if (model->editLoadPathpos == i)
-			{
-
-				if (ImGui::InputText(("##" + std::to_string(i)).c_str(), model->inputPath, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue)) {
-					model->setLoadPath();
+					model->addLoadPath();
 				}
 
-				ImGui::SameLine();
-
-				if (ImGui::Button("Set"))
+				if (ImGui::Button("Save"))
 				{
-					model->setLoadPath();
-				}
-			}
-			else {
-
-				ImGui::Text(model->loadPaths->at(i).c_str(), 500.0);
-
-				ImGui::SameLine();
-
-				if (ImGui::Button(("EditLoadPath##" + std::to_string(i)).c_str()))
-				{
-					model->editLoadPath(i);
+					model->saveLoadPaths();
 				}
 
-			}
-
-
-		}*/
-	}
-}
-
-void masterResourcePaths(ResourceTabModelComponent* model) {
-
-	if (ImGui::CollapsingHeader("Master Resource Groups")) {
-
-		if (ImGui::Button("Sync with Load Path"))
-		{
-			model->syncMasterVector();
-		}
-
-		if (model->masterResourceVector && !model->masterResourceVector->empty())
-		{
-			for (int i = 0; i < model->masterResourceVector->size(); i++)
-			{
-				ImGui::Text(model->masterResourceVector->at(i)->GroupName.c_str());
-
-				if (ImGui::CollapsingHeader(("Paths##MasterResourceVector" + std::to_string(i)).c_str()))
+				if (model->loadPaths)
 				{
-					if (model->masterResourceVector->at(i)->ResourcePaths)
+					for (size_t i = 0; i < model->loadPaths->size(); i++)
 					{
-						ImGui::Text("Paths");
-						for (int j = 0; j < model->masterResourceVector->at(i)->ResourcePaths->size(); j++)
+						ImGui::Text(model->loadPaths->at(i).pathGroupName.c_str());
+						for (size_t j = 0; j < model->loadPaths->at(i).paths->size(); j++)
 						{
-							ImGui::Text(model->masterResourceVector->at(i)->ResourcePaths->at(j).string().c_str());
+							ImGui::Text(model->loadPaths->at(i).paths->at(j).c_str());
 						}
+						for (size_t j = 0; j < model->loadPaths->at(i).extensions->size(); j++)
+						{
+							ImGui::Text(model->loadPaths->at(i).extensions->at(j).c_str());
+						}
+
+						ImGui::Spacing();
 					}
 				}
-				
+
+				/*for (int i = 0; i < model->loadPaths->size(); i++)
+				{
+
+					switch (ResourceLoaderEnums::ResourceLoadPaths(i))
+					{
+					case ResourceLoaderEnums::Objects:
+						ImGui::Text("Objects : ");
+						break;
+					case ResourceLoaderEnums::Shaders:
+						ImGui::Text("Shaders : ");
+						break;
+					case ResourceLoaderEnums::MaterialPath:
+						ImGui::Text("Material : ");
+						break;
+					case ResourceLoaderEnums::MaterialTexture:
+						ImGui::Text("MaterialTexture : ");
+						break;
+					case ResourceLoaderEnums::RenderMeshPath:
+						ImGui::Text("RenderMeshPath : ");
+						break;
+					case ResourceLoaderEnums::ImagePath:
+						ImGui::Text("Images : ");
+						break;
+					default:
+						ImGui::Text(("Unknown : " + std::to_string(i)).c_str());
+						break;
+					}
+					ImGui::SameLine();
+
+					if (model->editLoadPathpos == i)
+					{
+
+						if (ImGui::InputText(("##" + std::to_string(i)).c_str(), model->inputPath, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue)) {
+							model->setLoadPath();
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Set"))
+						{
+							model->setLoadPath();
+						}
+					}
+					else {
+
+						ImGui::Text(model->loadPaths->at(i).c_str(), 500.0);
+
+						ImGui::SameLine();
+
+						if (ImGui::Button(("EditLoadPath##" + std::to_string(i)).c_str()))
+						{
+							model->editLoadPath(i);
+						}
+
+					}
+
+
+				}*/
 			}
 
 		}
 	}
 }
+
+		void masterResourcePaths(ResourceTabModelComponent* model)
+		{
+
+			if (ImGui::CollapsingHeader("Master Resource Groups")) {
+
+				if (ImGui::Button("Sync with Load Path"))
+				{
+					model->syncMasterVector();
+				}
+
+				if (model->masterResourceVector && !model->masterResourceVector->empty())
+				{
+					for (int i = 0; i < model->masterResourceVector->size(); i++)
+					{
+						ImGui::Text(model->masterResourceVector->at(i)->GroupName.c_str());
+
+						if (ImGui::CollapsingHeader(("Paths##MasterResourceVector" + std::to_string(i)).c_str()))
+						{
+							if (model->masterResourceVector->at(i)->ResourcePaths)
+							{
+								ImGui::Text("Paths");
+								for (int j = 0; j < model->masterResourceVector->at(i)->ResourcePaths->size(); j++)
+								{
+									ImGui::Text(model->masterResourceVector->at(i)->ResourcePaths->at(j).string().c_str());
+								}
+							}
+						}
+
+					}
+
+				}
+			}
+		}
+	
 
 void ResourceTabComponent::view()
 {
