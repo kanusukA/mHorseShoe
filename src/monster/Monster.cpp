@@ -200,6 +200,7 @@ Ogre::Mesh* Monster::getColliderMesh(Ogre::String meshName, Ogre::String groupNa
 
 Ogre::MaterialPtr Monster::getMaterial(Ogre::String matName_p, Ogre::String groupName)
 {
+	// Material name is null when saved is null fix it!
 	Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(matName_p,groupName);
 	if (mat.isNull())
 	{

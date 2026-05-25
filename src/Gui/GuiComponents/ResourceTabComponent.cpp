@@ -75,6 +75,12 @@ void addLoadPath(ResourceTabModelComponent* model) {
 
 
 		}
+
+		if (ImGui::Button("Add Load Path"))
+		{
+			model->addLoadPath();
+		}
+
 		if (model->loadPaths)
 		{
 			for (int i = 0; i < model->loadPaths->size(); i++)
@@ -107,33 +113,7 @@ void addLoadPath(ResourceTabModelComponent* model) {
 				}
 
 
-				if (ImGui::Button("Add Load Path"))
-				{
-					model->addLoadPath();
-				}
-
-				if (ImGui::Button("Save"))
-				{
-					model->saveLoadPaths();
-				}
-
-				if (model->loadPaths)
-				{
-					for (size_t i = 0; i < model->loadPaths->size(); i++)
-					{
-						ImGui::Text(model->loadPaths->at(i).pathGroupName.c_str());
-						for (size_t j = 0; j < model->loadPaths->at(i).paths->size(); j++)
-						{
-							ImGui::Text(model->loadPaths->at(i).paths->at(j).c_str());
-						}
-						for (size_t j = 0; j < model->loadPaths->at(i).extensions->size(); j++)
-						{
-							ImGui::Text(model->loadPaths->at(i).extensions->at(j).c_str());
-						}
-
-						ImGui::Spacing();
-					}
-				}
+		
 
 				/*for (int i = 0; i < model->loadPaths->size(); i++)
 				{
@@ -189,15 +169,15 @@ void addLoadPath(ResourceTabModelComponent* model) {
 							model->editLoadPath(i);
 						}
 
-					}
+					}*/
 
 
-				}*/
+				}
 			}
 
 		}
 	}
-}
+
 
 		void masterResourcePaths(ResourceTabModelComponent* model)
 		{

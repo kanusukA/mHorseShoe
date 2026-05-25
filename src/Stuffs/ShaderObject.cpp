@@ -34,6 +34,7 @@ void Shader::_initShader(Ogre::MaterialPtr mat_p)
 
 		this->setName(ShaderName);
 		
+
 	}
 	else {
 		ToastComponent::GetInstance()->addMessage("No Programmable shader!");

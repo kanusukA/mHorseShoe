@@ -25,6 +25,8 @@ public:
 	StuffHandler* stuffHandler;
 	Ogre::SceneManager* oScnManager;
 
+	std::shared_ptr<std::string> defaultCase = std::make_shared<std::string>();
+
 
 	std::vector<std::shared_ptr<Case>>* caseVec = new std::vector<std::shared_ptr<Case>>();
 
@@ -87,6 +89,7 @@ public:
 	void loadCase(std::filesystem::path yamlFilePath);
 
 	// SAVING FUNCTIONS
+	void saveDefaultCase();
 	void saveAll();
 	void saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes);
 	void saveObjects(const std::vector<std::shared_ptr<Object>>* objects, YAML::Emitter& out);

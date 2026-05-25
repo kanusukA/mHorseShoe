@@ -1,5 +1,25 @@
 #include "CaseHandler.h"
 
+
+
+void CaseHandler::saveDefaultCase()
+{
+
+	if (defaultCase && defaultCase.get()->empty())
+	{
+		ToastComponent::GetInstance()->addMessage("Default Case is Empty!");
+		return;
+	}
+
+	resourceHandler->openSaveFile(resourceHandler->getSourceDir().string() + CASE_DEFAULT_CASE_PATH);
+	YAML::Emitter out;
+	out << YAML::BeginMap << YAML::Key << CASE_DEFAULT_CASE_NAME << *defaultCase.get();
+
+	resourceHandler->writeToSaveFile(out.c_str());
+	resourceHandler->closeSaveFile();
+
+}
+
 void CaseHandler::saveAll() {
 
 	

@@ -47,6 +47,14 @@ void SceneTabComponent::view()
 	ImGui::SetNextWindowSize(ImVec2(350, 600));
 	ImGui::Begin("Cases",0,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
+	ImGui::Text("Default Case : ");
+	if (!this->scnTabModel->defaultCase.expired())
+	{
+		ImGui::SameLine();
+		ImGui::Text(scnTabModel->defaultCase.lock().get()->c_str());
+	}
+	
+
 	//ImGui::ShowStyleEditor();
 	
 	ImVariableText("Case", mFontType::TTITLE32);
@@ -93,6 +101,11 @@ void SceneTabComponent::view()
 	if (ImGui::Button("Load Case"))
 	{
 		scnTabModel->loadCase();
+	}
+	if (ImGui::Button("Set Default"))
+	{
+		scnTabModel->saveDefaultCase();
+		// make set default text
 	}
 	
 	ImGui::EndChild();

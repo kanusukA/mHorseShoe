@@ -17,8 +17,8 @@ protected:
 	
 public:
 
-	Material(GDBuilderContext* GDBuilderCxt_p, Ogre::MaterialPtr material_p, std::string materialFilePath ) :
-		MaterialResource(ResourceHandler::GetInstance(),material_p->getName(), materialFilePath) {
+	Material(GDBuilderContext* GDBuilderCxt_p, Ogre::MaterialPtr material_p) :
+		MaterialResource(ResourceHandler::GetInstance(),material_p->getName()) {
 		material = material_p;
 		GDBuilderCxt = GDBuilderCxt_p;
 		setVertexShader();

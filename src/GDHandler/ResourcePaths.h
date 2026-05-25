@@ -19,6 +19,9 @@
 
 // save / load names
 
+#define CASE_DEFAULT_CASE_PATH "/Data/CASE_CONFIG.yml"
+#define CASE_DEFAULT_CASE_NAME "CASE_FILE_NAME"
+
 #define CASE_NAME_KEY "CASE_NAME"
 #define CASE_SCENE_KEY "CASE_SCENE"
 #define CASE_SCENES_KEY "SCENES"

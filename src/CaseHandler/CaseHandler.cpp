@@ -177,7 +177,7 @@ Material* CaseHandler::CreateMaterial(std::filesystem::path materialPath_p, std:
 	if (newMat)
 	{
 		ogreMaterial->copyDetailsTo(newMat);
-		Material* mat = new Material(this, newMat,materialPath_p.string());
+		Material* mat = new Material(this, newMat);
 
 		return mat;
 	}
@@ -329,6 +329,9 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 
 	ToastComponent::GetInstance()->addMessage("Loaded");
 }
+
+
+
 
 
 

@@ -56,7 +56,7 @@ void Gui::loadFonts()
 	fontSet->body32Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFontRegular_compressed_data, ubuntuFontRegular_compressed_size, 16);
 	fontSet->body16Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFontRegular_compressed_data, ubuntuFontRegular_compressed_size, 8);
 	
-	io.Fonts.
+	
 	io.FontDefault = fontSet->body32Font;
 
 	/*std::vector<std::filesystem::path>* fontsPath = this->guiFramework->getResourceHandler()->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::FONT);

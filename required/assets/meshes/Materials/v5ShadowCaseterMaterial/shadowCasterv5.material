@@ -29,6 +29,31 @@ fragment_program ShadowCasterV5FP hlsl
     }
 }
 
+vertex_program ShadowCasterV5VPglsl glslang
+{
+    source shadowCasterV5.vert
+    default_params
+    {
+        param_named_auto worldViewProjection worldviewproj_matrix
+        //param_named_auto ambientLight ambient_light_colour
+    }
+}
+
+fragment_program ShadowCasterV5FPglsl glslang
+{
+    source shadowCasterV5.frag
+    // Store normalized (usefull to avoid overflowin) or non-normalized depth ?
+    //compile_arguments -DSTORE_NORMALIZED_DEPTH
+
+    default_params
+    {
+        // Only used when storing normalized depth values
+        //param_named_auto p_Near near_clip_distance
+        //param_named_auto p_Far far_clip_distance
+        //param_named p_DepthOffset float 0.01
+    }
+}
+
 material ShadowCasterV5
 {
     //shadow_receiver_material MyShadowReceiver
@@ -38,10 +63,10 @@ material ShadowCasterV5
         pass Z-write
         {
             lighting off
-            vertex_program_ref ShadowCasterV5VP
+            vertex_program_ref ShadowCasterV5VPglsl
             {
             }
-            fragment_program_ref ShadowCasterV5FP
+            fragment_program_ref ShadowCasterV5FPglsl
             {
             }
         }

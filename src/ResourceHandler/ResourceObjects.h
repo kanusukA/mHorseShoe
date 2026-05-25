@@ -842,7 +842,7 @@ public:
 
 	bool wireFrameMode = false;
 
-	std::string materialFilePath; // file name of material
+	//std::string materialFilePath; // file name of material
 
 
 	void setId(int index) override {
@@ -854,9 +854,9 @@ public:
 	}
 
 
-	MaterialResource(ResourceHandlerBuilderContext* context, std::string materialName, std::string materialPath_p) {
+	MaterialResource(ResourceHandlerBuilderContext* context, std::string materialName) {
 		this->setName(materialName);
-		materialFilePath = materialPath_p;
+		//materialFilePath = materialPath_p;
 		setId(context->generateMaterialID());
 	};
 

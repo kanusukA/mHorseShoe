@@ -8,6 +8,8 @@ private:
 	bool rootSceneNodeSelected = true;
 public:
 
+	std::weak_ptr<std::string> defaultCase;
+
 	std::string* inputCaseName = new std::string("");
 	int selectedCase = 0;
 
@@ -87,6 +89,16 @@ public:
 
 	bool isRootScnNodeSelected() {
 		return this->rootSceneNodeSelected;
+	}
+
+	void saveDefaultCase() {
+		if (!defaultCase.expired())
+		{
+			*defaultCase.lock().get() = *inputCaseName;
+		}
+
+		gdSource->getCaseHandler()->saveDefaultCase();
+		
 	}
 
 	// Button functions
