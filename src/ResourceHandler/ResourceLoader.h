@@ -90,8 +90,8 @@ protected:
 	std::vector<ResourceLoadPath>* load_paths = new std::vector<ResourceLoadPath>();
 
 
-
-	
+	// Main File through which details of files are fetched
+	YAML::Node loadFile;
 
 
 
@@ -152,6 +152,11 @@ public:
 	std::vector<std::filesystem::path>* getSavedCaseFiles() {
 		return &caseFileNames;
 	}
+
+	// Open functions
+	bool openLoadFile(std::string filepath);
+
+	std::string fetchNodeByMapKey(std::string key);
 
 
 	// Loading Things Not related to Saved Data

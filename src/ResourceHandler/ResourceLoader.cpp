@@ -535,6 +535,27 @@ RLMaterial* ResourceLoader::_fetchMaterial(ResID id, std::string path_p, std::st
 
 }
 
+bool ResourceLoader::openLoadFile(std::string filepath)
+{
+	if (std::filesystem::exists(filepath))
+	{
+		loadFile = YAML::LoadFile(filepath);
+		return true;
+
+	}
+	return false;
+	
+}
+
+std::string ResourceLoader::fetchNodeByMapKey(std::string key)
+{
+	if (loadFile)
+	{
+		return loadFile[key].as<std::string>();
+	}
+	return "";
+}
+
 void ResourceLoader::loadMaterialsDp(std::vector<std::filesystem::path>* output,std::string extension, bool searchAllResources, bool searchFolders, bool clearOutput)
 {
 	/*if (clearOutput)

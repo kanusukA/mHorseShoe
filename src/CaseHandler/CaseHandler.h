@@ -88,6 +88,8 @@ public:
 	// Loading Functions
 	void loadCase(std::filesystem::path yamlFilePath);
 
+	void loadDefaultCase();
+
 	// SAVING FUNCTIONS
 	void saveDefaultCase();
 	void saveAll();

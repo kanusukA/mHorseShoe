@@ -330,6 +330,17 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 	ToastComponent::GetInstance()->addMessage("Loaded");
 }
 
+void CaseHandler::loadDefaultCase()
+{
+	if (resourceHandler->openLoadFile(resourceHandler->getSourceDir().string() + CASE_DEFAULT_CASE_PATH))
+	{
+		*defaultCase.get() =  resourceHandler->fetchNodeByMapKey(CASE_DEFAULT_KEY);
+	}
+
+
+
+}
+
 
 
 
