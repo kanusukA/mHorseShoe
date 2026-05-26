@@ -227,6 +227,7 @@ public:
 	std::string readFromFile(std::string key, std::string section, std::string filename);
 
 	std::filesystem::path getSourceDir();
+	std::filesystem::path getDataDir();
 
 	bool materialSaved(Ogre::String objectName, Ogre::String Material = "");
 

@@ -2,6 +2,30 @@
 
 
 
+void GDHandler::loadSavedCase() {
+	std::string loadfile = this->loadDefaultCase();
+	if (loadfile.empty())
+	{
+		ToastComponent::GetInstance()->addMessage("No default Case found.");
+		return;
+	}
+	if (resourceHandler->fileExists(this->resourceHandler->getDataDir().string() + "/" + loadfile))
+	{
+		this->loadCase(this->resourceHandler->getDataDir().string() + "/" + loadfile);
+		if (this->caseVec && this->caseVec->size() > 0)
+		{
+			ToastComponent::GetInstance()->addMessage("LOADED DEFAULT CASE");
+		}
+		else {
+			ToastComponent::GetInstance()->addMessage("Error Loading Default case file.");
+		}
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Unable to open : " + this->resourceHandler->getDataDir().string() + "/" + loadfile);
+	}
+	
+}
+
 //void GDHandler::setResources()
 //{
 //	// Textures

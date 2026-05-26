@@ -92,12 +92,21 @@ public:
 	}
 
 	void saveDefaultCase() {
-		if (!defaultCase.expired())
+		if (ModelComponent::selectedCase && !ModelComponent::selectedCase->selCase.expired())
 		{
-			*defaultCase.lock().get() = *inputCaseName;
+			if (ModelComponent::selectedCase->selCase.lock().get()->getFileName())
+			{
+				gdSource->getCaseHandler()->saveDefaultCase(*ModelComponent::selectedCase->selCase.lock().get()->getFileName());
+			}
+			else {
+				ToastComponent::GetInstance()->addMessage("The Selected Case Has no saved file. Save the file first and restart the program.");
+			}
+			
 		}
-
-		gdSource->getCaseHandler()->saveDefaultCase();
+		else {
+			ToastComponent::GetInstance()->addMessage("Select a Case First!");
+		}
+		
 		
 	}
 

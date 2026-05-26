@@ -25,7 +25,7 @@ public:
 	StuffHandler* stuffHandler;
 	Ogre::SceneManager* oScnManager;
 
-	std::shared_ptr<std::string> defaultCase = std::make_shared<std::string>();
+	//std::shared_ptr<std::string> defaultCase = std::make_shared<std::string>();
 
 
 	std::vector<std::shared_ptr<Case>>* caseVec = new std::vector<std::shared_ptr<Case>>();
@@ -61,6 +61,7 @@ public:
 
 
 	std::weak_ptr<Case> CreateCase(std::string caseName_p);
+	std::weak_ptr<Case> CreateCase(std::string caseName_p,std::string filename_p);
 	Scene* CreateScene(std::string scnName, SceneType scnType, Ogre::SceneNode* parentNode_p) override;
 	Scene* CreateScene(std::string scnName, SceneType scnType) override;
 	Object* CreateObject(std::string objName_p , std::filesystem::path meshPath_p, PhysXType type);
@@ -88,10 +89,11 @@ public:
 	// Loading Functions
 	void loadCase(std::filesystem::path yamlFilePath);
 
-	void loadDefaultCase();
+	// RETURES THE SAVED CASE FILENAME! WILL RETURN EMPTY STRING IS NON IS SAVED.
+	std::string loadDefaultCase();
 
-	// SAVING FUNCTIONS
-	void saveDefaultCase();
+	// THE DEFAULT FILENAME MUST MATCH THE FILENAME INSIDE THE SOURCE DIR / DATA FOLDER
+	void saveDefaultCase(std::string saveYmlFileName);
 	void saveAll();
 	void saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes);
 	void saveObjects(const std::vector<std::shared_ptr<Object>>* objects, YAML::Emitter& out);

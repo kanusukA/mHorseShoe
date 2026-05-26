@@ -111,12 +111,9 @@ void addLoadPath(ResourceTabModelComponent* model) {
 				{
 					model->deleteLoadPath(i);
 				}
-
+			}
 			
-		if (ImGui::Button("Add Load Path"))
-		{
-			model->addLoadPath();
-		}
+		
 
 		if (ImGui::Button("Save"))
 		{
@@ -180,7 +177,7 @@ void addLoadPath(ResourceTabModelComponent* model) {
 					}*/
 
 
-				}
+				
 			}
 
 		}

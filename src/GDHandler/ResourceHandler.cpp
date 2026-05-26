@@ -817,6 +817,13 @@ std::filesystem::path ResourceHandler::getSourceDir()
 
 }
 
+std::filesystem::path ResourceHandler::getDataDir()
+{
+	return this->getSourceDir().string() + DATA_DIRECTORY;
+}
+
+
+
 bool ResourceHandler::materialSaved(Ogre::String objectName, Ogre::String Material)
 {
 	return false;

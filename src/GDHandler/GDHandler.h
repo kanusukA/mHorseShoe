@@ -7,6 +7,8 @@
 #include <GDHandler/StartPlatinum.h>
 #include <feel/Feel.h>
 
+// THIS CLASS IS CREATED TO MANAGE PRE-MADE FUNCTIONS THAT CAN SCOPE (ALMOST) EVERY OTHER COMPONENT IN THIS SYSTEM
+// USE OF THIS CLASS IS NOT ADIVISED IF THE SCOPE REQUIRES ONLY A SINGLE COMPONENT TO BE ALTERED.
 class GDHandler : public CaseHandler
 {
 
@@ -37,8 +39,13 @@ public:
 
 		gui->initGui(this->monster->imguiOverlay);
 
+		loadSavedCase();
+
 
 	};
+
+	// LOADS THE DEFAULT CASE FROM THE CASE_CONFIG.YML FILE AND SELECTS IT IN THE MODEL_COMPONENT!
+	void loadSavedCase();
 
 	// NOTIFIER FUNCTIONS
 	virtual void notifyLoadCase() override;

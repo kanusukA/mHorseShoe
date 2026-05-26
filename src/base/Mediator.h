@@ -294,6 +294,8 @@ public:
 	}
 };
 
+
+// MODEL_COMPONENT CLASS USES STATIC VARIABLES TO PROVIDE SINGLE AND TRUE VALUES TO DIFFERENT VIEW COMPONENTS THAT ARE ALMOST REQUIRED BY ALL
 class ModelComponent {
 private:
 	ModelComponent();
@@ -308,7 +310,6 @@ public:
 	bool buttonLock = false; // used to lock buttons when a process is running to prevent multiple clicks and process overlapping
 
 	// INDEPENDENT RESOURCE DATA - These vectors are generated during runtime!
-
 	static	std::vector<std::shared_ptr<Case>>* caseVec;
 
 	static SelectedCase* selectedCase;

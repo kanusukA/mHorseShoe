@@ -47,6 +47,14 @@ std::weak_ptr<Case> CaseHandler::CreateCase(std::string caseName_p)
 
 }
 
+std::weak_ptr<Case> CaseHandler::CreateCase(std::string caseName_p, std::string filename_p)
+{
+	std::shared_ptr<Case> sCase = std::make_shared<Case>(this, caseName_p,filename_p);
+	caseVec->push_back(std::move(sCase));
+
+	return caseVec->at(caseVec->size() - 1);
+}
+
 
 Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType, Ogre::SceneNode* parentNode_p)
 {
@@ -274,7 +282,7 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 {
 	RLCase rlCase = resourceHandler->fetchCaseData(yamlFilePath);
 	
-	std::weak_ptr<Case> wCase = CreateCase(rlCase.name);
+	std::weak_ptr<Case> wCase = CreateCase(rlCase.name,yamlFilePath.filename().string());
 
 	// notify GDNotifier that new csae has been create, which will trigger GUI update to reflect new case in the UI.
 	this->notifyLoadCase();
@@ -330,12 +338,13 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 	ToastComponent::GetInstance()->addMessage("Loaded");
 }
 
-void CaseHandler::loadDefaultCase()
+std::string CaseHandler::loadDefaultCase()
 {
 	if (resourceHandler->openLoadFile(resourceHandler->getSourceDir().string() + CASE_DEFAULT_CASE_PATH))
 	{
-		*defaultCase.get() =  resourceHandler->fetchNodeByMapKey(CASE_DEFAULT_KEY);
+		return  resourceHandler->fetchNodeByMapKey(CASE_DEFAULT_CASE_NAME);
 	}
+	return "";
 
 
 

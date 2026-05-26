@@ -12,10 +12,13 @@ private:
 public:
 
 
-	Case(GDBuilderContext* builderCxt_p) : CaseResource(ResourceHandler::GetInstance(), "") {
+	Case(GDBuilderContext* builderCxt_p) : CaseResource(ResourceHandler::GetInstance(), "","") {
 		GDBuilderCxt = builderCxt_p;
 	}
-	Case(GDBuilderContext* builderCxt_p, std::string name_p) : CaseResource(ResourceHandler::GetInstance(), name_p) {
+	Case(GDBuilderContext* builderCxt_p,std::string name_p) : CaseResource(ResourceHandler::GetInstance(), name_p, "") {
+		GDBuilderCxt = builderCxt_p;
+	}
+	Case(GDBuilderContext* builderCxt_p, std::string name_p, std::string filename_p) : CaseResource(ResourceHandler::GetInstance(), name_p, filename_p) {
 		GDBuilderCxt = builderCxt_p;
 	}
 

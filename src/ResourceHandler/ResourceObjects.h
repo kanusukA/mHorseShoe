@@ -567,6 +567,8 @@ public:
 class CaseResource : public Resource {
 private:
 
+	std::string* caseFileName = nullptr;
+
 	std::vector<ResID>* Scenes = new std::vector<ResID>();
 
 protected:
@@ -584,14 +586,19 @@ public:
 	}
 
 
-	CaseResource(ResourceHandlerBuilderContext* context, std::string name_p) {
+	CaseResource(ResourceHandlerBuilderContext* context, std::string name_p, std::string filename_p) {
 		this->resourceHandlerCxt = context;
 		this->setName(name_p);
 
 		setId(context->generateCaseID());
 		context->AddIndexToMaster(getId());
 
+		caseFileName = new std::string(filename_p);
+
 	}
+
+	// CASE FILE NAME CAN BE NULL! NOT ALL CASES ARE SAVED (THOUGHT THAT WAS OBVIOUS)
+	std::string* getFileName() { return caseFileName; }
 
 
 	// CASE METHODS

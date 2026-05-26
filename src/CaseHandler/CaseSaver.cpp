@@ -2,21 +2,16 @@
 
 
 
-void CaseHandler::saveDefaultCase()
+void CaseHandler::saveDefaultCase(std::string filename)
 {
-
-	if (defaultCase && defaultCase.get()->empty())
-	{
-		ToastComponent::GetInstance()->addMessage("Default Case is Empty!");
-		return;
-	}
 
 	resourceHandler->openSaveFile(resourceHandler->getSourceDir().string() + CASE_DEFAULT_CASE_PATH);
 	YAML::Emitter out;
-	out << YAML::BeginMap << YAML::Key << CASE_DEFAULT_CASE_NAME << *defaultCase.get();
+	out << YAML::BeginMap << YAML::Key << CASE_DEFAULT_CASE_NAME << filename;
 
 	resourceHandler->writeToSaveFile(out.c_str());
 	resourceHandler->closeSaveFile();
+
 
 }
 
