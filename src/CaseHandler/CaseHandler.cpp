@@ -71,6 +71,11 @@ Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType, Ogre::Sc
 
 Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType)
 {
+	if (scnName.empty())
+	{
+		ToastComponent::GetInstance()->addMessage("Scene Name is Empty!!");
+		return nullptr;
+	}
 	if (this->sceneExists(scnName))
 	{
 		ToastComponent::GetInstance()->addMessage("Scene Already exists!!");

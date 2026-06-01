@@ -65,7 +65,7 @@ public:
 
 		this->loadFonts();
 		
-		ImGui::Spectrum::LoadFont();
+		//ImGui::Spectrum::LoadFont();
 
 	}
 

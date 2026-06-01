@@ -179,7 +179,7 @@ set(SOURCES
 	src/Stuffs/SceneObject.cpp
 	src/Stuffs/ShaderObject.cpp
 	src/timer/glock.cpp
-	src/imgui_spectrum.cpp
+	
 	
 )
 

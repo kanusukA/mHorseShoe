@@ -16,7 +16,7 @@
 #include <SDL3/SDL.h>
 #include <OgreImGuiOverlay.h>
 #include <imgui_stdlib.h>
-#include <imgui_spectrum.h>
+//#include <imgui_spectrum.h>
 //#include <PxPhysicsAPI.h>
 
 // STL headers
