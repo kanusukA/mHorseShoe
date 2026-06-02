@@ -70,7 +70,7 @@ struct ResourceMasterGroup {
 };
 
 
-
+// DEPRICATED - use ResourceMasterGroup
 namespace ResourceLoaderEnums {
 
 	
@@ -849,7 +849,7 @@ public:
 
 	bool wireFrameMode = false;
 
-	//std::string materialFilePath; // file name of material
+	std::string materialFilePath; // file name of material
 
 
 	void setId(int index) override {
@@ -861,9 +861,9 @@ public:
 	}
 
 
-	MaterialResource(ResourceHandlerBuilderContext* context, std::string materialName) {
+	MaterialResource(ResourceHandlerBuilderContext* context, std::string materialName, std::string materialFilePath_p) {
 		this->setName(materialName);
-		//materialFilePath = materialPath_p;
+		materialFilePath = materialFilePath_p;
 		setId(context->generateMaterialID());
 	};
 

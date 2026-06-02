@@ -79,7 +79,7 @@ private:
 
 protected:
 
-	void loadSavedCases();
+	
 
 	void resource_loader_shutdown() {
 		this->~ResourceLoader();
@@ -133,6 +133,8 @@ public:
 		loadSavedCases();
 
 	}
+
+	void loadSavedCases();
 
 	RLCase fetchCaseData(std::filesystem::path yamlFilePath);
 

@@ -27,8 +27,10 @@ public:
 
 	//std::shared_ptr<std::string> defaultCase = std::make_shared<std::string>();
 
-
 	std::vector<std::shared_ptr<Case>>* caseVec = new std::vector<std::shared_ptr<Case>>();
+
+
+
 
 	// DEPEDENT RESOURCE VECTOR
 	// These resources are used to create copy of themselves to be used by other resources in a lifecycle aware manner. (hopefully)
@@ -64,7 +66,7 @@ public:
 	std::weak_ptr<Case> CreateCase(std::string caseName_p,std::string filename_p);
 	Scene* CreateScene(std::string scnName, SceneType scnType, Ogre::SceneNode* parentNode_p) override;
 	Scene* CreateScene(std::string scnName, SceneType scnType) override;
-	Object* CreateObject(std::string objName_p , std::filesystem::path meshPath_p, PhysXType type);
+	Object* CreateObject(std::string objName_p , std::filesystem::path meshPath_p, PhysXType type) override;
 
 	// DEPENDENT RESOURCE
 	Ogre::MeshPtr fetchMeshByName(std::filesystem::path meshPath_p) override;

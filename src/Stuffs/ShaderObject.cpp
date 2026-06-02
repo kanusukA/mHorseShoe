@@ -49,10 +49,18 @@ void Shader::_setShaderVars()
 
 	//std::filesystem::path shaderLoc = ResourceHandler::GetInstance()->fetchLocByFileName(this->fileName,ResourceLoaderEnums::Shaders);
 
+	std::filesystem::path* shaderFileLoc = ResourceHandler::GetInstance()->fetchFileInGroup(this->fileName, ResourceGroup::ResourceMasterGroups[ResourceGroup::SHADER]);
+
+	if (!shaderFileLoc)
+	{
+		ToastComponent::GetInstance()->addMessage("Shader file not found in ResourceHandler! : " + this->fileName);
+		return;
+	}
+	ResourceHandler::GetInstance()->readGLSLShaderFile(*shaderFileLoc, this->ShaderParameters);
 	// TODO ADD AUTO SWITCH BETWEEN GLSL AND HLSL READER
 	//Reading Shader File
 	//ResourceHandler::GetInstance()->readShaderFile(shaderLoc, this->ShaderParameters);
-	//ResourceHandler::GetInstance()->readGLSLShaderFile(shaderLoc, this->ShaderParameters);
+	
 	// Implement a system by which shader value can be integrated at initialization!
 
 
@@ -116,7 +124,6 @@ void Shader::loadShaderVar(std::vector<ShaderVar> vars_p)
 	}
 
 	GDBuilderCxt->monSetShaderVars(vars_p, shaderParams);
-	// try this
 
 }
 

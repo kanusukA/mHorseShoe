@@ -219,8 +219,8 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p
 	out << YAML::Key << MATERIAL_CULLING_KEY;
 	out << YAML::Value << static_cast<int>(mat_p->culling);
 
-	//out << YAML::Key << MATERIAL_FILENAME_KEY;
-	//out << YAML::Value << mat_p->materialFilePath;
+	out << YAML::Key << MATERIAL_FILENAME_KEY;
+	out << YAML::Value << mat_p;
 
 	out << YAML::Key << MATERIAL_VERTEX_KEY;
 	

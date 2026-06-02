@@ -792,6 +792,22 @@ std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByName
 	return nullptr;
 }
 
+std::filesystem::path* ResourceHandler::fetchFileInGroup(std::string filename_p, std::string group_p)
+{
+	std::vector<std::filesystem::path>* groupVec = this->fetchResourceGroupVecByName(group_p);
+	if (groupVec)
+	{
+		for (size_t i = 0; i < groupVec->size(); i++)
+		{
+			if (groupVec->at(i).filename().string() == filename_p || groupVec->at(i).stem().string() == filename_p)
+			{
+				return &groupVec->at(i);
+			}
+		}
+	}
+	return nullptr;
+}
+
 std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByIndex(int masterIndex)
 {
 	if (masterResourceVector && masterIndex < masterResourceVector->size())

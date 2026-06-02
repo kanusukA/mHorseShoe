@@ -145,8 +145,11 @@ public:
 	std::vector<std::filesystem::path>* fetchResourceGroupVecByIndex(int masterIndex);
 	std::vector<std::filesystem::path>* fetchResourceGroupVecByName(std::string groupName);
 
+	// Use RESOURCE_MASTER_GROUP_INDEX to fecth predefined groups.
+	std::filesystem::path* fetchFileInGroup(std::string filename_p, std::string group_p);
 
 	//Searching fullpath
+	// DEPRICATED - use fetchFileInGroup
 	std::filesystem::path fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p);
 
 	//PATHS

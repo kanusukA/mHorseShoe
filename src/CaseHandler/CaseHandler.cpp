@@ -190,7 +190,7 @@ Material* CaseHandler::CreateMaterial(std::filesystem::path materialPath_p, std:
 	if (newMat)
 	{
 		ogreMaterial->copyDetailsTo(newMat);
-		Material* mat = new Material(this, newMat);
+		Material* mat = new Material(this, newMat,materialPath_p.string());
 
 		return mat;
 	}
@@ -289,12 +289,15 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 	
 	std::weak_ptr<Case> wCase = CreateCase(rlCase.name,yamlFilePath.filename().string());
 
-	// notify GDNotifier that new csae has been create, which will trigger GUI update to reflect new case in the UI.
-	this->notifyLoadCase();
-
 	for (int scenesIndex = 0; scenesIndex < rlCase.Scenes.size(); scenesIndex++)
 	{
 		std::weak_ptr<Scene> wScene = wCase.lock()->attachNewSceneToRoot(rlCase.Scenes.at(scenesIndex).name,SceneType(rlCase.Scenes.at(scenesIndex).scnType));
+
+		if (wScene.expired())
+		{
+			ToastComponent::GetInstance()->addMessage("Failed to create scene : " + rlCase.Scenes.at(scenesIndex).name);
+			return;
+		}
 
 		for (int objIndex = 0; objIndex < rlCase.Scenes.at(scenesIndex).objects.size(); objIndex++)
 		{
@@ -336,9 +339,11 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 			rlCase.Scenes.at(scenesIndex).rotation[2], rlCase.Scenes.at(scenesIndex).rotation[3]));
 
 		
+		
 
 	}
-
+	// notify GDNotifier that new csae has been create, which will trigger GUI update to reflect new case in the UI.
+	this->notifyLoadCase();
 
 	ToastComponent::GetInstance()->addMessage("Loaded");
 }

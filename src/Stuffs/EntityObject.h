@@ -42,7 +42,7 @@ public:
 		// Set default material
 		if (entity.get()->getMesh().get()->getSubMeshes().size() > 0 && entity.get()->getMesh().get()->getSubMesh(0)->getMaterial())
 		{
-			Material* newMat = new Material(GDBuilderCxt_p, entity.get()->getMesh().get()->getSubMesh(0)->getMaterial());
+			Material* newMat = new Material(GDBuilderCxt_p, entity.get()->getMesh().get()->getSubMesh(0)->getMaterial(), "");
 			sMaterial.reset(newMat);
 		}
 		

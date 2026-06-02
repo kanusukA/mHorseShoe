@@ -111,7 +111,9 @@ public:
 	}
 
 	// Button functions
-	void refresh();
+	void refresh() {
+		ResourceHandler::GetInstance()->loadSavedCases();
+	};
 	//void loadCase();
 
 	virtual void update() override {

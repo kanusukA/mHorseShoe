@@ -53,6 +53,11 @@ void SceneTabComponent::view()
 		ImGui::SameLine();
 		ImGui::Text(scnTabModel->defaultCase.lock().get()->c_str());
 	}
+
+	if (ImGui::Button("Refresh"))
+	{
+		scnTabModel->refresh();
+	}
 	
 
 	//ImGui::ShowStyleEditor();

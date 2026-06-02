@@ -20,7 +20,7 @@ int main() {
 
 	std::cout << "Ogre started : " << std::endl;
 
-	ResourceHandler::GetInstance()->getAllResources();
+	ResourceHandler::GetInstance();
 
 	//ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
 
