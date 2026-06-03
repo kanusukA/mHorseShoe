@@ -69,7 +69,7 @@ fragment_program ShadowMapReceiverV5FP hlsl
 
 vertex_program ShadowMapReceiverV5VPglsl glslang
 {
-    source shadowReceiverV5.vert
+    source shadowRecieverV5.vert
 
     // Similar to standard lighting but using the shadow map in addition
    // compile_arguments -DSHADOW_MAP
@@ -88,7 +88,7 @@ vertex_program ShadowMapReceiverV5VPglsl glslang
     default_params
     {
         param_named_auto worldviewproj worldviewproj_matrix
-        param_named_auto worldview worldview_matrix
+       // param_named_auto worldview worldview_matrix
         
         
          
@@ -97,7 +97,7 @@ vertex_program ShadowMapReceiverV5VPglsl glslang
 
 fragment_program ShadowMapReceiverV5FPglsl glslang
 {
-    source shadowReceiverV5FP.hlsl
+    source shadowRecieverV5.frag
     // Similar to standard lighting but using the shadow map in addition
     //compile_arguments -DSHADOW_MAP
     
@@ -155,32 +155,33 @@ material ShadowReceiverV5
             }
             fragment_program_ref ShadowMapReceiverV5FPglsl
             {
-
+                
             }
 
-           texture_unit 
+           texture_unit shadow
            {
                 content_type shadow
                 tex_address_mode clamp
                 filtering none
             }
 
-            texture_unit Diffuse
+            texture_unit diffuse
             {
-                
+                texture fogtex.png
+                tex_address_mode clamp
             }
 
-            texture_unit NormalMap
+            texture_unit normal_map
             {
 
             }
             
-            texture_unit DisplacementMap
+            texture_unit displacement_map
             {
 
             }
 
-            texture_unit Roughness
+            texture_unit roughness
             {
 
             }

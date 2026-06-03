@@ -57,6 +57,9 @@ public:
 
 	void readTextures();
 
+	void setTextureWrapMode(int texturePosition_p, Ogre::TextureUnitState::TextureAddressingMode mode_p);
+	void setTextureScale(int texturePosition_p, float scale);
+
 	void setTexture(int texturePosition_p, Ogre::TexturePtr tex_p);
 
 	void setCullingMode(Ogre::CullingMode culling_p);

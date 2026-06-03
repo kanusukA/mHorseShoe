@@ -14,6 +14,8 @@ public:
 
 	std::vector<std::filesystem::path>* images;
 
+
+
 	Ogre::TexturePtr Diffuse;
 	Ogre::TexturePtr Normal;
 	Ogre::TexturePtr Roughness;

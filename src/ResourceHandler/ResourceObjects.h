@@ -768,6 +768,8 @@ struct ShaderTexture
 	Ogre::TexturePtr texture = 0;
 	TextureMapType textureType;
 	int texturePosition; // Position of texture in Shader
+	Ogre::TextureAddressingMode addressingMode = Ogre::TAM_WRAP;
+	float scale = 1.0f;
 	
 };
 

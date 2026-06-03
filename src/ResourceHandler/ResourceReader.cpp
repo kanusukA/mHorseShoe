@@ -1,11 +1,11 @@
 #include "ResourceReader.h"
 
-std::string ResourceReader::cleanWord(std::string word)
+std::string ResourceReader::cleanWord(std::string word, bool containss)
 {
 	std::string output = "";
 	for (int i = 0; i < word.size(); i++)
 	{
-		if ((word.at(i) < 91 && word.at(i) > 64) || (word.at(i) < 123 && word.at(i) > 96))
+		if ((word.at(i) < 91 && word.at(i) > 64) || (word.at(i) < 123 && word.at(i) > 96) || (containss && word.at(i) >= 48 && word.at(i) <= 57))
 		{
 			output.push_back(word.at(i));
 		}
@@ -28,7 +28,7 @@ std::string ResourceReader::readMaterialName(std::filesystem::path mat_path_p)
 			if (materialFound)
 			{
 				inStream.close();
-				return cleanWord(word);
+				return cleanWord(word); // fix this
 			}
 			else {
 				if (word == "material")

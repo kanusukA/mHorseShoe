@@ -12,6 +12,10 @@ inline int ImageComboView(int index) {
 			{
 				for (int imageIndex = 0; imageIndex < ModelComponent::imageTextures->size(); imageIndex++)
 				{
+
+					ImGui::Image((ImTextureID)ModelComponent::imageTextures->at(imageIndex)->getHandle(), ImVec2(25, 25));
+					ImGui::SameLine();
+
 					if (ImGui::Selectable(ModelComponent::imageTextures->at(imageIndex)->getName().c_str(), false))
 					{
 						selValue = imageIndex;
@@ -20,8 +24,33 @@ inline int ImageComboView(int index) {
 				ImGui::EndCombo();
 			}
 		}
-
 		
+	}
+	return selValue;
+}
+
+inline int textureWrapModeComboView(int index) {
+	int selValue = -1;
+	if (ImGui::BeginCombo(("Wrap Mode##" + std::to_string(index)).c_str(), "Select Wrap Mode"))
+	{
+		if (ImGui::Selectable("Wrap"))
+		{
+			selValue = 0;
+		}
+		if (ImGui::Selectable("Mirror"))
+		{
+			selValue = 1;
+		}
+		if (ImGui::Selectable("Clamp"))
+		{
+			selValue = 2;
+		}
+		if (ImGui::Selectable("Border"))
+		{
+			selValue = 3;
+		}
+
+		ImGui::EndCombo();
 		
 	}
 	return selValue;
@@ -196,6 +225,30 @@ void RSUSTabComponent::view()
 							ModelComponent::imageTextures->at(selectedImage));
 					}
 
+					int selectedWrapMode = textureWrapModeComboView(texIndex);
+					if (selectedWrapMode > 0)
+					{
+						ModelComponent::selectedMaterial->selMaterial.lock()->setTextureWrapMode(
+							ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition, Ogre::TextureUnitState::TextureAddressingMode(selectedWrapMode)
+						);
+					}
+
+					if (ImGui::DragFloat(("Scale##" + std::to_string(texIndex)).c_str(), &ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).scale, 0.01f, 0.01f, 1.0f))
+					{
+						ModelComponent::selectedMaterial->selMaterial.lock()->setTextureScale(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition, ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).scale);
+					}
+
+				}
+				else {
+
+					ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
+
+					ImGui::Text("No Texture Found!");
+					int selectedImage = ImageComboView(texIndex);
+					if (selectedImage >= 0) {
+						ModelComponent::selectedMaterial->selMaterial.lock()->setTexture(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition,
+							ModelComponent::imageTextures->at(selectedImage));
+					}
 				}
 
 				

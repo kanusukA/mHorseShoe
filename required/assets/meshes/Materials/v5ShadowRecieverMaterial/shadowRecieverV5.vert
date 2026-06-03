@@ -3,7 +3,7 @@
 
 layout (location = 0) in vec3 aPos; // the position variable has attribute position 0
   
-layout (location = 1) in vec2 uv;
+layout (location = 8) in vec2 uv;
 
 layout (location = 1) out vec2 texuv;
 

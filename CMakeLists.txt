@@ -16,6 +16,8 @@ message ("c build type ${CMAKE_CONFIGURATION_TYPES}")
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
+add_compile_options(/Od )
+
 
 
 #set(CMAKE_CONFIGURATION_TYPES "Debug" CACHE STRING "" FORCE)

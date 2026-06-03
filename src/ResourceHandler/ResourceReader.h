@@ -46,7 +46,7 @@ private:
 
 public:
 
-	std::string cleanWord(std::string word);
+	std::string cleanWord(std::string word, bool containsDigits = true);
 
 	// MATERIAL FUNCS
 	std::string readMaterialName(std::filesystem::path mat_path_p);

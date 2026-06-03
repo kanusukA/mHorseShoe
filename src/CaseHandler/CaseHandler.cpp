@@ -174,6 +174,12 @@ Material* CaseHandler::CreateMaterial(std::filesystem::path materialPath_p, std:
 	//	}
 	//}
 
+	if (materialName.empty())
+	{
+		ToastComponent::GetInstance()->addMessage("No Material Assigned");
+		return nullptr;
+	}
+
 
 	// if not stored
 	//this->monSetLocation(materialPath_p.parent_path(), OGRE_MATERIAL_GROUP);

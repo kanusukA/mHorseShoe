@@ -34,7 +34,7 @@ vertex_program ShadowCasterV5VPglsl glslang
     source shadowCasterV5.vert
     default_params
     {
-        param_named_auto worldViewProjection worldviewproj_matrix
+        param_named_auto worldViewProj worldviewproj_matrix
         //param_named_auto ambientLight ambient_light_colour
     }
 }
