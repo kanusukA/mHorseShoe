@@ -24,6 +24,7 @@ vertex_program ShadowMapReceiverV5VP hlsl
     {
         param_named_auto worldviewproj worldviewproj_matrix
         param_named_auto worldview worldview_matrix
+        param_named_auto cameraWorldposition camera_position
         
         
          
@@ -113,6 +114,7 @@ fragment_program ShadowMapReceiverV5FPglsl glslang
 
     default_params
     {
+        param_named scale float 1
         // param_named DiffuseColor float4 0.0 0.0 0.0 0.0
         // param_named LightPower float 1.0
         // param_named skyIntensity float 0.2
@@ -122,6 +124,8 @@ fragment_program ShadowMapReceiverV5FPglsl glslang
         // param_named_auto numLight light_count           
         // param_named_auto lightdirectionArray light_direction_view_space_array 5
         // param_named_auto lightpositionArray light_position_view_space_array 5
+
+        param_named_auto lightpositionArray light_position_view_space_array 5
 
        // param_named_auto worldviewIT inverse_transpose_worldview_matrix
         

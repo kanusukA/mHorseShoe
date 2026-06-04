@@ -12,8 +12,6 @@ public:
 	SunWindowSize* windowSize;
 	std::string* materialName = new std::string("");
 
-	bool wireframeMode = false;
-
 	int selectedMaterial = 0;
 
 	ObjectTabModelComponent(const char* name_p) : ModelComponent(name_p) {
@@ -39,6 +37,22 @@ public:
 
 		}
 		
+	}
+
+	void update(GUIUpdateEvent event) override {
+		switch (event) {
+		case GUIUpdateEvent::OBJECT_UPDATE:
+			if (!ModelComponent::selectedObject->selObject.expired())
+			{
+				materialName->assign(ModelComponent::selectedObject->selObject.lock()->getMeshMaterialName());
+			}
+			else {
+				materialName->assign("");
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
 };

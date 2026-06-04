@@ -214,7 +214,7 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p
 	out << YAML::Value << mat_p->getName();
 
 	out << YAML::Key << MATERIAL_WIREFRAME_KEY;
-	out << YAML::Value << mat_p->wireFrameMode;
+	out << YAML::Value << mat_p->wireframeMode;
 
 	out << YAML::Key << MATERIAL_CULLING_KEY;
 	out << YAML::Value << static_cast<int>(mat_p->culling);
@@ -241,7 +241,24 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p
 	else {
 		out << YAML::Value << "";
 	}
-	
+
+	// Save Material Textures
+
+	out << YAML::Key << MATERIAL_TEXTURE_KEY << YAML::Value << YAML::BeginSeq;
+
+	if (mat_p->textures && mat_p->textures->size())
+	{
+		for (int i = 0; i < mat_p->textures->size(); i++)
+		{
+			out << YAML::BeginMap;
+			out << YAML::Key << MATERIAL_TEXTURE_NAME_KEY << YAML::Value << mat_p->textures->at(i).textureName;
+			out << YAML::Key << MATERIAL_TEXTURE_POSITION_KEY << YAML::Value << mat_p->textures->at(i).texturePosition;
+			out << YAML::Key << MATERIAL_TEXTURE_ADDRESSING_MODE_KEY << YAML::Value << static_cast<int>(mat_p->textures->at(i).addressingMode);
+			out << YAML::Key << MATERIAL_TEXTURE_SCALE_KEY << YAML::Value << mat_p->textures->at(i).scale;
+			out << YAML::EndMap;
+		}
+	}
+	out << YAML::EndSeq;
 
 	/*std::string sectionName = std::to_string(mat_p->getId());
 

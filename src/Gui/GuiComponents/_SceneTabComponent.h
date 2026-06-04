@@ -116,7 +116,7 @@ public:
 	};
 	//void loadCase();
 
-	virtual void update() override {
+	void update(GUIUpdateEvent event) override {
 		if (!ModelComponent::selectedCase->selCase.expired())
 		{
 			inputCaseName->clear();

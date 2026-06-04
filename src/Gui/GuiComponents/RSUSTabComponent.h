@@ -15,7 +15,6 @@ public:
 	std::vector<std::filesystem::path>* images;
 
 
-
 	Ogre::TexturePtr Diffuse;
 	Ogre::TexturePtr Normal;
 	Ogre::TexturePtr Roughness;
@@ -114,6 +113,27 @@ public:
 	void updateVertRsusFloat4(Ogre::String varName, float val1, float val2, float val3, float val4) {
 		this->gdSource->getShaderHandler()->updateVertParameterFloat4(varName, Ogre::Vector4(val1, val2, val3, val4));
 	}*/
+
+	const char* wrapModeEnumToname(Ogre::TextureUnitState::TextureAddressingMode mode) {
+		switch (mode)
+		{
+		case Ogre::TextureUnitState::TAM_WRAP:
+			return "Wrap";
+			break;
+		case Ogre::TextureUnitState::TAM_MIRROR:
+			return "Mirror";
+			break;
+		case Ogre::TextureUnitState::TAM_CLAMP:
+			return "Clamp";
+			break;
+		case Ogre::TextureUnitState::TAM_BORDER:
+			return "Border";
+			break;
+		default:
+			return "Select Wrap Mode";
+			break;
+		}
+	}
 
 };
 

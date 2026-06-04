@@ -849,7 +849,8 @@ public:
 
 	Ogre::CullingMode culling = Ogre::CULL_CLOCKWISE;
 
-	bool wireFrameMode = false;
+	bool wireframeMode = false;
+
 
 	std::string materialFilePath; // file name of material
 

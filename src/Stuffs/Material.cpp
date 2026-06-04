@@ -24,6 +24,7 @@ void Material::setTextureWrapMode(int texturePosition_p, Ogre::TextureUnitState:
 	try
 	{
 		material->getTechnique(0)->getPass(0)->getTextureUnitState(texturePosition_p)->setTextureAddressingMode(mode_p);
+		this->textures->at(texturePosition_p).addressingMode = mode_p;
 	}
 	catch (const std::exception&)
 	{
@@ -49,6 +50,8 @@ void Material::setTexture(int texturePosition_p, Ogre::TexturePtr tex_p)
 	try
 	{
 		material->getTechnique(0)->getPass(0)->getTextureUnitState(texturePosition_p)->setTexture(tex_p);
+		this->textures->at(texturePosition_p).textureName = tex_p.get()->getName();
+		this->textures->at(texturePosition_p).texture = tex_p;
 	}
 	catch (const std::exception&)
 	{
@@ -63,6 +66,6 @@ void Material::setCullingMode(Ogre::CullingMode culling_p) {
 
 void Material::setWireFrameMode(bool mode_p)
 {
-	wireFrameMode = mode_p;
-	material->getTechnique(0)->getPass(0)->setPolygonMode( wireFrameMode ? Ogre::PM_WIREFRAME : Ogre::PM_SOLID);
+	wireframeMode = mode_p;
+	material->getTechnique(0)->getPass(0)->setPolygonMode( wireframeMode ? Ogre::PM_WIREFRAME : Ogre::PM_SOLID);
 }

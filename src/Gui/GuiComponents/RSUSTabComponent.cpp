@@ -1,6 +1,6 @@
 #include "RSUSTabComponent.h"
 
-inline int ImageComboView(int index) {
+inline int ImageComboView(int index, const char* selectedImage) {
 	int selValue = -1;
 	if(!ModelComponent::imageTextures->empty()){
 		if(ModelComponent::imageTextures->at(0) == nullptr){
@@ -8,7 +8,7 @@ inline int ImageComboView(int index) {
 			return selValue;
 		}
 		else {
-			if (ImGui::BeginCombo(("Images##" + std::to_string(index)).c_str(), ModelComponent::imageTextures->at(0)->getName().c_str()))
+			if (ImGui::BeginCombo(("Images##" + std::to_string(index)).c_str(), selectedImage))
 			{
 				for (int imageIndex = 0; imageIndex < ModelComponent::imageTextures->size(); imageIndex++)
 				{
@@ -29,9 +29,9 @@ inline int ImageComboView(int index) {
 	return selValue;
 }
 
-inline int textureWrapModeComboView(int index) {
+inline int textureWrapModeComboView(int index, const char* currentMode) {
 	int selValue = -1;
-	if (ImGui::BeginCombo(("Wrap Mode##" + std::to_string(index)).c_str(), "Select Wrap Mode"))
+	if (ImGui::BeginCombo(("Wrap Mode##" + std::to_string(index)).c_str(), currentMode))
 	{
 		if (ImGui::Selectable("Wrap"))
 		{
@@ -219,13 +219,13 @@ void RSUSTabComponent::view()
 					ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
 					ImGui::Image((ImTextureID)ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texture->getHandle(), ImVec2(250, 250));
 
-					int selectedImage = ImageComboView(texIndex);
+					int selectedImage = ImageComboView(texIndex, ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
 					if (selectedImage >= 0) {
 						ModelComponent::selectedMaterial->selMaterial.lock()->setTexture(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition,
 							ModelComponent::imageTextures->at(selectedImage));
 					}
 
-					int selectedWrapMode = textureWrapModeComboView(texIndex);
+					int selectedWrapMode = textureWrapModeComboView(texIndex,RSUSModel->wrapModeEnumToname(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).addressingMode));
 					if (selectedWrapMode > 0)
 					{
 						ModelComponent::selectedMaterial->selMaterial.lock()->setTextureWrapMode(
@@ -233,18 +233,18 @@ void RSUSTabComponent::view()
 						);
 					}
 
-					if (ImGui::DragFloat(("Scale##" + std::to_string(texIndex)).c_str(), &ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).scale, 0.01f, 0.01f, 1.0f))
+					/*if (ImGui::DragFloat(("Scale##" + std::to_string(texIndex)).c_str(), &ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).scale, 0.01f, 0.01f, 1.0f))
 					{
 						ModelComponent::selectedMaterial->selMaterial.lock()->setTextureScale(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition, ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).scale);
-					}
+					}*/
 
 				}
 				else {
 
-					ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
+					//ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
 
 					ImGui::Text("No Texture Found!");
-					int selectedImage = ImageComboView(texIndex);
+					int selectedImage = ImageComboView(texIndex, ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
 					if (selectedImage >= 0) {
 						ModelComponent::selectedMaterial->selMaterial.lock()->setTexture(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition,
 							ModelComponent::imageTextures->at(selectedImage));

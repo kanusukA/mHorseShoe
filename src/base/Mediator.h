@@ -41,6 +41,18 @@ struct mFontSet {
 	ImFont* body16Font = nullptr;
 };
 
+// Update Events - implies which variable has changed
+
+enum GUIUpdateEvent
+{
+	CASE_UPDATE,
+	SCENE_UPDATE,
+	OBJECT_UPDATE,
+	MATERIAL_UPDATE,
+	RESOURCE_UPDATE
+
+};
+
 
 
 // GuiFRAMEWORK IMPLEMENTATION
@@ -366,12 +378,12 @@ public:
 	// SETTERS
 	void selectCase(const int index) {
 		selectedCase->selCase = caseVec->at(index);
-		update();
+		update(GUIUpdateEvent::CASE_UPDATE);
 	}
 
 	void selectScene(const std::weak_ptr<Scene>& scene_p) {
 		selectedScene->selScene = scene_p;
-		update();
+		update(GUIUpdateEvent::SCENE_UPDATE);
 	}
 
 	void selectObject(const std::weak_ptr<Object>& object_p) {
@@ -380,12 +392,19 @@ public:
 		{
 			this->selectMaterial(object_p.lock()->getwMaterial());
 		}
-		update();
+		else {
+			this->popMaterial();
+		}
+		update(GUIUpdateEvent::OBJECT_UPDATE);
 	}
 
 	void selectMaterial(const std::weak_ptr<Material>& material_p) {
 		selectedMaterial->selMaterial = material_p;
-		update();
+		update(GUIUpdateEvent::MATERIAL_UPDATE);
+	}
+
+	void popMaterial() {
+		selectedMaterial->selMaterial.reset();
 	}
 
 	void refreshImageTextures();
@@ -399,7 +418,7 @@ public:
 	virtual void init() {};
 
 	// Run when a ResourceUpdates!
-	virtual void update() {};
+	virtual void update(GUIUpdateEvent event) {};
 
 };
 
@@ -432,7 +451,7 @@ protected:
 	void regenScenes() override{
 		for (int i = 0; i < Models.size(); i++)
 		{
-			Models.at(i)->update();
+			Models.at(i)->update(GUIUpdateEvent::SCENE_UPDATE);
 		}
 	}
 

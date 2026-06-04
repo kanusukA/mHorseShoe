@@ -12,6 +12,7 @@ void ObjectTabComponent::view()
 		ImGui::Text("Object Name : ");
 		ImGui::SameLine();
 		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getName().c_str());
+		
 
 		
 
@@ -65,9 +66,9 @@ void ObjectTabComponent::view()
 			ImGui::SameLine();
 			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()->getName().c_str());
 
-			if (ImGui::Checkbox("WireFrame Mode", &objectModel->wireframeMode))
+			if (ImGui::Checkbox("WireFrame Mode", &ModelComponent::selectedMaterial->selMaterial.lock()->getWireFrameMode()))
 			{
-				ModelComponent::selectedMaterial->selMaterial.lock()->setWireFrameMode(objectModel->wireframeMode);
+				ModelComponent::selectedMaterial->selMaterial.lock()->setWireFrameMode(!ModelComponent::selectedMaterial->selMaterial.lock()->wireframeMode);
 			}
 
 			ImGui::Text("Culling Mode");

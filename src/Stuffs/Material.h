@@ -17,6 +17,8 @@ protected:
 	
 public:
 
+	
+
 	Material(GDBuilderContext* GDBuilderCxt_p, Ogre::MaterialPtr material_p, std::string filePath) :
 		MaterialResource(ResourceHandler::GetInstance(),material_p->getName(),  filePath) {
 		
@@ -24,6 +26,8 @@ public:
 		GDBuilderCxt = GDBuilderCxt_p;
 		setVertexShader();
 		setFragmentShader();
+
+		wireframeMode = material->getTechnique(0)->getPass(0)->getPolygonMode() == Ogre::PM_WIREFRAME;
 
 		if (vertexShader && fragmentShader)
 		{
@@ -66,9 +70,11 @@ public:
 	Ogre::CullingMode&  getCullingMode() {
 		return culling;
 	}
+
 	void setWireFrameMode(bool mode_p);
+
 	bool& getWireFrameMode() {
-		return wireFrameMode;
+		return wireframeMode;
 	}
 
 
