@@ -13,14 +13,16 @@ layout (location = 2) in vec3 p_normal;
 layout (location = 14) in vec4 p_tangent;
 layout (location = 15) in vec3 p_biTangent;
 
-layout (location = 5) out vec3 TfragPos; // Tangent Frag Position
-layout (location = 6) out vec3 TviewPos; // Tangent View Position
+layout (location = 5) out vec3 TWorldViewDir; 
+layout (location = 6) out vec3 worldViewPos;
+layout (location = 7) out vec3 eyeViewDir; 
+layout (location = 8) out vec3 out_normal;
 
 
 layout(std140, binding = 0, row_major) uniform OgreUniforms {
     mat4 worldviewproj;
     mat4 worldView;
-    vec3 cameraWorldposition;
+    vec4 cameraWorldposition; // MUST BE VEC 4!!!!!!
     
 }; 
 
@@ -29,15 +31,22 @@ layout(std140, binding = 0, row_major) uniform OgreUniforms {
 void main()
 {
 
+    out_normal = p_normal;
+
     vec3 tangent = normalize(mat3(worldView) * p_tangent.xyz);
     vec3 normal = normalize(mat3(worldView) * p_normal);
     vec3 binormal = cross(normal , tangent) * p_tangent.w;
 
-    TBN = mat3(tangent,binormal,normal);
+    TBN =  transpose(mat3(tangent,binormal,normal));
+    
+    worldViewPos = (worldView * vec4(aPos,1.0)).xyz;
 
-    TviewPos = TBN * cameraWorldposition;
+    TWorldViewDir = TBN * worldViewPos.xyz;
+    TWorldViewDir = normalize(-TWorldViewDir);
 
-    TfragPos = TBN * vec3(worldView * vec4(aPos, 1.0));
+    eyeViewDir = normalize(-worldViewPos);
+    
+    //output.Normal = normal;
 
     // float3 tangent = normalize(mul((float3x3)worldview,p_tangent.xyz));
     // float3 normal = normalize(mul((float3x3) worldview, Normal.xyz));

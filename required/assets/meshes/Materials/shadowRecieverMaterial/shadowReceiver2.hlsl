@@ -67,9 +67,6 @@ VertexOut mainVP(
     float3 binormal = cross(normal.xyz,tangent.xyz) * p_tangent.w;
 
     
-
-    
-
     output.TBN = float3x3(tangent,binormal,normal);
 
     output.worldviewPos = mul(worldview ,position).xyz;
@@ -239,7 +236,6 @@ float4 mainFP(
         color += float4(diffuseColor * Diffusefactor * LightPower,1.0f);
 
         //Specular
-
         float3 halfwayVector = normalize(-LightToWorld + viewDir); //fix this
 
         float3 F0 = lerp(float3(0.4,0.4,0.4),diffuseColor.rgb,metallic);

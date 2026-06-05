@@ -47,8 +47,9 @@ int main() {
 	
 	Ogre::Root* oRoot = monster->oRoot;
 
-
-	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, 0.4), 2);
+	// SHADOM V5 DOES NOT WORK WITH CONVENTIONAL MAIN DIRECTIONAL LIGHT AS IT DOES NOT HAVE A FIXED POSITION IN SPACE AND CAUSES ARTIFACTS!
+	// AS AN ALTERNATIVE A DIRECTION IS PASSED TO THE SHADER WHICH IS THEN USED TO CALCULATE MAIN DIRECTIONAL LIGHT.
+	//monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, 0.4), 2);
 
 
 	std::cout << "Setting up Kint" << std::endl;

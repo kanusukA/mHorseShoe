@@ -1,72 +1,72 @@
 
-vertex_program ShadowMapReceiverV5VP hlsl
-{
-    source shadowReceiverV5VP.hlsl
-    entry_point mainVP
-    profiles arbvp1
-    target vs_4_0
+// vertex_program ShadowMapReceiverV5VP hlsl
+// {
+//     source shadowReceiverV5VP.hlsl
+//     entry_point mainVP
+//     profiles arbvp1
+//     target vs_4_0
 
-    // Similar to standard lighting but using the shadow map in addition
-   // compile_arguments -DSHADOW_MAP
+//     // Similar to standard lighting but using the shadow map in addition
+//    // compile_arguments -DSHADOW_MAP
     
-    //default_params
-    //{
-        //param_named_auto worldviewproj worldviewproj_matrix
-        //param_named_auto world_mat world_matrix
-        //param_named_auto worldIT_mat inverse_transpose_world_matrix
-        //param_named_auto lightdirection light_direction 0
-		//param_named_auto lightposition light_position 0
-        //param_named_auto cameraWorldposition camera_position
+//     //default_params
+//     //{
+//         //param_named_auto worldviewproj worldviewproj_matrix
+//         //param_named_auto world_mat world_matrix
+//         //param_named_auto worldIT_mat inverse_transpose_world_matrix
+//         //param_named_auto lightdirection light_direction 0
+// 		//param_named_auto lightposition light_position 0
+//         //param_named_auto cameraWorldposition camera_position
 
-    //}
+//     //}
 
-    default_params
-    {
-        param_named_auto worldviewproj worldviewproj_matrix
-        param_named_auto worldview worldview_matrix
-        param_named_auto cameraWorldposition camera_position
+//     default_params
+//     {
+//         param_named_auto worldviewproj worldviewproj_matrix
+//         param_named_auto worldView worldview_matrix
+//         param_named_auto cameraWorldposition camera_position
         
         
          
-    }
-}
+//     }
+// }
 
-fragment_program ShadowMapReceiverV5FP hlsl
-{
-    source shadowReceiverV5FP.hlsl
-    entry_point mainFP
-    profiles arbfp1
-    target ps_4_0
-    // Similar to standard lighting but using the shadow map in addition
-    //compile_arguments -DSHADOW_MAP
+// fragment_program ShadowMapReceiverV5FP hlsl
+// {
+//     source shadowReceiverV5FP.hlsl
+//     entry_point mainFP
+//     profiles arbfp1
+//     target ps_4_0
+//     // Similar to standard lighting but using the shadow map in addition
+//     //compile_arguments -DSHADOW_MAP
     
-    //default_params
-    //{
-        //param_named_auto LightColor light_diffuse_colour 0
-        //param_named SpecularIntensity float 1
-        //param_named_auto LightPower light_power 0
-        //param_named_auto DiffuseColor surface_diffuse_colour
-        //param_named_auto AmbientColor surface_ambient_colour
-        //param_named skyIntensity float 0.15
-    //}
+//     //default_params
+//     //{
+//         //param_named_auto LightColor light_diffuse_colour 0
+//         //param_named SpecularIntensity float 1
+//         //param_named_auto LightPower light_power 0
+//         //param_named_auto DiffuseColor surface_diffuse_colour
+//         //param_named_auto AmbientColor surface_ambient_colour
+//         //param_named skyIntensity float 0.15
+//     //}
 
-    default_params
-    {
-        param_named DiffuseColor float4 0.0 0.0 0.0 0.0
-        param_named LightPower float 1.0
-        param_named skyIntensity float 0.2
-        param_named roughness float 0.3
-        param_named metallic float 0.9
-        param_named parallaxScale float 1.0
-        param_named_auto numLight light_count           
-        param_named_auto lightdirectionArray light_direction_view_space_array 5
-        param_named_auto lightpositionArray light_position_view_space_array 5
+//     default_params
+//     {
+//         // param_named DiffuseColor float4 0.0 0.0 0.0 0.0
+//         // param_named LightPower float 1.0
+//         // param_named skyIntensity float 0.2
+//         // param_named roughness float 0.3
+//         // param_named metallic float 0.9
+//         // param_named parallaxScale float 1.0
+//         // param_named_auto numLight light_count           
+//        // param_named_auto lightdirectionArray light_direction_view_space_array 5
+//         param_named_auto lightpositionArray light_position_view_space_array 5
 
-       // param_named_auto worldviewIT inverse_transpose_worldview_matrix
+//        // param_named_auto worldviewIT inverse_transpose_worldview_matrix
         
-    }
+//     }
 
-}
+// }
 
 vertex_program ShadowMapReceiverV5VPglsl glslang
 {
@@ -89,7 +89,8 @@ vertex_program ShadowMapReceiverV5VPglsl glslang
     default_params
     {
         param_named_auto worldviewproj worldviewproj_matrix
-       // param_named_auto worldview worldview_matrix
+        param_named_auto worldView worldview_matrix
+        param_named_auto cameraWorldposition camera_position
         
         
          
@@ -122,7 +123,7 @@ fragment_program ShadowMapReceiverV5FPglsl glslang
         // param_named metallic float 0.9
         // param_named parallaxScale float 1.0
         // param_named_auto numLight light_count           
-        // param_named_auto lightdirectionArray light_direction_view_space_array 5
+         param_named_auto lightdirectionArray light_direction_view_space_array 5
         // param_named_auto lightpositionArray light_position_view_space_array 5
 
         param_named_auto lightpositionArray light_position_view_space_array 5
@@ -171,8 +172,8 @@ material ShadowReceiverV5
 
             texture_unit diffuse
             {
-                texture fogtex.png
-                tex_address_mode clamp
+                //texture fogtex.png
+            //    tex_address_mode clamp
             }
 
             texture_unit normal_map

@@ -66,7 +66,7 @@ void Monster::InitMonster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::Over
 	_setupRTShader();
 
 	oScnManager->setAmbientLight(Ogre::ColourValue(0.53, 0.2, 0.12));
-	oScnManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
+	//oScnManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
 
 
 
@@ -131,11 +131,13 @@ void Monster::setShadowTechnique()
 		Ogre::MaterialPtr shadowCastMat = Ogre::MaterialManager::getSingleton().getByName("ShadowCasterV5");
 		Ogre::MaterialPtr shadowReceiverMat = Ogre::MaterialManager::getSingleton().getByName("ShadowReceiverV5");
 
-		oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+		oScnManager->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE);
 
 		oScnManager->setShadowTextureCasterMaterial(shadowCastMat);
 		oScnManager->setShadowTextureReceiverMaterial(shadowReceiverMat);
 		// TODO RESOURCES ARE SETUP LATER THAN MONSTER's INIT. MAKE RESOURCE LOAD FIRST IN THE PIPELINE.
+
+		ToastComponent::GetInstance()->addMessage("Initalized ShadowTexture.");
 
 	}
 	else {
