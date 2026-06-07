@@ -1,5 +1,7 @@
 #include "Mediator.h"
 
+
+// MUST BE CHANGED TO CASE HANDLER!
 SelectedCase* ModelComponent::selectedCase;
 SelectedMaterial* ModelComponent::selectedMaterial;
 SelectedScene* ModelComponent::selectedScene;

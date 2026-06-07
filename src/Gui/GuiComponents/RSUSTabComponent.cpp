@@ -233,15 +233,11 @@ void RSUSTabComponent::view()
 						);
 					}
 
-					/*if (ImGui::DragFloat(("Scale##" + std::to_string(texIndex)).c_str(), &ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).scale, 0.01f, 0.01f, 1.0f))
-					{
-						ModelComponent::selectedMaterial->selMaterial.lock()->setTextureScale(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition, ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).scale);
-					}*/
-
+			
 				}
 				else {
 
-					//ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
+					
 
 					ImGui::Text("No Texture Found!");
 					int selectedImage = ImageComboView(texIndex, ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
@@ -265,154 +261,7 @@ void RSUSTabComponent::view()
 		ImGui::Text("No Material Selected!");
 	}
 
-	/*if (RSUSModel->ogreMaterials)
-	{
-		if(RSUSModel->ogreMaterials->size() > 0){
-			if (ImGui::BeginCombo("Materials", RSUSModel->ogreMaterials->at(RSUSModel->selectedMaterial).c_str()))
-			{
-				for (int i = 0; i < RSUSModel->ogreMaterials->size(); i++)
-				{
-					if (ImGui::Selectable(RSUSModel->ogreMaterials->at(i).c_str(),RSUSModel->selectedMaterial == i))
-					{
-						RSUSModel->selectedMaterial = i;
-					}
-				}
-				ImGui::EndCombo();
-			}
-			
-		}
-
-		if (ImGui::Button("Shade it"))
-		{
-			RSUSModel->sendMaterialRsus();
-		}
-	}
-	else {
-		ImGui::Text("No Material Found!");
-	}
-
-	if (ImGui::Button("Get Matrials"))
-	{
-		RSUSModel->getMaterials();
-	}*/
-
-	// SHADER SELECTED
-
-	//if (RSUSModel->rsusObj)
-	//{
-	//	ImGui::Text("Fragment Shader Name : ");
-	//	ImGui::SameLine();
-	//	ImGui::Text(RSUSModel->rsusObj->fragShaderName.c_str());
-
-	//	ImGui::Text("Fragment Shader File Name : ");
-	//	ImGui::Text(RSUSModel->rsusObj->fragShaderFileName.c_str());
-
-
-	//	for (int i = 0; i < RSUSModel->rsusObj->fragVariables.size(); i++)
-	//	{
-	//		editableFragShaderVarViewComponent(RSUSModel->rsusObj->fragVariables.at(i), RSUSModel);
-	//	}
-
-	//	ImGui::Spacing();
-
-	//	ImGui::Text("Vertex Shader Name : ");
-	//	ImGui::SameLine();
-	//	ImGui::Text(RSUSModel->rsusObj->vertShaderName.c_str());
-
-	//	ImGui::Text("Vertex Shader File Name : ");
-	//	ImGui::SameLine();
-	//	ImGui::Text(RSUSModel->rsusObj->vertShaderFileName.c_str());
-
-	//	for (int i = 0; i < RSUSModel->rsusObj->vertVariables.size(); i++)
-	//	{
-	//		editableVertShaderVarViewComponent(RSUSModel->rsusObj->fragVariables.at(i), RSUSModel);
-	//	}
-
-	//	// TEXTURES
-
-	//	ImGui::Spacing();
-	//	ImGui::Text("Textures");
-	//	ImGui::Spacing();
-
-	//	textureViewComponent(
-	//		"Diffuse",
-	//		RSUSModel->rsusObj->textures->Diffuse,
-	//		RSUSModel->Diffuse,
-	//		&RSUSModel->selectedDiffuseIndex,
-	//		RSUSModel
-	//	);
-
-	//	if (RSUSModel->Diffuse)
-	//	{
-	//		ImGui::Image((ImTextureID)RSUSModel->Diffuse.get()->getHandle(), ImVec2(250, 250));
-	//	}
-
-	//	ImGui::Spacing();
-
-	//	textureViewComponent(
-	//		"Normal",
-	//		RSUSModel->rsusObj->textures->Normal,
-	//		RSUSModel->Normal,
-	//		&RSUSModel->selectedNormalIndex,
-	//		RSUSModel
-	//	);
-
-	//	if (RSUSModel->Normal)
-	//	{
-	//		ImGui::Image((ImTextureID)RSUSModel->Normal.get()->getHandle(), ImVec2(250, 250));
-	//	}
-
-	//	ImGui::Spacing();
-
-	//	textureViewComponent(
-	//		"Roughness",
-	//		RSUSModel->rsusObj->textures->Roughness,
-	//		RSUSModel->Roughness,
-	//		&RSUSModel->selectedRoughnessIndex,
-	//		RSUSModel
-	//	);
-
-	//	if (RSUSModel->Roughness)
-	//	{
-	//		ImGui::Image((ImTextureID)RSUSModel->Roughness.get()->getHandle(), ImVec2(250, 250));
-	//	}
-
-	//	ImGui::Spacing();
-
-	//	textureViewComponent(
-	//		"Parallax",
-	//		RSUSModel->rsusObj->textures->Parallax,
-	//		RSUSModel->Parallax,
-	//		&RSUSModel->selectedParallaxIndex,
-	//		RSUSModel
-	//	);
-
-	//	if (RSUSModel->Parallax)
-	//	{
-	//		ImGui::Image((ImTextureID)RSUSModel->Parallax.get()->getHandle(), ImVec2(250, 250));
-	//	}
-
-	//	ImGui::Spacing();
-
-	//	if (ImGui::Button("Set Texture"))
-	//	{
-	//		RSUSModel->setTexture();
-	//	}
-
-	//	ImGui::Spacing();
-
-	//	if (ImGui::Button("Save Parameters"))
-	//	{
-	//		// TODO CREATE A BETTER RSUS SAVE AND LOAD SYSTEM!!
-	//	}
-
-	//	ImGui::Spacing();
-
-	//	if (ImGui::Button("update shader"))
-	//	{
-	//		RSUSModel->updateShader();
-	//	}
-	//}
+	
 
 
 	ImGui::End();

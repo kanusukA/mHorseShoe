@@ -7,7 +7,6 @@
 class StatusTabModelComponent : public ModelComponent
 {
 private:
-	//PlayerObserver* playerObserver;
 
 public:
 
@@ -15,25 +14,18 @@ public:
 
 	}
 	void init() override{
-		//this->playerObserver = this->gdSource->getPlayerObserver();
 	}
 
 	bool isPlayerObserverSet() {
-		/*if (playerObserver)
-		{
-			return true;
-		}
-		else {
-			return false;
-		}*/
+
 	}
 
 	Ogre::Vector3 getPlayerPosition() {
-		//return playerObserver->getPlayerPosition();
+		
 	}
 
 	Ogre::Quaternion getPlayerOrientation() {
-		//return playerObserver->getPlayerRotation();
+		
 	}
 	
 

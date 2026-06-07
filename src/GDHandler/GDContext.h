@@ -52,6 +52,7 @@ public:
 
 	// Monster functions
 	void monSetLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);
+	bool monResourceGroupExists(std::string resourceGroup);
 
 	Ogre::MeshPtr monGetMesh(std::string meshName_p);
 	Ogre::Entity* monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p);

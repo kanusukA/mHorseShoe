@@ -17,12 +17,12 @@ private:
 
 protected:
 
-	// Ogre::Scenes must remain consistant with ResourceHandler.
-	void checkIntegrity();
+	// CREATE A CHECK INTEGRITY FUNCTION FOR SAVE FILES THAT CAN PRESCAN IF THE FILES REQUIRED BY THE SAVE FILE EXISTS!
+	//void checkIntegrity();
 
 
 public:
-	StuffHandler* stuffHandler;
+
 	Ogre::SceneManager* oScnManager;
 
 	//std::shared_ptr<std::string> defaultCase = std::make_shared<std::string>();
@@ -42,7 +42,6 @@ public:
 	// CASE FUNCTIONS
 	CaseHandler(Monster* monster) : GDBuilderContext(ResourceHandler::GetInstance(), monster) {
 		//stuffHandler = std::make_unique<StuffHandler>(monster, kint);
-		stuffHandler = new StuffHandler(monster);
 		oScnManager = monster->oScnManager;
 
 	};
@@ -51,7 +50,6 @@ public:
 	CaseHandler(Monster* monster, Case* case_p) : GDBuilderContext(ResourceHandler::GetInstance(), monster) {
 
 		//stuffHandler = std::make_unique<StuffHandler>(monster, kint);
-		stuffHandler = new StuffHandler(monster);
 		oScnManager = monster->oScnManager;
 
 	};

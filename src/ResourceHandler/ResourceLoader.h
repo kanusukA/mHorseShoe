@@ -119,8 +119,8 @@ public:
 		return load_paths;
 	}
 
-	void addLoadPath(ResourceLoaderEnums::ResourceLoadPaths pathType_p, std::string path_p);
-	void addLoadPath(std::string path_p);
+
+
 	void addLoadPath(ResourceLoadPath path_p);
 
 	// loadLocation_p - Resource Loader's path saving directory

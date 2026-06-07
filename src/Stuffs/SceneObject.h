@@ -35,6 +35,10 @@ public:
 	// Object
 	std::weak_ptr<Object> attachNewObject(const std::string objectName_p, std::filesystem::path meshPath_p, PhysXType type) {
 		Object* newObject = GDBuilderCxt->CreateObject(objectName_p, meshPath_p, type);
+		if (!newObject)
+		{
+			ToastComponent::GetInstance()->addMessage("Failed to Create Object : " + objectName_p + " in Scene : " + name);
+		}
 		std::shared_ptr<Object> sObject(newObject);
 		scene->attachObject(sObject->entity.get());
 		

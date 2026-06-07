@@ -37,57 +37,6 @@ void ResourceLoader::loadSavedPaths()
 }
 
 
-//void ResourceLoader::saveLoadPaths()
-//{
-//	ini->Reset();
-//
-//
-//
-//	/*for (int i = 0; i < this->load_paths->size(); i++)
-//	{
-//
-//		ini->SetValue("LoadPaths",load_paths->at(i).pathGroupName.c_str(), this->load_paths->at(i).c_str());
-//		
-//		
-//	}
-//	ini->SaveFile(this->resourceLoaderIniPath.string().c_str());*/
-//
-//	ini->Reset();
-//}
-
-void ResourceLoader::addLoadPath(ResourceLoaderEnums::ResourceLoadPaths pathType_p, std::string path_p)
-{
-	/*if (std::filesystem::exists(path_p))
-	{
-		this->load_paths->at(pathType_p) = path_p;
-	}
-	else {
-		if (std::filesystem::exists(this->sourceDir.string() + path_p))
-		{
-			this->load_paths->at(pathType_p) = this->sourceDir.string() + path_p;
-		}
-		else {
-			throw ResourceHandlerLoaderError("Load path SET invalid");
-		}
-		
-	}*/
-	
-}
-
-void ResourceLoader::addLoadPath(std::string path_p)
-{
-	/*if (std::filesystem::exists(path_p))
-	{
-		this->load_paths->push_back(path_p);
-	}
-	else if (std::filesystem::exists(this->sourceDir.string() + path_p)) {
-		this->load_paths->push_back(this->sourceDir.string() + path_p);
-	}
-	else {
-		throw ResourceHandlerLoaderError("Load path SET invalid");
-	}*/
-}
-
 void ResourceLoader::addLoadPath(ResourceLoadPath path_p)
 {
 	

@@ -14,7 +14,6 @@
 
 namespace fs = std::filesystem;
 
-
 struct SaveData {
 	std::string key;
 	std::string value;
@@ -48,10 +47,7 @@ enum ResourceHandlerType
 
 
 
-
-
 // Integrate it into gdhandler with Ogre 
-
 class ResourceHandler : public ResourceHandlerBuilderContext, public ResourceSaver , public ResourceLoader, public ResourceReader
 {
 
@@ -64,9 +60,6 @@ private:
 
 	CSimpleIniA ini;
 
-	// RESOURCES STORE
-	// HERE GENERAL RESOURCES ARE STORED.
-
 	// SOON TO BE DEPRICATED
 	std::vector<std::filesystem::path>* MaterialDp = new std::vector<std::filesystem::path>();
 	std::vector<std::filesystem::path>* ShaderDp = new std::vector<std::filesystem::path>();
@@ -77,30 +70,14 @@ private:
 	// THIS VECTOR STORES ALL THE RESOURCE PATHS. THAT HAS BEEN INITALIZED! i.e. THE PATHS THAT HASS BEEN CONNECTED TO THE ENUM GROUP AND THE RESOURCE_LOAD_PATHS.
 	std::vector<ResourceMasterGroup*>* masterResourceVector = new std::vector<ResourceMasterGroup*>();
 
-	std::vector<std::filesystem::path>* fetchResourcesByEnum(ResourceLoaderEnums::ResourceLoadPaths group_p);
-
 	// Searching Methods
 	// Main search function
-	void findAll(std::string location, ResourceHandlerType type);
 	std::filesystem::path find(std::string filepath, std::string location);
-	std::filesystem::path findAllInLocation(std::string filename, ResourceHandlerType type);
-
-	
-	// Add Resource
-	//void addResource(std::filesystem::path filePath, ResourceHandlerType type);
-
-	//std::filesystem::path _getSaveFileLoc(std::string filename);
-	void _readShaderFile(std::vector<std::string>* shaderVar, std::filesystem::path path);
-
-	// Loads ini file in ini obj. Creates the file if it does not exists
-	void _LoadIniFile(std::string filename);
 
 	// OVERHAUL PROJECT
-
 	std::vector<std::string>* allResourceParentPaths = new std::vector<std::string>(13);
 
 
-	// Hide the constructor and destructor of the class
 protected:
 	ResourceHandler();
 	~ResourceHandler() {
@@ -109,23 +86,9 @@ protected:
 
 public:
 
-	// OVERHAUL FUNCTIONS 
-	// This function creates a Material and sets a unique_ptr. The ownership of incoming mat_p is taken.
-	// Make sure Material is not a duplicate of existing
-	 
-	 
-	// Checks if the folder structure and required files exists for Resource Tasks
-	void checkFileStructure();
-
-	// DEPRICATED - RECOURCES ARE NOT LOADED USING THE MASTER_RECOURCE_VECTOR. WHICH PROVIDES VEC POINTERS TO THE DP VECTORS.
-	// Loads all the resources - Mesh, texture, Material, shader. Using the paths that are set on ResourceLoader.
-	void loadResources();
+	static ResourceHandler* GetInstance();
 
 	RLFetchedResource* fetchResourcesFromMesh(ResID meshID);
-
-
-	void saveResources();
-
 
 	std::vector<std::filesystem::path>* getMaterialsLoaded() { return MaterialDp; }
 	std::vector<std::filesystem::path>* getShadersLoaded() { return ShaderDp; }
@@ -148,11 +111,10 @@ public:
 	// Use RESOURCE_MASTER_GROUP_INDEX to fecth predefined groups.
 	std::filesystem::path* fetchFileInGroup(std::string filename_p, std::string group_p);
 
-	//Searching fullpath
-	// DEPRICATED - use fetchFileInGroup
-	std::filesystem::path fetchLocByFileName(std::string filename_p, ResourceLoaderEnums::ResourceLoadPaths group_p);
 
-	//PATHS
+	void getCases(std::vector<Ogre::String>* outputVec);
+
+	
 	void setPath(std::string path, ResourcePaths pathOf) {
 		if (std::filesystem::exists(path))
 		{
@@ -179,13 +141,13 @@ public:
 		return allResourceParentPaths;
 	}
 
-	// Resources
+	std::filesystem::path getDataDir();
 
+	// Resources
 	std::filesystem::path SourceDir;
 
 	//HELPING FUNCTIONS
 	bool fileExists(std::string path) { return std::filesystem::exists(path); }
-
 
 	// Class should not be cloneable
 	ResourceHandler(ResourceHandler& copy) = delete;
@@ -193,69 +155,19 @@ public:
 	// Class should not be assignable
 	void operator=(const ResourceHandler&) = delete;
 
-	std::string getResourceFile(std::string fileName, ResourceHandlerType type, bool addToOgre);
-
 	std::vector<ResourceMasterGroup*>* getMasterResourceVector() {
 		return masterResourceVector;
 	}
 
-	// Used for testing only
-	void getAllResources();
-
-	
-
-	// OLDER METHODS _________________________________________________________________________________________________________
-
-	// Ogre Functions
-	//void addOgreRenderMeshResourceLocation(); // Adds default render mesh location.
-	//void addOgreResourceLocation(std::filesystem::path location, std::string group);
-	//void getOgreRenderMeshes();
-	//void updateOgreMaterials();
-
-
-	// Only way to initialize the class
-	static ResourceHandler* GetInstance();
-
-	// SAVE/LOAD FUNCTIONS
-
-	// Gets saved Cases Name
-	void getCases(std::vector<Ogre::String> *outputVec);
-
-	//void readShaderFiles(Ogre::MaterialPtr mat);
-	//void readShaderFiles(Ogre::GpuProgramPtr program);
-
-	void writeToFile(std::string key, std::string value,std::string section, std::string filename);
-	void writeToFile(std::vector<SaveData>* data, std::string filename);
-	void clearFile(std::string filename);
-	std::string readFromFile(std::string key, std::string section, std::string filename);
-
 	std::filesystem::path getSourceDir();
-	std::filesystem::path getDataDir();
-
-	bool materialSaved(Ogre::String objectName, Ogre::String Material = "");
 
 
-	//void saveScene(std::string scnName, std::string caseName, std::string Filename, int scnType);
-	void saveSceneObject(std::string filename, std::string caseName, SceneObject obj, int scnType);
-	bool scnExists(std::string filename, int scnType);
-	bool objExists(std::string filename, int scnType);
-	void clearPrevSave();
-	
-
-	std::vector<std::string> loadScene(std::string filename, int scnType);
-	SceneObject loadObject(std::string filename, int scnType);
-
-	// IMAGES / TEXTURE
-	/*void loadImgToTex();*/
 
 	void shutdown() {
 		this->saveLoadPaths();
 		this->resource_loader_shutdown();
 	}
 };
-
-
-
 
 
 

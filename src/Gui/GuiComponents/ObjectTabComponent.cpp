@@ -49,9 +49,6 @@ void ObjectTabComponent::view()
 		ImGui::Text("Mesh Material : "); ImGui::SameLine();
 		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getMeshMaterialName().c_str());
 
-		/*ImGui::Text("Current Material : "); ImGui::SameLine();
-		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getwMaterial().lock()->getName().c_str());*/
-
 		ImGui::Text("Material : ");
 		ImGui::SameLine();
 		if (!ModelComponent::selectedMaterial->selMaterial.expired()) {

@@ -56,8 +56,8 @@ private:
 
 public:
 
-	Gui(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus) : 
-		GuiFramework(casehan, stuffhan,resourcehan, rsus,casehan) 
+	Gui(CaseHandler* casehan, ResourceHandler* resourcehan, RSUS* rsus) : 
+		GuiFramework(casehan, resourcehan, rsus,casehan) 
 	{
 		ImGui::StyleColorsDark();
 		// INITALIZE SPECTER

@@ -171,7 +171,7 @@ private:
 
 	// to be used with ResourceHandler Save
 	ShaderVar _putShaderValue(std::string valueStr);
-	std::vector<ShaderVar> _initShaderValue(Ogre::GpuProgramParametersPtr params, Ogre::StringVector* vec, Ogre::String filename , Ogre::String Section);
+
 
 	// Multi-Thread Shit
 	static RSUS* pinstance_;

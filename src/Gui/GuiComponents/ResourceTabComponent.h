@@ -65,10 +65,6 @@ public:
 		//gdSource->getResourceHandler()->addOgreRenderMeshResourceLocation();
 	}
 
-	void FetchAllResourcesBtn() {
-		gdSource->getResourceHandler()->getAllResources();
-	}
-
 	void editPath(int pathPos) {
 		*inputPath = paths->at(pathPos);
 		edit = pathPos;
@@ -208,19 +204,6 @@ public:
 
 	void deleteLoadPath(int index) {
 		this->gdSource->getResourceHandler()->removeLoadPath(index);
-	}
-
-	void setLoadPath() {
-		try
-		{
-			this->gdSource->getResourceHandler()->addLoadPath(ResourceLoaderEnums::ResourceLoadPaths(editLoadPathpos), *inputPath);
-		}
-		catch (...)
-		{
-			ToastComponent::GetInstance()->addMessage("Invalid path - " + *inputPath);
-		}
-
-		editLoadPathpos = -1;
 	}
 
 	void saveLoadPaths() {

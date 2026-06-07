@@ -153,12 +153,12 @@ set(SOURCES
 	src/GDHandler/GDNotifierHandler.cpp
 	src/GDHandler/GDSystem.cpp
 	src/GDHandler/ResourceHandler.cpp
-	src/GDHandler/ResourcePaths.cpp
+	
 	src/Gui/Gui.cpp
 	src/Gui/GuiButtons.cpp
 	src/Gui/GuiTabs.cpp
 	src/Gui/GuiComponents/AddTabComponent.cpp
-	src/Gui/GuiComponents/GuiComponents.cpp
+	
 	src/Gui/GuiComponents/ObjectTabComponent.cpp
 	src/Gui/GuiComponents/ResourceTabComponent.cpp
 	src/Gui/GuiComponents/RSUSTabComponent.cpp
@@ -168,7 +168,7 @@ set(SOURCES
 	src/Gui/GuiComponents/_SceneTabComponent.cpp
 	src/monster/Monster.cpp
 	src/ResourceHandler/ResourceLoader.cpp
-	src/ResourceHandler/ResourceManager.cpp
+	
 	src/ResourceHandler/ResourceObjects.cpp
 	src/ResourceHandler/ResourceReader.cpp
 	src/ResourceHandler/ResourceSaver.cpp

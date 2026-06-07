@@ -201,7 +201,7 @@ struct ComInit
 // IT PROVIDES ACCESS TO OTHER PARTS OF THE SOFTWARE/
 // THIS CLASS SHOULD NOT BE DIRCETLY CONNECTED WITH THE VIEW CLASS AS IT PROVIDES LIMITLESS ACCESS OF OTHER CLASSES
 // TYPICALLY MODELCOMPONENT MUST BE USED IN BETWEEN TO FILTER AND MASK DATA.
-class GDSource : public GuiRegen {
+class GDSource {
 
 private:
 	GDSource() {};
@@ -209,7 +209,6 @@ private:
 	
 protected:
 	CaseHandler* scnHandler = nullptr;
-	StuffHandler* stuffHandler = nullptr;
 	ResourceHandler* resourceHandler = nullptr;
 	RSUS* shaderHandler = nullptr;
 	GDSystem* system = nullptr;
@@ -224,11 +223,10 @@ protected:
 
 public:
 
-	GDSource(CaseHandler* casehan, StuffHandler* stuffhan, 
+	GDSource(CaseHandler* casehan,  
 		ResourceHandler* resourceHan,
 		RSUS* rsus,GDSystem* system_p) {
 		this->scnHandler = casehan;
-		this->stuffHandler = stuffhan;
 		this->resourceHandler = resourceHan;
 		//this->feel = feelhan;
 		this->shaderHandler = rsus;
@@ -258,10 +256,6 @@ public:
 
 	CaseHandler* getCaseHandler() {
 		return scnHandler;
-	}
-
-	StuffHandler* getStuffHandler() {
-		return stuffHandler;
 	}
 
 	ResourceHandler* getResourceHandler() {
@@ -448,17 +442,10 @@ protected:
 
 	};
 
-	void regenScenes() override{
-		for (int i = 0; i < Models.size(); i++)
-		{
-			Models.at(i)->update(GUIUpdateEvent::SCENE_UPDATE);
-		}
-	}
-
 public:
 
-	GuiFramework(CaseHandler* casehan, StuffHandler* stuffhan, ResourceHandler* resourcehan, RSUS* rsus, GDSystem* system_p) : 
-		GDSource(casehan, stuffhan,resourcehan,rsus,system_p) {
+	GuiFramework(CaseHandler* casehan, ResourceHandler* resourcehan, RSUS* rsus, GDSystem* system_p) : 
+		GDSource(casehan,resourcehan,rsus,system_p) {
 		//resourcehan->setGuiRegen(this);
 	}
 

@@ -3,7 +3,7 @@
 //Local
 #include <GDHandler/ResourcePaths.h>
 #include <ResourceHandler/ResourceReader.h>
-#include <Gui/GuiRegen.h>
+
 
 // Third-party Headers
 #include <Ogre.h>
@@ -69,25 +69,6 @@ struct ResourceMasterGroup {
 	std::vector<std::filesystem::path>* ResourcePaths = new std::vector<std::filesystem::path>();
 };
 
-
-// DEPRICATED - use ResourceMasterGroup
-namespace ResourceLoaderEnums {
-
-	
-
-	// DEPRICATED - use RESOURCE MASTER GROUP
-	enum ResourceLoadPaths {
-		OBJECT,
-		SHADERS,
-		MATERIAL_PATH,
-		MATERIAL_TEXTURE,
-		RENDER_MESH_PATH,
-		IMAGE_PATH,
-		FONT
-	};
-
-}
-
 typedef unsigned long long ResID;
 
 enum PhysXType {
@@ -142,21 +123,11 @@ bool vectorPathContains(std::vector<std::filesystem::path>* checkVec, std::strin
 class ResourceHandlerBuilderContext {
 
 private:
-	GuiRegen* guiRegen; // used to update Gui Resources
 	
 
 protected:
 	std::vector<ResID>* masterList = new std::vector<ResID>();
-	/*std::vector<CaseResource*>* caseRes = new std::vector<CaseResource*>();
-	std::vector<SceneResource*>* scnRes = new std::vector<SceneResource*>();
-	std::vector<ObjectResource*>* objRes = new std::vector<ObjectResource*>();
 
-
-	std::vector<ShaderResource*>* shaderRes = new std::vector<ShaderResource*>();
-	std::vector<std::unique_ptr<MaterialResource>>* matRes = new std::vector<std::unique_ptr<MaterialResource>>();
-	std::vector<RenderMeshResource*>* renderRes = new std::vector<RenderMeshResource*>();
-	std::vector<ColliderMeshResource*>* colRes = new std::vector<ColliderMeshResource*>();
-	std::vector<ImageResource*>* imageRes = new std::vector<ImageResource*>();*/
 
 	int caseID = 0;
 	int sceneID = 0;
@@ -178,73 +149,7 @@ protected:
 		}
 	}
 
-	/*void validateMasterList() {
-		unsigned long long totalItems = caseRes->size() + scnRes->size() + objRes->size() +
-			shaderRes->size() + matRes->size() + renderRes->size() + colRes->size() + imageRes->size();
-		if (totalItems != masterList->size())
-		{
-			throw ResourceHandlerIDError("Master List is not valid!");
-		}
-	}*/
-
 	
-
-// 	void addCaseRes(CaseResource* case_p) {
-// 		
-// 		caseRes->push_back(case_p);
-// 		validateMasterList();
-// 		caseIndex += 1;
-// 	}
-// 
-// 	void addSceneRes(SceneResource* scn_p) {
-// 
-// 		scnRes->push_back(scn_p);
-// 		validateMasterList();
-// 		sceneIndex += 1;
-// 
-// 		if (guiRegen)
-// 		{
-// 			guiRegen->regenScenes();
-// 		}
-// 	}
-// 
-// 	void addObjectRes(ObjectResource* obj_p) {
-// 
-// 		objRes->push_back(obj_p);
-// 		validateMasterList();
-// 		objectIndex += 1;
-// 	}
-// 
-// 	void addShaderRes(ShaderResource* shader_p) {
-// 
-// 		shaderRes->push_back(shader_p);
-// 		validateMasterList();
-// 		shaderIndex += 1;
-// 	}
-// 
-// 	void addMaterialRes(std::unique_ptr<MaterialResource> uniqueMaterial) {
-// 		matRes->push_back(std::move(uniqueMaterial));
-// 		validateMasterList();
-// 		matIndex += 1;
-// 	}
-// 
-// 	void addRenderMeshRes(RenderMeshResource* render_p) {
-// 		renderRes->push_back(render_p);
-// 		validateMasterList();
-// 		renderIndex += 1;
-// 	}
-// 
-// 	void addColliderMeshRes(ColliderMeshResource* collider_p) {
-// 		colRes->push_back(collider_p);
-// 		validateMasterList();
-// 		colliderIndex += 1;
-// 	}
-// 
-// 	void addImageRes(ImageResource* image_p) {
-// 		imageRes->push_back(image_p);
-// 		validateMasterList();
-// 		imageIndex += 1;
-// 	}
 
 public:
 
@@ -294,241 +199,7 @@ public:
 		return textureID;
 	}
 
-	// CASE RESOURCE
-
-	// Not a suggested method to fetch few cases. Try using getByID() insted. This method is only for GUI applications!
-	//std::vector<CaseResource*>* getAllCase() { return caseRes; };
-	//std::vector<SceneResource*>* getAllScenes() { return scnRes; };
-	//std::vector<ObjectResource*>* getAllObjects() { return objRes; };
-	//std::vector<std::unique_ptr<MaterialResource>>* getAllMaterial() { return matRes; };
-	//std::vector<ShaderResource*>* getAllShader() { return shaderRes; };
-	//std::vector<RenderMeshResource*>* getAllRenderMesh() { return renderRes; };
-	//std::vector<ColliderMeshResource*>* getAllColliderMesh() { return colRes; };
-	//std::vector<ImageResource*>* getAllImages() { return imageRes; };
-
-	//SceneResource* fetchSceneResourceByID(ResID id) {
-	//	try {
-	//		if (id < 10110000000)
-	//		{
-	//			return scnRes->at(id - 10100000000);
-	//		}
-	//		else if (id < 10120000000)
-	//		{
-	//			return scnRes->at(id - 10110000000);
-	//		}
-	//		else {
-	//			return scnRes->at(id - 10120000000);
-	//		}
-
-	//	}
-	//	catch (...)
-	//	{
-	//		throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
-	//	}
-
-	//}
-	//CaseResource* fetchCaseResourceByID(ResID id) {
-	//	try
-	//	{
-	//		return caseRes->at(id - 10000000000);
-	//	}
-	//	catch (...)
-	//	{
-	//		throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
-	//	}
-
-	//}
-	//ShaderResource* fetchShaderResourceByID(ResID id) {
-	//	try
-	//	{
-	//		if (id < 10710000000)
-	//		{
-	//			return shaderRes->at(id - 10700000000);
-	//		}
-	//		else {
-	//			return shaderRes->at(id - 10710000000);
-	//		}
-	//	}
-	//	catch (...)
-	//	{
-	//		throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
-	//	}
-
-	//}
-	//ObjectResource* fetchObjectResourceByID(ResID id) {
-	//	try
-	//	{
-	//		if (id < 10210000000)
-	//		{
-	//			return objRes->at(id - 10200000000);
-	//		}
-	//		else if (id < 10220000000) {
-	//			return objRes->at(id - 10210000000);
-	//		}
-	//		else {
-	//			return objRes->at(id - 10220000000);
-	//		}
-	//	}
-	//	catch (...)
-	//	{
-	//		throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
-	//	}
-
-	//}
-	///*MaterialResource* fetchMaterialResourceByID(ResID id) {
-	//	try
-	//	{
-	//		return matRes->at(id - 10800000000);
-	//	}
-	//	catch (const std::exception&)
-	//	{
-	//		throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
-	//	}
-
-	//}*/
-
-	//RenderMeshResource* fetchRenderMeshResourceByID(ResID id) {
-	//	try
-	//	{
-	//		return renderRes->at(id - 10300000000);
-	//	}
-	//	catch (...)
-	//	{
-	//		throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
-	//	}
-	//}
-
-	//ColliderMeshResource* fetchColliderMeshResourceByID(ResID id) {
-	//	try
-	//	{
-	//		return colRes->at(id - 10400000000);
-	//	}
-	//	catch (...)
-	//	{
-	//		throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
-	//	}
-	//}
-
-	//ImageResource* fetchImageResourceByID(ResID id) {
-	//	try
-	//	{
-	//		return imageRes->at(id - 10600000000);
-	//	}
-	//	catch (const std::exception&)
-	//	{
-	//		throw ResourceHandlerIDError(("Resource Does not Exist , id : " + std::to_string(id)).c_str());
-	//	}
-	//}
-
-	//bool resourceExists(ResID id) {
-	//	for (int i = 0; i < masterList->size(); i++)
-	//	{
-	//		if (masterList->at(i) == id)
-	//		{
-	//			return true;
-	//		}
-	//	}
-	//	return false;
-	//}
-
-	//// Initalizes CaseResource with resource handler and sets id and name!
-	//virtual void createCase(CaseResource* case_p) {};
-	//virtual void createScene(SceneResource* scn_p) {};
-	//virtual void createObject(ObjectResource* obj_p) {};
-	//virtual void createMaterial(MaterialResource* mat_p) {};
-	//virtual void createShader(ShaderResource* shader_p) {};
-	//virtual void createRenderMesh(RenderMeshResource* render_p) {};
-	//virtual void createColliderMesh(ColliderMeshResource* collider_p) {};
-	//virtual void createImage(ImageResource* image_p) {}
-
-	//void removeCase(CaseResource* case_p, ResID id) {
-	//	for (int i = 0; i < caseRes->size(); i++)
-	//	{
-	//		if (caseRes->at(i) == case_p)
-	//		{
-	//			caseRes->erase(caseRes->begin() + i);
-	//			break;
-	//		}
-	//	}
-	//	removeMasterListID(id);
-	//};
-	//void removeScene(SceneResource* scn_p, ResID id) {
-	//	for (int i = 0; i < scnRes->size(); i++)
-	//	{
-	//		if (scnRes->at(i) == scn_p)
-	//		{
-	//			scnRes->erase(scnRes->begin() + i);
-	//			break;
-	//		}
-	//	}
-	//	removeMasterListID(id);
-	//};
-	//void removeObject(ObjectResource* obj_p, ResID id) {
-	//	for (int i = 0; i < objRes->size(); i++)
-	//	{
-	//		if (objRes->at(i) == obj_p)
-	//		{
-	//			objRes->erase(objRes->begin() + i);
-	//			break;
-	//		}
-	//	}
-	//	removeMasterListID(id);
-	//};
-	//void removeMaterial(ResID id) {
-	//	for (int i = 0; i < matRes->size(); i++)
-	//	{
-	//		if (matRes->at(i)->_id == id)
-	//		{
-	//			matRes->erase(matRes->begin() + i);
-	//			break;
-	//		}
-	//	}
-	//	removeMasterListID(id);
-	//};
-	//void removeShader(ShaderResource* shader_p, ResID id) {
-	//	for (int i = 0; i < shaderRes->size(); i++)
-	//	{
-	//		if (shaderRes->at(i) == shader_p)
-	//		{
-	//			shaderRes->erase(shaderRes->begin() + i);
-	//			break;
-	//		}
-	//	}
-	//	removeMasterListID(id);
-	//};
-	//void removeRenderMesh(RenderMeshResource* render_p, ResID id) {
-	//	for (int i = 0; i < renderRes->size(); i++)
-	//	{
-	//		if (renderRes->at(i) == render_p)
-	//		{
-	//			renderRes->erase(renderRes->begin() + i);
-	//			break;
-	//		}
-	//	}
-	//	removeMasterListID(id);
-	//};
-	//void removeColliderMesh(ColliderMeshResource* collider_p, ResID id) {
-	//	for (int i = 0; i < colRes->size(); i++)
-	//	{
-	//		if (colRes->at(i) == collider_p)
-	//		{
-	//			colRes->erase(colRes->begin() + i);
-	//			break;
-	//		}
-	//	}
-	//	removeMasterListID(id);
-	//};
-	//void removeImage(ImageResource* image_p, ResID id) {
-	//	for (int i = 0; i < imageRes->size(); i++)
-	//	{
-	//		if (imageRes->at(i) == image_p)
-	//		{
-	//			imageRes->erase(imageRes->begin() + i);
-	//			break;
-	//		}
-	//	}
-	//	removeMasterListID(id);
-	//}
+	
 
 
 };
@@ -626,7 +297,7 @@ protected:
 public:
 
 	float* _getPosition() {
-		//std::cout << "position : " << position[0] << " " << position[1] << " " << position[2] << std::endl;
+		
 		return position;
 	}
 
@@ -724,6 +395,7 @@ public:
 		physXType = objectType;
 		this->setName(name_p);
 		meshFilePath = meshFilePath_p;
+		renderMeshName = meshFilePath.stem().string();
 		setId(context->generateObjectID());
 	}
 

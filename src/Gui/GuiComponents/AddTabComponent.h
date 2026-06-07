@@ -30,7 +30,7 @@ public:
 	int renderMeshesPos = 0;
 	int colliderMeshesPos = 0;
 
-	StuffType SelectedStuffType = STUFF_STATIC;
+	
 
 	std::string* CreateSceneNode = new std::string(""); // PORT TO IMGUI_STD_STRING
 
@@ -39,14 +39,7 @@ public:
 	}
 
 	void init() override {
-		// TODO ADD SCENES IN ADD TAB
-		/*MeshScenes = this->gdSource->getCaseHandler()->getMeshScenes();
-		StaticScenes = this->gdSource->getCaseHandler()->getStaticScenes();
-		DynamicScenes = this->gdSource->getCaseHandler()->getDynamicScenes();
-		MeshScenes = this->gdSource->getCaseHandler()->getMeshScenes();*/
-
-	/*	RenderMeshes = this->gdSource->getResourceHandler()->ogreRenderMeshes;
-		ColliderMeshes = this->gdSource->getResourceHandler()->colliderMeshes;*/
+		
 
 		
 	}
@@ -86,24 +79,10 @@ public:
 	
 
 	void createSceneBtn() {
-		/*switch (SelectedStuffType)
-		{
-		case STUFF_DYNAMIC:
-			gdSource->getCaseHandler()->CreateScene(SceneType::DYNAMIC, *CreateSceneNode);
-			break;
-		case STUFF_STATIC:
-			gdSource->getCaseHandler()->CreateScene(SceneType::STATIC, *CreateSceneNode);
-			break;
-		case STUFF_MESH_ONLY:
-			gdSource->getCaseHandler()->CreateScene(SceneType::MESH, *CreateSceneNode);
-			break;
-		default:
-			break;
-		}*/
 	}
 
 	void add() {
-		// TODO add stuffHandler Object creation
+		
 	}
 
 

@@ -1,6 +1,6 @@
 #include "CaseHandler.h"
 
-
+// ENTIRE OVERHAUL
 
 void CaseHandler::saveDefaultCase(std::string filename)
 {
@@ -27,8 +27,6 @@ void CaseHandler::saveAll() {
 			resourceHandler->saveCase(caseVec->at(caseIndex).get());
 			//resourceHandler->saveIni(*resourceHandler->getPath(ResourcePaths::Cases));
 			saveScenes(caseVec->at(caseIndex)->getScenes());
-			// Saving Scenes
-			//saveScenes(caseVec->at(caseIndex)->getScenes(), caseVec->at(caseIndex)->getId(), 0);
 			
 
 		}

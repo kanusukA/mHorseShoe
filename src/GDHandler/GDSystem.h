@@ -1,6 +1,7 @@
 #pragma once
 
-#include <GDHandler/stuff/Stuff.h>
+#include <monster/Monster.h>
+#include <kint/Kint.h>
 
 #include <GDHandler/GDNotifier.h>
 

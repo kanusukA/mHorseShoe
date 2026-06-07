@@ -27,6 +27,11 @@ void GDBuilderContext::monSetLocation(std::filesystem::path parentPath_p, std::s
 	monster->addOgreResourceLocation(parentPath_p.string(), OgreGroup);
 }
 
+bool GDBuilderContext::monResourceGroupExists(std::string resourceGroup)
+{
+	return Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(resourceGroup);
+}
+
 Ogre::MeshPtr GDBuilderContext::monGetMesh(std::string meshName_p)
 {
 	return monster->getMesh(meshName_p, OGRE_MESH_GROUP);

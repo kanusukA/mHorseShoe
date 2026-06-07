@@ -82,37 +82,7 @@ public:
 		ModelComponent::selectedMaterial->selMaterial.lock()->readTextures();
 	}
 
-	/*void updateFRsusInt(Ogre::String varName, int val) {
-		this->gdSource->getShaderHandler()->updateFragParameterInt(varName,val);
-	}
-	void updateFragRsusFloat(Ogre::String varName, float* val) {
-		this->gdSource->getShaderHandler()->updateFragParameterFloat(varName, val);
-	}
-	void updateFragRsusFloat2(Ogre::String varName, float val1, float val2) {
-		this->gdSource->getShaderHandler()->updateFragParameterFloat2(varName, Ogre::Vector2(val1, val2));
-	}
-	void updateFragRsusFloat3(Ogre::String varName, float val1, float val2, float val3) {
-		this->gdSource->getShaderHandler()->updateFragParameterFloat3(varName, Ogre::Vector3(val1, val2, val3));
-	}
-	void updateFragRsusFloat4(Ogre::String varName, float val1, float val2, float val3, float val4) {
-		this->gdSource->getShaderHandler()->updateFragParameterFloat4(varName, Ogre::Vector4(val1, val2, val3, val4));
-	}
-
-	void updateVertRsusInt(Ogre::String varName, int val) {
-		this->gdSource->getShaderHandler()->updateVertParameterInt(varName, val);
-	}
-	void updateVertRsusFloat(Ogre::String varName, float* val) {
-		this->gdSource->getShaderHandler()->updateVertParameterFloat(varName, val);
-	}
-	void updateVertRsusFloat2(Ogre::String varName, float val1, float val2) {
-		this->gdSource->getShaderHandler()->updateVertParameterFloat2(varName, Ogre::Vector2(val1, val2));
-	}
-	void updateVertRsusFloat3(Ogre::String varName, float val1, float val2, float val3) {
-		this->gdSource->getShaderHandler()->updateVertParameterFloat3(varName, Ogre::Vector3(val1, val2, val3));
-	}
-	void updateVertRsusFloat4(Ogre::String varName, float val1, float val2, float val3, float val4) {
-		this->gdSource->getShaderHandler()->updateVertParameterFloat4(varName, Ogre::Vector4(val1, val2, val3, val4));
-	}*/
+	
 
 	const char* wrapModeEnumToname(Ogre::TextureUnitState::TextureAddressingMode mode) {
 		switch (mode)

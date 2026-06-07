@@ -1,36 +1,5 @@
 #include "CaseHandler.h"
 
-void CaseHandler::checkIntegrity()
-{
-	// Check Scenes in 
-	//Ogre::Node::ChildNodeMap nodes = oScnManager->getRootSceneNode()->getChildren();
-
-	////std::vector<SceneResource*>* scnNodes = ResourceHandler::GetInstance()->getAllScenes();
-	//bool match = true;
-	//if (nodes.size() == scnNodes->size())
-	//{
-	//	for (int i = 0; i < nodes.size(); i++)
-	//	{
-	//		match = false;
-	//		for (int j = 0; j < scnNodes->size(); j++)
-	//		{
-	//			if (nodes.at(i)->getName() != scnNodes->at(j)->getName())
-	//			{
-	//				match = true;
-	//			}
-	//		}
-	//		if (!match)
-	//		{
-	//			throw CaseErrorHandler("Ogre Nodes are inconsistent with Resource Nodes");
-	//		}
-	//	}
-	//}
-	//else {
-	//	throw CaseErrorHandler("Ogre Nodes are inconsistent with Resource Nodes");
-	//}
-	//
-
-}
 
 
 bool CaseHandler::resourceExists(std::string resourceName)
@@ -91,6 +60,8 @@ Object* CaseHandler::CreateObject(std::string objectName_p, std::filesystem::pat
 	
 	// Get RenderMesh
 	Ogre::MeshPtr mesh = fetchMeshByName(meshPath_p);
+	// every ptr must be null checked!!!!!!
+
 
 	if (!this->objectExists(objectName_p))
 	{
@@ -123,13 +94,24 @@ Ogre::MeshPtr CaseHandler::fetchMeshByName(std::filesystem::path meshPath_p)
 	}*/
 	
 	// Create if it does not exist
-	this->monSetLocation(meshPath_p.parent_path(), OGRE_MESH_GROUP);
-	Ogre::MeshPtr mesh = this->monGetMesh(meshPath_p.filename().string());
-	
-	//std::unique_ptr<RenderMesh> uMesh = std::make_unique<RenderMesh>(this,mesh);
-	//meshVec->push_back(std::move(uMesh));
+	if (std::filesystem::exists(meshPath_p))
+	{
+		this->monSetLocation(meshPath_p.parent_path(), OGRE_MESH_GROUP);
+		
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Mesh file : " + meshPath_p.string() + " does not exist! Checking default directories");
+		
+	}
 
-	return mesh;
+	if (this->monResourceGroupExists(OGRE_MESH_GROUP))
+	{
+		Ogre::MeshPtr mesh = this->monGetMesh(meshPath_p.filename().string());
+		return mesh;
+	}
+
+	ToastComponent::GetInstance()->addMessage("Mesh file : " + meshPath_p.string() + " could not be found in default directories! Please check the file path and try again.");
+	return nullptr;
 
 }
 
@@ -310,6 +292,12 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 			RLObject obj = rlCase.Scenes.at(scenesIndex).objects.at(objIndex);
 
 			std::weak_ptr<Object> wObj =  wScene.lock()->attachNewObject(obj.name, obj.mesh.filepath, PhysXType(obj.ObjectPhysxType));
+			
+			if (wObj.expired())
+			{
+				ToastComponent::GetInstance()->addMessage("Failed to create object : " + obj.name + " in Scene : " + rlCase.Scenes.at(scenesIndex).name);
+				return;
+			}
 
 			if (wObj.lock()->setMaterial(obj.material.materialFilePath, obj.material.name))
 			{

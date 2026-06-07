@@ -182,12 +182,6 @@ void SceneTabComponent::view()
 
 			// ADD SCENE
 
-			//ImGui::Text("Scene Name : ");
-			
-
-
-			// ADD SCENE OBJECTS CREATIONS AND OBJECTS VIEW!!
-
 
 			ImGui::Text("SCENE : ");
 			ImGui::SameLine();

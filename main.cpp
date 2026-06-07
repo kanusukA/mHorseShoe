@@ -107,14 +107,13 @@ int main() {
 
 	std::cout << "loop ended : " << std::endl;
 
-	ResourceHandler::GetInstance()->saveResources();
 
 
 	// Shutdown
 	//kint->Shutdown();
 	monster->Shutdown();
 
-	ResourceHandler::GetInstance()->shutdown();
+	ResourceHandler::GetInstance()->shutdown(); // SAVES LOAD PATHS AS WELL!
 
 	std::cout << "HEllOS";
 
