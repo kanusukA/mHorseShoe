@@ -185,7 +185,7 @@ set(SOURCES
 	
 )
 
-add_executable(mHorseShoee ${SOURCES})
+add_executable(mHorseShoee ${SOURCES} "src/monster/MonsterCreator.cpp" "src/monster/MonsterRSUS.cpp")
 
 target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 

@@ -236,26 +236,47 @@ public:
 	// Add Subject and observer for render meshes available in Monster
 	std::vector<Ogre::MeshPtr> preLoadRenderMeshes = std::vector<Ogre::MeshPtr>();
 
-	
-
 	// RENDERING RELATED 
-	
 	Ogre::SceneNode* addCamera(Ogre::String camName, Ogre::Vector3 startPos);
-	Ogre::Entity* createMeshEntity(Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
-	Ogre::Entity* createMeshEntity(Ogre::String entityname ,Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
-	Ogre::Entity* createEntity(Ogre::String entityName_p, Ogre::MeshPtr mesh_p);
-	Ogre::MeshPtr getMesh(Ogre::String meshName, Ogre::String groupName = "Render_Mesh");
-	Ogre::SceneNode* createNewScnNodeAttach(std::string scnNodeName,Ogre::SceneNode* node); // Creates a new scnNode and attaches it to the given scnNode
 
-	Ogre::Mesh* getColliderMesh(Ogre::String meshName, Ogre::String groupName = "Collider_Mesh");
-	Ogre::MaterialPtr getMaterial(Ogre::String matName_p, Ogre::String groupName);
-	Ogre::MaterialPtr createEmptyMaterial(std::string name_p, Ogre::String groupName);
 	Ogre::SceneNode* addToScnNode(Ogre::String meshName, Ogre::SceneNode* toScnNode);
+
+
+	// MONSTER FUNCTIONS
+	void addOgreResourceLocation(std::string path_p, std::string OgreResourceGroup);
+	void initalizeResourceGroup(std::string OgreResourceGroup);
+
+
+	// VALIDATION CHECKERS
+	bool resourceExists(std::string resName, std::string groupName);
+	bool resourceGroupExists(std::string groupName);
+	bool resourceLocationExists(std::string path_p);
+	bool resourceEntityExists(std::string entityName);
+
+	// MONSTER CREATOR FUNCTIONS
+	//	CREATE FUNCTIONS
+	Ogre::Entity* createMeshEntity(Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
+	Ogre::Entity* createMeshEntity(Ogre::String entityname, Ogre::String mshname, Ogre::String groupName = "Render_Mesh");
+	Ogre::Entity* createEntity(Ogre::String entityName_p, Ogre::MeshPtr mesh_p);
+
+	Ogre::MaterialPtr createEmptyMaterial(std::string name_p, Ogre::String groupName);
+
+	Ogre::SceneNode* createNewScnNodeAttach(std::string scnNodeName, Ogre::SceneNode* node);
+
+	//	FETCH FUNCTIONS
+	Ogre::MeshPtr getMesh(Ogre::String meshName, Ogre::String groupName = "Render_Mesh");
+
+	Ogre::MaterialPtr getMaterial(Ogre::String matName_p, Ogre::String groupName);
+
 	Ogre::TexturePtr getImageTexture(std::string textureName, Ogre::String groupName);
 
-	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::String scnNodeName, Ogre::Entity* ent);
-	Ogre::SceneNode* loadMeshScnNodeFromEnt(Ogre::Entity* ent);
-	Ogre::SceneNode* loadMeshScnNode(Ogre::String scnNodeType,Ogre::String scnNodeName, Ogre::String objectname, Ogre::String meshName, Ogre::String groupName = "Render_Mesh", bool castShadow = true);
+
+
+	// OLDER FUNCTIONS - RETAIN THEM FOR FUTURE PURPOSE
+	Ogre::SceneNode* loadMeshScnNode(Ogre::String scnNodeType, Ogre::String scnNodeName, Ogre::String objectname, Ogre::String meshName, Ogre::String groupName = "Render_Mesh", bool castShadow = true);
+	
+
+
 	Ogre::SceneNode* loadMeshScnNode(
 		Ogre::String scnNodeType,
 		Ogre::String scnNodeName,
@@ -318,18 +339,6 @@ public:
 	Ogre::Camera* getCamera() { return cam; }
 	Ogre::SceneNode* getCameraScnNode() { return CameraNode; }
 
-	void addOgreResourceLocation(std::string path_p, std::string OgreResourceGroup);
-	void initalizeResourceGroup(std::string OgreResourceGroup);
-
-	void setSkyBox();
-	void setGrid();
-
-	void createTerrain(Ogre::Vector2 size, unsigned int vertSize, unsigned int grassDensity);
-	void setHeightMap(Ogre::String loc, Ogre::String grassMapImg, int vertSize, int displacementFac, int grassDensity, float scale);
-	void createGrass();
-
-	void setupTestTrack();
-
 
 	HWND* getHWND();
 
@@ -339,14 +348,12 @@ public:
 
 	
 	void _setupRTShader();
-	void _loadResource();
-	Ogre::ManualObject* _createGrassBlade(float scaleX, float scaleY);
 
 	// WINDOW RELATED
 	bool window_fullScreen = false;
 	SDL_Window* sdlWindow;
 	void _setupSDL3(INT64 windowWidth, INT64 windowHeight, Ogre::String windowName);
-	void windowUpdate();
+
 
 	void Shutdown();
 
