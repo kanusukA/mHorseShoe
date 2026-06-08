@@ -2,26 +2,24 @@
 
 
 
+std::unique_ptr<Case> CaseHandler::selectedCase;
+
 bool CaseHandler::resourceExists(std::string resourceName)
 {
 	return Ogre::ResourceGroupManager::getSingleton().resourceExistsInAnyGroup(resourceName);
 }
 
-std::weak_ptr<Case> CaseHandler::CreateCase(std::string caseName_p)
+Case* CaseHandler::CreateCase(std::string caseName_p)
 {
-	std::shared_ptr<Case> sCase = std::make_shared<Case>(this,caseName_p);
-	caseVec->push_back(std::move(sCase));
-
-	return caseVec->at(caseVec->size() - 1);
+	Case* newCase = new Case(this, caseName_p);
+	return newCase;
 
 }
 
-std::weak_ptr<Case> CaseHandler::CreateCase(std::string caseName_p, std::string filename_p)
+Case* CaseHandler::CreateCase(std::string caseName_p, std::string filename_p)
 {
-	std::shared_ptr<Case> sCase = std::make_shared<Case>(this, caseName_p,filename_p);
-	caseVec->push_back(std::move(sCase));
-
-	return caseVec->at(caseVec->size() - 1);
+	Case* newCase = new Case(this, caseName_p, filename_p);
+	return newCase;
 }
 
 
@@ -153,21 +151,30 @@ Image* CaseHandler::CreateImage(std::filesystem::path filePath_p)
 	
 }
 
+void CaseHandler::unload()
+{
+	selectedCase.reset();
+}
 
 
 void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 {
 	RLCase rlCase = resourceHandler->fetchCaseData(yamlFilePath);
 	
-	std::weak_ptr<Case> wCase = CreateCase(rlCase.name,yamlFilePath.filename().string());
+	Case* wCase = CreateCase(rlCase.name,yamlFilePath.filename().string());
+
+	if (!wCase)
+	{
+		ToastComponent::GetInstance()->addMessage("Failed To Load Case : " + rlCase.name + "Failed to create case resource!");
+		return;
+	}
 
 	for (int scenesIndex = 0; scenesIndex < rlCase.Scenes.size(); scenesIndex++)
 	{
-		std::weak_ptr<Scene> wScene = wCase.lock()->attachNewSceneToRoot(rlCase.Scenes.at(scenesIndex).name,SceneType(rlCase.Scenes.at(scenesIndex).scnType));
-
+		std::weak_ptr<Scene> wScene = wCase->attachNewSceneToRoot(rlCase.Scenes.at(scenesIndex).name,SceneType(rlCase.Scenes.at(scenesIndex).scnType));
 		if (wScene.expired())
 		{
-			ToastComponent::GetInstance()->addMessage("Failed to create scene : " + rlCase.Scenes.at(scenesIndex).name);
+			ToastComponent::GetInstance()->addMessage("Failed To Load Case : " + wCase->getName() + "Failed to create scene : " + rlCase.Scenes.at(scenesIndex).name);
 			return;
 		}
 
@@ -179,7 +186,7 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 			
 			if (wObj.expired())
 			{
-				ToastComponent::GetInstance()->addMessage("Failed to create object : " + obj.name + " in Scene : " + rlCase.Scenes.at(scenesIndex).name);
+				ToastComponent::GetInstance()->addMessage("Failed To Load Case : " + wCase->getName() + "Failed to create object : " + obj.name + " in Scene : " + rlCase.Scenes.at(scenesIndex).name);
 				return;
 			}
 
@@ -220,6 +227,10 @@ void CaseHandler::loadCase(std::filesystem::path yamlFilePath)
 		
 
 	}
+
+	selectedCase.reset(wCase);
+	wCase = nullptr;
+
 	// notify GDNotifier that new csae has been create, which will trigger GUI update to reflect new case in the UI.
 	this->notifyLoadCase();
 

@@ -10,7 +10,11 @@ class ObjectTabModelComponent : public ModelComponent {
 public:
 
 	SunWindowSize* windowSize;
-	std::string* materialName = new std::string("");
+	
+	std::weak_ptr<Material> material;
+	std::weak_ptr<Object> object;
+
+	std::string* materialName = new std::string();
 
 	int selectedMaterial = 0;
 
@@ -19,9 +23,9 @@ public:
 	}
 
 	void init() override {
-		//selectedObj = this->gdSource->getCaseHandler()->getSelectedObject();
 		windowSize = this->gdSource->getGdSystem()->getWindowSize();
-		//materials = this->gdSource->getResourceHandler()->getAllMaterial();
+		material = ModelComponent::selectedMaterial->selMaterial;
+		object = ModelComponent::selectedObject->selObject;
 	}
 
 	void setMaterial() {
@@ -42,6 +46,8 @@ public:
 	void update(GUIUpdateEvent event) override {
 		switch (event) {
 		case GUIUpdateEvent::OBJECT_UPDATE:
+			object = ModelComponent::selectedObject->selObject;
+			material = ModelComponent::selectedMaterial->selMaterial;
 			if (!ModelComponent::selectedObject->selObject.expired())
 			{
 				materialName->assign(ModelComponent::selectedObject->selObject.lock()->getMeshMaterialName());
@@ -60,10 +66,10 @@ public:
 class ObjectTabComponent : public ViewComponent
 {
 private:
-	ObjectTabModelComponent* objectModel;
+	ObjectTabModelComponent* model;
 public:
 	ObjectTabComponent(const char* name_p, ObjectTabModelComponent* objectModel_p) : ViewComponent(name_p) {
-		objectModel = objectModel_p;
+		model = objectModel_p;
 	}
 
 	void view() override;

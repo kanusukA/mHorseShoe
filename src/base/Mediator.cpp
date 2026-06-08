@@ -2,7 +2,7 @@
 
 
 // MUST BE CHANGED TO CASE HANDLER!
-SelectedCase* ModelComponent::selectedCase;
+//SelectedCase* ModelComponent::selectedCase;
 SelectedMaterial* ModelComponent::selectedMaterial;
 SelectedScene* ModelComponent::selectedScene;
 SelectedObject* ModelComponent::selectedObject;
@@ -14,7 +14,7 @@ std::vector<std::filesystem::path>* ModelComponent::textureDpVec;
 
 std::vector<Ogre::TexturePtr>* ModelComponent::imageTextures;
 
-std::vector<std::shared_ptr<Case>>* ModelComponent::caseVec;
+//std::vector<std::shared_ptr<Case>>* ModelComponent::caseVec;
 
 std::vector<std::filesystem::path>* ModelComponent::savedCaseFiles;
 

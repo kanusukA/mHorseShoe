@@ -316,9 +316,10 @@ public:
 	bool buttonLock = false; // used to lock buttons when a process is running to prevent multiple clicks and process overlapping
 
 	// INDEPENDENT RESOURCE DATA - These vectors are generated during runtime!
-	static	std::vector<std::shared_ptr<Case>>* caseVec;
+//	static	std::vector<std::shared_ptr<Case>>* caseVec;
 
-	static SelectedCase* selectedCase;
+	//CASE IS DIRECTLY TAKEN FROM THE CASEHANDLER.
+
 	static SelectedScene* selectedScene;
 	static SelectedObject* selectedObject;
 	static SelectedMaterial* selectedMaterial;
@@ -338,7 +339,7 @@ public:
 
 	ModelComponent(const char* name_p) {
 		name = name_p;
-		selectedCase = new SelectedCase();
+
 		selectedScene = new SelectedScene();
 		selectedObject = new SelectedObject();
 		selectedMaterial = new SelectedMaterial();
@@ -359,7 +360,7 @@ public:
 		
 		refreshImageTextures();
 
-		caseVec = gdSource->getCaseHandler()->caseVec;
+		//caseVec = gdSource->getCaseHandler()->caseVec;
 
 		savedCaseFiles = gdSource->getResourceHandler()->getSavedCaseFiles();
 
@@ -370,10 +371,11 @@ public:
 	}
 
 	// SETTERS
-	void selectCase(const int index) {
-		selectedCase->selCase = caseVec->at(index);
+	// A CASE CAN NO LOGNER BE 'SELECTED' AND MUST BE LOADED TO ENSURE VALID SCENES.
+	/*void selectCase(const int index) {
+		gdSource->getCaseHandler()->setSelectedCase(index);
 		update(GUIUpdateEvent::CASE_UPDATE);
-	}
+	}*/
 
 	void selectScene(const std::weak_ptr<Scene>& scene_p) {
 		selectedScene->selScene = scene_p;
@@ -496,7 +498,7 @@ public:
 	void updateLoadCase() {
 		ModelComponent* model = getModelByName(GD_SCENE_TAB_MODEL_COMP_NAME);
 		if (model) {
-			model->selectCase(0);
+		//	model->selectCase(0);
 		}
 		else {
 			ToastComponent::GetInstance()->addMessage("Unable to fecth GUI_Model : " + std::string( GD_SCENE_TAB_MODEL_COMP_NAME));

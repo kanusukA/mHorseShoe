@@ -7,33 +7,29 @@ void ObjectTabComponent::view()
 	ImGui::Begin("Object");
 
 	// Refresh when object is deleted and setup grid !!
-	if (!ModelComponent::selectedObject->selObject.expired())
+	if (!model->object.expired())
 	{
 		ImGui::Text("Object Name : ");
 		ImGui::SameLine();
-		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getName().c_str());
-		
-
-		
+		ImGui::Text(model->object.lock()->getName().c_str());
 
 		ImGui::Spacing();
 
 		// Mesh
 		ImGui::Text("Mesh : ");
 		ImGui::SameLine();
-		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getMeshName().c_str());
-
+		ImGui::Text(model->object.lock()->getMeshName().c_str());
+			
 		// Materials
-		ImGui::InputText("Material Name",objectModel->materialName);
-
+		ImGui::InputText("Material Name",model->materialName);
 		if(ModelComponent::materialDpVec && !ModelComponent::materialDpVec->empty()) {
-			if (ImGui::BeginCombo("Materials", ModelComponent::materialDpVec->at(objectModel->selectedMaterial).filename().string().c_str()))
+			if (ImGui::BeginCombo("Materials", ModelComponent::materialDpVec->at(model->selectedMaterial).filename().string().c_str()))
 			{
 				for (int i = 0; i < ModelComponent::materialDpVec->size(); i++)
 				{
-					if (ImGui::Selectable(ModelComponent::materialDpVec->at(i).filename().string().c_str(),objectModel->selectedMaterial == i))
+					if (ImGui::Selectable(ModelComponent::materialDpVec->at(i).filename().string().c_str(),model->selectedMaterial == i))
 					{
-						objectModel->selectedMaterial = i;
+						model->selectedMaterial = i;
 					}
 				}
 
@@ -43,44 +39,42 @@ void ObjectTabComponent::view()
 		ImGui::SameLine();
 		if (ImGui::Button("Set"))
 		{
-			objectModel->setMaterial();
+			model->setMaterial();
 		}
 
 		ImGui::Text("Mesh Material : "); ImGui::SameLine();
-		ImGui::Text(ModelComponent::selectedObject->selObject.lock()->getMeshMaterialName().c_str());
-
+		ImGui::Text(model->object.lock()->getMeshMaterialName().c_str());
 		ImGui::Text("Material : ");
 		ImGui::SameLine();
-		if (!ModelComponent::selectedMaterial->selMaterial.expired()) {
+		if (!model->material.expired()) {
 
-			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getName().c_str());
+			ImGui::Text(model->material.lock()->getName().c_str());
 			
 			ImGui::Text("Vertex Shader : ");
 			ImGui::SameLine();
-			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()->getName().c_str());
-
+			ImGui::Text(model->material.lock()->getVertexShader()->getName().c_str());
 			ImGui::Text("Fragment Shader : ");
 			ImGui::SameLine();
-			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()->getName().c_str());
+			ImGui::Text(model->material.lock()->getFragmentShader()->getName().c_str());
 
-			if (ImGui::Checkbox("WireFrame Mode", &ModelComponent::selectedMaterial->selMaterial.lock()->getWireFrameMode()))
+			if (ImGui::Checkbox("WireFrame Mode", &model->material.lock()->getWireFrameMode()))
 			{
-				ModelComponent::selectedMaterial->selMaterial.lock()->setWireFrameMode(!ModelComponent::selectedMaterial->selMaterial.lock()->wireframeMode);
+				model->material.lock()->setWireFrameMode(!model->material.lock()->getWireFrameMode());
 			}
 
 			ImGui::Text("Culling Mode");
 
-			if (ImGui::RadioButton("Anti-Clockwise", ModelComponent::selectedMaterial->selMaterial.lock()->getCullingMode() == Ogre::CullingMode::CULL_ANTICLOCKWISE))
+			if (ImGui::RadioButton("Anti-Clockwise", model->material.lock()->getCullingMode() == Ogre::CullingMode::CULL_ANTICLOCKWISE))
 			{
-				ModelComponent::selectedMaterial->selMaterial.lock()->setCullingMode(Ogre::CullingMode::CULL_ANTICLOCKWISE);
+				model->material.lock()->setCullingMode(Ogre::CullingMode::CULL_ANTICLOCKWISE);
 			}
-			if (ImGui::RadioButton("Clockwise", ModelComponent::selectedMaterial->selMaterial.lock()->getCullingMode() == Ogre::CullingMode::CULL_CLOCKWISE))
+			if (ImGui::RadioButton("Clockwise", model->material.lock()->getCullingMode() == Ogre::CullingMode::CULL_CLOCKWISE))
 			{
-				ModelComponent::selectedMaterial->selMaterial.lock()->setCullingMode(Ogre::CullingMode::CULL_CLOCKWISE);
+				model->material.lock()->setCullingMode(Ogre::CullingMode::CULL_CLOCKWISE);
 			}
-			if (ImGui::RadioButton("None", ModelComponent::selectedMaterial->selMaterial.lock()->getCullingMode() == Ogre::CullingMode::CULL_NONE))
+			if (ImGui::RadioButton("None", model->material.lock()->getCullingMode() == Ogre::CullingMode::CULL_NONE))
 			{
-				ModelComponent::selectedMaterial->selMaterial.lock()->setCullingMode(Ogre::CullingMode::CULL_NONE);
+				model->material.lock()->setCullingMode(Ogre::CullingMode::CULL_NONE);
 			}
 			
 

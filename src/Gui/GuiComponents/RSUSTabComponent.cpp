@@ -157,26 +157,25 @@ void RSUSTabComponent::view()
 {
 
 	ImGui::SetNextWindowSize(ImVec2(400, 650));
-	ImGui::SetNextWindowPos(ImVec2(*RSUSModel->windowSize->width - 400, 0));
+	ImGui::SetNextWindowPos(ImVec2(*model->windowSize->width - 400, 0));
 
 	ImGui::Begin("RSUS");
 	
-	if(!ModelComponent::selectedMaterial->selMaterial.expired()){
+	if(!model->selectedMaterial.expired()){
 
 		ImGui::Text("Material : "); ImGui::SameLine();
-		ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getName().c_str());
+		ImGui::Text(model->selectedMaterial.lock()->getName().c_str());
 
 		ImGui::Spacing();
 
-		if(ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()){
-
+		if(model->selectedMaterial.lock()->getVertexShader()) {
 			ImGui::Text("Vertex Shader : "); ImGui::SameLine();
-			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()->getShaderName().c_str());
+			ImGui::Text(model->selectedMaterial.lock()->getVertexShader()->getShaderName().c_str());
 
 			
-			for (int i = 0; i < ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()->getShaderVars()->size(); i++)
+			for (int i = 0; i < model->selectedMaterial.lock()->getVertexShader()->getShaderVars()->size(); i++)
 			{
-				editableShaderVarViewComponent(&ModelComponent::selectedMaterial->selMaterial.lock()->getVertexShader()->getShaderVars()->at(i),ShaderType::Vertex, RSUSModel);
+				editableShaderVarViewComponent(&model->selectedMaterial.lock()->getVertexShader()->getShaderVars()->at(i),ShaderType::Vertex, model);
 			}
 
 		}
@@ -184,16 +183,16 @@ void RSUSTabComponent::view()
 			ImGui::Text("No Vertex Shader Found!");
 		}
 
-		if (ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()) {
+		if (model->selectedMaterial.lock()->getFragmentShader()) {
 
 			ImGui::Text("Fragment Shader : "); ImGui::SameLine();
-			ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()->getName().c_str());
+			ImGui::Text(model->selectedMaterial.lock()->getFragmentShader()->getName().c_str());
 
 			
 			
-			for (int i = 0; i < ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()->getShaderVars()->size(); i++)
+			for (int i = 0; i < model->selectedMaterial.lock()->getFragmentShader()->getShaderVars()->size(); i++)
 			{
-				editableShaderVarViewComponent(&ModelComponent::selectedMaterial->selMaterial.lock()->getFragmentShader()->getShaderVars()->at(i), ShaderType::Fragment, RSUSModel);
+				editableShaderVarViewComponent(&model->selectedMaterial.lock()->getFragmentShader()->getShaderVars()->at(i), ShaderType::Fragment, model);
 			}
 			
 
@@ -208,28 +207,28 @@ void RSUSTabComponent::view()
 		ImGui::Text("Texture");
 		if (ImGui::Button("Refresh Textures"))
 		{
-			RSUSModel->refreshTexture();
+			model->refreshTexture();
 		}
-		if (ModelComponent::selectedMaterial->selMaterial.lock()->textures && !ModelComponent::selectedMaterial->selMaterial.lock()->textures->empty())
+		if (model->selectedMaterial.lock()->textures && !model->selectedMaterial.lock()->textures->empty())
 		{
-			for (int texIndex = 0; texIndex < ModelComponent::selectedMaterial->selMaterial.lock()->textures->size(); texIndex++)
+			for (int texIndex = 0; texIndex < model->selectedMaterial.lock()->textures->size(); texIndex++)
 			{
-				if (ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texture)
+				if (model->selectedMaterial.lock()->textures->at(texIndex).texture)
 				{
-					ImGui::Text(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
-					ImGui::Image((ImTextureID)ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texture->getHandle(), ImVec2(250, 250));
+					ImGui::Text(model->selectedMaterial.lock()->textures->at(texIndex).textureName.c_str());
+					ImGui::Image((ImTextureID)model->selectedMaterial.lock()->textures->at(texIndex).texture->getHandle(), ImVec2(250, 250));
 
-					int selectedImage = ImageComboView(texIndex, ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
+					int selectedImage = ImageComboView(texIndex, model->selectedMaterial.lock()->textures->at(texIndex).textureName.c_str());
 					if (selectedImage >= 0) {
-						ModelComponent::selectedMaterial->selMaterial.lock()->setTexture(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition,
+						model->selectedMaterial.lock()->setTexture(model->selectedMaterial.lock()->textures->at(texIndex).texturePosition,
 							ModelComponent::imageTextures->at(selectedImage));
 					}
 
-					int selectedWrapMode = textureWrapModeComboView(texIndex,RSUSModel->wrapModeEnumToname(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).addressingMode));
+					int selectedWrapMode = textureWrapModeComboView(texIndex,model->wrapModeEnumToname(model->selectedMaterial.lock()->textures->at(texIndex).addressingMode));
 					if (selectedWrapMode > 0)
 					{
-						ModelComponent::selectedMaterial->selMaterial.lock()->setTextureWrapMode(
-							ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition, Ogre::TextureUnitState::TextureAddressingMode(selectedWrapMode)
+						model->selectedMaterial.lock()->setTextureWrapMode(
+							model->selectedMaterial.lock()->textures->at(texIndex).texturePosition, Ogre::TextureUnitState::TextureAddressingMode(selectedWrapMode)
 						);
 					}
 
@@ -240,9 +239,9 @@ void RSUSTabComponent::view()
 					
 
 					ImGui::Text("No Texture Found!");
-					int selectedImage = ImageComboView(texIndex, ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).textureName.c_str());
+					int selectedImage = ImageComboView(texIndex, model->selectedMaterial.lock()->textures->at(texIndex).textureName.c_str());
 					if (selectedImage >= 0) {
-						ModelComponent::selectedMaterial->selMaterial.lock()->setTexture(ModelComponent::selectedMaterial->selMaterial.lock()->textures->at(texIndex).texturePosition,
+						model->selectedMaterial.lock()->setTexture(model->selectedMaterial.lock()->textures->at(texIndex).texturePosition,
 							ModelComponent::imageTextures->at(selectedImage));
 					}
 				}

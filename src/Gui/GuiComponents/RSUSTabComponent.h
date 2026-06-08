@@ -14,6 +14,8 @@ public:
 
 	std::vector<std::filesystem::path>* images;
 
+	std::weak_ptr<Material> selectedMaterial;
+
 
 	Ogre::TexturePtr Diffuse;
 	Ogre::TexturePtr Normal;
@@ -35,7 +37,7 @@ public:
 	}
 
 	void init() override {
-
+		selectedMaterial = ModelComponent::selectedMaterial->selMaterial;
 
 	}
 
@@ -105,16 +107,28 @@ public:
 		}
 	}
 
+	void update(GUIUpdateEvent event)override {
+		switch (event)
+		{
+		case GUIUpdateEvent::MATERIAL_UPDATE:
+			selectedMaterial = ModelComponent::selectedMaterial->selMaterial;
+
+			break;
+		default:
+			break;
+		}
+	}
+
 };
 
 
 class RSUSTabComponent : public ViewComponent
 {
-	RSUSTabModelComponent* RSUSModel;
+	RSUSTabModelComponent* model;
 public:
 
 	RSUSTabComponent(const char* name_p,RSUSTabModelComponent* RSUSModel_p) : ViewComponent(name_p) {
-		RSUSModel = RSUSModel_p;
+		model = RSUSModel_p;
 	}
 
 	void view() override;

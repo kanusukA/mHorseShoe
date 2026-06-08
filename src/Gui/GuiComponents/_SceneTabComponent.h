@@ -10,6 +10,9 @@ public:
 
 	std::weak_ptr<std::string> defaultCase;
 
+	std::weak_ptr<Scene> selectedScene;
+	std::weak_ptr<Object> selectedObject;
+
 	std::string* inputCaseName = new std::string("");
 	int selectedCase = 0;
 
@@ -29,7 +32,7 @@ public:
 	}
 
 	void init() override {
-		
+		selectedScene = ModelComponent::selectedScene->selScene;
 	}
 
 	void saveCase() {
@@ -48,10 +51,12 @@ public:
 	void addScene() {
 		if (rootSceneNodeSelected)
 		{
-			ModelComponent::selectedCase->selCase.lock()->attachNewSceneToRoot(*inputSceneName, scnType);
+			CaseHandler::selectedCase.get()->attachNewSceneToRoot(*inputSceneName, scnType);
+			
 		}
 		else {
-			ModelComponent::selectedScene->selScene.lock()->attachNewScene(*inputSceneName, scnType);
+			CaseHandler::selectedCase.get()->getwScene(selectedCase).lock()->attachNewScene(*inputSceneName, scnType);
+			
 		}
 		
 		
@@ -75,12 +80,16 @@ public:
 	}
 
 	void selectCase(int index) {
-		ModelComponent::selectCase(index);
+		/*ModelComponent::selectCase(index);*/
 	}
 
 	void deleteScene(int index) {
 		rootSceneNodeSelected = true;
-		ModelComponent::selectedCase->selCase.lock()->removeSceneByIndex(index);
+		if (CaseHandler::selectedCase)
+		{
+			CaseHandler::selectedCase.get()->removeSceneByIndex(index);
+		}
+		/*ModelComponent::selectedCase->selCase.lock()->removeSceneByIndex(index);*/
 	}
 
 	void selectRootSceneNode() {
@@ -92,11 +101,11 @@ public:
 	}
 
 	void saveDefaultCase() {
-		if (ModelComponent::selectedCase && !ModelComponent::selectedCase->selCase.expired())
+		if (CaseHandler::selectedCase)
 		{
-			if (ModelComponent::selectedCase->selCase.lock().get()->getFileName())
+			if (CaseHandler::selectedCase->getFileName())
 			{
-				gdSource->getCaseHandler()->saveDefaultCase(*ModelComponent::selectedCase->selCase.lock().get()->getFileName());
+				gdSource->getCaseHandler()->saveDefaultCase(*CaseHandler::selectedCase->getFileName());
 			}
 			else {
 				ToastComponent::GetInstance()->addMessage("The Selected Case Has no saved file. Save the file first and restart the program.");
@@ -117,18 +126,20 @@ public:
 	//void loadCase();
 
 	void update(GUIUpdateEvent event) override {
-		if (!ModelComponent::selectedCase->selCase.expired())
+		if (CaseHandler::selectedCase)
 		{
 			inputCaseName->clear();
-			inputCaseName->append(ModelComponent::selectedCase->selCase.lock()->getName());
+			inputCaseName->append(CaseHandler::selectedCase->getName());
 		}
 		if (!ModelComponent::selectedScene->selScene.expired())
 		{
+			selectedScene = ModelComponent::selectedScene->selScene;
 			inputSceneName->clear();
-			inputSceneName->append(ModelComponent::selectedScene->selScene.lock()->getName());
+			inputSceneName->append(selectedScene.lock()->getName());
 		}
 		if (!ModelComponent::selectedObject->selObject.expired())
 		{
+			selectedObject = ModelComponent::selectedObject->selObject;
 			inputObjectname->clear();
 			inputObjectname->append(ModelComponent::selectedObject->selObject.lock()->getMeshName());
 		}
@@ -143,7 +154,7 @@ private:
 	SceneTabComponent();
 
 	// MODELS
-	SceneTabModelComponent* scnTabModel;
+	SceneTabModelComponent* model;
 
 
 public:
@@ -152,7 +163,7 @@ public:
 	SceneTabComponent(const char* name_p,
 		SceneTabModelComponent* sceneTabComponent
 		) : ViewComponent(name_p){
-		scnTabModel = sceneTabComponent;
+		model = sceneTabComponent;
 	};
 
 	void view() override;
