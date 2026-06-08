@@ -91,3 +91,31 @@ Ogre::TexturePtr Monster::getImageTexture(std::string textureName, Ogre::String 
 
 	return Ogre::TextureManager::getSingleton().getByName(textureName);
 }
+
+
+// DELETION FUNCTION
+
+void Monster::rmSceneNode(std::string scnNode)
+{
+	if (oScnManager->hasSceneNode(scnNode))
+	{
+		oScnManager->destroySceneNode(scnNode);
+	}
+
+}
+
+void Monster::rmEntity(std::string entName)
+{
+	if (oScnManager->hasEntity(entName))
+	{
+		oScnManager->destroyEntity(entName);
+	}
+}
+
+void Monster::rmMaterial(std::string matName, std::string groupName)
+{
+	if (this->resourceGroupExists(groupName) && this->resourceExists(matName,groupName))
+	{
+		Ogre::MaterialManager::getSingleton().remove(matName, groupName);
+	}
+}

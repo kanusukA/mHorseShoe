@@ -51,8 +51,8 @@ public:
 	void loadMaterialsDpToOgre();
 
 	// Monster functions
-	void monSetLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);
-	bool monResourceGroupExists(std::string resourceGroup);
+	void monAddLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);
+	void monAddResourceGroup(std::string groupName);
 
 	Ogre::MeshPtr monGetMesh(std::string meshName_p);
 	Ogre::Entity* monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p);
@@ -63,8 +63,11 @@ public:
 	Ogre::MaterialPtr monCreateNewMaterial(std::string name_p);
 
 	Ogre::SceneNode* monCreateSceneNode(std::string name_p, Ogre::SceneNode* parentNode_p);
+
+
 	void monDeleteSceneNode(Ogre::SceneNode* scene_p);
 	void monDeleteEntity(Ogre::Entity* entity_p);
+	void monDeleteMaterial(Ogre::MaterialPtr material_p);
 
 	RSUS* monProvideRsus();
 	ImguiFonts* monProvideFonts();

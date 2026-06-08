@@ -30,7 +30,8 @@ public:
 	std::vector<std::shared_ptr<Case>>* caseVec = new std::vector<std::shared_ptr<Case>>();
 
 
-
+	//MAIN SELECTED CASE
+	std::unique_ptr<Case> selectedCase; 
 
 	// DEPEDENT RESOURCE VECTOR
 	// These resources are used to create copy of themselves to be used by other resources in a lifecycle aware manner. (hopefully)
@@ -75,16 +76,7 @@ public:
 	//RenderMesh* CreateRenderMesh(std::filesystem::path path_p);
 	Material* CreateMaterial( std::filesystem::path materialPath_p, std::string materialName);
 
-	// old method
-	//RenderMesh* CreateRenderMesh(std::string meshName_p);
-
-	//ColliderMesh* CreateColliderMesh(std::string MeshName_p);
-	//Shader* CreateShader(Ogre::MaterialPtr mat_p, ShaderType type); Shaders are created by Materials themselves!
-	// MaterialName must be valid with Ogre::Material before Calling CreateMaterial function.
-	
 	Image* CreateImage(std::filesystem::path filePath_p);
-
-	void loadSavedResource();
 
 	// Loading Functions
 	void loadCase(std::filesystem::path yamlFilePath);
@@ -97,8 +89,6 @@ public:
 	void saveAll();
 	void saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes);
 	void saveObjects(const std::vector<std::shared_ptr<Object>>* objects, YAML::Emitter& out);
-	/*void saveMaterial();
-	void saveShader();*/
 
 	void unload() {};
 

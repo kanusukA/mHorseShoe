@@ -23,17 +23,27 @@ public:
 	}
 
 	// CREATEING A NEW SCENE
-	std::weak_ptr<Scene> attachNewScene(std::string sceneName, SceneType scnType, Ogre::SceneNode* parentNode_p) {
+	std::weak_ptr<Scene> attachNewScene(std::string sceneName, SceneType scnType, Ogre::SceneNode* parentNode_p) { // add checks
 		Scene* newScene = GDBuilderCxt->CreateScene(sceneName, scnType,parentNode_p);
-		std::shared_ptr<Scene> sScene(newScene,SceneDeleter);
-		sceneVec->push_back(std::move(sScene));
-		return sceneVec->at(sceneVec->size() - 1);
+		if (newScene)
+		{
+			std::shared_ptr<Scene> sScene(newScene);
+			sceneVec->push_back(std::move(sScene));
+			return sceneVec->at(sceneVec->size() - 1);
+		}
+		return {}; // PASSES AN EMPTY WEAK POINTER IF THE SCENE CREATION FAILED
+		
 	}
-	std::weak_ptr<Scene> attachNewSceneToRoot(std::string sceneName, SceneType scnType) {
+
+	std::weak_ptr<Scene> attachNewSceneToRoot(std::string sceneName, SceneType scnType) { // add checks
 		Scene* newScene = GDBuilderCxt->CreateScene(sceneName, scnType);
-		std::shared_ptr<Scene> sScene(newScene,SceneDeleter);
-		sceneVec->push_back(std::move(sScene));
-		return sceneVec->at(sceneVec->size() - 1);
+		if (newScene)
+		{
+			std::shared_ptr<Scene> sScene(newScene);
+			sceneVec->push_back(std::move(sScene));
+			return sceneVec->at(sceneVec->size() - 1);
+		}
+		return {};
 	}
 
 	std::weak_ptr<Scene> getwScene(int index) {
@@ -46,6 +56,16 @@ public:
 
 	const std::vector<std::shared_ptr<Scene>>* getScenes() {
 		return sceneVec;
+	}
+
+	~Case() {
+		ToastComponent::GetInstance()->addMessage("Case : " + name + " is being destroyed!");
+		destoryCase();
+	}
+
+	void destoryCase() {
+
+		sceneVec->clear();
 	}
 
 };

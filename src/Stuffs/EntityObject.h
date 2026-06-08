@@ -2,6 +2,8 @@
 
 #include <Stuffs/RenderMesh.h>
 
+// clean each object file with new object creation standard!
+// use default destructors or change a newer implementation if modern C++ has something as such!
 
 
 class Object : public ObjectResource {
@@ -9,20 +11,10 @@ class Object : public ObjectResource {
 protected:
 
 	
-	
-
 public:
-
-	/*static void customDeleter(Ogre::Entity* entity_p) {
-		if (entity_p) {
-			GDBuilderCxt->monDeleteEntity(entity_p);
-			delete entity_p;
-		}
-	}*/
 
 	GDBuilderContext* GDBuilderCxt;
 
-	//std::unique_ptr < Ogre::Entity, void(*)(Ogre::Entity*) > entity;
 	std::shared_ptr<Ogre::Entity> entity;
 
 	std::shared_ptr<Material> sMaterial;
@@ -33,13 +25,8 @@ public:
 
 		this->renderMeshName = entity_p->getName();
 		
-		auto deleter = [this](Ogre::Entity* entity) {
-			GDBuilderCxt->monDeleteEntity(entity);
-			};
+		entity.reset(entity_p);
 
-		entity.reset(entity_p, deleter);
-
-		// Set default material
 		if (entity.get()->getMesh().get()->getSubMeshes().size() > 0 && entity.get()->getMesh().get()->getSubMesh(0)->getMaterial())
 		{
 			Material* newMat = new Material(GDBuilderCxt_p, entity.get()->getMesh().get()->getSubMesh(0)->getMaterial(), "");
@@ -60,7 +47,6 @@ public:
 		}
 		return false;
 		
-		
 	}
 
 	const std::weak_ptr<Material> getwMaterial() {
@@ -75,6 +61,10 @@ public:
 		return entity->getMesh().get()->getSubMesh(0)->getMaterialName();
 	}
 
+	// DELETOR
+	~Object() {
+		destroyObject();
+	}
 
 	void destroyObject() {
 		GDBuilderCxt->monDeleteEntity(entity.get());

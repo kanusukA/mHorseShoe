@@ -22,14 +22,14 @@ void GDBuilderContext::loadMaterialsDpToOgre()
 	monster->initalizeResourceGroup(OGRE_MATERIAL_GROUP);
 }
 
-void GDBuilderContext::monSetLocation(std::filesystem::path parentPath_p, std::string OgreGroup)
+void GDBuilderContext::monAddLocation(std::filesystem::path parentPath_p, std::string OgreGroup)
 {
 	monster->addOgreResourceLocation(parentPath_p.string(), OgreGroup);
 }
 
-bool GDBuilderContext::monResourceGroupExists(std::string resourceGroup)
+void GDBuilderContext::monAddResourceGroup(std::string groupName)
 {
-	return Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(resourceGroup);
+	monster->addResourceGroup(groupName);
 }
 
 Ogre::MeshPtr GDBuilderContext::monGetMesh(std::string meshName_p)
@@ -64,21 +64,18 @@ Ogre::SceneNode* GDBuilderContext::monCreateSceneNode(std::string name_p, Ogre::
 
 void GDBuilderContext::monDeleteSceneNode(Ogre::SceneNode* scene_p)
 {
-	scene_p->detachAllObjects();
-
-	scene_p->destroyAllChildrenAndObjects();
-
-	monster->oScnManager->destroySceneNode(scene_p);
-
+	monster->rmSceneNode(scene_p->getName());
 }
 
 void GDBuilderContext::monDeleteEntity(Ogre::Entity* entity_p)
 {
-	if (entity_p)
-	{
-		monster->oScnManager->destroyEntity(entity_p);
-	}
+	monster->rmEntity(entity_p->getName());
 	
+}
+
+void GDBuilderContext::monDeleteMaterial(Ogre::MaterialPtr material_p)
+{
+	monster->rmMaterial(material_p->getName(), OGRE_MATERIAL_GROUP);
 }
 
 RSUS* GDBuilderContext::monProvideRsus()

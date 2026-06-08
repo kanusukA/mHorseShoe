@@ -75,7 +75,6 @@ public:
 	}
 
 	void setPosition(Ogre::Vector3 pos_p) {
-		//std::cout << position[0] << " " << position[1] << " " << position[2] << std::endl;
 		this->position[0] = pos_p[0];
 		this->position[1] = pos_p[1];
 		this->position[2] = pos_p[2];
@@ -137,9 +136,14 @@ public:
 	Ogre::SceneNode* getSceneNode() {
 		return scene;
 	}
+	
+	~Scene() {
+		destroyScene();
+	}
 
-	// Used my Shared_ptr's custom deleter
 	void destroyScene() {
+		sceneVec.clear();
+		objVec.clear();
 		GDBuilderCxt->monDeleteSceneNode(scene);
 	}
 

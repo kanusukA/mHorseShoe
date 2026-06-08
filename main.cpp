@@ -40,7 +40,7 @@ int main() {
 	monster->InitMonster(ctx.getRoot(), ctx.getRenderWindow(), ctx.getOverlaySystem(), imOverlay);
 	
 	//setup materials to ogre
-
+	
 
 	std::cout << "Initializing kint" << std::endl;
 	//Kint* kint = new Kint();

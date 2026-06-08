@@ -232,6 +232,8 @@ public:
 
 	ResID getId() { return _id; };
 
+	virtual ~Resource() = default;
+
 };
 
 
@@ -277,6 +279,8 @@ public:
 	std::vector<ResID>* getScenesIdInCase() {
 		return Scenes;
 	}
+
+	virtual ~CaseResource() = default;
 
 
 };
@@ -363,6 +367,8 @@ public:
 		return scnType;
 	}
 
+	~SceneResource() = default;
+
 };
 
 
@@ -413,6 +419,8 @@ public:
 	const std::filesystem::path getMeshFilePath() {
 		return meshFilePath;
 	}
+
+	virtual ~ObjectResource() = default;
 
 };
 
@@ -468,14 +476,12 @@ public:
 	}
 
 	ShaderResource(ResourceHandlerBuilderContext* context, std::string name_p, ShaderType shaderType_p, std::string shaderFileName) {
-
 		this->setName(name_p);
 		this->resourceHandlerCxt = context;
 		shaderType = shaderType_p;
 		
 		ShaderName = shaderFileName;
 			
-
 		setId(context->generateShaderID());
 
 	}
@@ -484,12 +490,8 @@ public:
 		ShaderParameters->push_back(variable);	
 	}
 
-
-
 	std::vector<ShaderVar>* getShaderVars() {
-
 		return ShaderParameters;
-
 	}
 
 	std::vector<ShaderTexture>* getShaderTextures() {
@@ -508,6 +510,8 @@ public:
 	std::string getShaderFileName() {
 		return fileName;
 	}
+
+	~ShaderResource() = default;
 
 };
 
@@ -542,6 +546,7 @@ public:
 		setId(context->generateMaterialID());
 	};
 
+	~MaterialResource() = default;
 
 };
 
@@ -605,7 +610,7 @@ public:
 
 	std::string getMeshName() { return name; }
 
-
+	~RenderMeshResource() = default;
 
 };
 

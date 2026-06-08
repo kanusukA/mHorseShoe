@@ -85,6 +85,10 @@ public:
 	}
 
 
+	~Material() {
+		GDBuilderCxt->monDeleteMaterial(material);
+	}
+
 };
 
 // This class helps in pointer management and apt resource creation and assignment of resources

@@ -243,6 +243,7 @@ public:
 
 
 	// MONSTER FUNCTIONS
+	void addResourceGroup(std::string groupName);
 	void addOgreResourceLocation(std::string path_p, std::string OgreResourceGroup);
 	void initalizeResourceGroup(std::string OgreResourceGroup);
 
@@ -269,6 +270,11 @@ public:
 	Ogre::MaterialPtr getMaterial(Ogre::String matName_p, Ogre::String groupName);
 
 	Ogre::TexturePtr getImageTexture(std::string textureName, Ogre::String groupName);
+
+	// MONSTER DELETE FUNCTIONS
+	void rmSceneNode(std::string scnNode);
+	void rmEntity(std::string entName);
+	void rmMaterial(std::string matName, std::string groupName);
 
 
 
