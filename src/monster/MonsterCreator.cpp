@@ -84,12 +84,14 @@ Ogre::SceneNode* Monster::addToScnNode(Ogre::String meshName, Ogre::SceneNode* t
 
 Ogre::TexturePtr Monster::getImageTexture(std::string textureName, Ogre::String groupName)
 {
-	if (!Ogre::TextureManager::getSingleton().resourceExists(textureName))
+	if (Ogre::TextureManager::getSingleton().resourceExists(textureName,groupName))
 	{
-		return Ogre::TextureManager::getSingleton().load(textureName, groupName);
+		return Ogre::TextureManager::getSingleton().getByName(textureName);
 	}
 
-	return Ogre::TextureManager::getSingleton().getByName(textureName);
+	return nullptr;
+
+	
 }
 
 

@@ -155,6 +155,7 @@ void ResourceHandler::setMasterLoadPaths()
 
 	syncMasterLoadPaths();
 
+
 }
 
 // Syncs the load_paths internal path! If load_path vector itself is changed then run setMasterLoadPath()!
@@ -199,6 +200,8 @@ void ResourceHandler::syncMasterLoadPaths()
 	}
 
 }
+
+
 
 std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByName(std::string groupName)
 {

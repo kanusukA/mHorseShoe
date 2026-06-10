@@ -16,7 +16,6 @@ public:
 		RenderMeshResource(ResourceHandler::GetInstance(), mesh_p->getName(), meshPath_p ) {
 		builderCxt = builderCxt_p;
 
-
 	}
 
 	Ogre::MeshPtr getMesh() {

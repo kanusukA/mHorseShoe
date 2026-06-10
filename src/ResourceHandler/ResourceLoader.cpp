@@ -37,6 +37,18 @@ void ResourceLoader::loadSavedPaths()
 }
 
 
+ResourceLoadPath* ResourceLoader::getLoadPath(std::string groupName)
+{
+	for (size_t i = 0; i < load_paths->size(); i++)
+	{
+		if (load_paths->at(i).masterGroupName == groupName)
+		{
+			return &load_paths->at(i);
+		}
+	}
+	return nullptr;
+}
+
 void ResourceLoader::addLoadPath(ResourceLoadPath path_p)
 {
 	

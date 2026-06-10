@@ -10,7 +10,7 @@
 
 // STL Headers
 #include <list>
-
+	
 
 namespace fs = std::filesystem;
 
@@ -68,7 +68,7 @@ private:
 
 	// MASTER RESOURCE VECTOR
 	// THIS VECTOR STORES ALL THE RESOURCE PATHS. THAT HAS BEEN INITALIZED! i.e. THE PATHS THAT HASS BEEN CONNECTED TO THE ENUM GROUP AND THE RESOURCE_LOAD_PATHS.
-	std::vector<ResourceMasterGroup*>* masterResourceVector = new std::vector<ResourceMasterGroup*>();
+	std::vector<ResourceMasterGroup*>* masterResourceVector = new std::vector<ResourceMasterGroup*>(); 
 
 	// Searching Methods
 	// Main search function
@@ -103,6 +103,7 @@ public:
 	void setMasterLoadPaths();
 	// fetches the data from load_paths and re-sets the ResourceMasterGruops
 	void syncMasterLoadPaths();
+
 
 	// Used to fetch Resource Paths for a specific group. Use RESOURCE_MASTER_GROUP_INDEX to fecth predefined groups.
 	std::vector<std::filesystem::path>* fetchResourceGroupVecByIndex(int masterIndex);

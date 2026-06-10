@@ -104,7 +104,7 @@ void SceneTabComponent::view()
 	}
 
 	//ImGui::Text("Current Case : ");
-	if (CaseHandler::selectedCase)
+	if (!CaseHandler::selectedCase)
 	{
 		ImGui::Text("No Case Selected");
 	}

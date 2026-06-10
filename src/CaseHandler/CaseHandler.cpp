@@ -58,8 +58,11 @@ Object* CaseHandler::CreateObject(std::string objectName_p, std::filesystem::pat
 	
 	// Get RenderMesh
 	Ogre::MeshPtr mesh = fetchMeshByName(meshPath_p);
-	// every ptr must be null checked!!!!!!
-
+	if (!mesh)
+	{
+		ToastComponent::GetInstance()->addMessage("Unable to create Object invaild Mesh");
+		return nullptr;
+	}
 
 	if (!this->objectExists(objectName_p))
 	{
@@ -77,12 +80,12 @@ Object* CaseHandler::CreateObject(std::string objectName_p, std::filesystem::pat
 Ogre::MeshPtr CaseHandler::fetchMeshByName(std::filesystem::path meshPath_p)
 {
 
-	this->monAddLocation(meshPath_p.parent_path(), OGRE_MESH_GROUP);
+	//this->monAddLocation(meshPath_p.parent_path(), OGRE_MESH_GROUP); // must get initialized once a new path is added!
 	Ogre::MeshPtr mesh = this->monGetMesh(meshPath_p.filename().string());
 
 	if (!mesh)
 	{
-		ToastComponent::GetInstance()->addMessage("Mesh file : " + meshPath_p.string() + " does not exist! ");
+		ToastComponent::GetInstance()->addMessage("Mesh file : " + meshPath_p.filename().string() + " does not exist! ");
 		return nullptr;
 	}
 
@@ -104,8 +107,8 @@ Ogre::MeshPtr CaseHandler::fetchMeshById(ResID meshID_p)
 
 Ogre::TexturePtr CaseHandler::fetchImageByName(std::filesystem::path imagePath_p)
 {
-	this->monAddLocation(imagePath_p.parent_path(), OGRE_TEXTURE_GROUP);
-	this->monster->initalizeResourceGroup(OGRE_TEXTURE_GROUP);
+	/*this->monAddLocation(imagePath_p.parent_path(), OGRE_TEXTURE_GROUP);
+	this->monster->initalizeResourceGroup(OGRE_TEXTURE_GROUP);*/
 
 	// Duplicate Resource is checked!
 	return this->monGetTexture(imagePath_p.filename().string());

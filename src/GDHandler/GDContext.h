@@ -51,8 +51,10 @@ public:
 	void loadMaterialsDpToOgre();
 
 	// Monster functions
-	void monAddLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);
+	void monInitalizeAllResourceGroups();
+	//void monAddLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);
 	void monAddResourceGroup(std::string groupName);
+	//void monInitializeResourceGroup(std::string groupName);
 
 	Ogre::MeshPtr monGetMesh(std::string meshName_p);
 	Ogre::Entity* monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p);

@@ -38,6 +38,7 @@ public:
 		if (!newObject)
 		{
 			ToastComponent::GetInstance()->addMessage("Failed to Create Object : " + objectName_p + " in Scene : " + name);
+			return {};
 		}
 		std::shared_ptr<Object> sObject(newObject);
 		scene->attachObject(sObject->entity.get());
@@ -54,6 +55,11 @@ public:
 	//Scene
 	void attachNewScene(const std::string sceneName_p, const SceneType sceneType_p) {
 		Scene* newScene = GDBuilderCxt->CreateScene(sceneName_p, sceneType_p,scene);
+		if (!newScene)
+		{
+			ToastComponent::GetInstance()->addMessage("Unable to create Scene node : " + sceneName_p);
+			return;
+		}
 		std::shared_ptr<Scene> sScene(newScene, SceneDeleter);
 		sceneVec.push_back(std::move(sScene));
 	}

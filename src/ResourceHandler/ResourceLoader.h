@@ -114,14 +114,20 @@ public:
 		delete load_paths;
 	}
 
+	// LOAD PATHS
 	// USE ResourceLoadPaths Enum to fetch specific load paths
 	std::vector<ResourceLoadPath>* getLoadPaths() {
 		return load_paths;
 	}
 
-
+	// Check ResourceMasterGroups for defined group names
+	ResourceLoadPath* getLoadPath(std::string groupName);
 
 	void addLoadPath(ResourceLoadPath path_p);
+
+	void removeLoadPath(int index) {
+		load_paths->erase(load_paths->begin() + index);
+	}
 
 	// loadLocation_p - Resource Loader's path saving directory
 	void initResourceLoader(CSimpleIniA* ini_p,std::filesystem::path sourceDir_p,std::filesystem::path dataDirPath_p , std::string resourceLoaderIniPath_p) {
@@ -138,9 +144,7 @@ public:
 
 	RLCase fetchCaseData(std::filesystem::path yamlFilePath);
 
-	void removeLoadPath(int index) {
-		load_paths->erase(load_paths->begin() + index);
-	}
+	
 
 	// LOADING FILES AND FOLDERS
 	void fetchPathContents(std::string path, std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders = false);

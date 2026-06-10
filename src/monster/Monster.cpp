@@ -326,7 +326,7 @@ void Monster::addResourceGroup(std::string groupName)
 
 void Monster::addOgreResourceLocation(std::string path_p, std::string OgreResourceGroup)
 {
-	if (std::filesystem::exists(path_p))
+	if (!std::filesystem::exists(path_p))
 	{
 		ToastComponent::GetInstance()->addMessage("Invalid Path was being added to Resource Group : " + OgreResourceGroup + " : " + path_p);
 	}

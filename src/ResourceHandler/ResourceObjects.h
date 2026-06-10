@@ -64,9 +64,11 @@ struct ResourceMasterGroup {
 	}
 
 	std::string GroupName;
-	std::string loadPath;
+	std::string loadPath; // name of the loadPath i.e. in ResourceLoader with containes the paths for all the contents fetched in this perticular Group
 	int loadPathIndex;
 	std::vector<std::filesystem::path>* ResourcePaths = new std::vector<std::filesystem::path>();
+
+	// make load Paths as vector<> and imaplement String to path convertion in the ResourceLoader
 };
 
 typedef unsigned long long ResID;
