@@ -57,6 +57,7 @@ public:
 	//void monInitializeResourceGroup(std::string groupName);
 
 	Ogre::MeshPtr monGetMesh(std::string meshName_p);
+	Ogre::MeshPtr monGetMesh(std::filesystem::path path);
 	Ogre::Entity* monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p);
 
 	Ogre::TexturePtr monGetTexture(std::string textureName);

@@ -27,6 +27,7 @@ void GDBuilderContext::loadMaterialsDpToOgre()
 // Do not initialize anything with monster
 void GDBuilderContext::monInitalizeAllResourceGroups()
 {
+	monster->addResourceGroup(OGRE_MESH_GROUP);
 	//// Meshes
 	//std::vector<std::filesystem::path>* paths = ResourceHandler::GetInstance()->fetchResourceGroupVecByName(ResourceGroup::ResourceMasterGroups.at(ResourceGroup::RENDER_MESH_PATH));
 	//if (paths)
@@ -68,9 +69,14 @@ void GDBuilderContext::monAddResourceGroup(std::string groupName)
 
 Ogre::MeshPtr GDBuilderContext::monGetMesh(std::string meshName_p)
 {
-	std::filesystem::path* path_p = ResourceHandler::GetInstance()->fetchFileInGroup(meshName_p, ResourceGroup::ResourceMasterGroups.at(ResourceGroup::RENDER_MESH_PATH));
+	std::filesystem::path* path_p = ResourceHandler::GetInstance()->fetchFileInGroup(meshName_p, ResourceGroup::ResourceMasterGroups.at(ResourceGroup::RENDER_MESH_PATH)); 
 	
-	return monster->getMesh(meshName_p, OGRE_MESH_GROUP);
+	return monster->getMesh(path_p->string(), OGRE_MESH_GROUP);
+}
+
+Ogre::MeshPtr GDBuilderContext::monGetMesh(std::filesystem::path path)
+{
+	return Ogre::MeshPtr();
 }
 
 Ogre::Entity* GDBuilderContext::monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p)

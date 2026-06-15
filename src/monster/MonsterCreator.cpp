@@ -47,8 +47,9 @@ Ogre::SceneNode* Monster::createNewScnNodeAttach(std::string scnNodeName, Ogre::
 
 Ogre::MeshPtr Monster::getMesh(Ogre::String meshName, Ogre::String groupName)
 {
-
-	if (this->resourceGroupExists(groupName) && this->resourceExists(meshName, groupName))
+	// Ogre starts phrasing everything inside the foldler with is not only wastfull but can be used to inject/run unintended files!
+	//Ogre::ResourceGroupManager
+	if (this->resourceGroupExists(groupName) && std::filesystem::exists(meshName)) //this->resourceExists(meshName, groupName))
 	{
 		return Ogre::MeshManager::getSingleton().load(meshName, groupName);
 	}
