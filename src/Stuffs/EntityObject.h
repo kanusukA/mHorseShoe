@@ -23,6 +23,8 @@ public:
 		ObjectResource(ResourceHandler::GetInstance(), name_p, objType_p,meshPath_p) {
 		GDBuilderCxt = GDBuilderCxt_p;
 
+		
+
 		this->renderMeshName = entity_p->getName();
 		
 		entity.reset(entity_p);

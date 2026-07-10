@@ -45,7 +45,7 @@ public:
 	// CASE FUNCTIONS
 	CaseHandler(Monster* monster) : GDBuilderContext(ResourceHandler::GetInstance(), monster) {
 		//stuffHandler = std::make_unique<StuffHandler>(monster, kint);
-		oScnManager = monster->oScnManager;
+		//oScnManager = monster->oScnManager;
 
 	};
 

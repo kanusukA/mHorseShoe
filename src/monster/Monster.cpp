@@ -55,37 +55,46 @@ Monster::Monster()
 
 
 
-void Monster::InitMonster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p) {
+//void Monster::InitMonster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p) {
+//
+//	//oRoot = root;
+//
+//	//renderWindow = rWin;
+//
+//	//oScnManager = root->createSceneManager();
+//
+//	//_setupRTShader();
+//
+//	//oScnManager->setAmbientLight(Ogre::ColourValue(0.53, 0.2, 0.12));
+//
+//	//oScnManager->addRenderQueueListener(overlay);
+//
+//
+//	//// raycast setup
+//	//mRayScnQuery = oScnManager->createRayQuery(Ogre::Ray(), Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
+//
+//	//mRayScnQuery->setQueryMask(~QueryMask::SKY & ~QueryMask::GRID);
+//
+//	//imguiOverlay = imguiOverlay_p;
+//	//
+//	//
+//	//_setupSDL3(1600,900,"Psycho");
+//
+//	//SDL_GetWindowSize(sdlWindow, windowProp->window_width, windowProp->window_height);
+//
+//	//// Add Camera
+//	//this->addCamera(MAIN_CAMERA_NAME, Ogre::Vector3(5, 5, 5));
+//
+//	
+//}
 
-	oRoot = root;
+void Monster::InitMonster() {
+	// CREATE WINDOW
+	InitSDLWindow();
 
-	renderWindow = rWin;
+	// Init Vulkan
+	InitVulkan();
 
-	oScnManager = root->createSceneManager();
-
-	_setupRTShader();
-
-	oScnManager->setAmbientLight(Ogre::ColourValue(0.53, 0.2, 0.12));
-
-	oScnManager->addRenderQueueListener(overlay);
-
-
-	// raycast setup
-	mRayScnQuery = oScnManager->createRayQuery(Ogre::Ray(), Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
-
-	mRayScnQuery->setQueryMask(~QueryMask::SKY & ~QueryMask::GRID);
-
-	imguiOverlay = imguiOverlay_p;
-	
-	
-	_setupSDL3(1600,900,"Psycho");
-
-	SDL_GetWindowSize(sdlWindow, windowProp->window_width, windowProp->window_height);
-
-	// Add Camera
-	this->addCamera(MAIN_CAMERA_NAME, Ogre::Vector3(5, 5, 5));
-
-	
 }
 
 void Monster::setShadowTechnique()
@@ -334,7 +343,7 @@ void Monster::addOgreResourceLocation(std::string path_p, std::string OgreResour
 	{
 		Ogre::ResourceGroupManager::getSingletonPtr()->createResourceGroup(OgreResourceGroup);
 	}
-	if (!this->resourceLocationExists(path_p))
+	if (!this->resourceLocationExists(path_p,OgreResourceGroup))
 	{
 		Ogre::ResourceGroupManager::getSingletonPtr()->addResourceLocation(path_p, "FileSystem", OgreResourceGroup);
 
@@ -361,9 +370,9 @@ bool Monster::resourceGroupExists(std::string groupName)
 	return Ogre::ResourceGroupManager::getSingleton().resourceGroupExists(groupName);
 }
 
-bool Monster::resourceLocationExists(std::string path_p)
+bool Monster::resourceLocationExists(std::string path_p, std::string group)
 {
-	return Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(path_p);
+	return Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(path_p,group);
 }
 
 bool Monster::resourceEntityExists(std::string entityName)
@@ -384,7 +393,7 @@ HWND* Monster::getHWND()
 
 void Monster::updateMonster()
 {
-	oRoot->renderOneFrame();
+	//oRoot->renderOneFrame();
 
 	if (skySphere) {
 		skySphere->setPosition(CameraNode->getPosition().x,CameraNode->getPosition().y - 2500, CameraNode->getPosition().z);
@@ -447,7 +456,7 @@ void Monster::_setupRTShader() {
 
 void Monster::Shutdown()
 {
-	
+	ShutdownSDL();
 }
 
 void setObjRotation(Ogre::SceneNode* scnNode, Ogre::Vector3& rot)

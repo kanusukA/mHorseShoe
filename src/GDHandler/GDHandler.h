@@ -25,21 +25,21 @@ public:
 		// Init resources
 		ResourceHandler::GetInstance();
 
-		PlayerInput* pInput = new PlayerInput();
-		playerSubject = new PlayerSubject(monster->getCameraScnNode(), monster->getCamera(), pInput);
+		//PlayerInput* pInput = new PlayerInput();
+		//playerSubject = new PlayerSubject(monster->getCameraScnNode(), monster->getCamera(), pInput);
 		
 
 		feel = feel_p;
 		KeyHandler* keyHandler = new KeyHandler(this);
-		keyHandler->setPlayerInput(pInput);
+		//keyHandler->setPlayerInput(pInput);
 
 		feel->initFeel(renderer->sdlWindow, keyHandler);
 
-		gui = new Gui(this, ResourceHandler::GetInstance(), RSUS::GetInstance());
+		//gui = new Gui(this, ResourceHandler::GetInstance(), RSUS::GetInstance());
 
-		gui->initGui(this->monster->imguiOverlay);
+		//gui->initGui(this->monster->imguiOverlay);
 
-		loadSavedCase();
+		//loadSavedCase();
 
 
 	};

@@ -1,7 +1,11 @@
 ﻿# CMakeList.txt : Top-level CMake project file, do global configuration
 # and include sub-projects here.
 #
-cmake_minimum_required (VERSION 3.22)
+cmake_minimum_required (VERSION 3.28)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -31,6 +35,23 @@ message("build type ${CMAKE_BUILD_TYPE}")
 
 include(FetchContent)
 include(CPM.cmake)
+
+# VULKAN
+find_package(slang CONFIG HINTS "$ENV{VULKAN_SDK}/lib/cmake")
+
+find_package(Vulkan REQUIRED)
+
+
+# GLM - OPEN-GL MATHAMATICS LIBRARY - RECOMMANDED BY VULKAN
+FetchContent_Declare(
+	glm
+	GIT_REPOSITORY https://github.com/g-truc/glm.git
+	GIT_TAG 0af55ccecd98d4e5a8d1fad7de25ba429d60e863 
+)
+
+FetchContent_MakeAvailable(glm)
+
+
 
 
 
@@ -185,18 +206,31 @@ set(SOURCES
 	
 )
 
-add_executable(mHorseShoee ${SOURCES} "src/monster/MonsterCreator.cpp" "src/monster/MonsterRSUS.cpp")
+add_executable(mHorseShoee ${SOURCES} "src/monster/MonsterCreator.cpp" "src/monster/MonsterRSUS.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterVulkan.cpp")
 
-target_compile_features(mHorseShoee PUBLIC cxx_std_20)
+# target_compile_features(mHorseShoee PUBLIC cxx_std_20)
+
+#target_compile_definitions(mHorseShoee PUBLIC 
+#	VULKAN_HPP_DISPATCH_LOCADER_DYNAMIC=1
+#	VULKAN_HPP_NO_STRUCT_CONSTRUCTORS=1
+#)
+
+#target_sources(mHorseShoee PUBLIC FILE_SET cxx_modules TYPE CXX_MODULES BASE_DIRS "${Vulkan_INCLUDE_DIR}"
+#FILES "${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm")
 
 #target_compile_definitions(Plugin_GLSLangProgramManager PUBLIC $<$<CONFIG:Debug>:/O2 /Ob2>)
 
 
 
 
+target_include_directories(mHorseShoee PRIVATE "${Vulkan_INCLUDE_DIR}")
+
+#set_target_properties(mHorseShoee PROPERTIES CXX_STANDARD 20)
 
 
 target_include_directories(mHorseShoee PUBLIC "src/" )
+
+target_link_libraries(mHorseShoee PRIVATE glm::glm)
 
 
 target_link_libraries(mHorseShoee PRIVATE OgreBites)

@@ -83,8 +83,6 @@ std::filesystem::path ResourceHandler::find(std::string fileName, std::string lo
 
 ResourceHandler* ResourceHandler::GetInstance() {
 
-	
-
 	// locks storage 
 	std::lock_guard<std::mutex> lock(mutex_);
 	if (pinstance_ == nullptr) {

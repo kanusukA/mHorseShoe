@@ -20,9 +20,9 @@ int main() {
 
 	std::cout << "Ogre started : " << std::endl;
 
-	ResourceHandler::GetInstance()->getAllResources();
+	ResourceHandler::GetInstance();
 
-	//ResourceHandler::GetInstance()->addOgreRenderMeshResourceLocation();
+	//ResourceHandler::GetInstance()->/*addOgreRenderMeshResourceLocation*/();
 
 	// Ogre AND ImGui
 	std::cout << "Setting up ImGui" << std::endl;
@@ -40,11 +40,7 @@ int main() {
 	
 	Ogre::Root* oRoot = monster->oRoot;
 
-	
-
 	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, 0.4), 2);
-
-
 
 
 	std::cout << "Setting up Kint" << std::endl;

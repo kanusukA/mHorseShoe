@@ -129,40 +129,39 @@ void addLoadPath(ResourceTabModelComponent* model) {
 		}
 	}
 
+void masterResourcePaths(ResourceTabModelComponent* model)
+{
 
-		void masterResourcePaths(ResourceTabModelComponent* model)
+	if (ImGui::CollapsingHeader("Master Resource Groups")) {
+
+		if (ImGui::Button("Sync with Load Path"))
 		{
-
-			if (ImGui::CollapsingHeader("Master Resource Groups")) {
-
-				if (ImGui::Button("Sync with Load Path"))
-				{
-					model->syncMasterVector();
-				}
-
-				if (model->masterResourceVector && !model->masterResourceVector->empty())
-				{
-					for (int i = 0; i < model->masterResourceVector->size(); i++)
-					{
-						ImGui::Text(model->masterResourceVector->at(i)->GroupName.c_str());
-
-						if (ImGui::CollapsingHeader(("Paths##MasterResourceVector" + std::to_string(i)).c_str()))
-						{
-							if (model->masterResourceVector->at(i)->ResourcePaths)
-							{
-								ImGui::Text("Paths");
-								for (int j = 0; j < model->masterResourceVector->at(i)->ResourcePaths->size(); j++)
-								{
-									ImGui::Text(model->masterResourceVector->at(i)->ResourcePaths->at(j).string().c_str());
-								}
-							}
-						}
-
-					}
-
-				}
-			}
+			model->syncMasterVector();
 		}
+
+		if (model->masterResourceVector && !model->masterResourceVector->empty())
+		{
+			for (int i = 0; i < model->masterResourceVector->size(); i++)
+			{
+				ImGui::Text(model->masterResourceVector->at(i)->GroupName.c_str());
+
+				if (ImGui::CollapsingHeader(("Paths##MasterResourceVector" + std::to_string(i)).c_str()))
+				{
+					if (model->masterResourceVector->at(i)->ResourcePaths)
+					{
+						ImGui::Text("Paths");
+						for (int j = 0; j < model->masterResourceVector->at(i)->ResourcePaths->size(); j++)
+						{
+							ImGui::Text(model->masterResourceVector->at(i)->ResourcePaths->at(j).string().c_str());
+						}
+					}
+				}
+
+			}
+
+		}
+	}
+}
 	
 
 void ResourceTabComponent::view()

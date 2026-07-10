@@ -17,6 +17,7 @@ private:
 
 
 public:
+
 	Scene(GDBuilderContext* GDBuilderCxt_p,SceneType scnType, std::string name_p,Ogre::SceneNode* sceneNode_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p, scnType) {
 		GDBuilderCxt = GDBuilderCxt_p;
@@ -148,8 +149,8 @@ public:
 	}
 
 	void destroyScene() {
-		sceneVec.clear();
 		objVec.clear();
+		sceneVec.clear();
 		GDBuilderCxt->monDeleteSceneNode(scene);
 	}
 

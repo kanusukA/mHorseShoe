@@ -4,6 +4,8 @@
 
 
 
+
+
 // Rendering
 // Physics
 // GUI
@@ -15,8 +17,8 @@ int main() {
 
 	std::cout << "Start : " << std::endl;
 
-	OgreBites::ApplicationContext ctx(INSTANCE_NAME);
-	ctx.initApp();
+	//OgreBites::ApplicationContext ctx(INSTANCE_NAME);
+	//ctx.initApp();
 
 	std::cout << "Ogre started : " << std::endl;
 
@@ -31,21 +33,21 @@ int main() {
 	// This process cannot be done in GUI itself as it requires Imgui to be uninitalized. This was changed in Imgui version 1.92+ but Ogre uses 1.91.9b currently.
 	// TODO CHANGE THIS METHOD TO RUN AT GUI VIEW COMPONENT WHEN IMGUI VERSION IS UPDATED TO 1.92+
 	Monster* monster = new Monster();
-	monster->setupFonts();
+	//monster->setupFonts();
 
-	Ogre::ImGuiOverlay* imOverlay = ctx.initialiseImGui(); // initalizes imgui before InitMonster! else will pop errors in renderOneFrame in Loop.
-	ctx.addInputListener(ctx.getImGuiInputListener());
+	//Ogre::ImGuiOverlay* imOverlay = ctx.initialiseImGui(); // initalizes imgui before InitMonster! else will pop errors in renderOneFrame in Loop.
+	//ctx.addInputListener(ctx.getImGuiInputListener());
 
 	// Ogre Overlay INIT
-	monster->InitMonster(ctx.getRoot(), ctx.getRenderWindow(), ctx.getOverlaySystem(), imOverlay);
+	//monster->InitMonster(ctx.getRoot(), ctx.getRenderWindow(), ctx.getOverlaySystem(), imOverlay);
+	monster->InitMonster();
 	
 	//setup materials to ogre
-	
 
 	std::cout << "Initializing kint" << std::endl;
 	//Kint* kint = new Kint();
 	
-	Ogre::Root* oRoot = monster->oRoot;
+	//Ogre::Root* oRoot = monster->oRoot;
 
 	// SHADOM V5 DOES NOT WORK WITH CONVENTIONAL MAIN DIRECTIONAL LIGHT AS IT DOES NOT HAVE A FIXED POSITION IN SPACE AND CAUSES ARTIFACTS!
 	// AS AN ALTERNATIVE A DIRECTION IS PASSED TO THE SHADER WHICH IS THEN USED TO CALCULATE MAIN DIRECTIONAL LIGHT.
@@ -58,6 +60,8 @@ int main() {
 	kint->InitPhysics();*/
 
 	Feel* feel = new Feel();
+	
+
 
 	//GDHANDLER
 	
@@ -90,8 +94,11 @@ int main() {
 		deltaTime = elapsed / 100;
 
 		// Input / GUI Update
-		gdHandler->update(deltaTime);
+		//gdHandler->update(deltaTime);
 
+		feel->updateInput(deltaTime);
+
+		monster->updateMonster();
 		
 		renderTime = getCurrentTime();
 

@@ -34,20 +34,18 @@ void Feel::consoleMode(bool state)
 
 void Feel::updateInput(float deltaTime) {
 
-	
-
 	SDL_Event event;
 
 	keyHandler->mouseKeys->MouseXrel = 0;
 	keyHandler->mouseKeys->MouseYrel = 0;
 
 	// keyBoard lock if occupire by ImGui
-	if (ImGui::GetIO().WantCaptureKeyboard) {
+	/*if (ImGui::GetIO().WantCaptureKeyboard) {
 		SDL_PollEvent(&event);
 		keyHandler->inputKeys->MOUSE_LEFT_CLICK = 0;
 		keyHandler->inputKeys->MOUSE_RIGHT_CLICK = 0;
 		return;
-	}
+	}*/
 
 	while (SDL_PollEvent(&event) != 0)
 	{

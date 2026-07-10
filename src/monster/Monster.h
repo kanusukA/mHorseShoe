@@ -16,6 +16,9 @@
 #include <SDL3/SDL.h>
 #include <OgreImGuiOverlay.h>
 #include <imgui_stdlib.h>
+
+#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+#include <vulkan/vulkan_raii.hpp>
 //#include <imgui_spectrum.h>
 //#include <PxPhysicsAPI.h>
 
@@ -194,7 +197,15 @@ private:
 
 	//IKEYS* inputkeys;
 
+	vk::raii::Context Context;
+	vk::raii::Instance vkInstance = nullptr;
+
+	
+
 public:
+
+	bool window_fullScreen = false;
+	SDL_Window* sdlWindow;
 
 	Ogre::MovableObject* RayCastFromPoint();
 
@@ -209,7 +220,16 @@ public:
 	Monster();
 
 	// INITIALISES SDL3 WINDOW / ADDS DEFAULT CAMERAMAN / GUI SYSTEM
-	void InitMonster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p);
+	//void InitMonster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p);
+
+	void InitMonster();
+
+	// SDL CLASSES
+	void InitSDLWindow();
+	void ShutdownSDL();
+
+	// Vulkan
+	void InitVulkan();
 
 	void setShadowTechnique();
 
@@ -251,7 +271,7 @@ public:
 	// VALIDATION CHECKERS
 	bool resourceExists(std::string resName, std::string groupName);
 	bool resourceGroupExists(std::string groupName);
-	bool resourceLocationExists(std::string path_p);
+	bool resourceLocationExists(std::string path_p, std::string group);
 	bool resourceEntityExists(std::string entityName);
 
 	// MONSTER CREATOR FUNCTIONS
@@ -356,8 +376,7 @@ public:
 	void _setupRTShader();
 
 	// WINDOW RELATED
-	bool window_fullScreen = false;
-	SDL_Window* sdlWindow;
+	
 	void _setupSDL3(INT64 windowWidth, INT64 windowHeight, Ogre::String windowName);
 
 

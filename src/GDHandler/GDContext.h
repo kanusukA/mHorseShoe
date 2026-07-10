@@ -25,6 +25,7 @@ class Kint;
 
 // Primary Class.
 // Used to build object with all required contexts and initializations
+// CONNECTS MONSTER WITH CASE HANDLER
 class GDBuilderContext : public GDSystem
 {	
 protected:
@@ -41,7 +42,7 @@ public:
 		resourceHandler = resourceHan_p;
 		monster = monster_p;
 
-		startEngine();
+		//startEngine();
 		
 	}
 
@@ -52,12 +53,12 @@ public:
 
 	// Monster functions
 	void monInitalizeAllResourceGroups();
-	//void monAddLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);
+	void monAddLocation(std::filesystem::path meshParentPath_p, std::string OgreGroup);
 	void monAddResourceGroup(std::string groupName);
-	//void monInitializeResourceGroup(std::string groupName);
+	void monInitializeResourceGroup(std::string groupName);
 
 	Ogre::MeshPtr monGetMesh(std::string meshName_p);
-	Ogre::MeshPtr monGetMesh(std::filesystem::path path);
+	//Ogre::MeshPtr monGetMesh(std::filesystem::path path);
 	Ogre::Entity* monCreateEntity(std::string name_p, Ogre::MeshPtr mesh_p);
 
 	Ogre::TexturePtr monGetTexture(std::string textureName);

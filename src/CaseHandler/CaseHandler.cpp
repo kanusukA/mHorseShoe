@@ -74,7 +74,6 @@ Object* CaseHandler::CreateObject(std::string objectName_p, std::filesystem::pat
 	ToastComponent::GetInstance()->addMessage("Object already exists");
 	return nullptr;
 	
-	
 }
 
 Ogre::MeshPtr CaseHandler::fetchMeshByName(std::filesystem::path meshPath_p)

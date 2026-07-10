@@ -22,6 +22,9 @@ public:
 
 	}
 
+	// LOAD MESH AND MATERIAL THE OLD WAY AND JUST TAKE CARE OF NOT JUNKING THE FOLDERS
+	// THEN TEST SINGLE LOAD OF CASE THEN START WORKING ON PARALLAX            
+
 	void init() override {
 		windowSize = this->gdSource->getGdSystem()->getWindowSize();
 		material = ModelComponent::selectedMaterial->selMaterial;
