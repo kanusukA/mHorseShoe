@@ -12,13 +12,14 @@
 //#include <feel/KeyHandler.h>
 #include <GDHandler/ResourceHandler.h>
 
+#include "VulkanStats.h"
+
 // Third-party header
 #include <SDL3/SDL.h>
 #include <OgreImGuiOverlay.h>
 #include <imgui_stdlib.h>
 
-#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
-#include <vulkan/vulkan_raii.hpp>
+
 //#include <imgui_spectrum.h>
 //#include <PxPhysicsAPI.h>
 
@@ -197,8 +198,12 @@ private:
 
 	//IKEYS* inputkeys;
 
-	vk::raii::Context Context;
-	vk::raii::Instance vkInstance = nullptr;
+	// VULKAN INIT
+	VulkanStatus vkMonsterStats = VulkanStatus();
+	
+	void CreateVulkanDevice();
+
+	
 
 	
 
