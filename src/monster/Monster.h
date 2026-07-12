@@ -3,6 +3,10 @@
 #ifndef MONSTER_H
 #define MONSTER_H
 
+#ifndef VK_EXT_DEBUG_REPORT_EXTENSION_NAME
+#define VK_EXT_DEBUG_REPORT_EXTENSION_NAME "VK_EXT_debug_report"
+#endif
+
 //  IMPORT THIS BEFORE OGRE.H !!!!!!!!!!!
 #include <OgreApplicationContext.h>
 #include <OgreTrays.h>
@@ -16,6 +20,7 @@
 
 // Third-party header
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
 #include <OgreImGuiOverlay.h>
 #include <imgui_stdlib.h>
 
@@ -201,9 +206,11 @@ private:
 	// VULKAN INIT
 	VulkanStatus vkMonsterStats = VulkanStatus();
 	
-	void CreateVulkanDevice();
-
-	
+	// vulkan Init
+	void createVulkanInstance();
+	void createVulkanSurface();
+	void pickVulkanPhysicalDevice();
+	void createVulkanDevice();
 
 	
 

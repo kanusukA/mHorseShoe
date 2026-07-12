@@ -11,7 +11,7 @@ void Monster::InitSDLWindow() {
 		"PSYCHO",
 		1600,
 		800,
-		SDL_WINDOW_RESIZABLE
+		SDL_WINDOW_RESIZABLE | SDL_WINDOW_VULKAN
 	);
 
 	if (!sdlWindow)

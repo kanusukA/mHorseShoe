@@ -1,6 +1,32 @@
 #include "Monster.h"
 
+
+
+
 void Monster::InitVulkan() {
+
+	createVulkanInstance();
+	createVulkanSurface();
+	pickVulkanPhysicalDevice();
+	createVulkanDevice();
+
+}
+
+void Monster::createVulkanInstance() {
+	// Retrieve Extensions required by the Window System (SDL3 in this case)
+	uint32_t extensionCount = 0;
+	const char* const* instance_extensions = SDL_Vulkan_GetInstanceExtensions(&extensionCount);
+
+	if (instance_extensions == NULL)
+	{
+		throw std::exception("SDL FAILED TO PROVIDE EXTENSION DETAILS TO VULKAN");
+	}
+
+	int count_extensions = extensionCount + 1;
+	const char** extensions = static_cast<const char**>(SDL_malloc(count_extensions * sizeof(const char*)));
+	extensions[0] = VK_EXT_DEBUG_REPORT_EXTENSION_NAME;
+	SDL_memcpy(&extensions[1], instance_extensions, extensionCount * sizeof(const char*));
+
 
 
 	vk::ApplicationInfo appInfo{};
@@ -12,19 +38,40 @@ void Monster::InitVulkan() {
 
 	vk::InstanceCreateInfo createInfo{};
 	createInfo.pApplicationInfo = &appInfo;
-	createInfo.enabledExtensionCount = 0;
-	createInfo.ppEnabledExtensionNames = nullptr;
+	createInfo.enabledExtensionCount = count_extensions;
+	createInfo.ppEnabledExtensionNames = extensions;
 	createInfo.enabledLayerCount = 0;
 	createInfo.ppEnabledLayerNames = nullptr;
 
 	vkMonsterStats.vkInstance = vk::raii::Instance(vkMonsterStats.Context, createInfo);
+}
+
+void Monster::createVulkanSurface() {
+
+	SDL_PropertiesID properties = SDL_GetWindowProperties(sdlWindow);
+
+	void* hwnd = SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+
+	if (!hwnd)
+	{
+		throw std::exception("FAILED TO GET WINDOW HWND FROM SDL");
+	}
+
+	vk::Win32SurfaceCreateInfoKHR createInfo{
+		.hinstance = GetModuleHandle(nullptr),
+		.hwnd = static_cast<HWND>(hwnd)
+	};
+
+	vkMonsterStats.surface = vkMonsterStats.vkInstance.createWin32SurfaceKHR(createInfo);
+	
 
 
-	//-------------------------------------------------------------------------------------
+}
 
+void Monster::pickVulkanPhysicalDevice() {
 	// PICK GPU
 	auto physicalDevices = vkMonsterStats.vkInstance.enumeratePhysicalDevices();
-	std::multimap<int, vk::PhysicalDevice> suitableDevices;
+	std::multimap<int, vk::raii::PhysicalDevice> suitableDevices;
 	for (size_t i = 0; i < physicalDevices.size(); i++)
 	{
 
@@ -73,7 +120,7 @@ void Monster::InitVulkan() {
 	}
 
 	int maxScore = 0;
-	for (auto &device : suitableDevices)
+	for (auto& device : suitableDevices)
 	{
 		if (device.first > maxScore)
 		{
@@ -118,11 +165,79 @@ void Monster::InitVulkan() {
 	vkMonsterStats.supportsRequiredFeatures = features.template get<vk::PhysicalDeviceVulkan11Features>().shaderDrawParameters &&
 		features.template get<vk::PhysicalDeviceVulkan13Features>().dynamicRendering &&
 		features.template get<vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>().extendedDynamicState;
-	
-
 }
 
 
-void Monster::CreateVulkanDevice() {
+void Monster::createVulkanDevice() {
+	
+	//Specifying vulkan queues
+	std::vector<vk::QueueFamilyProperties> queueFamilyProperties = vkMonsterStats.gpuDevice.getQueueFamilyProperties();
+
+	// Check if the queue family supports both graphics and presentation (surface)
+	uint32_t queueIndex = ~0;
+	for (uint32_t qfpIndex = 0; qfpIndex < queueFamilyProperties.size(); qfpIndex++)
+	{
+		if ((queueFamilyProperties[qfpIndex].queueFlags & vk::QueueFlagBits::eGraphics) &&
+			vkMonsterStats.gpuDevice.getSurfaceSupportKHR(qfpIndex, vkMonsterStats.surface))
+		{
+			queueIndex = qfpIndex;
+			break;
+
+		}
+	}
+
+	if (queueIndex == ~0)
+	{
+		throw std::runtime_error("Cound not find queue for graphics and surface");
+	}
+
+	//auto graphicsQueueFamilyProperty = std::ranges::find_if(queueFamilyProperties, [](auto const& qfp) {return (qfp.queueFlags & vk::QueueFlagBits::eGraphics) != static_cast<vk::QueueFlags>(0); });
+	//auto graphicsIndex = static_cast<uint32_t>(std::distance(queueFamilyProperties.begin(), graphicsQueueFamilyProperty));
+	
+	// Define Queue Priority 0.0f - 1.0f
+	float queuePriority = 0.5f;
+	
+	vk::DeviceQueueCreateInfo deviceQueueCreateInfo{ .queueFamilyIndex = queueIndex, .queueCount = 1, .pQueuePriorities = &queuePriority };
+
+	
+	// Define device Features to be used - as in InitVulkan
+	// using StructrueChain - refer to Docs https://docs.vulkan.org/tutorial/latest/03_Drawing_a_triangle/00_Setup/04_Logical_device_and_queues.html
+
+	vk::StructureChain<
+		vk::PhysicalDeviceFeatures2,
+		vk::PhysicalDeviceVulkan11Features,
+		vk::PhysicalDeviceVulkan13Features,
+		vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT
+	> featureChain = {
+		{},
+		{.shaderDrawParameters = true },
+		{.dynamicRendering = true},
+		{.extendedDynamicState = true}
+	};
+
+	// required extensions
+
+	std::vector<const char*> requiredDeviceExtension = {
+		vk::KHRSwapchainExtensionName
+	};
+
+	// Create Device
+	vk::DeviceCreateInfo deviceCreateInfo{
+		.pNext = &featureChain.get<vk::PhysicalDeviceFeatures2>(),
+		.queueCreateInfoCount = 1,
+		.pQueueCreateInfos = &deviceQueueCreateInfo,
+		.enabledExtensionCount = static_cast<uint32_t>(requiredDeviceExtension.size()),
+		.ppEnabledExtensionNames = requiredDeviceExtension.data()
+	};
+
+	vkMonsterStats.device = vk::raii::Device(vkMonsterStats.gpuDevice, deviceCreateInfo);
+
+	vkMonsterStats.graphicsQueue = vk::raii::Queue(
+		vkMonsterStats.device,
+		queueIndex,
+		0
+	);
+
+
 
 }
