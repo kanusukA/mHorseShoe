@@ -10,13 +10,13 @@ void Feel::initFeel(SDL_Window* sdlWindow, KeyHandler* keyHandler_p)
 }
 
 void Feel::hideMouse() {
-	ShowCursor(false);
+//	ShowCursor(false);
 	SDL_SetWindowRelativeMouseMode(window,true);
 	mouseHidden = true;
 }
 
 void Feel::showMouse() {
-	ShowCursor(true);
+//	ShowCursor(true);
 	SDL_SetWindowRelativeMouseMode(window, false);
 	mouseHidden = false;
 	
@@ -27,7 +27,7 @@ void Feel::showMouse() {
 void Feel::consoleMode(bool state)
 {
 	SDL_SetWindowMouseGrab(window,!state);
-	ShowCursor(state);
+//	ShowCursor(state);
 	keyHandler->inputKeys->CONSOL_KEY = false;
 }
 

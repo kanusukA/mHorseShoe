@@ -2,7 +2,7 @@
 
 // ENTIRE OVERHAUL
 
-void CaseHandler::saveDefaultCase(std::string filename)
+/*void CaseHandler::saveDefaultCase(std::string filename)
 {
 
 	resourceHandler->openSaveFile(resourceHandler->getSourceDir().string() + CASE_DEFAULT_CASE_PATH);
@@ -64,7 +64,7 @@ void CaseHandler::saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes)
 
 		out << YAML::EndMap; // SCENE END
 
-		/*resourceHandler->resetIni();
+		resourceHandler->resetIni();
 		resourceHandler->saveScene(scenes->at(sceneIndex).get(), caseID, parentNode);
 		resourceHandler->saveIni(*resourceHandler->getPath(ResourcePaths::Scenes));
 
@@ -76,7 +76,7 @@ void CaseHandler::saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes)
 		if (scenes->at(sceneIndex)->getObjects())
 		{
 			saveObjects(scenes->at(sceneIndex)->getObjects(), scenes->at(sceneIndex)->getId());
-		}*/
+		}
 
 	}
 	out << YAML::EndSeq;
@@ -119,7 +119,7 @@ void CaseHandler::saveObjects(const std::vector<std::shared_ptr<Object>>* object
 	//resourceHandler->saveIni(*resourceHandler->getPath(ResourcePaths::MaterialPath));
 
 	// Saving Shaders
-	/*resourceHandler->resetIni();
+	resourceHandler->resetIni();
 	resourceHandler->saveIni(*resourceHandler->getPath(ResourcePaths::Shaders));
 	for (int objectIndex = 0; objectIndex < objects->size(); objectIndex++)
 	{
@@ -132,8 +132,8 @@ void CaseHandler::saveObjects(const std::vector<std::shared_ptr<Object>>* object
 
 	}
 	resourceHandler->saveIni(*resourceHandler->getPath(ResourcePaths::Shaders));
-	resourceHandler->resetIni();*/
+	resourceHandler->resetIni();
 
 	
 	
-}
+}*/

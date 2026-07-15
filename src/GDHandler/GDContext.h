@@ -49,7 +49,7 @@ public:
 	virtual void update(float deltaTime) {};
 
 	//Ogre
-	void loadMaterialsDpToOgre();
+/*	void loadMaterialsDpToOgre();
 
 	// Monster functions
 	void monInitalizeAllResourceGroups();
@@ -94,11 +94,11 @@ public:
 	
 
 
-
+*/
 };
 
 
 
-Ogre::Quaternion Vec4toQuaternion(Ogre::Vector4 orientation);
+//Ogre::Quaternion Vec4toQuaternion(Ogre::Vector4 orientation);
 
-Ogre::Vector4 QuaternionToVec4(Ogre::Quaternion quat);
+//Ogre::Vector4 QuaternionToVec4(Ogre::Quaternion quat);

@@ -159,11 +159,11 @@ public:
 
 	HeldKeys* heldKeys = new HeldKeys();
 
-	PlayerInput* pInput;
+/*	PlayerInput* pInput;
 
 	GDBuilderContext* builderCxt;
-
-	KeyHandler(GDBuilderContext* builderCxt_p);
+*/
+	KeyHandler(/*GDBuilderContext* builderCxt_p*/);
 
 	InputHandler* inputHandler = InputHandler::GetInstance();
 	IKEYS* inputKeys = inputHandler->getInputKeys();
@@ -173,7 +173,7 @@ public:
 
 	std::vector<Key*>* keys = new std::vector<Key*>();
 
-	void setPlayerInput(PlayerInput* pInput_p);
+//	void setPlayerInput(PlayerInput* pInput_p);
 
 
 

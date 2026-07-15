@@ -22,7 +22,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 //#include <OgreImGuiOverlay.h>
-#include <imgui_stdlib.h>
+//#include <imgui_stdlib.h>
 
 
 //#include <imgui_spectrum.h>
@@ -32,9 +32,10 @@
 #if defined (_WIN32)
 	#include <Windows.h>
 #endif
-
+#include <stdio.h>
+#include <iostream>
 #include <random>
-#include <cons.h>
+//#include <cons.h>
 
 
 //const Ogre::String TRAY_SYSTEM_NAME = "Default_Tray_Man";
@@ -214,6 +215,7 @@ private:
 	void createVulkanSurface();
 	void pickVulkanPhysicalDevice();
 	void createVulkanDevice();
+	void createSwapchain();
 
 	
 

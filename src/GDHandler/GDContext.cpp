@@ -5,14 +5,14 @@ void GDBuilderContext::startEngine()
 	
 	//loadMaterialsDpToOgre();
 
-	monInitalizeAllResourceGroups();
+//	monInitalizeAllResourceGroups();
 
-	monster->setShadowTechnique();
+//:	monster->setShadowTechnique();
 
 }
 
 
-void GDBuilderContext::loadMaterialsDpToOgre()
+/*void GDBuilderContext::loadMaterialsDpToOgre()
 {
 	std::vector<std::filesystem::path>* MaterialPaths = ResourceHandler::GetInstance()->getMaterialsLoaded();
 
@@ -70,9 +70,9 @@ void GDBuilderContext::monInitializeResourceGroup(std::string groupName)
 
 Ogre::MeshPtr GDBuilderContext::monGetMesh(std::string meshName_p)
 {
-	/*std::filesystem::path* path_p = ResourceHandler::GetInstance()->fetchFileInGroup(meshName_p, ResourceGroup::ResourceMasterGroups.at(ResourceGroup::RENDER_MESH_PATH)); 
+	std::filesystem::path* path_p = ResourceHandler::GetInstance()->fetchFileInGroup(meshName_p, ResourceGroup::ResourceMasterGroups.at(ResourceGroup::RENDER_MESH_PATH)); 
 	
-	return monster->getMesh(path_p->string(), OGRE_MESH_GROUP);*/
+	return monster->getMesh(path_p->string(), OGRE_MESH_GROUP);
 	return monster->getMesh(meshName_p, OGRE_MESH_GROUP);
 }
 
@@ -158,4 +158,4 @@ Ogre::Quaternion Vec4toQuaternion(Ogre::Vector4 orientation) {
 }
 Ogre::Vector4 QuaternionToVec4(Ogre::Quaternion quat) {
 	return Ogre::Vector4(quat.w, quat.x, quat.y, quat.z);
-}
+}*/

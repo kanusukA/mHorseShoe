@@ -23,23 +23,23 @@ protected:
 
 public:
 
-	Ogre::SceneManager* oScnManager;
+//	Ogre::SceneManager* oScnManager;
 
 	//std::shared_ptr<std::string> defaultCase = std::make_shared<std::string>();
 
-	std::vector<std::shared_ptr<Case>>* caseVec = new std::vector<std::shared_ptr<Case>>();
+//	std::vector<std::shared_ptr<Case>>* caseVec = new std::vector<std::shared_ptr<Case>>();
 
 
 	// MAIN SELECTED CASE
 	// TO SET THIS CASE ALWAYS USE THE LOAD CASE FUNCTION TO AVOID CREATING A CASE WITH INVALID SCENES.
-	static std::unique_ptr<Case> selectedCase; 
+//	static std::unique_ptr<Case> selectedCase; 
 
 
 	// DEPEDENT RESOURCE VECTOR
 	// These resources are used to create copy of themselves to be used by other resources in a lifecycle aware manner. (hopefully)
 
-	std::vector<std::unique_ptr<RenderMesh>>* meshVec = new std::vector<std::unique_ptr<RenderMesh>>();
-	std::vector<std::unique_ptr<Material>>* materialVec = new std::vector<std::unique_ptr<Material>>();
+//	std::vector<std::unique_ptr<RenderMesh>>* meshVec = new std::vector<std::unique_ptr<RenderMesh>>();
+//	std::vector<std::unique_ptr<Material>>* materialVec = new std::vector<std::unique_ptr<Material>>();
 	
 
 	// CASE FUNCTIONS
@@ -53,11 +53,11 @@ public:
 	CaseHandler(Monster* monster, Case* case_p) : GDBuilderContext(ResourceHandler::GetInstance(), monster) {
 
 		//stuffHandler = std::make_unique<StuffHandler>(monster, kint);
-		oScnManager = monster->oScnManager;
+//		oScnManager = monster->oScnManager;
 
 	};
 
-	bool resourceExists(std::string resourceName);
+/*	bool resourceExists(std::string resourceName);
 
 
 	std::vector<std::shared_ptr<Case>>* fetchAllCases() { return caseVec; }
@@ -92,7 +92,7 @@ public:
 	void saveScenes(const std::vector<std::shared_ptr<Scene>>* scenes);
 	void saveObjects(const std::vector<std::shared_ptr<Object>>* objects, YAML::Emitter& out);
 
-	void unload();
+	void unload(); */
 
 };
 

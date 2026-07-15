@@ -1,4 +1,13 @@
 #include "Monster.h"
+#include "SDL3/SDL_vulkan.h"
+#include "vulkan/vulkan.hpp"
+#include "vulkan/vulkan_core.h"
+#include <cstddef>
+#include <exception>
+#include <map>
+
+#include <algorithm>
+#include <limits.h>
 
 
 
@@ -9,6 +18,7 @@ void Monster::InitVulkan() {
 	createVulkanSurface();
 	pickVulkanPhysicalDevice();
 	createVulkanDevice();
+	createSwapchain();
         
 
 }
@@ -20,7 +30,7 @@ void Monster::createVulkanInstance() {
 
 	if (instance_extensions == NULL)
 	{
-		throw std::exception("SDL FAILED TO PROVIDE EXTENSION DETAILS TO VULKAN");
+		throw std::runtime_error("SDL FAILED TO PROVIDE EXTENSION DETAILS TO VULKAN");
 	}
 
 	int count_extensions = extensionCount + 1;
@@ -49,13 +59,22 @@ void Monster::createVulkanInstance() {
 
 void Monster::createVulkanSurface() {
 
-	SDL_PropertiesID properties = SDL_GetWindowProperties(sdlWindow);
+	VkSurfaceKHR surface;
+
+	if(!SDL_Vulkan_CreateSurface(sdlWindow, *vkMonsterStats.vkInstance, nullptr, &surface)){
+	
+		throw std::runtime_error("UNABLE TO CREATE VULKAN SURFACE FROM SDLWINDOW!");
+	}
+
+	vkMonsterStats.surface = vk::raii::SurfaceKHR(vkMonsterStats.vkInstance,surface);
+
+/*	SDL_PropertiesID properties = SDL_GetWindowProperties(sdlWindow);
 
 	void* hwnd = SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 
 	if (!hwnd)
 	{
-		throw std::exception("FAILED TO GET WINDOW HWND FROM SDL");
+		throw std::runtime_error("FAILED TO GET WINDOW HWND FROM SDL");
 	}
 
 	vk::Win32SurfaceCreateInfoKHR createInfo{
@@ -64,7 +83,7 @@ void Monster::createVulkanSurface() {
 	};
 
 	vkMonsterStats.surface = vkMonsterStats.vkInstance.createWin32SurfaceKHR(createInfo);
-	
+*/	
 
 
 }
@@ -117,7 +136,7 @@ void Monster::pickVulkanPhysicalDevice() {
 
 	if (suitableDevices.empty())
 	{
-		throw std::exception("No Suitable Device Found!");
+		throw std::runtime_error("No Suitable Device Found!");
 	}
 
 	int maxScore = 0;
@@ -240,5 +259,90 @@ void Monster::createVulkanDevice() {
 	);
 
 
+
+}
+
+
+void Monster::createSwapchain(){
+	auto surfaceCapabilities = vkMonsterStats.gpuDevice.getSurfaceCapabilitiesKHR(*vkMonsterStats.surface);
+
+	// supported surface formats
+	std::vector<vk::SurfaceFormatKHR> availableFormats = vkMonsterStats.gpuDevice.getSurfaceFormatsKHR( vkMonsterStats.surface);
+
+	// supported presentModes
+	std::vector<vk::PresentModeKHR> availablePresentModes = vkMonsterStats.gpuDevice.getSurfacePresentModesKHR(vkMonsterStats.surface);
+
+	// Things to determine when choosing swapchain settings
+	// - Surface format (color depth)
+	// - Presentations mode (conditions for swapping images to the screen)
+	// - Swap extent (resolution of images in swapchain)
+	
+
+	// Surface format
+	
+	// vulkan recommands for BGRA 8bit 
+	// if that is not found the next best is taken
+	
+	const auto formatIt = std::ranges::find_if(
+			availableFormats,
+			[](const auto &format) {return format.format == vk::Format::eB8G8R8A8Srgb && format.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear;});
+	
+	vk::SurfaceFormatKHR surfaceFormat = formatIt != availableFormats.end() ? *formatIt : availableFormats[0];
+
+	// Present mode
+	// There are foure possible modes in vulkan
+	// - eImmediate - transfered to screen right away, may cause tearing
+	// - eFifo - similar to vertical sync, queue is set and is changed when display is refreshed
+	// - eFifoRelaxed - if the queue is empty it's shown right away, may cause tearing
+	// - eMailBox - also known as 'triple buffer, replaces item in queue if it's full. Is more energy demanding.
+	
+	// eFifo is always present.
+	assert(std::ranges::any_of(availablePresentModes, [](auto presentMode == ){return vk::PresentModeKHR::eFifo; }));
+	vk::PresentModeKHR presentMode = std::ranges::any_of(availablePresentModes, [](const vk::PresentModeKHR value) {return vk::PresentModeKHR::eMailbox == value; }) ? 
+	vk::PresentModeKHR::eMailbox :
+	vk::PresentModeKHR::eFifo;
+
+	// Swap extent
+	vk::Extent2D swapExtent;
+
+	if (surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()){
+		swapExtent = surfaceCapabilities.currentExtent;
+	}
+
+	int width, height;
+	SDL_Vulkan_GetDrawableSize(sdlWindow, &width, &height);
+
+	swapExtent = vk::Extent2D(
+		std::clamp<uint32_t>(width, surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width),
+	std::clamp<uint32_t>(height, surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height)
+	);
+
+	// image count - how many images to store in swapchain
+	auto minImageCount = std::max(3u, surfaceCapabilities.minImageCount);
+	if ((0 < surfaceCapabilities.maxImageCount) && (surfaceCapabilities.maxImageCount < minImageCount)){
+		minImageCount = surfaceCapabilities.maxImageCount;
+	}
+
+	vk::SwapchainCreateInfoKHR swapChainCreateInfo {
+	.surface = *vkMonsterStats.surface,
+	.minImageCount = minImageCount,
+	.imageFormat = surfaceFormat.format,
+	.imageColorSpace = surfaceFormat.colorSpace,
+	.imageExtent = swapExtent,
+	.imageArrayLayers = 1,
+	.imageUsage = vk::ImageUsageFlagBits::eColorAttachment,
+	.imageSharingMode = vk::SharingMode::eExclusive,
+	.preTransform = surfaceCapabilities.currentTransform,
+	.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
+	.presentMode = presentMode,
+	.clipped = true
+	};
+
+	// When the window is resized the swapchain must be created from scratch again
+	// It's left null for now
+	swapChainCreateInfo.oldSwapchain = nullptr;
+	
+	vkMonsterStats.swapChain = vk::raii::SwapchainKHR(vkMonsterStats.device, swapChainCreateInfo);
+	vkMonsterStats.swapChainImages = vkMonsterStats.swapChain.getImages();
 
 }

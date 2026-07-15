@@ -18,12 +18,12 @@ public:
 
 	PlayerSubject* playerSubject = nullptr;
 
-	Gui* gui;
+//	Gui* gui;
 
 	GDHandler(ResourceHandler* resourceHan_p, Monster* renderer, Feel* feel_p) : CaseHandler(renderer) {
 
 		// Init resources
-		ResourceHandler::GetInstance();
+//		ResourceHandler::GetInstance();
 
 		//PlayerInput* pInput = new PlayerInput();
 		//playerSubject = new PlayerSubject(monster->getCameraScnNode(), monster->getCamera(), pInput);

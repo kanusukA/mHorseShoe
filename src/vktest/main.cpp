@@ -1,7 +1,10 @@
 
-#include <GDHandler/GDHandler.h>
-#include <timer/glock.h>
-#include <cons.h>
+//#include <GDHandler/GDHandler.h>
+#include "Monster.h"
+#include "SDL3/SDL_events.h"
+#include "SDL3/SDL_oldnames.h"
+//#include <timer/glock.h>
+//#include <cons.h>
 
 
 
@@ -35,7 +38,7 @@ int main() {
 //	Monster* monster = new Monster(ctx.getRoot(),ctx.getRenderWindow(), ctx.getOverlaySystem(),imOverlay);
 	//setup materials to ogre
 	Monster* monster = new Monster();
-
+	monster->InitMonster();
 	std::cout << "Initializing kint" << std::endl;
 	//Kint* kint = new Kint();
 	
@@ -49,13 +52,13 @@ int main() {
 	/*kint = new Kint();
 	kint->InitPhysics();*/
 
-	Feel* feel = new Feel();
+	//Feel* feel = new Feel();
 
 
 //	feel->initFeel(monster->sdlWindow,
 	//GDHANDLER
 	
-	GDHandler* gdHandler = new GDHandler(ResourceHandler::GetInstance(),monster,feel); // TODO integrate Feel with GDHandler itself
+	//GDHandler* gdHandler = new GDHandler(ResourceHandler::GetInstance(),monster,feel); // TODO integrate Feel with GDHandler itself
 
 	//monster->setGrid();
 	
@@ -73,29 +76,39 @@ int main() {
 	double elapsed;
 	double deltaTime;
 
-	double lastTime = getCurrentTime();
+//	double lastTime = getCurrentTime();
 
 	std::cout << "loop started : " << std::endl;
-	
-	while (!InputHandler::GetInstance()->getInputKeys()->QUIT_KEY) {
 
-		startTime = getCurrentTime();
-		elapsed = startTime - lastTime;
-		deltaTime = elapsed / 100;
+	bool running = true;
+	SDL_Event event;
+	
+	while (/*!InputHandler::GetInstance()->getInputKeys()->QUIT_KEY*/ running) {
+
+		while (SDL_PollEvent(&event)) {
+		
+			if (event.type == SDL_EVENT_QUIT ) {
+			
+				running = false;
+			}
+		}
+//		startTime = getCurrentTime();
+//		elapsed = startTime - lastTime;
+//		deltaTime = elapsed / 100;
 
 		// Input / GUI Update
 		//gdHandler->update(deltaTime);
 
 		
-		renderTime = getCurrentTime();
+//		renderTime = getCurrentTime();
 
 
-		lastTime = startTime;
+//		lastTime = startTime;
 
-		if (startTime + MS_PER_FRAME > getCurrentTime()) {
+/*		if (startTime + MS_PER_FRAME > getCurrentTime()) {
 			Sleep(startTime + MS_PER_FRAME - getCurrentTime());
 		}
-	
+*/	
 
 	}
 

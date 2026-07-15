@@ -2,7 +2,7 @@
 
 
 
-void GDHandler::loadSavedCase() {
+/*void GDHandler::loadSavedCase() {
 	std::string loadfile = this->loadDefaultCase();
 	if (loadfile.empty())
 	{
@@ -24,7 +24,7 @@ void GDHandler::loadSavedCase() {
 		ToastComponent::GetInstance()->addMessage("Unable to open : " + this->resourceHandler->getDataDir().string() + "/" + loadfile);
 	}
 	
-}
+}*/
 
 //void GDHandler::setResources()
 //{
@@ -113,7 +113,7 @@ void GDHandler::update(float deltatime)
 {
 	feel->updateInput(deltatime);
 
-	if (playerSubject && this->getWindowState() == GDSun::IN_GAME)
+/*	if (playerSubject && this->getWindowState() == GDSun::IN_GAME)
 	{
 		playerSubject->updatePosition(deltatime);
 		playerSubject->updateRotation(deltatime);
@@ -129,7 +129,7 @@ void GDHandler::update(float deltatime)
 
 	monster->updateMonster();
 
-
+*/
 
 
 }

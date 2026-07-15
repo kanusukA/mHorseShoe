@@ -4,11 +4,11 @@
 
 std::unique_ptr<Case> CaseHandler::selectedCase;
 
-bool CaseHandler::resourceExists(std::string resourceName)
+/*bool CaseHandler::resourceExists(std::string resourceName)
 {
 	return Ogre::ResourceGroupManager::getSingleton().resourceExistsInAnyGroup(resourceName);
 }
-
+*/
 Case* CaseHandler::CreateCase(std::string caseName_p)
 {
 	Case* newCase = new Case(this, caseName_p);
@@ -23,7 +23,7 @@ Case* CaseHandler::CreateCase(std::string caseName_p, std::string filename_p)
 }
 
 
-Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType, Ogre::SceneNode* parentNode_p)
+/*Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType, Ogre::SceneNode* parentNode_p)
 {
 	if (this->sceneExists(scnName))
 	{
@@ -103,11 +103,11 @@ Ogre::MeshPtr CaseHandler::fetchMeshById(ResID meshID_p)
 
 	return nullptr;
 }
-
-Ogre::TexturePtr CaseHandler::fetchImageByName(std::filesystem::path imagePath_p)
+*/
+/*Ogre::TexturePtr CaseHandler::fetchImageByName(std::filesystem::path imagePath_p)
 {
-	/*this->monAddLocation(imagePath_p.parent_path(), OGRE_TEXTURE_GROUP);
-	this->monster->initalizeResourceGroup(OGRE_TEXTURE_GROUP);*/
+	this->monAddLocation(imagePath_p.parent_path(), OGRE_TEXTURE_GROUP);
+	this->monster->initalizeResourceGroup(OGRE_TEXTURE_GROUP);
 
 	// Duplicate Resource is checked!
 	return this->monGetTexture(imagePath_p.filename().string());
@@ -249,7 +249,7 @@ std::string CaseHandler::loadDefaultCase()
 
 
 
-}
+}*/
 
 
 

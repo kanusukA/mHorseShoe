@@ -1,11 +1,11 @@
 #include "GDHandler.h"
 
 void GDHandler::notifyLoadCase() {
-	std::cout << "Load case notified" << std::endl;
+//	std::cout << "Load case notified" << std::endl;
 	// LOAD GUI FRAMEWORK
-	gui->updateLoadCase();
+//	gui->updateLoadCase();
 }
 
 void GDHandler::notifySaveCase() {
-	std::cout << "Save case notified" << std::endl;
+//	std::cout << "Save case notified" << std::endl;
 }

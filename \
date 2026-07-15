@@ -15,16 +15,13 @@ endif()
 
 project ("mHorseShoee_C")
 message ("c build type ${CMAKE_CONFIGURATION_TYPES}")
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 
 
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
-if(MSVC)
-    add_compile_options(/Od )
-endif()
+add_compile_options(/Od )
+
 
 
 #set(CMAKE_CONFIGURATION_TYPES "Debug" CACHE STRING "" FORCE)
@@ -108,11 +105,12 @@ set(OGRE_INSTALL_TOOLS TRUE CACHE BOOL "" FORCE)
 #)
 
 
-#CPMADDPACKAGE(
-#	NAME ogre
-#	GIT_REPOSITORY "https://github.com/OGRECave/ogre"
-#	GIT_TAG "v14.5.2"	
-#)
+CPMADDPACKAGE(
+	NAME ogre
+	GIT_REPOSITORY "https://github.com/OGRECave/ogre"
+	GIT_TAG "v14.5.2"
+	
+)
 
 
 
@@ -161,58 +159,54 @@ FetchContent_MakeAvailable(sdl)
 
 
 set(SOURCES
-	#main.cpp
-	#src/imgui_stdlib.cpp
-	#	src/base/Mediator.cpp
-	#src/CaseHandler/CaseHandler.cpp
-	#src/CaseHandler/CaseSaver.cpp
-	#	src/feel/Feel.cpp
-	#src/feel/KeyHandler.cpp
-	#src/feel/Keys.cpp
-	#src/feel/playerMovement.cpp
-	#src/GDHandler/GDHandler.cpp
-	#src/GDHandler/GDContext.cpp
-	#src/GDHandler/GDNotifier.cpp
-	#src/GDHandler/GDNotifierHandler.cpp
-	#src/GDHandler/GDSystem.cpp
-	#src/GDHandler/ResourceHandler.cpp
+	main.cpp
+	src/imgui_stdlib.cpp
+	src/base/Mediator.cpp
+	src/CaseHandler/CaseHandler.cpp
+	src/CaseHandler/CaseSaver.cpp
+	src/feel/Feel.cpp
+	src/feel/KeyHandler.cpp
+	src/feel/Keys.cpp
+	src/feel/playerMovement.cpp
+	src/GDHandler/GDHandler.cpp
+	src/GDHandler/GDContext.cpp
+	src/GDHandler/GDNotifier.cpp
+	src/GDHandler/GDNotifierHandler.cpp
+	src/GDHandler/GDSystem.cpp
+	src/GDHandler/ResourceHandler.cpp
 	
-	#src/Gui/Gui.cpp
-	#src/Gui/GuiButtons.cpp
-	#src/Gui/GuiTabs.cpp
-	#src/Gui/GuiComponents/AddTabComponent.cpp
+	src/Gui/Gui.cpp
+	src/Gui/GuiButtons.cpp
+	src/Gui/GuiTabs.cpp
+	src/Gui/GuiComponents/AddTabComponent.cpp
 	
-	#src/Gui/GuiComponents/ObjectTabComponent.cpp
-	#src/Gui/GuiComponents/ResourceTabComponent.cpp
-	#src/Gui/GuiComponents/RSUSTabComponent.cpp
-	#src/Gui/GuiComponents/StatusTabComponent.cpp
-	#src/Gui/GuiComponents/ToastComponent.cpp
-	#src/Gui/GuiComponents/ToastTabComponent.cpp
-	#src/Gui/GuiComponents/_SceneTabComponent.cpp
-	#src/monster/Monster.cpp
-	#src/ResourceHandler/ResourceLoader.cpp
+	src/Gui/GuiComponents/ObjectTabComponent.cpp
+	src/Gui/GuiComponents/ResourceTabComponent.cpp
+	src/Gui/GuiComponents/RSUSTabComponent.cpp
+	src/Gui/GuiComponents/StatusTabComponent.cpp
+	src/Gui/GuiComponents/ToastComponent.cpp
+	src/Gui/GuiComponents/ToastTabComponent.cpp
+	src/Gui/GuiComponents/_SceneTabComponent.cpp
+	src/monster/Monster.cpp
+	src/ResourceHandler/ResourceLoader.cpp
 	
-	#src/ResourceHandler/ResourceObjects.cpp
-	#src/ResourceHandler/ResourceReader.cpp
-	#src/ResourceHandler/ResourceSaver.cpp
-	#src/Stuffs/CaseObject.cpp
-	#src/Stuffs/ColliderMesh.cpp
-	#src/Stuffs/EntityObject.cpp
-	#src/Stuffs/ImageObject.cpp
-	#src/Stuffs/Material.cpp
-	#src/Stuffs/RenderMesh.cpp
-	#src/Stuffs/SceneObject.cpp
-	#src/Stuffs/ShaderObject.cpp
-	#src/timer/glock.cpp
-	src/vktest/main.cpp
-	src/vktest/Monster.cpp
-	src/vktest/MonsterSDL.cpp
-	src/vktest/MonsterVulkan.cpp
-
+	src/ResourceHandler/ResourceObjects.cpp
+	src/ResourceHandler/ResourceReader.cpp
+	src/ResourceHandler/ResourceSaver.cpp
+	src/Stuffs/CaseObject.cpp
+	src/Stuffs/ColliderMesh.cpp
+	src/Stuffs/EntityObject.cpp
+	src/Stuffs/ImageObject.cpp
+	src/Stuffs/Material.cpp
+	src/Stuffs/RenderMesh.cpp
+	src/Stuffs/SceneObject.cpp
+	src/Stuffs/ShaderObject.cpp
+	src/timer/glock.cpp
+	
 	
 )
 
-add_executable(mHorseShoee ${SOURCES} )
+add_executable(mHorseShoee ${SOURCES} "src/monster/MonsterCreator.cpp" "src/monster/MonsterRSUS.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterVulkan.cpp" "src/monster/VulkanStats.h")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 
@@ -234,7 +228,7 @@ target_include_directories(mHorseShoee PRIVATE "${Vulkan_INCLUDE_DIR}")
 #set_target_properties(mHorseShoee PROPERTIES CXX_STANDARD 20)
 
 
-target_include_directories(mHorseShoee PUBLIC "src/vktest" )
+target_include_directories(mHorseShoee PUBLIC "src/" )
 
 target_link_libraries(mHorseShoee PRIVATE glm::glm)
 

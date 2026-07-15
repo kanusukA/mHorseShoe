@@ -17,16 +17,16 @@ public:
 
 class Key {
 protected:
-	GDBuilderContext* builderCxt;
+//	GDBuilderContext* builderCxt;
 	HeldKeys* heldkeys;
 
 	SDL_Keycode SDL_Key;
 
 
 public:
-	Key(GDBuilderContext* builderCxt_p, SDL_Keycode SDL_Key_p, HeldKeys* heldKeys_p) {
+	Key(/*GDBuilderContext* builderCxt_p,*/ SDL_Keycode SDL_Key_p, HeldKeys* heldKeys_p) {
 		heldkeys = heldKeys_p;
-		builderCxt = builderCxt_p;
+//		builderCxt = builderCxt_p;
 		SDL_Key = SDL_Key_p;
 		
 	}
@@ -53,14 +53,14 @@ private:
 	bool state;
 	bool lock = false;
 public:
-	FullScreenKey(GDBuilderContext* builderCxt_p, HeldKeys* heldKeys, bool state_p = true) : Key(builderCxt_p,SDLK_F,heldKeys) {
+	FullScreenKey(/*GDBuilderContext* builderCxt_p,*/ HeldKeys* heldKeys, bool state_p = true) : Key(/*builderCxt_p,*/SDLK_F,heldKeys) {
 		state = state_p;
 	}
 
 	void click(SDL_EventType key_evnt) override {
 		if(!lock){
 			state = !state;
-			this->builderCxt->setFullScreen(state);
+//			this->builderCxt->setFullScreen(state);
 			lock = true;
 		}
 		if (key_evnt == SDL_EVENT_KEY_UP)
@@ -76,14 +76,14 @@ private:
 	bool state; 
 	bool lock = false;
 public:
-	HideGuiKey(GDBuilderContext* builderCxt_p, HeldKeys* heldKeys, bool state_p = true) : Key(builderCxt_p, SDLK_H, heldKeys) {
+	HideGuiKey(/*GDBuilderContext* builderCxt_p,*/ HeldKeys* heldKeys, bool state_p = true) : Key(/*builderCxt_p,*/ SDLK_H, heldKeys) {
 		state = state_p;
 	}
 
 	void click(SDL_EventType key_evnt) override {
 		if (!lock) {
 			state = !state;
-			this->builderCxt->setGuiVisibility(state);
+		//	this->builderCxt->setGuiVisibility(state);
 			lock = true;
 		}
 		if (key_evnt == SDL_EVENT_KEY_UP)
@@ -99,7 +99,7 @@ private:
 	bool state;
 	bool lock = false;
 public:
-	CheckFunctionKey(GDBuilderContext* builderCxt_p, HeldKeys* heldKeys, bool state_p = true) : Key(builderCxt_p, SDLK_H,heldKeys) {
+	CheckFunctionKey(/*GDBuilderContext* builderCxt_p,*/ HeldKeys* heldKeys, bool state_p = true) : Key(/*builderCxt_p,*/ SDLK_H,heldKeys) {
 		state = state_p;
 	}
 
@@ -107,8 +107,8 @@ public:
 		if (!lock) {
 			state = !state;
 			
-			ToastComponent::GetInstance()->addMessage("Width : " + std::to_string(*builderCxt->getWindowSize()->width));
-			ToastComponent::GetInstance()->addMessage("Height : " + std::to_string(*builderCxt->getWindowSize()->height));
+		//	ToastComponent::GetInstance()->addMessage("Width : " + std::to_string(*builderCxt->getWindowSize()->width));
+		//	ToastComponent::GetInstance()->addMessage("Height : " + std::to_string(*builderCxt->getWindowSize()->height));
 
 			lock = true;
 		}
@@ -126,7 +126,7 @@ private:
 	bool state;
 	bool lock = false;
 public:
-	WinStateKey(GDBuilderContext* builderCxt_p, HeldKeys* heldKeys, bool state_p = true) : Key(builderCxt_p, SDLK_G,heldKeys) {
+	WinStateKey(/*GDBuilderContext* builderCxt_p,*/ HeldKeys* heldKeys, bool state_p = true) : Key(/*builderCxt_p,*/ SDLK_G,heldKeys) {
 		state = state_p;
 	}
 
@@ -154,7 +154,7 @@ public:
 
 // PLAYER MOVEMENT KEYS -----------------------------------------------------------------
 
-class CamForwardKey : public Key {
+/*class CamForwardKey : public Key {
 private:
 	PlayerInput* input;
 
@@ -232,4 +232,4 @@ public:
 		}
 	}
 
-};
+};*/
