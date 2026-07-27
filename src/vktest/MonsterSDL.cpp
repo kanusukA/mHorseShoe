@@ -25,10 +25,10 @@ void Monster::InitSDLWindow() {
 //		ToastComponent::GetInstance()->addMessage("Unable to create SDL Window!");
 		return;
 	}
-	SDL_Renderer* renderer = SDL_CreateRenderer(sdlWindow, NULL);
+	/*SDL_Renderer* renderer = SDL_CreateRenderer(sdlWindow, NULL);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
-	SDL_RenderPresent(renderer);
+	SDL_RenderPresent(renderer);*/
 
 
 }

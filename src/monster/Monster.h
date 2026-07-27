@@ -36,6 +36,8 @@
 #include <random>
 #include <cons.h>
 
+#include <map>
+
 
 //const Ogre::String TRAY_SYSTEM_NAME = "Default_Tray_Man";
 

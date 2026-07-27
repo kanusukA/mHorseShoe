@@ -16,9 +16,18 @@ struct VulkanStatus {
 	vk::raii::PhysicalDevice gpuDevice = nullptr;   
 	vk::raii::Queue graphicsQueue = nullptr;
 	vk::raii::SurfaceKHR surface = nullptr;
-	vk::raii::SwapchainKHR swapChain;
+	vk::raii::SwapchainKHR swapChain = nullptr;
+	vk::raii::Pipeline graphicsPipeline = nullptr;
+	vk::SurfaceFormatKHR swapChainSurfaceFormat;
+	vk::Extent2D swapChainExtent;
 	
 	std::vector<vk::Image> swapChainImages;
+	std::vector<vk::raii::ImageView> swapChainImageViews;
+
+	uint32_t queueIndex;
+
+	vk::raii::CommandPool commandPool = nullptr;
+	vk::raii::CommandBuffer commandBuffer = nullptr;
 
 	bool vulkanInitalized = false;
 

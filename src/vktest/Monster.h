@@ -17,6 +17,7 @@
 //#include <GDHandler/ResourceHandler.h>
 
 #include "VulkanStats.h"
+#include <VulkanReader.h>
 
 // Third-party header
 #include <SDL3/SDL.h>
@@ -30,6 +31,7 @@
 
 // STL headers
 #if defined (_WIN32)
+	#define NOMINMAX 
 	#include <Windows.h>
 #endif
 #include <stdio.h>
@@ -55,6 +57,8 @@
 #define ROUGH_TEX_NAME "Roughness"
 #define NORMAL_TEX_NAME "NormalMap"
 #define PARALLAX_TEX_NAME "DisplacementMap"
+
+
 
 
 struct MainDirectionalLight
@@ -216,7 +220,25 @@ private:
 	void pickVulkanPhysicalDevice();
 	void createVulkanDevice();
 	void createSwapchain();
+	void createImageView();
+	void createGraphicsPipeline();
+	void createCommandPool();
+	void createCommandBuffer();
 
+	void transition_image_layout(
+		uint32_t imageIndex,
+		vk::ImageLayout old_layout,
+		vk::ImageLayout new_layout,
+		vk::AccessFlags2 src_access_mask,
+		vk::AccessFlags2 dst_access_mask,
+		vk::PipelineStageFlags2 src_stage_mask,
+		vk::PipelineStageFlags2 dst_stage_mask
+	);
+
+	// Shader
+	vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;
+
+	void recordCommandBuffer(uint32_t imageIndex);
 	
 
 public:

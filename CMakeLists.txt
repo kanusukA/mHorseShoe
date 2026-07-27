@@ -209,10 +209,11 @@ set(SOURCES
 	src/vktest/MonsterSDL.cpp
 	src/vktest/MonsterVulkan.cpp
 
+
 	
 )
 
-add_executable(mHorseShoee ${SOURCES} )
+add_executable(mHorseShoee ${SOURCES}  "src/vktest/VulkanReader.h")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 

@@ -3,6 +3,7 @@
 #include "vulkan/vulkan.hpp"
 #include "vulkan/vulkan_core.h"
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <map>
 
@@ -14,12 +15,17 @@
 
 void Monster::InitVulkan() {
 
+	std::cout << "Initalizing Vulkan" << std::endl;
+
 	createVulkanInstance();
 	createVulkanSurface();
 	pickVulkanPhysicalDevice();
 	createVulkanDevice();
 	createSwapchain();
-        
+	createImageView();
+	createGraphicsPipeline();
+	createCommandPool();
+	createCommandBuffer();
 
 }
 
@@ -218,7 +224,7 @@ void Monster::createVulkanDevice() {
 	float queuePriority = 0.5f;
 	
 	vk::DeviceQueueCreateInfo deviceQueueCreateInfo{ .queueFamilyIndex = queueIndex, .queueCount = 1, .pQueuePriorities = &queuePriority };
-
+	vkMonsterStats.queueIndex = queueIndex;
 	
 	// Define device Features to be used - as in InitVulkan
 	// using StructrueChain - refer to Docs https://docs.vulkan.org/tutorial/latest/03_Drawing_a_triangle/00_Setup/04_Logical_device_and_queues.html
@@ -287,7 +293,7 @@ void Monster::createSwapchain(){
 			availableFormats,
 			[](const auto &format) {return format.format == vk::Format::eB8G8R8A8Srgb && format.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear;});
 	
-	vk::SurfaceFormatKHR surfaceFormat = formatIt != availableFormats.end() ? *formatIt : availableFormats[0];
+	vkMonsterStats.swapChainSurfaceFormat = formatIt != availableFormats.end() ? *formatIt : availableFormats[0];
 
 	// Present mode
 	// There are foure possible modes in vulkan
@@ -303,22 +309,22 @@ void Monster::createSwapchain(){
 	vk::PresentModeKHR::eFifo;
 
 	// Swap extent
-	vk::Extent2D swapExtent;
 
-	if (surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()){
-		swapExtent = surfaceCapabilities.currentExtent;
+	if (surfaceCapabilities.currentExtent.width != (std::numeric_limits<uint32_t>::max)()) {
+		vkMonsterStats.swapChainExtent = surfaceCapabilities.currentExtent;
 	}
 
 	int width, height;
-	SDL_Vulkan_GetDrawableSize(sdlWindow, &width, &height);
+	SDL_GetWindowSizeInPixels(sdlWindow, &width, &height);
+	
 
-	swapExtent = vk::Extent2D(
+	vkMonsterStats.swapChainExtent = vk::Extent2D(
 		std::clamp<uint32_t>(width, surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width),
 	std::clamp<uint32_t>(height, surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height)
 	);
 
 	// image count - how many images to store in swapchain
-	auto minImageCount = std::max(3u, surfaceCapabilities.minImageCount);
+	auto minImageCount = (std::max)(3u, surfaceCapabilities.minImageCount);
 	if ((0 < surfaceCapabilities.maxImageCount) && (surfaceCapabilities.maxImageCount < minImageCount)){
 		minImageCount = surfaceCapabilities.maxImageCount;
 	}
@@ -326,9 +332,9 @@ void Monster::createSwapchain(){
 	vk::SwapchainCreateInfoKHR swapChainCreateInfo {
 	.surface = *vkMonsterStats.surface,
 	.minImageCount = minImageCount,
-	.imageFormat = surfaceFormat.format,
-	.imageColorSpace = surfaceFormat.colorSpace,
-	.imageExtent = swapExtent,
+	.imageFormat = vkMonsterStats.swapChainSurfaceFormat.format,
+	.imageColorSpace = vkMonsterStats.swapChainSurfaceFormat.colorSpace,
+	.imageExtent = vkMonsterStats.swapChainExtent,
 	.imageArrayLayers = 1,
 	.imageUsage = vk::ImageUsageFlagBits::eColorAttachment,
 	.imageSharingMode = vk::SharingMode::eExclusive,
@@ -340,9 +346,225 @@ void Monster::createSwapchain(){
 
 	// When the window is resized the swapchain must be created from scratch again
 	// It's left null for now
-	swapChainCreateInfo.oldSwapchain = nullptr;
+	//swapChainCreateInfo.oldSwapchain = nullptr;
 	
 	vkMonsterStats.swapChain = vk::raii::SwapchainKHR(vkMonsterStats.device, swapChainCreateInfo);
 	vkMonsterStats.swapChainImages = vkMonsterStats.swapChain.getImages();
 
+}
+
+void Monster::createImageView() {
+
+	assert(vkMonsterStats.swapChainImages.empty());
+
+	vk::ImageViewCreateInfo imageViewCreateInfo{
+		.viewType = vk::ImageViewType::e2D,
+		.format = vkMonsterStats.swapChainSurfaceFormat.format,
+		.subresourceRange = {
+			vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1
+			}
+	};
+
+	imageViewCreateInfo.components = {
+		vk::ComponentSwizzle::eIdentity,vk::ComponentSwizzle::eIdentity,vk::ComponentSwizzle::eIdentity,vk::ComponentSwizzle::eIdentity
+	};
+
+	for (const auto &image : vkMonsterStats.swapChainImages)
+	{
+		imageViewCreateInfo.image = image;
+		vkMonsterStats.swapChainImageViews.emplace_back(vkMonsterStats.device, imageViewCreateInfo);
+	}
+}
+
+[[nodiscard]] vk::raii::ShaderModule Monster::createShaderModule(const std::vector<char>& code) const {
+
+	vk::ShaderModuleCreateInfo shaderModuleCreateInfo{
+		.codeSize = code.size() * sizeof(char),
+		.pCode = reinterpret_cast<const uint32_t*>(code.data())
+	};
+
+	vk::raii::ShaderModule shaderModule{ vkMonsterStats.device, shaderModuleCreateInfo };
+	return shaderModule;
+
+}
+
+void Monster::createGraphicsPipeline() {
+
+	auto shaderCode = readShaderFile("C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/vktest/shaders/triangle.spv");
+
+	vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
+
+	vk::PipelineShaderStageCreateInfo vertexShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eVertex, .module = shaderModule, .pName = "vertMain" };
+
+	vk::PipelineShaderStageCreateInfo fragShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eFragment, .module = shaderModule, .pName = "fragMain" };
+
+	vk::PipelineShaderStageCreateInfo ShaderStages[] = { vertexShaderStageCreateInfo,fragShaderStageCreateInfo };
+
+	// Dynamic state
+	std::vector<vk::DynamicState> dynamicStates{ vk::DynamicState::eViewport, vk::DynamicState::eScissor };
+	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
+
+		// vertex input
+	vk::PipelineVertexInputStateCreateInfo vertexInputCreateInfo;
+	vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo{ .topology = vk::PrimitiveTopology::eTriangleList };
+
+		// viewport - screen size being rendered
+		// scissor - crop on that viewport
+	vk::Viewport viewport{ 0.0f,0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f };
+	vk::Rect2D scissor{ vk::Offset2D(0.0f,0.0f), vkMonsterStats.swapChainExtent };
+
+	vk::PipelineViewportStateCreateInfo viewportCreateStateInfo{ .viewportCount = 1, .pViewports = &viewport, .scissorCount = 1, .pScissors = &scissor };
+
+	
+	// RASTERIZER
+
+	vk::PipelineRasterizationStateCreateInfo rasterizer{
+		.depthClampEnable = false,
+		.rasterizerDiscardEnable = false,
+		.polygonMode = vk::PolygonMode::eFill,
+		.cullMode = vk::CullModeFlagBits::eBack,
+		.frontFace = vk::FrontFace::eClockwise,
+		.depthBiasEnable = false,
+		.lineWidth = 1.0f
+	};
+
+
+	// MULTISAMPLING
+	vk::PipelineMultisampleStateCreateInfo multisampleCreateInfo{ .rasterizationSamples = vk::SampleCountFlagBits::e1, .sampleShadingEnable = false };
+
+	// Color-blending
+	vk::PipelineColorBlendAttachmentState colorBlendState{ 
+		.blendEnable = false, 
+		.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA 
+	};
+
+
+	vk::PipelineColorBlendStateCreateInfo colorBlendInfo{
+		.logicOpEnable = false,
+		.logicOp = vk::LogicOp::eCopy,
+		.attachmentCount = 1,
+		.pAttachments = &colorBlendState
+	};
+
+	vk::raii::PipelineLayout pipelineLayout = nullptr;
+
+	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ .setLayoutCount = 0, .pushConstantRangeCount = 0 };
+
+	pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
+
+
+	vk::PipelineRenderingCreateInfo renderingCreateInfo{
+		.colorAttachmentCount = 1,
+		.pColorAttachmentFormats = &vkMonsterStats.swapChainSurfaceFormat.format
+	};
+
+	vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo{
+		.stageCount = 2,
+		.pStages = ShaderStages,
+		.pVertexInputState = &vertexInputCreateInfo,
+		.pInputAssemblyState = &inputAssemblyStateCreateInfo,
+		.pViewportState = &viewportCreateStateInfo,
+		.pRasterizationState = &rasterizer,
+		.pMultisampleState = &multisampleCreateInfo,
+		.pColorBlendState = &colorBlendInfo,
+		.pDynamicState = &dynamicStateCreateInfo,
+		.layout = pipelineLayout,
+		.renderPass = nullptr
+	};
+
+	vk::StructureChain<vk::GraphicsPipelineCreateInfo, vk::PipelineRenderingCreateInfo> pipelineCreateInfoChain = {
+		graphicsPipelineCreateInfo,
+		renderingCreateInfo
+	};
+
+
+	vkMonsterStats.graphicsPipeline = vk::raii::Pipeline(vkMonsterStats.device, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
+
+
+}
+
+void Monster::createCommandPool() {
+	vk::CommandPoolCreateInfo poolInfo{
+		.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+		.queueFamilyIndex = vkMonsterStats.queueIndex
+	};
+
+	vkMonsterStats.commandPool = vk::raii::CommandPool(vkMonsterStats.device, poolInfo);
+
+}
+
+void Monster::createCommandBuffer() {
+
+	vk::CommandBufferAllocateInfo allocInfo{
+		.commandPool = vkMonsterStats.commandPool,
+		.level = vk::CommandBufferLevel::ePrimary,
+		.commandBufferCount = 1
+	};
+
+	vkMonsterStats.commandBuffer = std::move(vk::raii::CommandBuffers(vkMonsterStats.device, allocInfo).front());
+
+};
+
+void Monster::transition_image_layout(
+	uint32_t imageIndex,
+	vk::ImageLayout old_layout,
+	vk::ImageLayout new_layout,
+	vk::AccessFlags2 src_access_mask,
+	vk::AccessFlags2 dst_access_mask,
+	vk::PipelineStageFlags2 src_stage_mask,
+	vk::PipelineStageFlags2 dst_stage_mask
+) {
+	vk::ImageMemoryBarrier2 barriar = {
+		.srcStageMask = src_stage_mask,
+		.srcAccessMask = src_access_mask,
+		.dstStageMask = dst_stage_mask,
+		.dstAccessMask = dst_access_mask,
+		.oldLayout = old_layout,
+		.newLayout = new_layout,
+		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.image = vkMonsterStats.swapChainImages[imageIndex],
+		.subresourceRange = {
+			.aspectMask = vk::ImageAspectFlagBits::eColor,
+			.baseMipLevel = 0,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1} };
+
+	vk::DependencyInfo dependency_info = {
+		.dependencyFlags = {},
+		.imageMemoryBarrierCount = 1,
+		.pImageMemoryBarriers = &barriar
+	};
+
+	vkMonsterStats.commandBuffer.pipelineBarrier2(dependency_info);
+
+}
+
+void Monster::recordCommandBuffer(uint32_t imageIndex) {
+	vkMonsterStats.commandBuffer.begin({});
+
+	transition_image_layout(
+		imageIndex,
+		vk::ImageLayout::eUndefined,
+		vk::ImageLayout::eColorAttachmentOptimal,
+		{},
+		vk::AccessFlagBits2::eColorAttachmentWrite,
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput
+	);
+
+
+	vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f);
+
+	vk::RenderingAttachmentInfo attachmentInfo = {
+		.imageView = vkMonsterStats.swapChainImageViews[imageIndex],
+		.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+		.loadOp = vk::AttachmentLoadOp::eClear,
+		.storeOp = vk::AttachmentStoreOp::eStore,
+		.clearValue = clearColor
+
+	};
+
+	
 }
