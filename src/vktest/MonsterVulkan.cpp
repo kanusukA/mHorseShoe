@@ -1,7 +1,6 @@
 #include "Monster.h"
-#include "SDL3/SDL_vulkan.h"
-#include "vulkan/vulkan.hpp"
-#include "vulkan/vulkan_core.h"
+
+
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -11,6 +10,78 @@
 #include <limits.h>
 
 
+
+void Monster::renderFrame() {
+
+	auto fenceResult = vkMonsterStats.device.waitForFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex], true, UINT64_MAX);
+	if (fenceResult != vk::Result::eSuccess)
+	{
+		throw std::runtime_error("failed to wait for fence!");
+	}
+	
+	auto [result, imageIndex] = vkMonsterStats.swapChain.acquireNextImage(UINT64_MAX, *vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex], nullptr);
+
+	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || framebufferResized)
+	{
+		framebufferResized = false;
+		recreateSwapChain();
+		return;
+	}
+	if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR)
+	{
+		throw std::runtime_error("failed to acquire swapchain");
+	}
+
+	vkMonsterStats.device.resetFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].reset();
+	recordCommandBuffer(imageIndex);
+
+	// submitting command buffer
+	vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
+
+	const vk::SubmitInfo submitInfo{
+		.waitSemaphoreCount = 1,
+		.pWaitSemaphores = &*vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex],
+		.pWaitDstStageMask = &waitDestinationStageMask,
+		.commandBufferCount = 1,
+		.pCommandBuffers = &*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
+		.signalSemaphoreCount = 1,
+		.pSignalSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex]
+	};
+
+	vkMonsterStats.graphicsQueue.submit(submitInfo, *vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
+
+	// SUBPASSES ARE OPTIONAL. GET MORE DETAIL.
+
+	/*vk::SubpassDependency dependency{
+		.srcSubpass = vk::SubpassExternal,
+		.dstSubpass = 0,
+		.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput,
+		.dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput,
+		.srcAccessMask = vk::AccessFlagBits::eNone,
+		.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite
+	};*/
+
+	const vk::PresentInfoKHR presentInfoKHR{
+		.waitSemaphoreCount = 1,
+		.pWaitSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex],
+		.swapchainCount = 1,
+		.pSwapchains = &*vkMonsterStats.swapChain,
+		.pImageIndices = &imageIndex
+	};
+
+	auto presentResult = vkMonsterStats.graphicsQueue.presentKHR(presentInfoKHR);
+	if ((presentResult == vk::Result::eSuboptimalKHR) || (presentResult == vk::Result::eErrorOutOfDateKHR) || framebufferResized)
+	{
+		framebufferResized = false;
+		recreateSwapChain();
+	}
+
+	vkMonsterStats.frameIndex = (vkMonsterStats.frameIndex + 1) % MAX_FRAMES_IN_FLIGHT;
+
+
+}
 
 
 void Monster::InitVulkan() {
@@ -25,7 +96,10 @@ void Monster::InitVulkan() {
 	createImageView();
 	createGraphicsPipeline();
 	createCommandPool();
+	createVertexBuffer();
 	createCommandBuffer();
+	createSyncObjects();
+
 
 }
 
@@ -341,7 +415,8 @@ void Monster::createSwapchain(){
 	.preTransform = surfaceCapabilities.currentTransform,
 	.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
 	.presentMode = presentMode,
-	.clipped = true
+	.clipped = true,
+	.oldSwapchain = nullptr
 	};
 
 	// When the window is resized the swapchain must be created from scratch again
@@ -405,7 +480,14 @@ void Monster::createGraphicsPipeline() {
 	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
 
 		// vertex input
-	vk::PipelineVertexInputStateCreateInfo vertexInputCreateInfo;
+	auto bindingDescription = Vertex::getBindingDescription();
+	auto attributeDescription = Vertex::getAttributeDescriptions();
+	vk::PipelineVertexInputStateCreateInfo vertexInputCreateInfo{
+		.vertexBindingDescriptionCount = 1,
+		.pVertexBindingDescriptions = &bindingDescription,
+		.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescription.size()),
+		.pVertexAttributeDescriptions = attributeDescription.data()
+	};
 	vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo{ .topology = vk::PrimitiveTopology::eTriangleList };
 
 		// viewport - screen size being rendered
@@ -493,15 +575,21 @@ void Monster::createCommandPool() {
 
 }
 
+void Monster::createVertexBuffer() {
+	vk::BufferCreateInfo bufferInfo{
+		//.size = sizeof()
+	}
+}
+
 void Monster::createCommandBuffer() {
 
 	vk::CommandBufferAllocateInfo allocInfo{
 		.commandPool = vkMonsterStats.commandPool,
 		.level = vk::CommandBufferLevel::ePrimary,
-		.commandBufferCount = 1
+		.commandBufferCount = MAX_FRAMES_IN_FLIGHT
 	};
 
-	vkMonsterStats.commandBuffer = std::move(vk::raii::CommandBuffers(vkMonsterStats.device, allocInfo).front());
+	vkMonsterStats.commandBuffers = std::move(vk::raii::CommandBuffers(vkMonsterStats.device, allocInfo));
 
 };
 
@@ -537,12 +625,13 @@ void Monster::transition_image_layout(
 		.pImageMemoryBarriers = &barriar
 	};
 
-	vkMonsterStats.commandBuffer.pipelineBarrier2(dependency_info);
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].pipelineBarrier2(dependency_info);
 
 }
 
 void Monster::recordCommandBuffer(uint32_t imageIndex) {
-	vkMonsterStats.commandBuffer.begin({});
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].begin({});
 
 	transition_image_layout(
 		imageIndex,
@@ -566,5 +655,68 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
 	};
 
+	vk::RenderingInfo renderingInfo = {
+		.renderArea = {.offset = {0, 0}, .extent = vkMonsterStats.swapChainExtent},
+		.layerCount = 1,
+		.colorAttachmentCount = 1,
+		.pColorAttachments = &attachmentInfo
+	};
+
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingInfo);
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, *vkMonsterStats.graphicsPipeline);
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].draw(3, 1, 0, 0);
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
+
+	transition_image_layout(
+		imageIndex,
+		vk::ImageLayout::eColorAttachmentOptimal,
+		vk::ImageLayout::ePresentSrcKHR,
+		vk::AccessFlagBits2::eColorAttachmentWrite,
+		{},
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+		vk::PipelineStageFlagBits2::eBottomOfPipe
+	);
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].end();
+
 	
+}
+
+
+void Monster::createSyncObjects() {
+	for (size_t i = 0; i < vkMonsterStats.swapChainImages.size(); i++)
+	{
+		vkSyncStats.renderFinishedSemaphores.emplace_back(vkMonsterStats.device, vk::SemaphoreCreateInfo());
+	}
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		vkSyncStats.presentCompleteSemaphores.emplace_back(vkMonsterStats.device, vk::SemaphoreCreateInfo());
+		vkSyncStats.inFlightFences.emplace_back(vkMonsterStats.device, vk::FenceCreateInfo{ .flags = vk::FenceCreateFlagBits::eSignaled });
+	}
+
+}
+
+void Monster::cleanupSwapChain() {
+	vkMonsterStats.swapChainImages.clear();
+	vkMonsterStats.swapChainImageViews.clear();
+	vkMonsterStats.swapChain = nullptr;
+
+}
+
+
+void Monster::recreateSwapChain() {
+	vkMonsterStats.device.waitIdle();
+
+	cleanupSwapChain();
+
+	createSwapchain();
+	createImageView();
+
 }

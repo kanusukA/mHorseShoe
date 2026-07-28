@@ -86,12 +86,19 @@ int main() {
 	while (/*!InputHandler::GetInstance()->getInputKeys()->QUIT_KEY*/ running) {
 
 		while (SDL_PollEvent(&event)) {
+
+			if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED)
+			{
+				monster->framebufferResized = true;
+			}
 		
 			if (event.type == SDL_EVENT_QUIT ) {
 			
 				running = false;
 			}
 		}
+
+		monster->renderFrame();
 //		startTime = getCurrentTime();
 //		elapsed = startTime - lastTime;
 //		deltaTime = elapsed / 100;

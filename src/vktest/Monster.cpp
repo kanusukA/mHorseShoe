@@ -456,6 +456,7 @@ void Monster::_setupRTShader() {
 */
 void Monster::Shutdown()
 {
+	vkMonsterStats.device.waitIdle();
 	ShutdownSDL();
 }
 /*

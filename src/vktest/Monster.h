@@ -29,6 +29,8 @@
 //#include <imgui_spectrum.h>
 //#include <PxPhysicsAPI.h>
 
+#define VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS
+
 // STL headers
 #if defined (_WIN32)
 	#define NOMINMAX 
@@ -59,6 +61,9 @@
 #define PARALLAX_TEX_NAME "DisplacementMap"
 
 
+
+// VULKAN
+constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 
 struct MainDirectionalLight
@@ -213,6 +218,9 @@ private:
 
 	// VULKAN INIT
 	VulkanStatus vkMonsterStats = VulkanStatus();
+	VulkanSync vkSyncStats = VulkanSync();
+
+
 	
 	// vulkan Init
 	void createVulkanInstance();
@@ -224,6 +232,8 @@ private:
 	void createGraphicsPipeline();
 	void createCommandPool();
 	void createCommandBuffer();
+	void createVertexBuffer();
+	void createSyncObjects();
 
 	void transition_image_layout(
 		uint32_t imageIndex,
@@ -239,10 +249,13 @@ private:
 	vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;
 
 	void recordCommandBuffer(uint32_t imageIndex);
+
+	void recreateSwapChain();
+	void cleanupSwapChain();
 	
 
 public:
-
+	bool framebufferResized = false;
 	bool window_fullScreen = false;
 	SDL_Window* sdlWindow;
 
@@ -263,12 +276,16 @@ public:
 
 	void InitMonster();
 
+
 	// SDL CLASSES
 	void InitSDLWindow();
 	void ShutdownSDL();
 
 	// Vulkan
 	void InitVulkan();
+	
+
+	void renderFrame();
 
 /*	void setShadowTechnique();
 
