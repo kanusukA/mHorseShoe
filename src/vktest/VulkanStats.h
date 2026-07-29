@@ -6,12 +6,15 @@
 	#define VK_USE_PLATFORM_WIN32_KHR
 #endif
 
+
+
 #include "vulkan/vulkan.hpp"
 #include "vulkan/vulkan_core.h"
 
 #define VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS
 #include <vulkan/vulkan_raii.hpp>
 
+#include <vk_mem_alloc.h>
 
 #include <glm/glm.hpp>
 
@@ -71,4 +74,14 @@ struct VulkanSync {
 	std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
 	std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
 	std::vector<vk::raii::Fence> inFlightFences;
+};
+
+struct VulkanMemAlloc {
+	VmaAllocator vmaAllocator;
+
+	vk::raii::Buffer vertexBuffer = nullptr;
+	VmaAllocation vertexBufferAlloc;
+	vk::raii::Buffer indexBuffer = nullptr;
+	VmaAllocation indexBufferAlloc;
+
 };

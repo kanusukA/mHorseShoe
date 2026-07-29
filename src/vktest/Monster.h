@@ -29,7 +29,7 @@
 //#include <imgui_spectrum.h>
 //#include <PxPhysicsAPI.h>
 
-#define VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS
+
 
 // STL headers
 #if defined (_WIN32)
@@ -218,22 +218,27 @@ private:
 
 	// VULKAN INIT
 	VulkanStatus vkMonsterStats = VulkanStatus();
+	VulkanMemAlloc vkMemAlloc = VulkanMemAlloc();
 	VulkanSync vkSyncStats = VulkanSync();
 
 
-	
 	// vulkan Init
 	void createVulkanInstance();
 	void createVulkanSurface();
 	void pickVulkanPhysicalDevice();
 	void createVulkanDevice();
+	void createVulkanMemAllocator();
 	void createSwapchain();
 	void createImageView();
 	void createGraphicsPipeline();
 	void createCommandPool();
 	void createCommandBuffer();
 	void createVertexBuffer();
+	void createIndexBuffer(); 
 	void createSyncObjects();
+
+	std::pair<VkBuffer, VmaAllocation> createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage);
+	void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize bufferSize);
 
 	void transition_image_layout(
 		uint32_t imageIndex,

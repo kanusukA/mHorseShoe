@@ -9,6 +9,23 @@
 #include <algorithm>
 #include <limits.h>
 
+#define VMA_IMPLEMENTATION
+#include <vulkan/vulkan.h>
+#include "vk_mem_alloc.h"
+
+// TESTING
+
+const std::vector<Vertex> vertices = {
+	{{0.0f, -0.5f}, {1.0f,1.0f,1.0f}},
+	{{0.5f, 0.5f}, {0.0f,1.0f,0.0f}},
+	{{-0.5f, 0.5f}, {0.0f,0.0f,1.0f}},
+};
+
+const std::vector<uint16_t> indices = {
+	0, 1, 2, 2, 3, 0
+};  
+
+// -----------------
 
 
 void Monster::renderFrame() {
@@ -92,12 +109,13 @@ void Monster::InitVulkan() {
 	createVulkanSurface();
 	pickVulkanPhysicalDevice();
 	createVulkanDevice();
+	createVulkanMemAllocator();
 	createSwapchain();
 	createImageView();
 	createGraphicsPipeline();
 	createCommandPool();
-	createVertexBuffer();
 	createCommandBuffer();
+	createVertexBuffer();
 	createSyncObjects();
 
 
@@ -342,6 +360,22 @@ void Monster::createVulkanDevice() {
 
 }
 
+void Monster::createVulkanMemAllocator() {
+	VmaAllocatorCreateInfo vmaCreateInfo{
+		.physicalDevice = *vkMonsterStats.gpuDevice,
+		.device = *vkMonsterStats.device,
+		.instance = *vkMonsterStats.vkInstance
+	};
+
+	auto result = vmaCreateAllocator(&vmaCreateInfo, &vkMemAlloc.vmaAllocator);
+
+	if (result != VkResult::VK_SUCCESS)
+	{
+		throw std::runtime_error("Unable to create VMA Allocator Object!");
+	}
+
+}
+
 
 void Monster::createSwapchain(){
 	auto surfaceCapabilities = vkMonsterStats.gpuDevice.getSurfaceCapabilitiesKHR(*vkMonsterStats.surface);
@@ -575,11 +609,7 @@ void Monster::createCommandPool() {
 
 }
 
-void Monster::createVertexBuffer() {
-	vk::BufferCreateInfo bufferInfo{
-		//.size = sizeof()
-	}
-}
+
 
 void Monster::createCommandBuffer() {
 
@@ -667,6 +697,9 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, *vkMonsterStats.graphicsPipeline);
 
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer, { 0 });
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer, 0, vk::IndexType::eUint16);
+
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
@@ -719,4 +752,149 @@ void Monster::recreateSwapChain() {
 	createSwapchain();
 	createImageView();
 
+}
+
+void Monster::createVertexBuffer() {
+	
+	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+	// Create a staging buffer (stored in the CPU for quick access and change)
+	auto [stagingBuffer,stagingBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eTransferSrc,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+		VMA_MEMORY_USAGE_AUTO 
+	);
+
+	// add data to the staging buffer
+	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, vertices.data(), stagingBufferAlloc, 0, bufferSize);
+
+	// create the device_local(graphics crad memory) buffer
+	auto [vkBuffer, vkBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+		VMA_MEMORY_USAGE_AUTO
+	);
+	vkMemAlloc.vertexBuffer = vk::raii::Buffer(vkMonsterStats.device, vkBuffer);
+	vkMemAlloc.vertexBufferAlloc = vkBufferAlloc;
+
+	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
+
+	////create a Barrier - staging buffer
+	//VkBufferMemoryBarrier bufMemBarrier = { VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER };
+	//bufMemBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+	//bufMemBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+	//bufMemBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	//bufMemBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	//bufMemBarrier.buffer = stagingBuffer;
+	//bufMemBarrier.offset = 0;
+	//bufMemBarrier.size = VK_WHOLE_SIZE;
+
+	// creating copyCommandBuffer
+	
+
+	//vkCmdPipelineBarrier(*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
+	//	VK_PIPELINE_STAGE_TRANSFER_BIT,
+	//	VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, 0, 0, nullptr, 1, &bufMemBarrier, 0, nullptr);
+
+	//VkBufferCopy bufCopy = {
+	//	0,
+	//	0,
+	//	bufferSize
+	//};
+
+	//vkCmdCopyBuffer(*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
+	//		stagingBuffer, vkBuffer, 1, &bufCopy);
+
+	//// vertetxBuffer
+	//VkBufferMemoryBarrier bufMemBarrier2 = { VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER };
+	//bufMemBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+	//bufMemBarrier.dstAccessMask = VK_ACCESS_UNIFORM_READ_BIT;
+	//bufMemBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	//bufMemBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	//bufMemBarrier.buffer = vkBuffer;
+	//bufMemBarrier.offset = 0;
+	//bufMemBarrier.size = VK_WHOLE_SIZE;
+
+	//vkCmdPipelineBarrier(*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
+	//	VK_PIPELINE_STAGE_TRANSFER_BIT,
+	//	VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, 0, 0, nullptr, 1, &bufMemBarrier2, 0, nullptr);
+	
+
+}
+
+void Monster::createIndexBuffer() {
+	vk::DeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+	// Create a staging buffer (stored in the CPU for quick access and change)
+	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eTransferSrc,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+		VMA_MEMORY_USAGE_AUTO
+	);
+
+	// add data to the staging buffer
+	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, indices.data(), stagingBufferAlloc, 0, bufferSize);
+
+	// create the device_local(graphics crad memory) buffer
+	auto [vkBuffer, vkBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+		VMA_MEMORY_USAGE_AUTO
+	);
+	vkMemAlloc.indexBuffer = vk::raii::Buffer(vkMonsterStats.device, vkBuffer);
+	vkMemAlloc.indexBufferAlloc = vkBufferAlloc;
+
+	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
+
+
+
+}
+
+std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage) {
+
+	vk::BufferCreateInfo bufferInfo{
+		.size = size,
+		.usage = usage,
+		.sharingMode = vk::SharingMode::eExclusive
+	};
+
+	VmaAllocationCreateInfo allocInfo{
+		.flags = allocFlags,
+		.usage = allocUsage
+
+	};
+
+	// ASSIGN Memory to that buffer
+	VkBuffer buffer;
+	VmaAllocation allocation;
+
+	auto result = vmaCreateBuffer(vkMemAlloc.vmaAllocator, bufferInfo, &allocInfo, &buffer, &allocation, nullptr);
+
+	if (result != VkResult::VK_SUCCESS)
+	{
+		throw std::runtime_error("Unbale to create vertex buffer");
+	}
+
+	return {std::move(buffer),std::move(allocation)};
+}
+
+void Monster::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize bufferSize)
+{
+	vk::CommandBufferAllocateInfo allocInfo{
+		.commandPool = vkMonsterStats.commandPool, .level = vk::CommandBufferLevel::ePrimary, .commandBufferCount = 1
+	};
+	vk::raii::CommandBuffer commandCopyBuffer = std::move(vkMonsterStats.device.allocateCommandBuffers(allocInfo).front());
+
+	commandCopyBuffer.begin({ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit });
+
+	commandCopyBuffer.copyBuffer(srcBuffer, dstBuffer, vk::BufferCopy(0, 0, bufferSize));
+
+	commandCopyBuffer.end();
+
+	vkMonsterStats.graphicsQueue.submit(
+		vk::SubmitInfo{ .commandBufferCount = 1, .pCommandBuffers = &*commandCopyBuffer }
+	);
+	vkMonsterStats.graphicsQueue.waitIdle();
 }

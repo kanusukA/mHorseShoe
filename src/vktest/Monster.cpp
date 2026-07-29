@@ -456,6 +456,7 @@ void Monster::_setupRTShader() {
 */
 void Monster::Shutdown()
 {
+	vmaDestroyAllocator(vkMemAlloc.vmaAllocator);
 	vkMonsterStats.device.waitIdle();
 	ShutdownSDL();
 }

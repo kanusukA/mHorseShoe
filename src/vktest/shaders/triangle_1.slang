@@ -15,8 +15,8 @@ struct VertexOutput {
 VertexOutput vertMain(VSInput input){
 
     VertexOutput output;
-    output.sv_position = float4(input.inPosition, 0, 1);
-    output.color = float4(input.inColor,1);
+    output.sv_position = float4(input.inPosition, 0.0f, 1.0f);
+    output.color = float4(input.inColor,1.0f);
     return output;
 
 }

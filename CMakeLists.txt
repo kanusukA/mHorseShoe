@@ -34,8 +34,6 @@ endif()
 message("build type ${CMAKE_BUILD_TYPE}")
 
 
-
-
 include(FetchContent)
 include(CPM.cmake)
 
@@ -208,12 +206,9 @@ set(SOURCES
 	src/vktest/Monster.cpp
 	src/vktest/MonsterSDL.cpp
 	src/vktest/MonsterVulkan.cpp
-
-
-	
 )
 
-add_executable(mHorseShoee ${SOURCES}  "src/vktest/VulkanReader.h")
+add_executable(mHorseShoee ${SOURCES}  "src/vktest/VulkanReader.h" "src/vktest/vk_mem_alloc.h")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 
@@ -234,6 +229,8 @@ target_include_directories(mHorseShoee PRIVATE "${Vulkan_INCLUDE_DIR}")
 
 #set_target_properties(mHorseShoee PROPERTIES CXX_STANDARD 20)
 
+
+target_link_libraries(mHorseShoee PRIVATE Vulkan::Vulkan)
 
 target_include_directories(mHorseShoee PUBLIC "src/vktest" )
 
