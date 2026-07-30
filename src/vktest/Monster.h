@@ -65,6 +65,15 @@
 // VULKAN
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
+// VALIDATION LAYERS
+const std::vector<char const*> validationLayers = {
+	"VK_LAYER_KHRONOS_validation"
+};
+
+static VKAPI_ATTR vk::Bool32
+
+constexpr bool enableValidationLayers = true;
+
 
 struct MainDirectionalLight
 {
@@ -221,6 +230,10 @@ private:
 	VulkanMemAlloc vkMemAlloc = VulkanMemAlloc();
 	VulkanSync vkSyncStats = VulkanSync();
 
+	VulkanTextures vkTextures = VulkanTextures();
+
+	VulkanDescriptors vkDescriptors = VulkanDescriptors();
+
 
 	// vulkan Init
 	void createVulkanInstance();
@@ -230,15 +243,35 @@ private:
 	void createVulkanMemAllocator();
 	void createSwapchain();
 	void createImageView();
+	void createDescriptiorSetLayout();
 	void createGraphicsPipeline();
 	void createCommandPool();
 	void createCommandBuffer();
+	void createTextureImage();
 	void createVertexBuffer();
 	void createIndexBuffer(); 
+	void createUniformBuffers();
+	void createDescriptorPool();
+	void createDescriptorSets();
 	void createSyncObjects();
 
 	std::pair<VkBuffer, VmaAllocation> createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage);
+	std::pair<vk::raii::Image, VmaAllocation> createImage(
+		uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage
+	);
+
 	void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize bufferSize);
+
+	void copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, const vk::raii::Buffer& buffer, vk::raii::Image& image, uint32_t width, uint32_t height);
+
+	void updateUniformBuffer(uint32_t currentImage);
+
+	void transitionImageLayout(
+		vk::raii::CommandBuffer& commandBuffer,
+		const vk::raii::Image& image,
+		vk::ImageLayout oldLayout,
+		vk::ImageLayout newLayout
+	);
 
 	void transition_image_layout(
 		uint32_t imageIndex,
@@ -252,6 +285,9 @@ private:
 
 	// Shader
 	vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;
+
+	vk::raii::CommandBuffer begineSingleTimeCommands();
+	void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer);
 
 	void recordCommandBuffer(uint32_t imageIndex);
 

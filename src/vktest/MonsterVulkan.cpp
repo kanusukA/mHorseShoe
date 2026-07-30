@@ -13,12 +13,16 @@
 #include <vulkan/vulkan.h>
 #include "vk_mem_alloc.h"
 
+// NOTES AND SUGGESTIONS FOR CUSTOM CHANGES IN THE FRAMEWORK
+// USE VK_TRUE AND VK_FALSE - ENSURES CROSS_PLATFORMNESS. read more
+
 // TESTING
 
 const std::vector<Vertex> vertices = {
-	{{0.0f, -0.5f}, {1.0f,1.0f,1.0f}},
-	{{0.5f, 0.5f}, {0.0f,1.0f,0.0f}},
-	{{-0.5f, 0.5f}, {0.0f,0.0f,1.0f}},
+	{{-0.5f, -0.5f}, {1.0f,1.0f,1.0f}},
+	{{0.5f, -0.5f}, {0.0f,1.0f,0.0f}},
+	{{0.5f, 0.5f}, {0.0f,0.0f,1.0f}},
+	{{-0.5f, 0.5f}, {1.0f,1.0f,1.0f}}
 };
 
 const std::vector<uint16_t> indices = {
@@ -26,6 +30,7 @@ const std::vector<uint16_t> indices = {
 };  
 
 // -----------------
+
 
 
 void Monster::renderFrame() {
@@ -50,6 +55,8 @@ void Monster::renderFrame() {
 	}
 
 	vkMonsterStats.device.resetFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
+
+	updateUniformBuffer(vkMonsterStats.frameIndex);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].reset();
 	recordCommandBuffer(imageIndex);
@@ -112,16 +119,44 @@ void Monster::InitVulkan() {
 	createVulkanMemAllocator();
 	createSwapchain();
 	createImageView();
+	createDescriptiorSetLayout();
 	createGraphicsPipeline();
 	createCommandPool();
 	createCommandBuffer();
+	createTextureImage();
 	createVertexBuffer();
+	createIndexBuffer();
+	createUniformBuffers();
+	createDescriptorPool();
+	createDescriptorSets();
 	createSyncObjects();
 
 
 }
 
 void Monster::createVulkanInstance() {
+
+	// Validation Layers
+	std::vector<char const*> requiredLayers;
+	if (enableValidationLayers)
+	{
+		requiredLayers.assign(validationLayers.begin(), validationLayers.end());
+	}
+
+	auto layerProperties = vkMonsterStats.Context.enumerateInstanceLayerProperties();
+	auto unsupportedLayerIt = std::ranges::find_if(
+		requiredLayers,
+		[&layerProperties](auto const& requiredLayer) {
+			return std::ranges::none_of(layerProperties,
+				[requiredLayer](auto const& layerProperty) {return strcmp(layerProperty.layerName, requiredLayer) == 0; });
+		}
+	);
+
+	if (unsupportedLayerIt != requiredLayers.end())
+	{
+		throw std::runtime_error("Required layer not supported: " + std::string(*unsupportedLayerIt));
+	}
+
 	// Retrieve Extensions required by the Window System (SDL3 in this case)
 	uint32_t extensionCount = 0;
 	const char* const* instance_extensions = SDL_Vulkan_GetInstanceExtensions(&extensionCount);
@@ -149,10 +184,14 @@ void Monster::createVulkanInstance() {
 	createInfo.pApplicationInfo = &appInfo;
 	createInfo.enabledExtensionCount = count_extensions;
 	createInfo.ppEnabledExtensionNames = extensions;
-	createInfo.enabledLayerCount = 0;
-	createInfo.ppEnabledLayerNames = nullptr;
+	createInfo.enabledLayerCount = static_cast<uint32_t>(requiredLayers.size());
+	createInfo.ppEnabledLayerNames = requiredLayers.data();
 
 	vkMonsterStats.vkInstance = vk::raii::Instance(vkMonsterStats.Context, createInfo);
+
+	
+
+
 }
 
 void Monster::createVulkanSurface() {
@@ -485,6 +524,22 @@ void Monster::createImageView() {
 	}
 }
 
+void Monster::createDescriptiorSetLayout()
+{
+	vk::DescriptorSetLayoutBinding uboLayoutBinding{
+		.binding = 0,
+		.descriptorType = vk::DescriptorType::eUniformBuffer,
+		.descriptorCount = 1,
+		.stageFlags = vk::ShaderStageFlagBits::eVertex
+	};
+
+	vk::DescriptorSetLayoutCreateInfo layoutInfo{
+		.bindingCount = 1,
+		.pBindings = &uboLayoutBinding
+	};
+	vkDescriptors.descriptorSetLayout = vk::raii::DescriptorSetLayout(vkMonsterStats.device, layoutInfo);
+}
+
 [[nodiscard]] vk::raii::ShaderModule Monster::createShaderModule(const std::vector<char>& code) const {
 
 	vk::ShaderModuleCreateInfo shaderModuleCreateInfo{
@@ -494,6 +549,35 @@ void Monster::createImageView() {
 
 	vk::raii::ShaderModule shaderModule{ vkMonsterStats.device, shaderModuleCreateInfo };
 	return shaderModule;
+
+}
+
+vk::raii::CommandBuffer Monster::begineSingleTimeCommands()
+{
+	vk::CommandBufferAllocateInfo allocInfo{
+		.commandPool = vkMonsterStats.commandPool,
+		.level = vk::CommandBufferLevel::ePrimary,
+		.commandBufferCount = 1
+	};
+	vk::raii::CommandBuffer commandBuffer = std::move(vk::raii::CommandBuffers(vkMonsterStats.device, allocInfo).front());
+
+	vk::CommandBufferBeginInfo beginInfo{.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
+	commandBuffer.begin(beginInfo);
+
+	return std::move(commandBuffer);
+}
+
+void Monster::endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer)
+{
+	commandBuffer.end();
+
+	vk::SubmitInfo submitInfo{
+		.commandBufferCount = 1,
+		.pCommandBuffers = &*commandBuffer
+	};
+
+	vkMonsterStats.graphicsQueue.submit(submitInfo, nullptr);
+	vkMonsterStats.graphicsQueue.waitIdle();
 
 }
 
@@ -539,7 +623,7 @@ void Monster::createGraphicsPipeline() {
 		.rasterizerDiscardEnable = false,
 		.polygonMode = vk::PolygonMode::eFill,
 		.cullMode = vk::CullModeFlagBits::eBack,
-		.frontFace = vk::FrontFace::eClockwise,
+		.frontFace = vk::FrontFace::eCounterClockwise,
 		.depthBiasEnable = false,
 		.lineWidth = 1.0f
 	};
@@ -562,11 +646,16 @@ void Monster::createGraphicsPipeline() {
 		.pAttachments = &colorBlendState
 	};
 
-	vk::raii::PipelineLayout pipelineLayout = nullptr;
 
-	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ .setLayoutCount = 0, .pushConstantRangeCount = 0 };
 
-	pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
+	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{
+		.setLayoutCount = 1,
+		.pSetLayouts = &*vkDescriptors.descriptorSetLayout,
+		.pushConstantRangeCount = 0,
+
+	};
+
+	vkDescriptors.pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
 
 
 	vk::PipelineRenderingCreateInfo renderingCreateInfo{
@@ -584,7 +673,7 @@ void Monster::createGraphicsPipeline() {
 		.pMultisampleState = &multisampleCreateInfo,
 		.pColorBlendState = &colorBlendInfo,
 		.pDynamicState = &dynamicStateCreateInfo,
-		.layout = pipelineLayout,
+		.layout = vkDescriptors.pipelineLayout,
 		.renderPass = nullptr
 	};
 
@@ -621,7 +710,58 @@ void Monster::createCommandBuffer() {
 
 	vkMonsterStats.commandBuffers = std::move(vk::raii::CommandBuffers(vkMonsterStats.device, allocInfo));
 
-};
+}
+void Monster::createTextureImage()
+{
+	int texWidth, texHeight, texChannels;
+	stbi_uc* pixels = stbi_load(
+		"C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/vktest/textures/praise_the_sun.png",
+		&texWidth,
+		&texHeight,
+		&texChannels,
+		STBI_rgb_alpha
+	);
+	vk::DeviceSize imageSize = texWidth * texHeight * 4;
+
+	if (!pixels)
+	{
+		throw std::runtime_error("Failed to load image");
+	}
+
+	// staging buffer for texture
+	auto [stagingBuffer, stagingAlloc] =
+		createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,
+			VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+			VMA_MEMORY_USAGE_AUTO
+		);
+
+	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, pixels, stagingAlloc, 0, imageSize);
+
+	stbi_image_free(pixels);
+
+	std::tie(vkTextures.textureImage, vkTextures.textureAlloc) = createImage(
+		texWidth,
+		texHeight,
+		vk::Format::eR8G8B8A8Srgb,
+		vk::ImageTiling::eOptimal,
+		vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
+		0,
+		VMA_MEMORY_USAGE_AUTO
+	);
+
+	vk::raii::CommandBuffer commandBuffer = begineSingleTimeCommands();
+	transitionImageLayout(commandBuffer, vkTextures.textureImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
+	copyBufferToImage(
+		commandBuffer,
+		std::move(vk::raii::Buffer(vkMonsterStats.device, stagingBuffer)),
+		vkTextures.textureImage,
+		static_cast<uint32_t>(texWidth),
+		static_cast<uint32_t>(texHeight)
+	);
+	transitionImageLayout(commandBuffer, vkTextures.textureImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+	endSingleTimeCommands(std::move(commandBuffer));
+}
+
 
 void Monster::transition_image_layout(
 	uint32_t imageIndex,
@@ -703,7 +843,13 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
-	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].draw(3, 1, 0, 0);
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
+		vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
+	);
+
+
+	//vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].draw(3, 1, 0, 0);
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
 
@@ -852,6 +998,79 @@ void Monster::createIndexBuffer() {
 
 }
 
+void Monster::createUniformBuffers()
+{
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		vk::DeviceSize bufferSize = sizeof(UniformBufferObject);
+
+
+		auto [buffer, alloc] = createBuffer(bufferSize,
+			vk::BufferUsageFlagBits::eUniformBuffer,
+			VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+			VMA_MEMORY_USAGE_AUTO);
+		vkMemAlloc.uniformBuffers.emplace_back(std::move(vk::raii::Buffer(vkMonsterStats.device,buffer)));
+		vkMemAlloc.uniformBufferAlloc.emplace_back(std::move(alloc));
+		vkMemAlloc.uniformBuffersMapped.emplace_back(std::move(alloc->GetMappedData()));
+		
+	}
+}
+
+void Monster::createDescriptorPool()
+{
+	vk::DescriptorPoolSize poolSize{
+		.type = vk::DescriptorType::eUniformBuffer,
+		.descriptorCount = MAX_FRAMES_IN_FLIGHT
+	};
+
+	vk::DescriptorPoolCreateInfo poolInfo{
+		.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
+		.maxSets = MAX_FRAMES_IN_FLIGHT,
+		.poolSizeCount = 1,
+		.pPoolSizes = &poolSize
+	};
+
+	vkDescriptors.descriptorPool = vk::raii::DescriptorPool(vkMonsterStats.device, poolInfo);
+
+}
+
+void Monster::createDescriptorSets()
+{
+	// set layout for descriptor Sets
+	std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *vkDescriptors.descriptorSetLayout);
+	vk::DescriptorSetAllocateInfo allocInfo{
+		.descriptorPool = vkDescriptors.descriptorPool,
+		.descriptorSetCount = static_cast<uint32_t>(layouts.size()),
+		.pSetLayouts = layouts.data()
+	};
+
+	// Allocate Descriptor sets
+	vkDescriptors.descriptorSets = vkMonsterStats.device.allocateDescriptorSets(allocInfo);
+
+	//configure allocated descriptor sets
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		vk::DescriptorBufferInfo bufferInfo{
+			.buffer = vkMemAlloc.uniformBuffers[i],
+			.offset = 0,
+			.range = sizeof(UniformBufferObject)
+		};
+		vk::WriteDescriptorSet descriptorWrite{
+			.dstSet = vkDescriptors.descriptorSets[i],
+			.dstBinding = 0,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = vk::DescriptorType::eUniformBuffer,
+			.pBufferInfo = &bufferInfo
+		};
+
+		vkMonsterStats.device.updateDescriptorSets(descriptorWrite, {});
+
+	}
+
+
+}
+
 std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage) {
 
 	vk::BufferCreateInfo bufferInfo{
@@ -869,8 +1088,11 @@ std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(vk::DeviceSize size, vk
 	// ASSIGN Memory to that buffer
 	VkBuffer buffer;
 	VmaAllocation allocation;
+	//VmaAllocationInfo allocationInfo = {};
 
 	auto result = vmaCreateBuffer(vkMemAlloc.vmaAllocator, bufferInfo, &allocInfo, &buffer, &allocation, nullptr);
+
+
 
 	if (result != VkResult::VK_SUCCESS)
 	{
@@ -880,21 +1102,92 @@ std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(vk::DeviceSize size, vk
 	return {std::move(buffer),std::move(allocation)};
 }
 
+std::pair<vk::raii::Image, VmaAllocation> Monster::createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage,VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage)
+{
+	vk::ImageCreateInfo imageInfo{
+		.imageType = vk::ImageType::e2D,
+		.format = vk::Format::eA8B8G8R8SrgbPack32,
+		.extent = {width, height,1},
+		.mipLevels = 1,
+		.arrayLayers = 1,
+		.samples = vk::SampleCountFlagBits::e1,
+		.tiling = vk::ImageTiling::eOptimal,
+		.usage = vk::ImageUsageFlagBits::eSampled,
+		.sharingMode = vk::SharingMode::eExclusive
+	};
+
+	VmaAllocationCreateInfo allocInfo{
+		.flags = allocFlags,
+		.usage = allocUsage
+
+	};
+
+	VmaAllocation allocation;
+
+	VkImage vkImage;
+
+	vmaCreateImage(vkMemAlloc.vmaAllocator, imageInfo, &allocInfo, &vkImage, &allocation, nullptr);
+
+	return {
+		std::move(vk::raii::Image(vkMonsterStats.device,vkImage)),
+		std::move(allocation)
+	};
+
+	
+
+}
+
 void Monster::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize bufferSize)
 {
-	vk::CommandBufferAllocateInfo allocInfo{
-		.commandPool = vkMonsterStats.commandPool, .level = vk::CommandBufferLevel::ePrimary, .commandBufferCount = 1
+
+	vk::raii::CommandBuffer commandCopyBuffer = begineSingleTimeCommands();
+	commandCopyBuffer.copyBuffer(srcBuffer, dstBuffer, vk::BufferCopy{ .size = bufferSize });
+	endSingleTimeCommands(std::move(commandCopyBuffer));
+
+}
+
+void Monster::copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, const vk::raii::Buffer& buffer, vk::raii::Image& image, uint32_t width, uint32_t height)
+{
+	vk::BufferImageCopy region{
+		.bufferOffset = 0,
+		.bufferRowLength = 0,
+		.bufferImageHeight = 0,
+		.imageSubresource = {.aspectMask = vk::ImageAspectFlagBits::eColor, .mipLevel = 0, .baseArrayLayer = 0, .layerCount = 1},
+		.imageOffset = {0,0,0},
+		.imageExtent = {width, height, 1} };
+
+}
+
+void Monster::updateUniformBuffer(uint32_t currentImage)
+{
+	static auto startTime = std::chrono::high_resolution_clock::now();
+
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	
+	UniformBufferObject ubo{};
+
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 10.0f);
+	ubo.proj[1][1] *= -1;
+
+	memcpy(vkMemAlloc.uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
+
+}
+
+void Monster::transitionImageLayout(vk::raii::CommandBuffer& commandBuffer, const vk::raii::Image& image, vk::ImageLayout oldLayout, vk::ImageLayout newLayout)
+{
+	vk::ImageMemoryBarrier barrier{
+		.oldLayout = oldLayout,
+		.newLayout = newLayout,
+		.srcQueueFamilyIndex = vk::QueueFamilyIgnored,
+		.dstQueueFamilyIndex = vk::QueueFamilyIgnored,
+		.image = image,
+		.subresourceRange = {.aspectMask = vk::ImageAspectFlagBits::eColor, .levelCount = 1, .layerCount = 1}
 	};
-	vk::raii::CommandBuffer commandCopyBuffer = std::move(vkMonsterStats.device.allocateCommandBuffers(allocInfo).front());
 
-	commandCopyBuffer.begin({ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit });
-
-	commandCopyBuffer.copyBuffer(srcBuffer, dstBuffer, vk::BufferCopy(0, 0, bufferSize));
-
-	commandCopyBuffer.end();
-
-	vkMonsterStats.graphicsQueue.submit(
-		vk::SubmitInfo{ .commandBufferCount = 1, .pCommandBuffers = &*commandCopyBuffer }
-	);
-	vkMonsterStats.graphicsQueue.waitIdle();
+	commandBuffer.pipelineBarrier()
 }
