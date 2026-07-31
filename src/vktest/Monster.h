@@ -38,6 +38,7 @@
 #endif
 #include <stdio.h>
 #include <iostream>
+
 #include <random>
 //#include <cons.h>
 
@@ -70,7 +71,17 @@ const std::vector<char const*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
 };
 
-static VKAPI_ATTR vk::Bool32
+
+static VKAPI_ATTR vk::Bool32 VKAPI_CALL debugCallback(
+	vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
+	vk::DebugUtilsMessageTypeFlagsEXT type,
+	const vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
+	void* pUserData
+) {
+	std::cerr << "validation layer: type " << vk::to_string(type) << " msg: " << pCallbackData->pMessage << std::endl;
+
+	return vk::False;
+}
 
 constexpr bool enableValidationLayers = true;
 
@@ -234,20 +245,27 @@ private:
 
 	VulkanDescriptors vkDescriptors = VulkanDescriptors();
 
+	vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
+
 
 	// vulkan Init
 	void createVulkanInstance();
+	void setupDebugMessenger();
 	void createVulkanSurface();
 	void pickVulkanPhysicalDevice();
 	void createVulkanDevice();
 	void createVulkanMemAllocator();
 	void createSwapchain();
 	void createImageView();
+	vk::raii::ImageView createImageView(vk::Image const &image, vk::Format format, vk::ImageAspectFlags flags);
 	void createDescriptiorSetLayout();
 	void createGraphicsPipeline();
 	void createCommandPool();
 	void createCommandBuffer();
+	void createDepthResources();
 	void createTextureImage();
+	void createTextureImageView();
+	void createTextureSampler();
 	void createVertexBuffer();
 	void createIndexBuffer(); 
 	void createUniformBuffers();
@@ -262,7 +280,7 @@ private:
 
 	void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize bufferSize);
 
-	void copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, const vk::raii::Buffer& buffer, vk::raii::Image& image, uint32_t width, uint32_t height);
+	void copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, VkBuffer buffer, vk::raii::Image& image, uint32_t width, uint32_t height);
 
 	void updateUniformBuffer(uint32_t currentImage);
 
@@ -280,8 +298,12 @@ private:
 		vk::AccessFlags2 src_access_mask,
 		vk::AccessFlags2 dst_access_mask,
 		vk::PipelineStageFlags2 src_stage_mask,
-		vk::PipelineStageFlags2 dst_stage_mask
+		vk::PipelineStageFlags2 dst_stage_mask,
+		vk::ImageAspectFlags flags
 	);
+
+	vk::Format findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling, vk::FormatFeatureFlags features);
+	vk::Format findDepthFormat();
 
 	// Shader
 	vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;

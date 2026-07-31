@@ -13,16 +13,20 @@
 #include <vulkan/vulkan.h>
 #include "vk_mem_alloc.h"
 
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 // NOTES AND SUGGESTIONS FOR CUSTOM CHANGES IN THE FRAMEWORK
 // USE VK_TRUE AND VK_FALSE - ENSURES CROSS_PLATFORMNESS. read more
 
 // TESTING
 
 const std::vector<Vertex> vertices = {
-	{{-0.5f, -0.5f}, {1.0f,1.0f,1.0f}},
-	{{0.5f, -0.5f}, {0.0f,1.0f,0.0f}},
-	{{0.5f, 0.5f}, {0.0f,0.0f,1.0f}},
-	{{-0.5f, 0.5f}, {1.0f,1.0f,1.0f}}
+	{{-0.5f, -0.5f}, {1.0f,1.0f,1.0f},{1.0f, 0.0f} },
+	{{0.5f, -0.5f}, {0.0f,1.0f,0.0f}, {0.0f, 0.0f} },
+	{{0.5f, 0.5f}, {0.0f,0.0f,1.0f}, {0.0f, 1.0f} },
+	{{-0.5f, 0.5f}, {1.0f,1.0f,1.0f},{1.0f, 1.0f} }
 };
 
 const std::vector<uint16_t> indices = {
@@ -59,6 +63,7 @@ void Monster::renderFrame() {
 	updateUniformBuffer(vkMonsterStats.frameIndex);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].reset();
+
 	recordCommandBuffer(imageIndex);
 
 	// submitting command buffer
@@ -113,6 +118,7 @@ void Monster::InitVulkan() {
 	std::cout << "Initalizing Vulkan" << std::endl;
 
 	createVulkanInstance();
+	setupDebugMessenger();
 	createVulkanSurface();
 	pickVulkanPhysicalDevice();
 	createVulkanDevice();
@@ -124,6 +130,8 @@ void Monster::InitVulkan() {
 	createCommandPool();
 	createCommandBuffer();
 	createTextureImage();
+	createTextureImageView();
+	createTextureSampler();
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
@@ -168,7 +176,7 @@ void Monster::createVulkanInstance() {
 
 	int count_extensions = extensionCount + 1;
 	const char** extensions = static_cast<const char**>(SDL_malloc(count_extensions * sizeof(const char*)));
-	extensions[0] = VK_EXT_DEBUG_REPORT_EXTENSION_NAME;
+	extensions[0] = vk::EXTDebugUtilsExtensionName;
 	SDL_memcpy(&extensions[1], instance_extensions, extensionCount * sizeof(const char*));
 
 
@@ -178,7 +186,7 @@ void Monster::createVulkanInstance() {
 	appInfo.pApplicationName = "Psycho";
 	appInfo.applicationVersion = 10000;
 	appInfo.engineVersion = 10001;
-	appInfo.apiVersion = VK_API_VERSION_1_0;
+	appInfo.apiVersion = VK_API_VERSION_1_3;
 
 	vk::InstanceCreateInfo createInfo{};
 	createInfo.pApplicationInfo = &appInfo;
@@ -192,6 +200,33 @@ void Monster::createVulkanInstance() {
 	
 
 
+}
+
+void Monster::setupDebugMessenger()
+{
+	if (enableValidationLayers)
+	{
+		vk::DebugUtilsMessageSeverityFlagsEXT severityFlags(
+			vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+			vk::DebugUtilsMessageSeverityFlagBitsEXT::eError
+
+		);
+
+		vk::DebugUtilsMessageTypeFlagsEXT messageTypeFlags(
+			vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+			vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
+			vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation
+		);
+
+		vk::DebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo{
+			.messageSeverity = severityFlags,
+			.messageType = messageTypeFlags,
+			.pfnUserCallback = &debugCallback
+		};
+
+		debugMessenger = vkMonsterStats.vkInstance.createDebugUtilsMessengerEXT(debugUtilsMessengerCreateInfo);
+
+	}
 }
 
 void Monster::createVulkanSurface() {
@@ -315,12 +350,12 @@ void Monster::pickVulkanPhysicalDevice() {
 
 	// Required Feature Check
 	auto features = vkMonsterStats.gpuDevice.template getFeatures2<vk::PhysicalDeviceFeatures2,
-		vk::PhysicalDeviceVulkan11Features,
 		vk::PhysicalDeviceVulkan13Features,
 		vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>();
 
-	vkMonsterStats.supportsRequiredFeatures = features.template get<vk::PhysicalDeviceVulkan11Features>().shaderDrawParameters &&
+	vkMonsterStats.supportsRequiredFeatures = features.template get<vk::PhysicalDeviceFeatures2>().features.samplerAnisotropy &&
 		features.template get<vk::PhysicalDeviceVulkan13Features>().dynamicRendering &&
+		features.template get<vk::PhysicalDeviceVulkan13Features>().synchronization2 &&
 		features.template get<vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>().extendedDynamicState;
 }
 
@@ -362,13 +397,11 @@ void Monster::createVulkanDevice() {
 
 	vk::StructureChain<
 		vk::PhysicalDeviceFeatures2,
-		vk::PhysicalDeviceVulkan11Features,
 		vk::PhysicalDeviceVulkan13Features,
 		vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT
 	> featureChain = {
-		{},
-		{.shaderDrawParameters = true },
-		{.dynamicRendering = true},
+		{.features = {.samplerAnisotropy = true}},
+		{.synchronization2 = true, .dynamicRendering = true},
 		{.extendedDynamicState = true}
 	};
 
@@ -394,8 +427,6 @@ void Monster::createVulkanDevice() {
 		queueIndex,
 		0
 	);
-
-
 
 }
 
@@ -505,37 +536,50 @@ void Monster::createImageView() {
 
 	assert(vkMonsterStats.swapChainImages.empty());
 
-	vk::ImageViewCreateInfo imageViewCreateInfo{
-		.viewType = vk::ImageViewType::e2D,
-		.format = vkMonsterStats.swapChainSurfaceFormat.format,
-		.subresourceRange = {
-			vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1
-			}
-	};
-
-	imageViewCreateInfo.components = {
-		vk::ComponentSwizzle::eIdentity,vk::ComponentSwizzle::eIdentity,vk::ComponentSwizzle::eIdentity,vk::ComponentSwizzle::eIdentity
-	};
-
+	vkMonsterStats.swapChainImageViews.reserve(vkMonsterStats.swapChainImages.size());
 	for (const auto &image : vkMonsterStats.swapChainImages)
 	{
-		imageViewCreateInfo.image = image;
-		vkMonsterStats.swapChainImageViews.emplace_back(vkMonsterStats.device, imageViewCreateInfo);
+		vkMonsterStats.swapChainImageViews.emplace_back(createImageView(image, vkMonsterStats.swapChainSurfaceFormat.format, vk::ImageAspectFlagBits::eColor));
 	}
+}
+
+vk::raii::ImageView Monster::createImageView(vk::Image const& image, vk::Format format, vk::ImageAspectFlags flags)
+{
+	vk::ImageViewCreateInfo imageViewCreateInfo{
+		.image = image,
+		.viewType = vk::ImageViewType::e2D,
+		.format = format,
+		.subresourceRange = {
+			.aspectMask = flags,
+			.baseMipLevel = 0,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1}
+	};
+	vk::raii::ImageView imageView = vk::raii::ImageView(vkMonsterStats.device, imageViewCreateInfo);
+	return std::move(imageView);
 }
 
 void Monster::createDescriptiorSetLayout()
 {
-	vk::DescriptorSetLayoutBinding uboLayoutBinding{
+
+	std::array<vk::DescriptorSetLayoutBinding, 2> bindings{
+		{{
 		.binding = 0,
 		.descriptorType = vk::DescriptorType::eUniformBuffer,
 		.descriptorCount = 1,
 		.stageFlags = vk::ShaderStageFlagBits::eVertex
+		},{
+		.binding = 1,
+		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+		.descriptorCount = 1,
+		.stageFlags = vk::ShaderStageFlagBits::eFragment
+		}}
 	};
 
 	vk::DescriptorSetLayoutCreateInfo layoutInfo{
-		.bindingCount = 1,
-		.pBindings = &uboLayoutBinding
+		.bindingCount = static_cast<uint32_t>(bindings.size()),
+		.pBindings = bindings.data()
 	};
 	vkDescriptors.descriptorSetLayout = vk::raii::DescriptorSetLayout(vkMonsterStats.device, layoutInfo);
 }
@@ -567,7 +611,7 @@ vk::raii::CommandBuffer Monster::begineSingleTimeCommands()
 	return std::move(commandBuffer);
 }
 
-void Monster::endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer)
+void Monster::endSingleTimeCommands(vk::raii::CommandBuffer &&commandBuffer)
 {
 	commandBuffer.end();
 
@@ -592,6 +636,15 @@ void Monster::createGraphicsPipeline() {
 	vk::PipelineShaderStageCreateInfo fragShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eFragment, .module = shaderModule, .pName = "fragMain" };
 
 	vk::PipelineShaderStageCreateInfo ShaderStages[] = { vertexShaderStageCreateInfo,fragShaderStageCreateInfo };
+
+
+	vk::PipelineDepthStencilStateCreateInfo depthStencil{
+		.depthTestEnable = vk::True,
+		.depthWriteEnable = vk::True,
+		.depthCompareOp = vk::CompareOp::eLess,
+		.depthBoundsTestEnable = vk::False,
+		.stencilTestEnable = vk::False
+	};
 
 	// Dynamic state
 	std::vector<vk::DynamicState> dynamicStates{ vk::DynamicState::eViewport, vk::DynamicState::eScissor };
@@ -646,8 +699,6 @@ void Monster::createGraphicsPipeline() {
 		.pAttachments = &colorBlendState
 	};
 
-
-
 	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{
 		.setLayoutCount = 1,
 		.pSetLayouts = &*vkDescriptors.descriptorSetLayout,
@@ -660,7 +711,8 @@ void Monster::createGraphicsPipeline() {
 
 	vk::PipelineRenderingCreateInfo renderingCreateInfo{
 		.colorAttachmentCount = 1,
-		.pColorAttachmentFormats = &vkMonsterStats.swapChainSurfaceFormat.format
+		.pColorAttachmentFormats = &vkMonsterStats.swapChainSurfaceFormat.format,
+		.depthAttachmentFormat = vkTextures.depthFormat
 	};
 
 	vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo{
@@ -671,10 +723,12 @@ void Monster::createGraphicsPipeline() {
 		.pViewportState = &viewportCreateStateInfo,
 		.pRasterizationState = &rasterizer,
 		.pMultisampleState = &multisampleCreateInfo,
+		.pDepthStencilState = &depthStencil,
 		.pColorBlendState = &colorBlendInfo,
 		.pDynamicState = &dynamicStateCreateInfo,
 		.layout = vkDescriptors.pipelineLayout,
-		.renderPass = nullptr
+		.renderPass = nullptr,
+		
 	};
 
 	vk::StructureChain<vk::GraphicsPipelineCreateInfo, vk::PipelineRenderingCreateInfo> pipelineCreateInfoChain = {
@@ -685,7 +739,6 @@ void Monster::createGraphicsPipeline() {
 
 	vkMonsterStats.graphicsPipeline = vk::raii::Pipeline(vkMonsterStats.device, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
 
-
 }
 
 void Monster::createCommandPool() {
@@ -693,12 +746,9 @@ void Monster::createCommandPool() {
 		.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
 		.queueFamilyIndex = vkMonsterStats.queueIndex
 	};
-
 	vkMonsterStats.commandPool = vk::raii::CommandPool(vkMonsterStats.device, poolInfo);
 
 }
-
-
 
 void Monster::createCommandBuffer() {
 
@@ -711,6 +761,34 @@ void Monster::createCommandBuffer() {
 	vkMonsterStats.commandBuffers = std::move(vk::raii::CommandBuffers(vkMonsterStats.device, allocInfo));
 
 }
+void Monster::createDepthResources()
+{
+	/*
+	vk::Format::eD32Sfloat: 32-bit float for depth
+
+	vk::Format::eD32SfloatS8Uint: 32-bit signed float for depth and 8 bit stencil component
+
+	vk::Format::eD24UnormS8Uint: 24-bit float for depth and 8 bit stencil component
+	*/
+
+	vkTextures.depthFormat = findDepthFormat();
+
+	std::tie(vkTextures.depthImage, vkTextures.depthImageAlloc) = createImage(
+		vkMonsterStats.swapChainExtent.width,
+		vkMonsterStats.swapChainExtent.height,
+		vkTextures.depthFormat,
+		vk::ImageTiling::eOptimal,
+		vk::ImageUsageFlagBits::eDepthStencilAttachment,
+		0,
+		VMA_MEMORY_USAGE_AUTO
+	);
+	vkTextures.depthImageView = createImageView(vkTextures.depthImage, vkTextures.depthFormat, vk::ImageAspectFlagBits::eDepth);
+
+
+}
+
+
+
 void Monster::createTextureImage()
 {
 	int texWidth, texHeight, texChannels;
@@ -722,6 +800,8 @@ void Monster::createTextureImage()
 		STBI_rgb_alpha
 	);
 	vk::DeviceSize imageSize = texWidth * texHeight * 4;
+
+	
 
 	if (!pixels)
 	{
@@ -735,14 +815,17 @@ void Monster::createTextureImage()
 			VMA_MEMORY_USAGE_AUTO
 		);
 
-	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, pixels, stagingAlloc, 0, imageSize);
+	void* data = nullptr;
+	vmaMapMemory(vkMemAlloc.vmaAllocator, stagingAlloc, &data);
+	memcpy(data, pixels, imageSize);
+	vmaUnmapMemory(vkMemAlloc.vmaAllocator, stagingAlloc);
 
-	stbi_image_free(pixels);
+	//vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, pixels, stagingAlloc, 0, imageSize);
 
 	std::tie(vkTextures.textureImage, vkTextures.textureAlloc) = createImage(
 		texWidth,
 		texHeight,
-		vk::Format::eR8G8B8A8Srgb,
+		vkMonsterStats.swapChainSurfaceFormat.format,
 		vk::ImageTiling::eOptimal,
 		vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
 		0,
@@ -753,13 +836,55 @@ void Monster::createTextureImage()
 	transitionImageLayout(commandBuffer, vkTextures.textureImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
 	copyBufferToImage(
 		commandBuffer,
-		std::move(vk::raii::Buffer(vkMonsterStats.device, stagingBuffer)),
+		stagingBuffer,
 		vkTextures.textureImage,
 		static_cast<uint32_t>(texWidth),
 		static_cast<uint32_t>(texHeight)
 	);
 	transitionImageLayout(commandBuffer, vkTextures.textureImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
 	endSingleTimeCommands(std::move(commandBuffer));
+
+	vmaDestroyBuffer(vkMemAlloc.vmaAllocator, stagingBuffer, stagingAlloc);
+
+	stbi_image_free(pixels);
+}
+
+void Monster::createTextureImageView()
+{
+
+	vkTextures.textureImageView = createImageView(
+		*vkTextures.textureImage,
+		vk::Format::eR8G8B8A8Srgb,
+		{ vk::ImageAspectFlagBits::eColor}
+	);
+
+}
+
+void Monster::createTextureSampler()
+{
+
+	vk::PhysicalDeviceProperties properties = vkMonsterStats.gpuDevice.getProperties();
+
+	vk::SamplerCreateInfo samplerInfo{
+		.magFilter = vk::Filter::eLinear,
+		.minFilter = vk::Filter::eLinear,
+		.mipmapMode = vk::SamplerMipmapMode::eLinear,
+		.addressModeU = vk::SamplerAddressMode::eRepeat,
+		.addressModeV = vk::SamplerAddressMode::eRepeat,
+		.addressModeW = vk::SamplerAddressMode::eRepeat,
+		.anisotropyEnable = vk::True,
+		.maxAnisotropy = properties.limits.maxSamplerAnisotropy,
+		.compareEnable = vk::False,
+		.compareOp = vk::CompareOp::eAlways,
+		.borderColor = vk::BorderColor::eIntOpaqueBlack,
+		.unnormalizedCoordinates = vk::False,
+	};
+
+	vkTextures.textureSampler = vk::raii::Sampler(vkMonsterStats.device, samplerInfo);
+
+
+
+
 }
 
 
@@ -770,7 +895,8 @@ void Monster::transition_image_layout(
 	vk::AccessFlags2 src_access_mask,
 	vk::AccessFlags2 dst_access_mask,
 	vk::PipelineStageFlags2 src_stage_mask,
-	vk::PipelineStageFlags2 dst_stage_mask
+	vk::PipelineStageFlags2 dst_stage_mask,
+	vk::ImageAspectFlags flags
 ) {
 	vk::ImageMemoryBarrier2 barriar = {
 		.srcStageMask = src_stage_mask,
@@ -783,7 +909,7 @@ void Monster::transition_image_layout(
 		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 		.image = vkMonsterStats.swapChainImages[imageIndex],
 		.subresourceRange = {
-			.aspectMask = vk::ImageAspectFlagBits::eColor,
+			.aspectMask = flags,
 			.baseMipLevel = 0,
 			.levelCount = 1,
 			.baseArrayLayer = 0,
@@ -799,6 +925,30 @@ void Monster::transition_image_layout(
 
 }
 
+vk::Format Monster::findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features)
+{
+	for (const auto format : candidates)
+	{
+		vk::FormatProperties props = vkMonsterStats.gpuDevice.getFormatProperties(format);
+
+		if (((tiling == vk::ImageTiling::eLinear) && ((props.linearTilingFeatures & features) == features)) ||
+			((tiling == vk::ImageTiling::eOptimal) && ((props.optimalTilingFeatures & features) == features)))
+		{
+			return format;
+		}
+	}
+
+	throw std::runtime_error("failed to find supported format");
+
+}
+
+vk::Format Monster::findDepthFormat()
+{
+	return findSupportedFormat({ vk::Format::eD32Sfloat, vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint },
+		vk::ImageTiling::eOptimal,
+		vk::FormatFeatureFlagBits::eDepthStencilAttachment);
+}
+
 void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].begin({});
@@ -810,12 +960,25 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 		{},
 		vk::AccessFlagBits2::eColorAttachmentWrite,
 		vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-		vk::PipelineStageFlagBits2::eColorAttachmentOutput
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+		vk::ImageAspectFlagBits::eColor
 	);
 
+	transition_image_layout(
+		imageIndex,
+		vk::ImageLayout::eUndefined,
+		vk::ImageLayout::eDepthAttachmentOptimal,
+		vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
+		vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
+		vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+		vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+		vk::ImageAspectFlagBits::eDepth
+	);
 
 	vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f);
+	vk::ClearValue clearDepth = vk::ClearDepthStencilValue(1.0f, 0);
 
+	// SWAPCHAIN ATTACHMENT
 	vk::RenderingAttachmentInfo attachmentInfo = {
 		.imageView = vkMonsterStats.swapChainImageViews[imageIndex],
 		.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
@@ -825,11 +988,20 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
 	};
 
+	vk::RenderingAttachmentInfo depthAttachmentInfo = {
+		.imageView = vkTextures.depthImageView,
+		.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
+		.loadOp = vk::AttachmentLoadOp::eClear,
+		.storeOp = vk::AttachmentStoreOp::eDontCare,
+		.clearValue = clearDepth
+	};
+
 	vk::RenderingInfo renderingInfo = {
 		.renderArea = {.offset = {0, 0}, .extent = vkMonsterStats.swapChainExtent},
 		.layerCount = 1,
 		.colorAttachmentCount = 1,
-		.pColorAttachments = &attachmentInfo
+		.pColorAttachments = &attachmentInfo,
+		.pDepthAttachment = &depthAttachmentInfo
 	};
 
 
@@ -846,9 +1018,6 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
 		vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
 	);
-
-
-	//vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].draw(3, 1, 0, 0);
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
@@ -860,23 +1029,19 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 		vk::AccessFlagBits2::eColorAttachmentWrite,
 		{},
 		vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-		vk::PipelineStageFlagBits2::eBottomOfPipe
+		vk::PipelineStageFlagBits2::eBottomOfPipe,
+		vk::ImageAspectFlagBits::eColor
 	);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].end();
-
-	
 }
 
-
 void Monster::createSyncObjects() {
-	for (size_t i = 0; i < vkMonsterStats.swapChainImages.size(); i++)
-	{
-		vkSyncStats.renderFinishedSemaphores.emplace_back(vkMonsterStats.device, vk::SemaphoreCreateInfo());
-	}
+
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		vkSyncStats.presentCompleteSemaphores.emplace_back(vkMonsterStats.device, vk::SemaphoreCreateInfo());
+		vkSyncStats.renderFinishedSemaphores.emplace_back(vkMonsterStats.device, vk::SemaphoreCreateInfo());
 		vkSyncStats.inFlightFences.emplace_back(vkMonsterStats.device, vk::FenceCreateInfo{ .flags = vk::FenceCreateFlagBits::eSignaled });
 	}
 
@@ -886,17 +1051,14 @@ void Monster::cleanupSwapChain() {
 	vkMonsterStats.swapChainImages.clear();
 	vkMonsterStats.swapChainImageViews.clear();
 	vkMonsterStats.swapChain = nullptr;
-
 }
-
 
 void Monster::recreateSwapChain() {
 	vkMonsterStats.device.waitIdle();
-
 	cleanupSwapChain();
-
 	createSwapchain();
 	createImageView();
+	createDepthResources();
 
 }
 
@@ -926,47 +1088,6 @@ void Monster::createVertexBuffer() {
 
 	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
 
-	////create a Barrier - staging buffer
-	//VkBufferMemoryBarrier bufMemBarrier = { VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER };
-	//bufMemBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
-	//bufMemBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-	//bufMemBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	//bufMemBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	//bufMemBarrier.buffer = stagingBuffer;
-	//bufMemBarrier.offset = 0;
-	//bufMemBarrier.size = VK_WHOLE_SIZE;
-
-	// creating copyCommandBuffer
-	
-
-	//vkCmdPipelineBarrier(*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
-	//	VK_PIPELINE_STAGE_TRANSFER_BIT,
-	//	VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, 0, 0, nullptr, 1, &bufMemBarrier, 0, nullptr);
-
-	//VkBufferCopy bufCopy = {
-	//	0,
-	//	0,
-	//	bufferSize
-	//};
-
-	//vkCmdCopyBuffer(*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
-	//		stagingBuffer, vkBuffer, 1, &bufCopy);
-
-	//// vertetxBuffer
-	//VkBufferMemoryBarrier bufMemBarrier2 = { VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER };
-	//bufMemBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
-	//bufMemBarrier.dstAccessMask = VK_ACCESS_UNIFORM_READ_BIT;
-	//bufMemBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	//bufMemBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	//bufMemBarrier.buffer = vkBuffer;
-	//bufMemBarrier.offset = 0;
-	//bufMemBarrier.size = VK_WHOLE_SIZE;
-
-	//vkCmdPipelineBarrier(*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
-	//	VK_PIPELINE_STAGE_TRANSFER_BIT,
-	//	VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, 0, 0, nullptr, 1, &bufMemBarrier2, 0, nullptr);
-	
-
 }
 
 void Monster::createIndexBuffer() {
@@ -994,8 +1115,6 @@ void Monster::createIndexBuffer() {
 
 	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
 
-
-
 }
 
 void Monster::createUniformBuffers()
@@ -1018,16 +1137,22 @@ void Monster::createUniformBuffers()
 
 void Monster::createDescriptorPool()
 {
-	vk::DescriptorPoolSize poolSize{
-		.type = vk::DescriptorType::eUniformBuffer,
+
+	std::array<vk::DescriptorPoolSize, 2>poolSize{ {
+		{.type = vk::DescriptorType::eUniformBuffer,
 		.descriptorCount = MAX_FRAMES_IN_FLIGHT
-	};
+		},
+		{
+		.type = vk::DescriptorType::eCombinedImageSampler,
+		.descriptorCount = MAX_FRAMES_IN_FLIGHT
+		}
+	} };
 
 	vk::DescriptorPoolCreateInfo poolInfo{
 		.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
 		.maxSets = MAX_FRAMES_IN_FLIGHT,
-		.poolSizeCount = 1,
-		.pPoolSizes = &poolSize
+		.poolSizeCount = static_cast<uint32_t>(poolSize.size()),
+		.pPoolSizes = poolSize.data()
 	};
 
 	vkDescriptors.descriptorPool = vk::raii::DescriptorPool(vkMonsterStats.device, poolInfo);
@@ -1055,6 +1180,14 @@ void Monster::createDescriptorSets()
 			.offset = 0,
 			.range = sizeof(UniformBufferObject)
 		};
+
+		vk::DescriptorImageInfo imageInfo{
+			.sampler = vkTextures.textureSampler,
+			.imageView = vkTextures.textureImageView,
+			.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+		};
+
+		/*
 		vk::WriteDescriptorSet descriptorWrite{
 			.dstSet = vkDescriptors.descriptorSets[i],
 			.dstBinding = 0,
@@ -1063,8 +1196,27 @@ void Monster::createDescriptorSets()
 			.descriptorType = vk::DescriptorType::eUniformBuffer,
 			.pBufferInfo = &bufferInfo
 		};
+		*/
+		std::array<vk::WriteDescriptorSet, 2>descriptorWrites{ {
+			{
+			.dstSet = vkDescriptors.descriptorSets[i],
+			.dstBinding = 0,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = vk::DescriptorType::eUniformBuffer,
+			.pBufferInfo = &bufferInfo
+			},
+			{
+			.dstSet = vkDescriptors.descriptorSets[i],
+			.dstBinding = 1,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+			.pImageInfo = &imageInfo
+			}
+		} };
 
-		vkMonsterStats.device.updateDescriptorSets(descriptorWrite, {});
+		vkMonsterStats.device.updateDescriptorSets(descriptorWrites, {});
 
 	}
 
@@ -1092,8 +1244,6 @@ std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(vk::DeviceSize size, vk
 
 	auto result = vmaCreateBuffer(vkMemAlloc.vmaAllocator, bufferInfo, &allocInfo, &buffer, &allocation, nullptr);
 
-
-
 	if (result != VkResult::VK_SUCCESS)
 	{
 		throw std::runtime_error("Unbale to create vertex buffer");
@@ -1106,13 +1256,13 @@ std::pair<vk::raii::Image, VmaAllocation> Monster::createImage(uint32_t width, u
 {
 	vk::ImageCreateInfo imageInfo{
 		.imageType = vk::ImageType::e2D,
-		.format = vk::Format::eA8B8G8R8SrgbPack32,
+		.format = format,
 		.extent = {width, height,1},
 		.mipLevels = 1,
 		.arrayLayers = 1,
 		.samples = vk::SampleCountFlagBits::e1,
-		.tiling = vk::ImageTiling::eOptimal,
-		.usage = vk::ImageUsageFlagBits::eSampled,
+		.tiling = tiling,
+		.usage = usage,
 		.sharingMode = vk::SharingMode::eExclusive
 	};
 
@@ -1125,6 +1275,7 @@ std::pair<vk::raii::Image, VmaAllocation> Monster::createImage(uint32_t width, u
 	VmaAllocation allocation;
 
 	VkImage vkImage;
+
 
 	vmaCreateImage(vkMemAlloc.vmaAllocator, imageInfo, &allocInfo, &vkImage, &allocation, nullptr);
 
@@ -1146,7 +1297,7 @@ void Monster::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceS
 
 }
 
-void Monster::copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, const vk::raii::Buffer& buffer, vk::raii::Image& image, uint32_t width, uint32_t height)
+void Monster::copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, VkBuffer buffer, vk::raii::Image& image, uint32_t width, uint32_t height)
 {
 	vk::BufferImageCopy region{
 		.bufferOffset = 0,
@@ -1154,7 +1305,10 @@ void Monster::copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, const vk
 		.bufferImageHeight = 0,
 		.imageSubresource = {.aspectMask = vk::ImageAspectFlagBits::eColor, .mipLevel = 0, .baseArrayLayer = 0, .layerCount = 1},
 		.imageOffset = {0,0,0},
-		.imageExtent = {width, height, 1} };
+		.imageExtent = {width, height, 1} 
+	};
+
+	commandBuffer.copyBufferToImage(buffer, image, vk::ImageLayout::eTransferDstOptimal, region);
 
 }
 
@@ -1189,5 +1343,29 @@ void Monster::transitionImageLayout(vk::raii::CommandBuffer& commandBuffer, cons
 		.subresourceRange = {.aspectMask = vk::ImageAspectFlagBits::eColor, .levelCount = 1, .layerCount = 1}
 	};
 
-	commandBuffer.pipelineBarrier()
+	vk::PipelineStageFlags sourceStage;
+	vk::PipelineStageFlags destinationStage;
+
+	if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eTransferDstOptimal)
+	{
+		barrier.srcAccessMask = {};
+		barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+
+		sourceStage = vk::PipelineStageFlagBits::eTopOfPipe;
+		destinationStage = vk::PipelineStageFlagBits::eTransfer;
+	}
+	else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal) {
+
+		barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+		barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+
+		sourceStage = vk::PipelineStageFlagBits::eTransfer;
+		destinationStage = vk::PipelineStageFlagBits::eFragmentShader;
+
+	}
+	else {
+		throw std::invalid_argument("unsupported layout transition!");
+	}
+
+	commandBuffer.pipelineBarrier(sourceStage, destinationStage, {}, {}, nullptr, barrier);
 }
