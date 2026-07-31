@@ -40,6 +40,7 @@
 #include <iostream>
 
 #include <random>
+#include <filesystem>
 //#include <cons.h>
 
 
@@ -350,6 +351,8 @@ public:
 
 	void renderFrame();
 
+	Mesh loadMeshObj(std::filesystem::path &path);
+
 /*	void setShadowTechnique();
 
 	// Use this function to add input listner to the application context
@@ -517,6 +520,10 @@ public:
 	}
 
 };*/
+
+// MONSTER RAPID OBJ EXTENSIONS
+
+
 
 
 

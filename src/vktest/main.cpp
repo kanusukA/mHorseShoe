@@ -41,6 +41,8 @@ int main() {
 	monster->InitMonster();
 	std::cout << "Initializing kint" << std::endl;
 	//Kint* kint = new Kint();
+	auto path = std::filesystem::path("C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/vktest/shaders/orangeBox.obj");
+	monster->loadMeshObj(path);
 	
 //	Ogre::Root* oRoot = monster->oRoot;
 

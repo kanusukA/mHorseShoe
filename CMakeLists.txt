@@ -208,7 +208,7 @@ set(SOURCES
 	src/vktest/MonsterVulkan.cpp
 )
 
-add_executable(mHorseShoee ${SOURCES}  "src/vktest/VulkanReader.h" "src/vktest/vk_mem_alloc.h")
+add_executable(mHorseShoee ${SOURCES}  "src/vktest/VulkanReader.h" "src/vktest/vk_mem_alloc.h" "src/vktest/MonsterRapid.cpp")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 

@@ -26,7 +26,7 @@
 #include <chrono>
 
 struct Vertex {
-	glm::vec2 pos;
+	glm::vec3 pos;
 	glm::vec3 color;
 	glm::vec2 texCoord;
 
@@ -41,6 +41,13 @@ struct Vertex {
 			{.location = 2, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(Vertex,texCoord)},
 			} };
 	}
+};
+
+
+struct Mesh {
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
+
 };
 
 
