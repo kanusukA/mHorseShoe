@@ -45,8 +45,10 @@ struct Vertex {
 
 
 struct Mesh {
-	std::vector<Vertex> vertices;
-	std::vector<uint32_t> indices;
+	std::vector<Vertex>* vertices = nullptr;
+	std::vector<uint16_t>* indices = nullptr;
+
+	glm::vec4 color = glm::vec4(1, 1, 1, 1);
 
 };
 
@@ -99,6 +101,8 @@ struct VulkanMemAlloc {
 	VmaAllocation vertexBufferAlloc;
 	vk::raii::Buffer indexBuffer = nullptr;
 	VmaAllocation indexBufferAlloc;
+
+	uint32_t indexes;
 
 	std::vector<vk::raii::Buffer> uniformBuffers;
 	std::vector<VmaAllocation> uniformBufferAlloc;

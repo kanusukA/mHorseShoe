@@ -6,6 +6,7 @@
 //#include <timer/glock.h>
 //#include <cons.h>
 
+#include <feel/feel.h>
 
 
 // Rendering
@@ -41,13 +42,35 @@ int main() {
 	monster->InitMonster();
 	std::cout << "Initializing kint" << std::endl;
 	//Kint* kint = new Kint();
-	auto path = std::filesystem::path("C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/vktest/shaders/orangeBox.obj");
-	monster->loadMeshObj(path);
+	//std::filesystem::path mpath = std::filesystem::path("D:/source/repos/mHorseShoeVCmake/mHorseShoe/src/vktest/shaders/orangeBox.obj");
+	std::filesystem::path mpath = std::filesystem::path("../../../vktest/shaders/orangeBox.obj");
+	auto apath = std::filesystem::absolute(mpath);
+
+	WCHAR path[MAX_PATH];
+
+	GetModuleFileNameW(NULL, path, MAX_PATH);
+
+	char strPath[MAX_PATH];
+	char DefChar = ' ';
+	WideCharToMultiByte(CP_ACP, 0, path, -1, strPath, MAX_PATH, &DefChar, NULL);
+	std::filesystem::path srcPath = strPath;
+	std::cout << "Current Path" << srcPath.remove_filename();
+
+	if (std::filesystem::exists(apath))
+	{
+		throw std::runtime_error("File does not exist!");
+	}
+
+	auto mesh =	monster->loadMeshObj(apath);
+
+	monster->presentMesh(mesh);
 	
 //	Ogre::Root* oRoot = monster->oRoot;
 
 //	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, 0.4), 2);
 
+	
+	Feel feel = Feel();
 
 	std::cout << "Setting up Kint" << std::endl;
 	// Physics INIT
@@ -83,11 +106,22 @@ int main() {
 	std::cout << "loop started : " << std::endl;
 
 	bool running = true;
-	SDL_Event event;
+	//SDL_Event event;
 	
 	while (/*!InputHandler::GetInstance()->getInputKeys()->QUIT_KEY*/ running) {
 
-		while (SDL_PollEvent(&event)) {
+		feel.updateFeel();
+
+		if (feel.mappedEvents.windowResize->eventState)
+		{
+			monster->framebufferResized = true;
+		}
+		if (feel.mappedEvents.quitApplication->eventState)
+		{
+			running = false;
+		}
+
+		/*while (SDL_PollEvent(&event)) {
 
 			if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED)
 			{
@@ -98,7 +132,7 @@ int main() {
 			
 				running = false;
 			}
-		}
+		}*/
 
 		monster->renderFrame();
 //		startTime = getCurrentTime();

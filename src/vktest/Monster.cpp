@@ -1,5 +1,21 @@
 #include "Monster.h"
 
+
+
+
+void Monster::presentMesh(Mesh& mesh) {
+	// Wait for vulkan to finish commands
+	vkMonsterStats.device.waitIdle(); // DON"T CHANGE (MOSTLY ANYTHING) WHEN GPU IS READING
+
+	// delete old buffers
+	vmaDestroyBuffer(vkMemAlloc.vmaAllocator, *vkMemAlloc.vertexBuffer, vkMemAlloc.vertexBufferAlloc);
+
+	// create new vertex buffers
+	createVertexBuffer(*mesh.vertices);
+	createIndexBuffer(*mesh.indices);
+
+}
+
 // Multi-Thread shit
 /*RSUS* RSUS::pinstance_{ nullptr };
 std::mutex RSUS::mutex_;

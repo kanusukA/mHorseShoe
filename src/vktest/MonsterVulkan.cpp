@@ -22,14 +22,14 @@
 
 // TESTING
 
-const std::vector<Vertex> vertices = {
-	{{-0.5f, -0.5f}, {1.0f,1.0f,1.0f},{1.0f, 0.0f} },
-	{{0.5f, -0.5f}, {0.0f,1.0f,0.0f}, {0.0f, 0.0f} },
-	{{0.5f, 0.5f}, {0.0f,0.0f,1.0f}, {0.0f, 1.0f} },
-	{{-0.5f, 0.5f}, {1.0f,1.0f,1.0f},{1.0f, 1.0f} }
+const std::vector<Vertex> p_vertices = {
+	{{-0.5f, -0.5f, 0.5f}, {1.0f,1.0f,1.0f},{1.0f, 0.0f} },
+	{{0.5f, -0.5f,0.5f}, {0.0f,1.0f,0.0f}, {0.0f, 0.0f} },
+	{{0.5f, 0.5f,0.5f}, {0.0f,0.0f,1.0f}, {0.0f, 1.0f} },
+	{{-0.5f, 0.5f,0.5f}, {1.0f,1.0f,1.0f},{1.0f, 1.0f} }
 };
 
-const std::vector<uint16_t> indices = {
+const std::vector<uint16_t> p_indices = {
 	0, 1, 2, 2, 3, 0
 };  
 
@@ -627,7 +627,7 @@ void Monster::endSingleTimeCommands(vk::raii::CommandBuffer &&commandBuffer)
 
 void Monster::createGraphicsPipeline() {
 
-	auto shaderCode = readShaderFile("C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/vktest/shaders/triangle.spv");
+	auto shaderCode = readShaderFile("D:/source/repos/mHorseShoeVCmake/mHorseShoe/src/vktest/shaders/triangle.spv");
 
 	vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
 
@@ -793,7 +793,7 @@ void Monster::createTextureImage()
 {
 	int texWidth, texHeight, texChannels;
 	stbi_uc* pixels = stbi_load(
-		"C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/vktest/textures/praise_the_sun.png",
+		"D:/source/repos/mHorseShoeVCmake/mHorseShoe/src/vktest/textures/praise_the_sun.png",
 		&texWidth,
 		&texHeight,
 		&texChannels,
@@ -1018,7 +1018,7 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
 		vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
 	);
-	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(vkMemAlloc.indexes, 1, 0, 0, 0);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
 
@@ -1063,14 +1063,17 @@ void Monster::recreateSwapChain() {
 }
 
 void Monster::createVertexBuffer() {
-	
+	createVertexBuffer(p_vertices);
+}
+
+void Monster::createVertexBuffer(std::vector<Vertex> vertices) {
 	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 	// Create a staging buffer (stored in the CPU for quick access and change)
-	auto [stagingBuffer,stagingBufferAlloc] = createBuffer(
+	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
 		bufferSize,
 		vk::BufferUsageFlagBits::eTransferSrc,
 		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
-		VMA_MEMORY_USAGE_AUTO 
+		VMA_MEMORY_USAGE_AUTO
 	);
 
 	// add data to the staging buffer
@@ -1087,10 +1090,17 @@ void Monster::createVertexBuffer() {
 	vkMemAlloc.vertexBufferAlloc = vkBufferAlloc;
 
 	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
-
 }
 
 void Monster::createIndexBuffer() {
+	createIndexBuffer(p_indices);
+
+}
+
+void Monster::createIndexBuffer(std::vector<uint16_t> indices) {
+
+	vkMemAlloc.indexes = indices.size(); // Used during recordCommandBuffer()
+
 	vk::DeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 	// Create a staging buffer (stored in the CPU for quick access and change)
 	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
@@ -1114,7 +1124,6 @@ void Monster::createIndexBuffer() {
 	vkMemAlloc.indexBufferAlloc = vkBufferAlloc;
 
 	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
-
 }
 
 void Monster::createUniformBuffers()

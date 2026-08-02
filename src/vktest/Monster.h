@@ -268,7 +268,9 @@ private:
 	void createTextureImageView();
 	void createTextureSampler();
 	void createVertexBuffer();
+	void createVertexBuffer(std::vector<Vertex> vertices);
 	void createIndexBuffer(); 
+	void createIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();
 	void createDescriptorPool();
 	void createDescriptorSets();
@@ -352,6 +354,8 @@ public:
 	void renderFrame();
 
 	Mesh loadMeshObj(std::filesystem::path &path);
+
+	void presentMesh(Mesh& mesh);
 
 /*	void setShadowTechnique();
 
