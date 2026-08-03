@@ -5,7 +5,11 @@
 
 class FeelKey {
 
+
 public:
+
+	// Prevents the button from sustaining true state for more than a single loop
+	bool switchLock = false;
 
 	std::vector<FeelKey*> heldKeys = std::vector<FeelKey*>();
 	SDL_Keycode key;
@@ -20,6 +24,13 @@ public:
 	}
 
 	void checkHit(SDL_Event& event) {
+
+		if (switchLock && pressed)
+		{
+			pressed = false;
+			return;
+		}
+
 		if (!heldKeys.empty())
 		{
 			for (const auto hKey : heldKeys)
@@ -75,8 +86,14 @@ public:
 	float xRel;
 	float yRel;
 
-	void updateMousePos() {
-		// Get relative mouse pos from sdl3 
+	void updateMousePos(SDL_Event& event) {
+		xRel = 0.0f;
+		yRel = 0.0f;
+		if (event.type == SDL_EVENT_MOUSE_MOTION)
+		{
+			xRel = event.motion.xrel / 10;
+			yRel = event.motion.yrel / 10;
+		}
 	}
 
 };
@@ -98,6 +115,8 @@ struct Keys
 	MappedKey rightKey;
 	MappedKey upKey;
 	MappedKey downKey;
+
+	MappedKey windowGrab;
 
 };
 

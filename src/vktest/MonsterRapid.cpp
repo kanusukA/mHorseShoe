@@ -7,7 +7,8 @@
 
 Mesh Monster::loadMeshObj(std::filesystem::path& path)
 {
-	rapidobj::Result result = rapidobj::ParseFile("D:/source/repos/mHorseShoeVCmake/mHorseShoe/src/vktest/shaders/test1.obj");
+	std::filesystem::path filepath = std::filesystem::path("../../../src/vktest/shaders/test1.obj");
+	rapidobj::Result result = rapidobj::ParseFile(std::filesystem::absolute(filepath).string().c_str());
 
 	rapidobj::Triangulate(result);
 

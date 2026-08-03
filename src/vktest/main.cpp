@@ -8,6 +8,7 @@
 
 #include <feel/feel.h>
 
+#include <glock.h>
 
 // Rendering
 // Physics
@@ -70,7 +71,8 @@ int main() {
 //	monster->addMainDirectionalLight(MAIN_DIRECTIONAL_LIGHT_NAME, Ogre::Vector3(0, -0.6, 0.4), 2);
 
 	
-	Feel feel = Feel();
+	Glock glock = Glock();
+	
 
 	std::cout << "Setting up Kint" << std::endl;
 	// Physics INIT
@@ -96,10 +98,7 @@ int main() {
 	//monster->_createGrassBlade(0.3, 1);
 
 	// MAIN LOOP
-	double startTime;
-	double renderTime;
-	double elapsed;
-	double deltaTime;
+
 
 //	double lastTime = getCurrentTime();
 
@@ -110,15 +109,22 @@ int main() {
 	
 	while (/*!InputHandler::GetInstance()->getInputKeys()->QUIT_KEY*/ running) {
 
-		feel.updateFeel();
 
-		if (feel.mappedEvents.windowResize->eventState)
+		glock.setStartTime();
+
+		Feel::GetInstance()->updateFeel();
+
+		if (Feel::GetInstance()->mappedEvents.windowResize->eventState)
 		{
 			monster->framebufferResized = true;
 		}
-		if (feel.mappedEvents.quitApplication->eventState)
+		if (Feel::GetInstance()->mappedEvents.quitApplication->eventState)
 		{
 			running = false;
+		}
+		if (Feel::GetInstance()->mappedKeys.windowGrab->pressed)
+		{
+			monster->grabMouse(!monster->windowGrabbed);
 		}
 
 		/*while (SDL_PollEvent(&event)) {
@@ -134,7 +140,8 @@ int main() {
 			}
 		}*/
 
-		monster->renderFrame();
+		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(), glock.deltaTime);
+
 //		startTime = getCurrentTime();
 //		elapsed = startTime - lastTime;
 //		deltaTime = elapsed / 100;
@@ -152,6 +159,13 @@ int main() {
 			Sleep(startTime + MS_PER_FRAME - getCurrentTime());
 		}
 */	
+
+		glock.setEndTime();
+
+		if (glock.getDelta() < MS_PER_FRAME)
+		{
+			glock.setSleep(MS_PER_FRAME - glock.deltaTime);
+		}
 
 	}
 

@@ -17,6 +17,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+
 // NOTES AND SUGGESTIONS FOR CUSTOM CHANGES IN THE FRAMEWORK
 // USE VK_TRUE AND VK_FALSE - ENSURES CROSS_PLATFORMNESS. read more
 
@@ -110,6 +111,7 @@ void Monster::renderFrame() {
 	vkMonsterStats.frameIndex = (vkMonsterStats.frameIndex + 1) % MAX_FRAMES_IN_FLIGHT;
 
 }
+
 
 
 
@@ -627,7 +629,9 @@ void Monster::endSingleTimeCommands(vk::raii::CommandBuffer &&commandBuffer)
 
 void Monster::createGraphicsPipeline() {
 
-	auto shaderCode = readShaderFile("D:/source/repos/mHorseShoeVCmake/mHorseShoe/src/vktest/shaders/triangle.spv");
+	std::filesystem::path filePath = std::filesystem::path("../../../src/vktest/shaders/triangle.spv");
+
+	auto shaderCode = readShaderFile(std::filesystem::absolute(filePath).string().c_str());
 
 	vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
 
@@ -791,9 +795,10 @@ void Monster::createDepthResources()
 
 void Monster::createTextureImage()
 {
+	std::filesystem::path filepath = std::filesystem::path("../../../src/vktest/textures/praise_the_sun.png");
 	int texWidth, texHeight, texChannels;
 	stbi_uc* pixels = stbi_load(
-		"D:/source/repos/mHorseShoeVCmake/mHorseShoe/src/vktest/textures/praise_the_sun.png",
+		std::filesystem::absolute(filepath).string().c_str(),
 		&texWidth,
 		&texHeight,
 		&texChannels,
@@ -1332,10 +1337,14 @@ void Monster::updateUniformBuffer(uint32_t currentImage)
 
 	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//ubo.view = camera.getViewMatrix();
 
-	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 10.0f);
-	ubo.proj[1][1] *= -1;
+	//ubo.proj = camera.getProjectionMatrix(static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height));
+
+	ubo.view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
+
+	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 100.0f);
+	//ubo.proj[1][1] *= -1;
 
 	memcpy(vkMemAlloc.uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 

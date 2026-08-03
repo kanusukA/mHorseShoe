@@ -22,6 +22,9 @@
 // Third-party header
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
+
+#include <Camera.h>
+
 //#include <OgreImGuiOverlay.h>
 //#include <imgui_stdlib.h>
 
@@ -235,6 +238,9 @@ private:
 
 	Ogre::Vector3 result = Ogre::Vector3();
 */
+
+
+
 	//IKEYS* inputkeys;
 
 	// VULKAN INIT
@@ -318,11 +324,20 @@ private:
 
 	void recreateSwapChain();
 	void cleanupSwapChain();
+
+	
+
+	Camera camera;
+
+	void renderFrame();
+	void updateSDL();
 	
 
 public:
 	bool framebufferResized = false;
 	bool window_fullScreen = false;
+
+	bool windowGrabbed = false;
 	SDL_Window* sdlWindow;
 
 /*	Ogre::MovableObject* RayCastFromPoint();
@@ -351,11 +366,18 @@ public:
 	void InitVulkan();
 	
 
-	void renderFrame();
+
 
 	Mesh loadMeshObj(std::filesystem::path &path);
 
 	void presentMesh(Mesh& mesh);
+
+
+	void updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRot  ,float deltatime);
+
+	// SDL
+	void grabMouse(bool grab);
+	void hideMouse(bool hide);
 
 /*	void setShadowTechnique();
 
@@ -494,7 +516,7 @@ public:
 
 	HWND* getHWND();
 */
-	void updateMonster();
+	
 
 //	void deleteScnNode(Ogre::SceneNode* scnNode);
 

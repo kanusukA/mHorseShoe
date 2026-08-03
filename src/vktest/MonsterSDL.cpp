@@ -33,6 +33,21 @@ void Monster::InitSDLWindow() {
 
 }
 
+void Monster::grabMouse(bool grab)
+{
+	SDL_SetWindowRelativeMouseMode(sdlWindow, grab);
+	windowGrabbed = SDL_GetWindowRelativeMouseMode(sdlWindow);
+}
+
+void Monster::hideMouse(bool hide)
+{
+}
+
+void Monster::updateSDL()
+{
+
+}
+
 
 
 void Monster::ShutdownSDL() {

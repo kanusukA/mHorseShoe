@@ -16,6 +16,23 @@ void Monster::presentMesh(Mesh& mesh) {
 
 }
 
+void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRot, float deltatime)
+{
+	camera.processKeys(cameraPosition, deltatime);
+	if (windowGrabbed)
+	{
+		camera.processMouse(cameraRot);
+	}
+	
+
+	std::cout << "POSITION : " << camera.position.x << " " << camera.position.y << " " << camera.position.z << " pitch : " << cameraRot.x << " YAW : " << cameraRot.y << std::endl;
+
+	renderFrame();
+
+}
+
+
+
 // Multi-Thread shit
 /*RSUS* RSUS::pinstance_{ nullptr };
 std::mutex RSUS::mutex_;
@@ -105,6 +122,9 @@ Monster::Monster()
 //}
 
 void Monster::InitMonster() {
+
+	camera = Camera();
+
 	// CREATE WINDOW
 	InitSDLWindow();
 
@@ -321,6 +341,7 @@ void Monster::setupFonts()
 //}
 
 
+
 /*void Monster::addResourceLocation(const char* loc)
 {
 	try
@@ -472,8 +493,8 @@ void Monster::_setupRTShader() {
 */
 void Monster::Shutdown()
 {
-	vmaDestroyAllocator(vkMemAlloc.vmaAllocator);
 	vkMonsterStats.device.waitIdle();
+	vmaDestroyAllocator(vkMemAlloc.vmaAllocator);
 	ShutdownSDL();
 }
 /*

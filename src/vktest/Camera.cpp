@@ -1,7 +1,7 @@
 #include <Camera.h>
 
 void Camera::processKeys(glm::vec3 direction, float deltatime) {
-	float velocity = movSpeed * deltatime;
+	float velocity = movSpeed * 1;
 	position += (front * direction.x) * velocity;
 	position += (right * direction.z) * velocity;
 	position += (up * direction.y) * velocity;
