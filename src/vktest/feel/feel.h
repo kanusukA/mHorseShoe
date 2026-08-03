@@ -4,9 +4,18 @@
 
 #include <mutex>
 
+// Extensions are a way to get pollEvents to other classes. This featuer is mainly required for Imgui but can be used in many other libraries.
+// Extensions are executed first. Before any events and keys.
+class FeelPollEventExtension {
+public:
+	virtual void pollEvent(SDL_Event& event) {};
+};
+
 class Feel {
 	std::vector<FeelKey*> keys = {};
 	std::vector<FeelEvent*> events = {};
+
+	std::vector<FeelPollEventExtension*> extensions = {};
 	
 	static Feel* pinstance_;
 	static std::mutex mutex_;
@@ -49,6 +58,11 @@ public:
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
+			for (const auto& extension : extensions)
+			{
+				extension->pollEvent(event);
+			}
+
 			mouse.updateMousePos(event);
 
 			for (auto& key : keys)
@@ -61,6 +75,10 @@ public:
 			}
 		}
 		
+	}
+
+	void addExtension(FeelPollEventExtension* p_extension) {
+		extensions.push_back(p_extension);
 	}
 
 

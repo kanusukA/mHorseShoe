@@ -23,7 +23,14 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 
+#include <imgui.h>
+#include <imgui-1.92.9b/backends/imgui_impl_sdl3.h>
+#include <imgui-1.92.9b/backends/imgui_impl_vulkan.h>
+
 #include <Camera.h>
+
+#include <feel/feel.h>
+
 
 //#include <OgreImGuiOverlay.h>
 //#include <imgui_stdlib.h>
@@ -226,7 +233,7 @@ private:
 };*/
 
 
-class Monster
+class Monster : public FeelPollEventExtension
 {
 
 private:
@@ -242,6 +249,9 @@ private:
 
 
 	//IKEYS* inputkeys;
+	
+	// SDL3
+	ImGui_ImplVulkanH_Window g_MainWindowData;
 
 	// VULKAN INIT
 	VulkanStatus vkMonsterStats = VulkanStatus();
@@ -320,7 +330,7 @@ private:
 	vk::raii::CommandBuffer begineSingleTimeCommands();
 	void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer);
 
-	void recordCommandBuffer(uint32_t imageIndex);
+	void recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata);
 
 	void recreateSwapChain();
 	void cleanupSwapChain();
@@ -329,8 +339,15 @@ private:
 
 	Camera camera;
 
-	void renderFrame();
+	void renderVulkanFrame(ImDrawData* drawData);
 	void updateSDL();
+
+	void startImGuiFrame();
+	void renderFrame();
+
+	void pollEvent(SDL_Event& event) override {
+		ImGui_ImplSDL3_ProcessEvent(&event);
+	}
 	
 
 public:
@@ -361,6 +378,10 @@ public:
 	// SDL CLASSES
 	void InitSDLWindow();
 	void ShutdownSDL();
+
+	// Init Imgui
+	void InitImgui();
+	void ShutdownImGui();
 
 	// Vulkan
 	void InitVulkan();

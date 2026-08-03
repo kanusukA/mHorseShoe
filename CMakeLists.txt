@@ -206,9 +206,17 @@ set(SOURCES
 	src/vktest/Monster.cpp
 	src/vktest/MonsterSDL.cpp
 	src/vktest/MonsterVulkan.cpp
+
+	#Imgui
+	src/vktest/imgui-1.92.9b/imgui.cpp
+	src/vktest/imgui-1.92.9b/imgui_draw.cpp
+	src/vktest/imgui-1.92.9b/imgui_tables.cpp
+	src/vktest/imgui-1.92.9b/imgui_widgets.cpp
+	src/vktest/imgui-1.92.9b/backends/imgui_impl_vulkan.cpp
+	src/vktest/imgui-1.92.9b/backends/imgui_impl_sdl3.cpp
 )
 
-add_executable(mHorseShoee ${SOURCES}  "src/vktest/VulkanReader.h" "src/vktest/vk_mem_alloc.h" "src/vktest/MonsterRapid.cpp" "src/vktest/feel/feel.h" "src/vktest/feel/feel.cpp" "src/vktest/feel/keys.h" "src/vktest/Camera.h" "src/vktest/Camera.cpp" "src/vktest/glock.h")
+add_executable(mHorseShoee ${SOURCES}  "src/vktest/VulkanReader.h" "src/vktest/vk_mem_alloc.h" "src/vktest/MonsterRapid.cpp" "src/vktest/feel/feel.h" "src/vktest/feel/feel.cpp" "src/vktest/feel/keys.h" "src/vktest/Camera.h" "src/vktest/Camera.cpp" "src/vktest/glock.h" "src/vktest/MonsterImgui.cpp")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 
@@ -233,6 +241,8 @@ target_include_directories(mHorseShoee PRIVATE "${Vulkan_INCLUDE_DIR}")
 target_link_libraries(mHorseShoee PRIVATE Vulkan::Vulkan)
 
 target_include_directories(mHorseShoee PUBLIC "src/vktest" )
+
+target_include_directories(mHorseShoee PUBLIC "src/vktest/imgui-1.92.9b")
 
 target_link_libraries(mHorseShoee PRIVATE glm::glm)
 

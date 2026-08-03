@@ -38,7 +38,8 @@ const std::vector<uint16_t> p_indices = {
 
 
 
-void Monster::renderFrame() {
+void Monster::renderVulkanFrame(ImDrawData* drawData) {
+
 
 	auto fenceResult = vkMonsterStats.device.waitForFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex], true, UINT64_MAX);
 	if (fenceResult != vk::Result::eSuccess)
@@ -65,7 +66,7 @@ void Monster::renderFrame() {
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].reset();
 
-	recordCommandBuffer(imageIndex);
+	recordCommandBuffer(imageIndex,drawData);
 
 	// submitting command buffer
 	vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
@@ -328,6 +329,8 @@ void Monster::pickVulkanPhysicalDevice() {
 
 	// Check Queue Family
 	auto queueFamilyProperties = vkMonsterStats.gpuDevice.getQueueFamilyProperties();
+
+	
 
 
 	// Checks if the queue supports Graphics command (most basic of all. More checks will be required when testing is done)
@@ -954,7 +957,7 @@ vk::Format Monster::findDepthFormat()
 		vk::FormatFeatureFlagBits::eDepthStencilAttachment);
 }
 
-void Monster::recordCommandBuffer(uint32_t imageIndex) {
+void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata) {
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].begin({});
 
@@ -1012,7 +1015,11 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingInfo);
 
+
+
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, *vkMonsterStats.graphicsPipeline);
+
+	ImGui_ImplVulkan_RenderDrawData(drawdata, *vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *vkMonsterStats.graphicsPipeline);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer, { 0 });
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer, 0, vk::IndexType::eUint16);
