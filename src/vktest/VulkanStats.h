@@ -1,6 +1,7 @@
 #define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 
-
+// VULKAN
+constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 #if defined (_WIN32)
 	#define VK_USE_PLATFORM_WIN32_KHR
@@ -14,7 +15,11 @@
 #define VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS
 #include <vulkan/vulkan_raii.hpp>
 
+#include <imgui.h>
+
 #include <vk_mem_alloc.h>
+
+#include <SDL3/SDL.h>
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -24,6 +29,76 @@
 
 
 #include <chrono>
+
+
+
+
+class ImGuiVulkanUtil {
+protected:
+	vk::raii::Sampler sampler{ nullptr };
+	vk::Buffer vertexBuffers;
+	vk::Buffer indexBuffers;
+	VmaAllocation vertexAllocation;
+	VmaAllocation indexAllocation;
+	uint32_t vertexCount = 0;
+	uint32_t indexCount = 0;
+	vk::raii::Image fontImage = nullptr;
+	vk::raii::ImageView fontImageView = nullptr;
+
+	vk::raii::PipelineCache pipelineCache{ nullptr };
+	vk::raii::PipelineLayout pipelineLayout{ nullptr };
+	vk::raii::Pipeline pipeline{ nullptr };
+	vk::raii::DescriptorPool descriptorPool{ nullptr };
+	vk::raii::DescriptorSetLayout descriptorSetLayout{ nullptr };
+	vk::raii::DescriptorSet descriptorSet{ nullptr };
+
+	vk::raii::Device* device = nullptr;
+	vk::raii::PhysicalDevice* physicalDevice = nullptr;
+	vk::raii::Queue* graphicsQueue = nullptr;
+	uint32_t graphicsQueueFamily = 0;
+
+	VmaAllocator allocator = nullptr;
+
+	vk::raii::CommandBuffer commandBuffer = nullptr;
+
+
+	ImGuiStyle vulkanStyle;
+
+
+
+	bool needsUpdateBuffers = false;
+
+	vk::PipelineRenderingCreateInfo renderingInfo{};
+	vk::Format colorFormat = vk::Format::eB8G8R8A8Unorm;
+
+
+public:
+
+	struct PushConstBlock {
+		glm::vec2 scale;
+		glm::vec2 translate;
+	}pushConstBlock;
+
+	ImGuiVulkanUtil() {};
+	~ImGuiVulkanUtil();
+
+	virtual void setUtils(vk::raii::Device& p_device, vk::raii::PhysicalDevice& p_physicalDevice,
+		vk::raii::Queue& graphicsQueue, uint32_t graphicsQueueFamily, VmaAllocator allocator) {};
+
+	void init(float width, float height);
+	void initResources();
+	void setStyle(uint32_t index);
+	virtual void updateTexture(vk::raii::CommandBuffer& commandBuffer, ImTextureData* tex) {};
+
+	bool newFrame();
+	virtual void updateBuffers(uint32_t frameIndex) {};
+	void drawFrame(vk::raii::CommandBuffer& commandBuffer);
+
+	void handleKey(SDL_Event& event) {};
+
+
+
+};
 
 struct Vertex {
 	glm::vec3 pos;

@@ -74,8 +74,7 @@
 
 
 
-// VULKAN
-constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+
 
 // VALIDATION LAYERS
 const std::vector<char const*> validationLayers = {
@@ -233,7 +232,7 @@ private:
 };*/
 
 
-class Monster : public FeelPollEventExtension
+class Monster : public FeelPollEventExtension , public ImGuiVulkanUtil
 {
 
 private:
@@ -251,7 +250,7 @@ private:
 	//IKEYS* inputkeys;
 	
 	// SDL3
-	ImGui_ImplVulkanH_Window g_MainWindowData;
+	//ImGui_ImplVulkanH_Window g_MainWindowData;
 
 	// VULKAN INIT
 	VulkanStatus vkMonsterStats = VulkanStatus();
@@ -292,7 +291,7 @@ private:
 	void createDescriptorSets();
 	void createSyncObjects();
 
-	std::pair<VkBuffer, VmaAllocation> createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage);
+	std::pair<VkBuffer, VmaAllocation> createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage, VmaAllocationInfo* allocationInfo = nullptr);
 	std::pair<vk::raii::Image, VmaAllocation> createImage(
 		uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage
 	);
@@ -330,7 +329,7 @@ private:
 	vk::raii::CommandBuffer begineSingleTimeCommands();
 	void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer);
 
-	void recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata);
+	void recordCommandBuffer(uint32_t imageIndex);
 
 	void recreateSwapChain();
 	void cleanupSwapChain();
@@ -339,7 +338,7 @@ private:
 
 	Camera camera;
 
-	void renderVulkanFrame(ImDrawData* drawData);
+	void renderVulkanFrame();
 	void updateSDL();
 
 	void startImGuiFrame();
@@ -348,6 +347,12 @@ private:
 	void pollEvent(SDL_Event& event) override {
 		ImGui_ImplSDL3_ProcessEvent(&event);
 	}
+
+	// IMgui
+	void updateTexture(vk::raii::CommandBuffer& commandBuffer, ImTextureData* tex) override;
+	void setUtils(vk::raii::Device& p_device, vk::raii::PhysicalDevice& p_physicalDevice,
+		vk::raii::Queue& graphicsQueue, uint32_t graphicsQueueFamily, VmaAllocator allocator) override;
+	void updateBuffers(uint32_t frameIndex) override;
 	
 
 public:
@@ -367,7 +372,9 @@ public:
 */
 	// INITIALIZE OGRE3D AND CREATE A RENDERWINDOW
 	// name  -  NAME OF THE RENDERWINDOW
-	Monster();
+	Monster() : FeelPollEventExtension(), ImGuiVulkanUtil() {
+		
+	};
 
 	// INITIALISES SDL3 WINDOW / ADDS DEFAULT CAMERAMAN / GUI SYSTEM
 	//void InitMonster(Ogre::Root* root, Ogre::RenderWindow* rWin, Ogre::OverlaySystem* overlay, Ogre::ImGuiOverlay* imguiOverlay_p);

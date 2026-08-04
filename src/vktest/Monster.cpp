@@ -23,18 +23,22 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRot, float
 	{
 		camera.processMouse(cameraRot);
 	}
-	startImGuiFrame();
+	//startImGuiFrame();
 
-	ImGui::Begin("Random");
+//	ImGui::Begin("Random");
 
-	ImGui::End();
+	//ImGui::End();
+
+//	ImGui::EndFrame();
 
 	// IMGUI Must be run before rendingFrame()
 	
 
-	std::cout << "POSITION : " << camera.position.x << " " << camera.position.y << " " << camera.position.z << " pitch : " << cameraRot.x << " YAW : " << cameraRot.y << std::endl;
+	//std::cout << "POSITION : " << camera.position.x << " " << camera.position.y << " " << camera.position.z << " pitch : " << cameraRot.x << " YAW : " << cameraRot.y << std::endl;
 
-	renderFrame();
+	//renderFrame();
+
+	renderVulkanFrame();
 
 }
 
@@ -85,13 +89,7 @@ std::mutex RSUS::mutex_;
 	}
 }*/
 
-Monster::Monster()
-{
-	
 
-	
-	
-}
 
 
 
@@ -138,7 +136,10 @@ void Monster::InitMonster() {
 	// Init Vulkan
 	InitVulkan();
 
-	InitImgui();
+	//InitImgui();
+	setUtils(vkMonsterStats.device, vkMonsterStats.gpuDevice, vkMonsterStats.graphicsQueue, vkMonsterStats.queueIndex, vkMemAlloc.vmaAllocator);
+	init(vkMonsterStats.swapChainExtent.width, vkMonsterStats.swapChainExtent.height);
+	initResources();
 
 }
 
@@ -503,7 +504,7 @@ void Monster::_setupRTShader() {
 void Monster::Shutdown()
 {
 	vkMonsterStats.device.waitIdle();
-	ShutdownImGui();
+	//ShutdownImGui();
 	vmaDestroyAllocator(vkMemAlloc.vmaAllocator);
 	ShutdownSDL();
 }

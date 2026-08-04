@@ -216,7 +216,7 @@ set(SOURCES
 	src/vktest/imgui-1.92.9b/backends/imgui_impl_sdl3.cpp
 )
 
-add_executable(mHorseShoee ${SOURCES}  "src/vktest/VulkanReader.h" "src/vktest/vk_mem_alloc.h" "src/vktest/MonsterRapid.cpp" "src/vktest/feel/feel.h" "src/vktest/feel/feel.cpp" "src/vktest/feel/keys.h" "src/vktest/Camera.h" "src/vktest/Camera.cpp" "src/vktest/glock.h" "src/vktest/MonsterImgui.cpp")
+add_executable(mHorseShoee ${SOURCES}  "src/vktest/VulkanReader.h" "src/vktest/vk_mem_alloc.h" "src/vktest/MonsterRapid.cpp" "src/vktest/feel/feel.h" "src/vktest/feel/feel.cpp" "src/vktest/feel/keys.h" "src/vktest/Camera.h" "src/vktest/Camera.cpp" "src/vktest/glock.h" "src/vktest/MonsterImgui.cpp" "src/vktest/VulkanStats.cpp")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 

@@ -124,6 +124,7 @@ int main() {
 		}
 		if (Feel::GetInstance()->mappedKeys.windowGrab->pressed)
 		{
+			std::cout << "HIT" << std::endl;
 			monster->grabMouse(!monster->windowGrabbed);
 		}
 

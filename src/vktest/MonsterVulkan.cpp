@@ -38,8 +38,12 @@ const std::vector<uint16_t> p_indices = {
 
 
 
-void Monster::renderVulkanFrame(ImDrawData* drawData) {
+void Monster::renderVulkanFrame() {
 
+	if (newFrame())
+	{
+		updateBuffers(vkMonsterStats.frameIndex);
+	}
 
 	auto fenceResult = vkMonsterStats.device.waitForFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex], true, UINT64_MAX);
 	if (fenceResult != vk::Result::eSuccess)
@@ -65,8 +69,16 @@ void Monster::renderVulkanFrame(ImDrawData* drawData) {
 	updateUniformBuffer(vkMonsterStats.frameIndex);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].reset();
+	//vkMonsterStats.commandBuffers[MAX_FRAMES_IN_FLIGHT + 1].reset();
+	
 
-	recordCommandBuffer(imageIndex,drawData);
+	recordCommandBuffer(imageIndex);
+
+	//Imgui
+	commandBuffer.reset();
+
+	drawFrame(commandBuffer);
+	
 
 	// submitting command buffer
 	vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
@@ -76,7 +88,7 @@ void Monster::renderVulkanFrame(ImDrawData* drawData) {
 		.pWaitSemaphores = &*vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex],
 		.pWaitDstStageMask = &waitDestinationStageMask,
 		.commandBufferCount = 1,
-		.pCommandBuffers = &*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
+		.pCommandBuffers = (vk::CommandBuffer[]) (*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *commandBuffer),
 		.signalSemaphoreCount = 1,
 		.pSignalSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex]
 	};
@@ -99,10 +111,12 @@ void Monster::renderVulkanFrame(ImDrawData* drawData) {
 		.pWaitSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex],
 		.swapchainCount = 1,
 		.pSwapchains = &*vkMonsterStats.swapChain,
-		.pImageIndices = &imageIndex
+		.pImageIndices = &imageIndex,
+		
 	};
 
 	auto presentResult = vkMonsterStats.graphicsQueue.presentKHR(presentInfoKHR);
+
 	if ((presentResult == vk::Result::eSuboptimalKHR) || (presentResult == vk::Result::eErrorOutOfDateKHR) || framebufferResized)
 	{
 		framebufferResized = false;
@@ -762,7 +776,7 @@ void Monster::createCommandBuffer() {
 	vk::CommandBufferAllocateInfo allocInfo{
 		.commandPool = vkMonsterStats.commandPool,
 		.level = vk::CommandBufferLevel::ePrimary,
-		.commandBufferCount = MAX_FRAMES_IN_FLIGHT
+		.commandBufferCount = MAX_FRAMES_IN_FLIGHT + 1 // For IMGUI
 	};
 
 	vkMonsterStats.commandBuffers = std::move(vk::raii::CommandBuffers(vkMonsterStats.device, allocInfo));
@@ -957,7 +971,7 @@ vk::Format Monster::findDepthFormat()
 		vk::FormatFeatureFlagBits::eDepthStencilAttachment);
 }
 
-void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata) {
+void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].begin({});
 
@@ -1009,17 +1023,15 @@ void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata) {
 		.layerCount = 1,
 		.colorAttachmentCount = 1,
 		.pColorAttachments = &attachmentInfo,
-		.pDepthAttachment = &depthAttachmentInfo
+		.pDepthAttachment = &depthAttachmentInfo,
+		
 	};
 
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingInfo);
 
 
-
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, *vkMonsterStats.graphicsPipeline);
-
-	ImGui_ImplVulkan_RenderDrawData(drawdata, *vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *vkMonsterStats.graphicsPipeline);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer, { 0 });
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer, 0, vk::IndexType::eUint16);
@@ -1031,6 +1043,7 @@ void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata) {
 		vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
 	);
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(vkMemAlloc.indexes, 1, 0, 0, 0);
+
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
 
@@ -1163,6 +1176,14 @@ void Monster::createDescriptorPool()
 		{.type = vk::DescriptorType::eUniformBuffer,
 		.descriptorCount = MAX_FRAMES_IN_FLIGHT
 		},
+		/*{
+			.type = vk::DescriptorType::eSampledImage,
+			.descriptorCount = IMGUI_IMPL_VULKAN_MINIMUM_SAMPLED_IMAGE_POOL_SIZE
+		},
+		{
+			.type = vk::DescriptorType::eSampler,
+			.descriptorCount = IMGUI_IMPL_VULKAN_MINIMUM_SAMPLER_POOL_SIZE
+		},*/
 		{
 		.type = vk::DescriptorType::eCombinedImageSampler,
 		.descriptorCount = MAX_FRAMES_IN_FLIGHT
@@ -1171,10 +1192,14 @@ void Monster::createDescriptorPool()
 
 	vk::DescriptorPoolCreateInfo poolInfo{
 		.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
-		.maxSets = MAX_FRAMES_IN_FLIGHT,
 		.poolSizeCount = static_cast<uint32_t>(poolSize.size()),
 		.pPoolSizes = poolSize.data()
 	};
+
+	for (const auto& pool : poolSize)
+	{
+		poolInfo.maxSets += pool.descriptorCount;
+	}
 
 	vkDescriptors.descriptorPool = vk::raii::DescriptorPool(vkMonsterStats.device, poolInfo);
 
@@ -1244,7 +1269,13 @@ void Monster::createDescriptorSets()
 
 }
 
-std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage) {
+std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(
+	vk::DeviceSize size, 
+	vk::BufferUsageFlags usage, 
+	VmaAllocationCreateFlags allocFlags, 
+	VmaMemoryUsage allocUsage,
+	VmaAllocationInfo* allocationInfo
+) {
 
 	vk::BufferCreateInfo bufferInfo{
 		.size = size,
@@ -1263,7 +1294,7 @@ std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(vk::DeviceSize size, vk
 	VmaAllocation allocation;
 	//VmaAllocationInfo allocationInfo = {};
 
-	auto result = vmaCreateBuffer(vkMemAlloc.vmaAllocator, bufferInfo, &allocInfo, &buffer, &allocation, nullptr);
+	auto result = vmaCreateBuffer(vkMemAlloc.vmaAllocator, bufferInfo, &allocInfo, &buffer, &allocation, allocationInfo);
 
 	if (result != VkResult::VK_SUCCESS)
 	{

@@ -2,7 +2,8 @@
 #include <SDL3/SDL.h>
 #include <vector>
 // THIS CLASS CONTAINS ALL DIFFERENT TYPE OF KEYS (OF VARIOUS COMBINATION ETC.)
-
+#include <stdio.h>
+#include <iostream>
 class FeelKey {
 
 
@@ -25,10 +26,9 @@ public:
 
 	void checkHit(SDL_Event& event) {
 
-		if (switchLock && pressed)
+		if (switchLock)
 		{
 			pressed = false;
-			return;
 		}
 
 		if (!heldKeys.empty())
@@ -44,10 +44,22 @@ public:
 		if (event.key.key == key)
 		{
 			if (event.type == SDL_EVENT_KEY_DOWN) {
-				pressed = true;
+				if (switchLock)
+				{
+					pressed = false;
+					return;
+				}
+				else {
+					switchLock = true;
+					pressed = true;
+					std::cout << key << " Pressed DOWN " << std::endl;
+				}
+				
 			}
 			else if (event.type == SDL_EVENT_KEY_UP) {
+				switchLock = false;
 				pressed = false;
+				std::cout << key << " Pressed UP " << std::endl;
 			}
 				
 		}
