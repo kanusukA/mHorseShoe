@@ -615,6 +615,17 @@ void Monster::createDescriptiorSetLayout()
 
 }
 
+vk::raii::ShaderModule Monster::createShaderModule(const uint32_t* code, size_t codeSize) const
+{
+	vk::ShaderModuleCreateInfo shaderModuleCreateInfo{
+		.codeSize = codeSize,
+		.pCode = code
+	};
+
+	vk::raii::ShaderModule shaderModule{ vkMonsterStats.device, shaderModuleCreateInfo };
+	return std::move(shaderModule);
+}
+
 vk::raii::CommandBuffer Monster::begineSingleTimeCommands()
 {
 	vk::CommandBufferAllocateInfo allocInfo{

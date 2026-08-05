@@ -139,7 +139,9 @@ void Monster::InitMonster() {
 	//InitImgui();
 	setUtils(vkMonsterStats.device, vkMonsterStats.gpuDevice, vkMonsterStats.graphicsQueue, vkMonsterStats.queueIndex, vkMemAlloc.vmaAllocator);
 	init(vkMonsterStats.swapChainExtent.width, vkMonsterStats.swapChainExtent.height);
+	createImGuiShaders();
 	initResources();
+	createImGuiPipeline();
 
 }
 

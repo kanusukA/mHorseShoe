@@ -38,6 +38,7 @@ void Monster::InitImgui()
 
 	ImGui_ImplVulkan_Init(&init_info);
 
+	createImGuiShaders();
 
 
 }
@@ -238,3 +239,113 @@ void Monster::updateBuffers(uint32_t frameIndex)
 	vmaFlushAllocation(allocator, indexAllocation, 0, VK_WHOLE_SIZE);
 
 }
+
+void Monster::createImGuiShaders()
+{
+	if (imguiVertShader == VK_NULL_HANDLE)
+	{
+		imguiVertShader = createShaderModule(__glsl_shader_vert_spv,sizeof(__glsl_shader_vert_spv));
+	}
+	if (imguiFragShader == VK_NULL_HANDLE)
+	{
+		imguiFragShader = createShaderModule(__glsl_shader_frag_spv, sizeof(__glsl_shader_frag_spv));
+	}
+}
+
+void Monster::createImGuiPipeline()
+{
+	vk::PipelineShaderStageCreateInfo vertexShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eVertex, .module = imguiVertShader, .pName = "main" };
+
+	vk::PipelineShaderStageCreateInfo fragShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eFragment, .module = imguiFragShader, .pName = "main" };
+
+	vk::PipelineShaderStageCreateInfo ShaderStages[] = { vertexShaderStageCreateInfo,fragShaderStageCreateInfo };
+
+	vk::VertexInputBindingDescription binding_desc[1] = {};
+	binding_desc[0].stride = sizeof(ImDrawVert);
+	binding_desc[0].inputRate = vk::VertexInputRate::eVertex;
+
+	vk::VertexInputAttributeDescription attribute_desc[3] = {};
+	attribute_desc[0].location = 0;
+	attribute_desc[0].binding = binding_desc[0].binding;
+	attribute_desc[0].format = vk::Format::eR32G32Sfloat;
+	attribute_desc[0].offset = offsetof(ImDrawVert, pos);
+	attribute_desc[1].location = 1;
+	attribute_desc[1].binding = binding_desc[0].binding;
+	attribute_desc[1].format = vk::Format::eR32G32Sfloat;
+	attribute_desc[1].offset = offsetof(ImDrawVert, uv);
+	attribute_desc[2].location = 2;
+	attribute_desc[2].binding = binding_desc[0].binding;
+	attribute_desc[2].format = vk::Format::eR8G8B8A8Unorm;
+	attribute_desc[2].offset = offsetof(ImDrawVert, uv);
+
+	vk::PipelineVertexInputStateCreateInfo vertexInfo = {};
+	vertexInfo.vertexBindingDescriptionCount = 1;
+	vertexInfo.vertexAttributeDescriptionCount = 3;
+	vertexInfo.pVertexBindingDescriptions = binding_desc;
+	vertexInfo.pVertexAttributeDescriptions = attribute_desc;
+
+	vk::PipelineInputAssemblyStateCreateInfo ia_info = {};
+	ia_info.topology = vk::PrimitiveTopology::eTriangleList;
+
+	vk::PipelineViewportStateCreateInfo viewport_info = {};
+	viewport_info.viewportCount = 1;
+	viewport_info.scissorCount = 1;
+
+	vk::PipelineRasterizationStateCreateInfo raster_info = {};
+	raster_info.polygonMode = vk::PolygonMode::eFill;
+	raster_info.cullMode = vk::CullModeFlagBits::eNone;
+	raster_info.frontFace = vk::FrontFace::eCounterClockwise;
+	raster_info.lineWidth = 1.0f;
+
+	vk::PipelineMultisampleStateCreateInfo ms_info = {};
+	ms_info.rasterizationSamples = vk::SampleCountFlagBits::e1;
+
+	vk::PipelineColorBlendAttachmentState color_attachment[1] = {};
+	color_attachment[0].blendEnable = VK_TRUE;
+	color_attachment[0].srcColorBlendFactor = vk::BlendFactor::eSrcAlpha;
+	color_attachment[0].dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
+	color_attachment[0].colorBlendOp = vk::BlendOp::eAdd;
+	color_attachment[0].srcAlphaBlendFactor = vk::BlendFactor::eOne;
+	color_attachment[0].dstAlphaBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
+	color_attachment[0].alphaBlendOp = vk::BlendOp::eAdd;
+	color_attachment[0].colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
+
+
+	vk::PipelineDepthStencilStateCreateInfo depth_info = {};
+
+	vk::PipelineColorBlendStateCreateInfo blend_info = {};
+	blend_info.attachmentCount = 1;
+	blend_info.pAttachments = color_attachment;
+
+	std::vector<vk::DynamicState> dynamicStates{ vk::DynamicState::eViewport, vk::DynamicState::eScissor };
+	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
+
+	vk::PipelineRenderingCreateInfo renderingCreateInfo{
+		.colorAttachmentCount = 1,
+		.pColorAttachmentFormats = &vkMonsterStats.swapChainSurfaceFormat.format,
+		.depthAttachmentFormat = vkTextures.depthFormat
+	};
+
+	vk::GraphicsPipelineCreateInfo create_info = {};
+	create_info.stageCount = 2;
+	create_info.pStages = ShaderStages;
+	create_info.pVertexInputState = &vertexInfo;
+	create_info.pInputAssemblyState = &ia_info;
+	create_info.pViewportState = &viewport_info;
+	create_info.pRasterizationState = &raster_info;
+	create_info.pMultisampleState = &ms_info;
+	create_info.pDepthStencilState = &depth_info;
+	create_info.pColorBlendState = &blend_info;
+	create_info.pDynamicState = &dynamicStateCreateInfo;
+	create_info.layout = pipelineLayout;
+	create_info.renderPass = nullptr;
+
+	vk::StructureChain<vk::GraphicsPipelineCreateInfo, vk::PipelineRenderingCreateInfo> pipelineCreateInfoChain = {
+		create_info,
+		renderingCreateInfo
+	};
+
+	pipeline = device->createGraphicsPipeline(pipelineCache, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
+}
+
+

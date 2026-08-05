@@ -134,9 +134,11 @@ void ImGuiVulkanUtil::initResources()
 
 	pipelineLayout = device->createPipelineLayout(pipelineLayoutInfo);
 
-	
+	// Create Pipeline Ahead;
 
 }
+
+
 
 bool ImGuiVulkanUtil::newFrame()
 {
@@ -168,6 +170,7 @@ bool ImGuiVulkanUtil::newFrame()
 
 void ImGuiVulkanUtil::drawFrame(vk::raii::CommandBuffer& commandBuffer)
 {
+	commandBuffer.begin({});
 	ImDrawData* drawData = ImGui::GetDrawData();
 	if (!drawData || drawData->CmdListsCount == 0)
 	{
@@ -257,6 +260,8 @@ void ImGuiVulkanUtil::drawFrame(vk::raii::CommandBuffer& commandBuffer)
 	}
 
 	commandBuffer.endRendering();
+
+	commandBuffer.end();
 
 }
 

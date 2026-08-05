@@ -325,6 +325,7 @@ private:
 
 	// Shader
 	vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;
+	vk::raii::ShaderModule createShaderModule(const uint32_t* code, size_t codeSize ) const;
 
 	vk::raii::CommandBuffer begineSingleTimeCommands();
 	void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer);
@@ -353,6 +354,8 @@ private:
 	void setUtils(vk::raii::Device& p_device, vk::raii::PhysicalDevice& p_physicalDevice,
 		vk::raii::Queue& graphicsQueue, uint32_t graphicsQueueFamily, VmaAllocator allocator) override;
 	void updateBuffers(uint32_t frameIndex) override;
+	void createImGuiShaders() override;
+	void createImGuiPipeline() override;
 	
 
 public:
