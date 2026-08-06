@@ -381,6 +381,7 @@ public:
 
 	// Init Imgui
 	void InitImgui();
+	bool createImGuiPipeline();
 	void ShutdownImGui();
 
 	// Vulkan

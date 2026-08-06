@@ -99,6 +99,8 @@ int main() {
 
 	// MAIN LOOP
 
+	Feel::GetInstance()->addExtension(monster);
+
 
 //	double lastTime = getCurrentTime();
 

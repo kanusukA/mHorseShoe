@@ -63,7 +63,7 @@ struct VulkanStatus {
 	vk::raii::Queue graphicsQueue = nullptr;
 	vk::raii::SurfaceKHR surface = nullptr;
 	vk::raii::SwapchainKHR swapChain = nullptr;
-	vk::raii::Pipeline graphicsPipeline = nullptr;
+	
 	vk::SurfaceFormatKHR swapChainSurfaceFormat;
 	vk::Extent2D swapChainExtent;
 	
@@ -83,6 +83,11 @@ struct VulkanStatus {
 	bool supportsGraphic = false;
 	bool supportsRequiredExtensions = false;
 	bool supportsRequiredFeatures= false;
+
+	vk::raii::Pipeline graphicsPipeline = nullptr;
+	vk::raii::Pipeline imguiPipeline = nullptr;
+
+	vk::raii::PipelineLayout imguiPipeLayout = nullptr;
 	
 
 

@@ -1019,7 +1019,7 @@ void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata) {
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, *vkMonsterStats.graphicsPipeline);
 
-	ImGui_ImplVulkan_RenderDrawData(drawdata, *vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *vkMonsterStats.graphicsPipeline);
+	
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer, { 0 });
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer, 0, vk::IndexType::eUint16);
@@ -1031,6 +1031,28 @@ void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata) {
 		vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
 	);
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(vkMemAlloc.indexes, 1, 0, 0, 0);
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
+
+	vk::RenderingAttachmentInfo imguiColorInfo = {
+		.imageView = vkMonsterStats.swapChainImageViews[imageIndex],
+		.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+		.loadOp = vk::AttachmentLoadOp::eLoad,
+		.storeOp = vk::AttachmentStoreOp::eStore,
+
+	};
+
+	vk::RenderingInfo renderingImguiInfo = {
+		.renderArea = {.offset = {0, 0}, .extent = vkMonsterStats.swapChainExtent},
+		.layerCount = 1,
+		.colorAttachmentCount = 1,
+		.pColorAttachments = &imguiColorInfo,
+		
+	};
+
+	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingImguiInfo);
+
+	ImGui_ImplVulkan_RenderDrawData(drawdata, *vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *vkMonsterStats.imguiPipeline);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
 
