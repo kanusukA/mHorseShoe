@@ -16,6 +16,7 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 #include <vulkan/vulkan_raii.hpp>
 
 #include <imgui.h>
+#include <imgui-1.92.9b/backends/imgui_impl_vulkan.h>
 
 #include <vk_mem_alloc.h>
 
@@ -140,6 +141,9 @@ protected:
 
 	VmaAllocator allocator = nullptr;
 
+	vk::Fence imguiFence;
+
+	vk::raii::CommandPool commandPool = nullptr;
 	vk::raii::CommandBuffer commandBuffer = nullptr;
 
 
@@ -148,13 +152,10 @@ protected:
 	vk::raii::ShaderModule imguiVertShader = nullptr;
 	vk::raii::ShaderModule imguiFragShader = nullptr;
 
-
-
 	bool needsUpdateBuffers = false;
 
 	vk::PipelineRenderingCreateInfo renderingInfo{};
 	vk::Format colorFormat = vk::Format::eB8G8R8A8Unorm;
-
 
 public:
 
@@ -177,13 +178,25 @@ public:
 
 	virtual void createImGuiPipeline() {};
 
+	vk::RenderingAttachmentInfo attachmentInfo(
+		vk::ImageView view,
+		vk::ClearValue* clearView,
+		vk::ImageLayout layout
+	);
+
 	bool newFrame();
-	virtual void updateBuffers(uint32_t frameIndex) {};
-	void drawFrame(vk::raii::CommandBuffer& commandBuffer);
+	virtual void updateBuffers() {};
+	virtual void drawFrame(vk::raii::CommandBuffer& commandBuffer, uint32_t imageIndex) {};
+
+
+	void renderImGuiFrame(vk::raii::CommandBuffer& commandBuffer, uint32_t imageIndex);
 
 	void handleKey(SDL_Event& event) {};
 
+	//void immediate_submit();
 
+	//void initCommands();
+	void initSync();
 
 };
 

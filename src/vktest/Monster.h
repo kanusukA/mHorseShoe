@@ -353,9 +353,11 @@ private:
 	void updateTexture(vk::raii::CommandBuffer& commandBuffer, ImTextureData* tex) override;
 	void setUtils(vk::raii::Device& p_device, vk::raii::PhysicalDevice& p_physicalDevice,
 		vk::raii::Queue& graphicsQueue, uint32_t graphicsQueueFamily, VmaAllocator allocator) override;
-	void updateBuffers(uint32_t frameIndex) override;
+	void updateBuffers() override;
 	void createImGuiShaders() override;
 	void createImGuiPipeline() override;
+
+	void drawFrame(vk::raii::CommandBuffer& commandBuffer, uint32_t imageIdex) override;
 	
 
 public:
@@ -396,8 +398,6 @@ public:
 	// Vulkan
 	void InitVulkan();
 	
-
-
 
 	Mesh loadMeshObj(std::filesystem::path &path);
 

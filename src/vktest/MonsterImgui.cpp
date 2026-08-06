@@ -154,30 +154,18 @@ void Monster::setUtils(vk::raii::Device& p_device, vk::raii::PhysicalDevice& p_p
 	graphicsQueueFamily = p_graphicsQueueFamily;
 	allocator = p_allocator;
 
-	
-	
-		vertexBuffers = device->createBuffer({ .usage = vk::BufferUsageFlagBits::eVertexBuffer });
-		indexBuffers = device->createBuffer({ .usage = vk::BufferUsageFlagBits::eIndexBuffer });
-
-		
-
-	
+	vertexBuffers = device->createBuffer({ .usage = vk::BufferUsageFlagBits::eVertexBuffer });
+	indexBuffers = device->createBuffer({ .usage = vk::BufferUsageFlagBits::eIndexBuffer });
 
 	renderingInfo.colorAttachmentCount = 1;
 	vk::Format formats[] = { colorFormat };
 	renderingInfo.pColorAttachmentFormats = &colorFormat;
 
-	// Command buffer
-	vk::CommandBufferAllocateInfo cmdBufferAllocInfo{
-	    .commandPool = vkMonsterStats.commandPool,
-	    .level = vk::CommandBufferLevel::ePrimary,
-		.commandBufferCount = 1,
-		
-	};
-	commandBuffer = std::move(vk::raii::CommandBuffers(vkMonsterStats.device,cmdBufferAllocInfo).front());
+
+
 }
 
-void Monster::updateBuffers(uint32_t frameIndex)
+void Monster::updateBuffers()
 {
 	ImDrawData* drawData = ImGui::GetDrawData();
 	if (!drawData || drawData->CmdListsCount == 0)
@@ -346,6 +334,139 @@ void Monster::createImGuiPipeline()
 	};
 
 	pipeline = device->createGraphicsPipeline(pipelineCache, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
+}
+
+void Monster::drawFrame(vk::raii::CommandBuffer& commandBuffer, uint32_t imageIdex)
+{
+	/*vk::RenderingAttachmentInfo colorInfo{
+		.imageView = targetView,
+		.imageLayout = vk::ImageLayout::eColorAttachmentOptimal
+	};
+
+	vk::RenderingInfo renderingInfo{
+		.colorAttachmentCount = 1,
+		.pColorAttachments = &colorInfo
+	};
+
+	commandBuffer.beginRendering(renderingInfo);*/
+
+
+	// IMAGE BARRIER
+	vk::ImageMemoryBarrier2 presentToColor{
+		.srcStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+		.srcAccessMask = vk::AccessFlagBits2::eNone,
+		.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+		.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite | vk::AccessFlagBits2::eColorAttachmentRead,
+		.oldLayout = vk::ImageLayout::eUndefined,
+		.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
+		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.image = vkMonsterStats.swapChainImages[imageIdex],
+		.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+	};
+
+	vk::DependencyInfo depInfo{
+		.imageMemoryBarrierCount = 1,
+		.pImageMemoryBarriers = &presentToColor
+	};
+
+	commandBuffer.pipelineBarrier2(depInfo);
+
+
+	ImDrawData* drawData = ImGui::GetDrawData();
+	if (!drawData || drawData->CmdListsCount == 0)
+	{
+		return;
+	}
+
+	if (drawData->Textures)
+	{
+		for (size_t i = 0; i < drawData->Textures->Size; i++)
+		{
+			ImTextureData* tex = (*drawData->Textures)[i];
+			if (tex->Status != ImTextureStatus_OK)
+			{
+				updateTexture(commandBuffer, tex);
+			}
+		}
+	}
+
+	vk::RenderingAttachmentInfo colorAttachment{
+		.imageView = vkMonsterStats.swapChainImageViews[imageIdex],
+		.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+		.loadOp = vk::AttachmentLoadOp::eLoad,
+		.storeOp = vk::AttachmentStoreOp::eStore
+	};
+
+	vk::RenderingInfo renderingInfo{};
+	renderingInfo.renderArea = vk::Rect2D({ 0, 0 }, {
+		static_cast<uint32_t>(drawData->DisplaySize.x),
+		static_cast<uint32_t>(drawData->DisplaySize.y)
+		});
+
+	renderingInfo.layerCount = 1;
+	renderingInfo.colorAttachmentCount = 1;
+	renderingInfo.pColorAttachments = &colorAttachment;
+
+	commandBuffer.beginRendering(renderingInfo);
+
+	// Create Imgui specific pipeline for its own functions
+	commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *pipeline);
+
+	vk::Viewport viewport{};
+	viewport.width = drawData->DisplaySize.x;
+	viewport.height = drawData->DisplaySize.y;
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+	commandBuffer.setViewport(0, viewport);
+
+	pushConstBlock.scale = glm::vec2(2.0f / drawData->DisplaySize.x, 2.0f / drawData->DisplaySize.y);
+	pushConstBlock.translate = glm::vec2(-1.0f);
+
+	commandBuffer.pushConstants(*pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(PushConstBlock), &pushConstBlock);
+
+	commandBuffer.bindVertexBuffers(0, vertexBuffers, { 0 });
+	commandBuffer.bindIndexBuffer(indexBuffers, { 0 }, vk::IndexType::eUint16);
+
+	uint32_t vertexOffset = 0;
+	uint32_t indexOffset = 0;
+
+	for (size_t i = 0; i < drawData->CmdListsCount; i++)
+	{
+		const ImDrawList* cmdList = drawData->CmdLists[i];
+
+		for (size_t j = 0; j < cmdList->CmdBuffer.Size; j++)
+		{
+			const ImDrawCmd* pcmd = &cmdList->CmdBuffer[j];
+
+			vk::Rect2D scissor{};
+			scissor.offset.x = std::max(static_cast<int32_t>(pcmd->ClipRect.x), 0);
+			scissor.offset.y = std::max(static_cast<int32_t>(pcmd->ClipRect.y), 0);
+			scissor.extent.width = static_cast<uint32_t>(pcmd->ClipRect.z - pcmd->ClipRect.x);
+			scissor.extent.height = static_cast<uint32_t>(pcmd->ClipRect.w - pcmd->ClipRect.y);
+
+			commandBuffer.setScissor(0, scissor);
+
+			VkDescriptorSet texHandle = (VkDescriptorSet)pcmd->GetTexID();
+			if (texHandle)
+			{
+				commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
+					*pipelineLayout, 0, { vk::DescriptorSet(texHandle) }, {});
+			}
+			else {
+				commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
+					*pipelineLayout, 0, { *descriptorSet }, {});
+			}
+
+			commandBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
+			indexOffset += pcmd->ElemCount;
+
+		}
+		vertexOffset += cmdList->VtxBuffer.Size;
+
+	}
+
+	commandBuffer.endRendering();
 }
 
 

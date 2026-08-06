@@ -134,11 +134,23 @@ void ImGuiVulkanUtil::initResources()
 
 	pipelineLayout = device->createPipelineLayout(pipelineLayoutInfo);
 
-	// Create Pipeline Ahead;
+
 
 }
 
 
+
+vk::RenderingAttachmentInfo ImGuiVulkanUtil::attachmentInfo(vk::ImageView view, vk::ClearValue* clearView, vk::ImageLayout layout)
+{
+	vk::RenderingAttachmentInfo attachmentinfo{
+		.imageView = view,
+		.imageLayout = layout,
+		.loadOp = clearView ? vk::AttachmentLoadOp::eClear : vk::AttachmentLoadOp::eLoad,
+		.storeOp = vk::AttachmentStoreOp::eStore,
+		.clearValue = *clearView
+	};
+	return attachmentinfo;
+}
 
 bool ImGuiVulkanUtil::newFrame()
 {
@@ -168,101 +180,94 @@ bool ImGuiVulkanUtil::newFrame()
 	return false;
 }
 
-void ImGuiVulkanUtil::drawFrame(vk::raii::CommandBuffer& commandBuffer)
+
+
+void ImGuiVulkanUtil::renderImGuiFrame(vk::raii::CommandBuffer& commandBuffer, uint32_t imageIndex)
 {
-	commandBuffer.begin({});
-	ImDrawData* drawData = ImGui::GetDrawData();
-	if (!drawData || drawData->CmdListsCount == 0)
+	if (newFrame())
 	{
-		return;
+		updateBuffers();
 	}
+	
 
-	if (drawData->Textures)
-	{
-		for (size_t i = 0; i < drawData->Textures->Size; i++)
-		{
-			ImTextureData* tex = (*drawData->Textures)[i];
-			if (tex->Status != ImTextureStatus_OK)
-			{
-				updateTexture(commandBuffer, tex);
-			}
-		}
-	}
+	drawFrame(commandBuffer, imageIndex);
 
-	vk::RenderingAttachmentInfo colorAttachment{};
-
-	vk::RenderingInfo renderingInfo{};
-	renderingInfo.renderArea = vk::Rect2D({ 0, 0 }, {
-		static_cast<uint32_t>(drawData->DisplaySize.x),
-		static_cast<uint32_t>(drawData->DisplaySize.y)
-		});
-
-	renderingInfo.layerCount = 1;
-	renderingInfo.colorAttachmentCount = 1;
-	renderingInfo.pColorAttachments = &colorAttachment;
-
-	commandBuffer.beginRendering(renderingInfo);
-
-	// Create Imgui specific pipeline for its own functions
-	commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *pipeline);
-
-	vk::Viewport viewport{};
-	viewport.width = drawData->DisplaySize.x;
-	viewport.height = drawData->DisplaySize.y;
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-	commandBuffer.setViewport(0, viewport);
-
-	pushConstBlock.scale = glm::vec2(2.0f / drawData->DisplaySize.x, 2.0f / drawData->DisplaySize.y);
-	pushConstBlock.translate = glm::vec2(-1.0f);
-
-	commandBuffer.pushConstants(*pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(PushConstBlock), &pushConstBlock);
-
-	commandBuffer.bindVertexBuffers(0, vertexBuffers, { 0 });
-	commandBuffer.bindIndexBuffer(indexBuffers, { 0 }, vk::IndexType::eUint16);
-
-	uint32_t vertexOffset = 0;
-	uint32_t indexOffset = 0;
-
-	for (size_t i = 0; i < drawData->CmdListsCount; i++)
-	{
-		const ImDrawList* cmdList = drawData->CmdLists[i];
-
-		for (size_t j = 0; j < cmdList->CmdBuffer.Size; j++)
-		{
-			const ImDrawCmd* pcmd = &cmdList->CmdBuffer[j];
-
-			vk::Rect2D scissor{};
-			scissor.offset.x = std::max(static_cast<int32_t>(pcmd->ClipRect.x),0);
-			scissor.offset.y = std::max(static_cast<int32_t>(pcmd->ClipRect.y), 0);
-			scissor.extent.width = static_cast<uint32_t>(pcmd->ClipRect.z - pcmd->ClipRect.x);
-			scissor.extent.height = static_cast<uint32_t>(pcmd->ClipRect.w - pcmd->ClipRect.y);
-
-			commandBuffer.setScissor(0, scissor);
-
-			VkDescriptorSet texHandle = (VkDescriptorSet)pcmd->GetTexID();
-			if (texHandle)
-			{
-				commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
-					*pipelineLayout, 0, { vk::DescriptorSet(texHandle) }, {});
-			}
-			else {
-				commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
-					*pipelineLayout, 0, { *descriptorSet }, {});
-			}
-
-			commandBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
-			indexOffset += pcmd->ElemCount;
-
-		}
-		vertexOffset += cmdList->VtxBuffer.Size;
-
-	}
-
-	commandBuffer.endRendering();
-
-	commandBuffer.end();
-
+	// SUBMITION AND PRESENTATION IS DONE BY MONSTER
 }
+
+//void ImGuiVulkanUtil::drawImgui(vk::raii::CommandBuffer& cmdBuffer, vk::ImageView targetView)
+//{
+//	vk::RenderingAttachmentInfo renderingAttachInfo = attachmentInfo(targetView, nullptr, vk::ImageLayout::eColorAttachmentOptimal);
+//
+//	vk::RenderingInfo renderingInfo{
+//		.colorAttachmentCount = 1,
+//		.pColorAttachments = &renderingAttachInfo
+//	};
+//
+//	cmdBuffer.beginRendering(renderingInfo);
+//
+//	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *cmdBuffer);
+//
+//	cmdBuffer.end();
+//
+//}
+
+//void ImGuiVulkanUtil::immediate_submit()
+//{
+//	device->resetFences(imguiFence);
+//	commandBuffer.reset();
+//
+//	vk::CommandBufferBeginInfo beginInfo{
+//		.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit
+//	};
+//
+//	commandBuffer.begin(beginInfo);
+//
+//	// ENTER FUNCTION COMMAND HERE
+//	commandBuffer.end();
+//
+//	vk::CommandBufferSubmitInfo cmdSubimtInfo{
+//		.commandBuffer = commandBuffer
+//	};
+//
+//	vk::SubmitInfo2 submitInfo{
+//		.commandBufferInfoCount = 1,
+//		.pCommandBufferInfos = &cmdSubimtInfo
+//	};
+//
+//	graphicsQueue->submit2(submitInfo, imguiFence);
+//
+//	device->waitForFences(imguiFence, VK_TRUE, UINT64_MAX);
+//
+//}
+//
+//void ImGuiVulkanUtil::initCommands()
+//{
+//	vk::CommandPoolCreateInfo poolInfo{
+//		.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+//	};
+//
+//	commandPool = device->createCommandPool(poolInfo);
+//
+//	vk::CommandBufferAllocateInfo cmdBufferInfo{
+//		.commandPool = commandPool,
+//		.level = vk::CommandBufferLevel::ePrimary,
+//		.commandBufferCount = 1,
+//	};
+//
+//	commandBuffer = std::move(vk::raii::CommandBuffers(*device,cmdBufferInfo).front());
+//
+//
+//
+//}
+
+void ImGuiVulkanUtil::initSync()
+{
+	vk::FenceCreateInfo fenceInfo{
+
+	};
+	imguiFence = device->createFence(fenceInfo);
+}
+
 
 

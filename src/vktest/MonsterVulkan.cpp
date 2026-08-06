@@ -40,17 +40,14 @@ const std::vector<uint16_t> p_indices = {
 
 void Monster::renderVulkanFrame() {
 
-	if (newFrame())
-	{
-		updateBuffers(vkMonsterStats.frameIndex);
-	}
-
+	// WAIT FOR SIGNAL FROM GPU THAT INDICATE RENDERING HAS FINISHED
 	auto fenceResult = vkMonsterStats.device.waitForFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex], true, UINT64_MAX);
 	if (fenceResult != vk::Result::eSuccess)
 	{
 		throw std::runtime_error("failed to wait for fence!");
 	}
 	
+	// ACQUIRE NEW SWAPCHAIN IMAGE VIEW TO WHICH WE WILL ADD COLOR
 	auto [result, imageIndex] = vkMonsterStats.swapChain.acquireNextImage(UINT64_MAX, *vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex], nullptr);
 
 	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || framebufferResized)
@@ -64,20 +61,18 @@ void Monster::renderVulkanFrame() {
 		throw std::runtime_error("failed to acquire swapchain");
 	}
 
+	// SET FENCES BACK TO NORMAL STATE (HAS TO BE DONE MANUALLY)
 	vkMonsterStats.device.resetFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
 
+	// UPDATE BUFFERS
 	updateUniformBuffer(vkMonsterStats.frameIndex);
 
+	// RESET COMMAND BUFFERS
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].reset();
 	//vkMonsterStats.commandBuffers[MAX_FRAMES_IN_FLIGHT + 1].reset();
 	
-
+	// RECORD COMMANDS. SEE MORE
 	recordCommandBuffer(imageIndex);
-
-	//Imgui
-	commandBuffer.reset();
-
-	drawFrame(commandBuffer);
 	
 
 	// submitting command buffer
@@ -85,12 +80,12 @@ void Monster::renderVulkanFrame() {
 
 	const vk::SubmitInfo submitInfo{
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &*vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex],
+		.pWaitSemaphores = &*vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex], // waits until this semaphore is triggered
 		.pWaitDstStageMask = &waitDestinationStageMask,
 		.commandBufferCount = 1,
-		.pCommandBuffers = (vk::CommandBuffer[]) (*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *commandBuffer),
+		.pCommandBuffers = &*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
 		.signalSemaphoreCount = 1,
-		.pSignalSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex]
+		.pSignalSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex] // triggers this semaphore
 	};
 
 	vkMonsterStats.graphicsQueue.submit(submitInfo, *vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
@@ -108,7 +103,7 @@ void Monster::renderVulkanFrame() {
 
 	const vk::PresentInfoKHR presentInfoKHR{
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex],
+		.pWaitSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex], // waits for this
 		.swapchainCount = 1,
 		.pSwapchains = &*vkMonsterStats.swapChain,
 		.pImageIndices = &imageIndex,
@@ -984,19 +979,24 @@ vk::Format Monster::findDepthFormat()
 
 void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
+	// COMMAND BUFFERS ARE RECORDED IN ORDER BUT MAY NOT RUN IN THAT ORDER FOR OPTIMIZATION , HENCE BARRIERS ARE USED
+
+	// INITALIZE RECODRING OF COMMAND BUFFER
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].begin({});
 
+	// MAKE SURE COLOR HAS BEEN PRINTED
 	transition_image_layout(
 		imageIndex,
-		vk::ImageLayout::eUndefined,
-		vk::ImageLayout::eColorAttachmentOptimal,
-		{},
-		vk::AccessFlagBits2::eColorAttachmentWrite,
-		vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-		vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+		vk::ImageLayout::eUndefined, // Image can be in any layout in input
+		vk::ImageLayout::eColorAttachmentOptimal, // must be converted into a color attachment 
+		{}, // No read/write is required prior to this step
+		vk::AccessFlagBits2::eColorAttachmentWrite, // must be in color Write before continuing
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput, // must be in Color ouput mode
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput, // continue in color output mode
 		vk::ImageAspectFlagBits::eColor
 	);
 
+	// Similar transition for Depth Attachment
 	transition_image_layout(
 		imageIndex,
 		vk::ImageLayout::eUndefined,
@@ -1038,7 +1038,6 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 		
 	};
 
-
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingInfo);
 
 
@@ -1058,6 +1057,9 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
 
+	renderImGuiFrame(vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],imageIndex);
+
+	// MAKES SURE THE FINAL IMAGE IS IN PRESENT MODE BEFORE FINISHING
 	transition_image_layout(
 		imageIndex,
 		vk::ImageLayout::eColorAttachmentOptimal,
