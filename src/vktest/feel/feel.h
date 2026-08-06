@@ -9,7 +9,10 @@
 class FeelPollEventExtension {
 public:
 	virtual void pollEvent(SDL_Event& event) {};
+	virtual void keyHit(MappedKey key) {};
 };
+
+
 
 class Feel {
 	std::vector<FeelKey*> keys = {};
@@ -39,8 +42,8 @@ public:
 
 	FeelMouse mouse = FeelMouse();
 
-	FeelKey* setKey(uint32_t keyCode, std::vector<FeelKey*> heldKeys = {}) {
-		FeelKey* newKey = new FeelKey(keyCode, heldKeys);
+	FeelKey* setKey(uint32_t keyCode, MKeyCode mkeyCode, std::vector<FeelKey*> heldKeys = {}) {
+		FeelKey* newKey = new FeelKey(keyCode, mkeyCode, heldKeys);
 		keys.push_back(std::move(newKey));
 		return keys.at(keys.size() -1 );
 	}
@@ -67,7 +70,13 @@ public:
 
 			for (auto& key : keys)
 			{
-				key->checkHit(event);
+				if (key->checkHit(event))
+				{
+					for (const auto& extension : extensions)
+					{
+						extension->keyHit(key);
+					}
+				}
 			}
 			for (auto& evt : events)
 			{

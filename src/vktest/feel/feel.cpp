@@ -16,18 +16,18 @@ Feel* Feel::GetInstance(){
 
 void Feel::setupDefaultKeys() {
 
-	mappedKeys.lCtrl = setKey(SDLK_LCTRL);
-	mappedKeys.lShift = setKey(SDLK_LSHIFT);
+	mappedKeys.lCtrl = setKey(SDLK_LCTRL, MKEY_L_CTRL);
+	mappedKeys.lShift = setKey(SDLK_LSHIFT, MKEY_L_SHIFT);
 
-	mappedKeys.forwardKey = setKey(SDLK_W);
-	mappedKeys.backwardKey = setKey(SDLK_S);
-	mappedKeys.upKey = setKey(SDLK_W, { mappedKeys.lCtrl });
-	mappedKeys.downKey = setKey(SDLK_S, { mappedKeys.lShift });
+	mappedKeys.forwardKey = setKey(SDLK_W, MKEY_FORWARD);
+	mappedKeys.backwardKey = setKey(SDLK_S, MKEY_BACKWARD);
+	mappedKeys.upKey = setKey(SDLK_W, MKEY_UP ,{ mappedKeys.lCtrl });
+	mappedKeys.downKey = setKey(SDLK_S, MKEY_DOWN, { mappedKeys.lShift });
 
-	mappedKeys.leftKey = setKey(SDLK_A);
-	mappedKeys.rightKey = setKey(SDLK_D);
+	mappedKeys.leftKey = setKey(SDLK_A, MKEY_LEFT);
+	mappedKeys.rightKey = setKey(SDLK_D, MKEY_RIGHT);
 
-	mappedKeys.windowGrab = setKey(SDLK_G);
+	mappedKeys.windowGrab = setKey(SDLK_G, MKEY_WINDOW_GRAB);
 	mappedKeys.windowGrab->switchLock = true;
 
 }

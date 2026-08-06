@@ -232,7 +232,7 @@ private:
 };*/
 
 
-class Monster : public FeelPollEventExtension , public ImGuiVulkanUtil
+class Monster : public FeelPollEventExtension 
 {
 
 private:
@@ -330,7 +330,7 @@ private:
 	vk::raii::CommandBuffer begineSingleTimeCommands();
 	void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer);
 
-	void recordCommandBuffer(uint32_t imageIndex);
+	void recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawData);
 
 	void recreateSwapChain();
 	void cleanupSwapChain();
@@ -339,7 +339,7 @@ private:
 
 	Camera camera;
 
-	void renderVulkanFrame();
+	void renderVulkanFrame(ImDrawData* drawData);
 	void updateSDL();
 
 	void startImGuiFrame();
@@ -349,15 +349,13 @@ private:
 		ImGui_ImplSDL3_ProcessEvent(&event);
 	}
 
-	// IMgui
-	void updateTexture(vk::raii::CommandBuffer& commandBuffer, ImTextureData* tex) override;
-	void setUtils(vk::raii::Device& p_device, vk::raii::PhysicalDevice& p_physicalDevice,
-		vk::raii::Queue& graphicsQueue, uint32_t graphicsQueueFamily, VmaAllocator allocator) override;
-	void updateBuffers() override;
-	void createImGuiShaders() override;
-	void createImGuiPipeline() override;
+	void keyHit(MappedKey key) override {
+		if (key->keyCode == MKEY_WINDOW_GRAB)
+		{
+			grabMouse(!windowGrabbed);
+		}
+	}
 
-	void drawFrame(vk::raii::CommandBuffer& commandBuffer, uint32_t imageIdex) override;
 	
 
 public:
@@ -377,7 +375,7 @@ public:
 */
 	// INITIALIZE OGRE3D AND CREATE A RENDERWINDOW
 	// name  -  NAME OF THE RENDERWINDOW
-	Monster() : FeelPollEventExtension(), ImGuiVulkanUtil() {
+	Monster() : FeelPollEventExtension() {
 		
 	};
 

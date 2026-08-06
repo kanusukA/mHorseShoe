@@ -4,6 +4,9 @@
 // THIS CLASS CONTAINS ALL DIFFERENT TYPE OF KEYS (OF VARIOUS COMBINATION ETC.)
 #include <stdio.h>
 #include <iostream>
+
+typedef uint16_t MKeyCode;
+
 class FeelKey {
 
 
@@ -19,12 +22,16 @@ public:
 
 	bool pressed = false;
 
-	FeelKey(uint32_t p_key, std::vector<FeelKey*> p_heldKeys = std::vector<FeelKey*>()) {
+	MKeyCode keyCode;
+
+	FeelKey(uint32_t p_key, uint16_t mkeyCode , std::vector<FeelKey*> p_heldKeys = std::vector<FeelKey*>()) {
 		key = p_key;
 		heldKeys = p_heldKeys;
+		keyCode = mkeyCode;
 	}
 
-	void checkHit(SDL_Event& event) {
+
+	bool checkHit(SDL_Event& event) {
 
 		if (switchLock)
 		{
@@ -37,7 +44,7 @@ public:
 			{
 				if (!hKey->pressed)
 				{
-					return;
+					return false;
 				}
 			}
 		}
@@ -47,7 +54,7 @@ public:
 				if (switchLock)
 				{
 					pressed = false;
-					return;
+					return false;
 				}
 				else {
 					switchLock = true;
@@ -63,6 +70,8 @@ public:
 			}
 				
 		}
+
+		return pressed;
 	}
 
 
@@ -114,6 +123,17 @@ typedef FeelKey* MappedKey;
 typedef FeelEvent* MappedEvent;
 
 // MAPPED KEYS - KEYS THAT ARE MAPPED TO THEIR PURPOSE
+
+// CUSTOM KEYCODES
+constexpr MKeyCode MKEY_L_CTRL = 0;
+constexpr MKeyCode MKEY_L_SHIFT = 0;
+constexpr MKeyCode MKEY_FORWARD = 0;
+constexpr MKeyCode MKEY_BACKWARD = 0;
+constexpr MKeyCode MKEY_RIGHT = 0;
+constexpr MKeyCode MKEY_LEFT = 0;
+constexpr MKeyCode MKEY_UP = 0;
+constexpr MKeyCode MKEY_DOWN = 0;
+constexpr MKeyCode MKEY_WINDOW_GRAB = 0;
 
 struct Keys
 {

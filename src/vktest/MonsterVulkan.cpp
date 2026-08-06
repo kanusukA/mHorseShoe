@@ -38,7 +38,7 @@ const std::vector<uint16_t> p_indices = {
 
 
 
-void Monster::renderVulkanFrame() {
+void Monster::renderVulkanFrame(ImDrawData* drawData) {
 
 	// WAIT FOR SIGNAL FROM GPU THAT INDICATE RENDERING HAS FINISHED
 	auto fenceResult = vkMonsterStats.device.waitForFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex], true, UINT64_MAX);
@@ -72,7 +72,7 @@ void Monster::renderVulkanFrame() {
 	//vkMonsterStats.commandBuffers[MAX_FRAMES_IN_FLIGHT + 1].reset();
 	
 	// RECORD COMMANDS. SEE MORE
-	recordCommandBuffer(imageIndex);
+	recordCommandBuffer(imageIndex, drawData);
 	
 
 	// submitting command buffer
@@ -977,7 +977,7 @@ vk::Format Monster::findDepthFormat()
 		vk::FormatFeatureFlagBits::eDepthStencilAttachment);
 }
 
-void Monster::recordCommandBuffer(uint32_t imageIndex) {
+void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawData) {
 
 	// COMMAND BUFFERS ARE RECORDED IN ORDER BUT MAY NOT RUN IN THAT ORDER FOR OPTIMIZATION , HENCE BARRIERS ARE USED
 
@@ -1077,7 +1077,7 @@ void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingImguiInfo);
 
-	ImGui_ImplVulkan_RenderDrawData(drawdata, *vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *vkMonsterStats.imguiPipeline);
+	ImGui_ImplVulkan_RenderDrawData(drawData, *vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *vkMonsterStats.imguiPipeline);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
 

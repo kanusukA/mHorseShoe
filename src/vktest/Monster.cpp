@@ -23,22 +23,22 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRot, float
 	{
 		camera.processMouse(cameraRot);
 	}
-	//startImGuiFrame();
+	startImGuiFrame();
 
-//	ImGui::Begin("Random");
+	ImGui::Begin("Random");
 
-	//ImGui::End();
+	ImGui::End();
 
-//	ImGui::EndFrame();
+	ImGui::EndFrame();
 
 	// IMGUI Must be run before rendingFrame()
 	
 
 	//std::cout << "POSITION : " << camera.position.x << " " << camera.position.y << " " << camera.position.z << " pitch : " << cameraRot.x << " YAW : " << cameraRot.y << std::endl;
 
-	//renderFrame();
+	renderFrame();
 
-	renderVulkanFrame();
+	//renderVulkanFrame();
 
 }
 
@@ -136,12 +136,8 @@ void Monster::InitMonster() {
 	// Init Vulkan
 	InitVulkan();
 
-	//InitImgui();
-	setUtils(vkMonsterStats.device, vkMonsterStats.gpuDevice, vkMonsterStats.graphicsQueue, vkMonsterStats.queueIndex, vkMemAlloc.vmaAllocator);
-	init(vkMonsterStats.swapChainExtent.width, vkMonsterStats.swapChainExtent.height);
-	createImGuiShaders();
-	initResources();
-	createImGuiPipeline();
+	InitImgui();
+	
 
 }
 

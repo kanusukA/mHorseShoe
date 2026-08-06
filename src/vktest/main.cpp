@@ -124,11 +124,11 @@ int main() {
 		{
 			running = false;
 		}
-		if (Feel::GetInstance()->mappedKeys.windowGrab->pressed)
+		/*if (Feel::GetInstance()->mappedKeys.windowGrab->pressed)
 		{
 			std::cout << "HIT" << std::endl;
 			monster->grabMouse(!monster->windowGrabbed);
-		}
+		}*/
 
 		/*while (SDL_PollEvent(&event)) {
 
