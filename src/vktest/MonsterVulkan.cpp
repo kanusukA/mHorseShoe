@@ -38,15 +38,16 @@ const std::vector<uint16_t> p_indices = {
 
 
 
-void Monster::renderVulkanFrame(ImDrawData* drawData) {
+void Monster::renderVulkanFrame() {
 
-
+	// WAIT FOR SIGNAL FROM GPU THAT INDICATE RENDERING HAS FINISHED
 	auto fenceResult = vkMonsterStats.device.waitForFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex], true, UINT64_MAX);
 	if (fenceResult != vk::Result::eSuccess)
 	{
 		throw std::runtime_error("failed to wait for fence!");
 	}
 	
+	// ACQUIRE NEW SWAPCHAIN IMAGE VIEW TO WHICH WE WILL ADD COLOR
 	auto [result, imageIndex] = vkMonsterStats.swapChain.acquireNextImage(UINT64_MAX, *vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex], nullptr);
 
 	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || framebufferResized)
@@ -60,25 +61,31 @@ void Monster::renderVulkanFrame(ImDrawData* drawData) {
 		throw std::runtime_error("failed to acquire swapchain");
 	}
 
+	// SET FENCES BACK TO NORMAL STATE (HAS TO BE DONE MANUALLY)
 	vkMonsterStats.device.resetFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
 
+	// UPDATE BUFFERS
 	updateUniformBuffer(vkMonsterStats.frameIndex);
 
+	// RESET COMMAND BUFFERS
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].reset();
-
-	recordCommandBuffer(imageIndex,drawData);
+	//vkMonsterStats.commandBuffers[MAX_FRAMES_IN_FLIGHT + 1].reset();
+	
+	// RECORD COMMANDS. SEE MORE
+	recordCommandBuffer(imageIndex);
+	
 
 	// submitting command buffer
 	vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
 
 	const vk::SubmitInfo submitInfo{
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &*vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex],
+		.pWaitSemaphores = &*vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex], // waits until this semaphore is triggered
 		.pWaitDstStageMask = &waitDestinationStageMask,
 		.commandBufferCount = 1,
 		.pCommandBuffers = &*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
 		.signalSemaphoreCount = 1,
-		.pSignalSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex]
+		.pSignalSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex] // triggers this semaphore
 	};
 
 	vkMonsterStats.graphicsQueue.submit(submitInfo, *vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
@@ -96,13 +103,15 @@ void Monster::renderVulkanFrame(ImDrawData* drawData) {
 
 	const vk::PresentInfoKHR presentInfoKHR{
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex],
+		.pWaitSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex], // waits for this
 		.swapchainCount = 1,
 		.pSwapchains = &*vkMonsterStats.swapChain,
-		.pImageIndices = &imageIndex
+		.pImageIndices = &imageIndex,
+		
 	};
 
 	auto presentResult = vkMonsterStats.graphicsQueue.presentKHR(presentInfoKHR);
+
 	if ((presentResult == vk::Result::eSuboptimalKHR) || (presentResult == vk::Result::eErrorOutOfDateKHR) || framebufferResized)
 	{
 		framebufferResized = false;
@@ -601,6 +610,17 @@ void Monster::createDescriptiorSetLayout()
 
 }
 
+vk::raii::ShaderModule Monster::createShaderModule(const uint32_t* code, size_t codeSize) const
+{
+	vk::ShaderModuleCreateInfo shaderModuleCreateInfo{
+		.codeSize = codeSize,
+		.pCode = code
+	};
+
+	vk::raii::ShaderModule shaderModule{ vkMonsterStats.device, shaderModuleCreateInfo };
+	return std::move(shaderModule);
+}
+
 vk::raii::CommandBuffer Monster::begineSingleTimeCommands()
 {
 	vk::CommandBufferAllocateInfo allocInfo{
@@ -762,7 +782,7 @@ void Monster::createCommandBuffer() {
 	vk::CommandBufferAllocateInfo allocInfo{
 		.commandPool = vkMonsterStats.commandPool,
 		.level = vk::CommandBufferLevel::ePrimary,
-		.commandBufferCount = MAX_FRAMES_IN_FLIGHT
+		.commandBufferCount = MAX_FRAMES_IN_FLIGHT + 1 // For IMGUI
 	};
 
 	vkMonsterStats.commandBuffers = std::move(vk::raii::CommandBuffers(vkMonsterStats.device, allocInfo));
@@ -957,21 +977,26 @@ vk::Format Monster::findDepthFormat()
 		vk::FormatFeatureFlagBits::eDepthStencilAttachment);
 }
 
-void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata) {
+void Monster::recordCommandBuffer(uint32_t imageIndex) {
 
+	// COMMAND BUFFERS ARE RECORDED IN ORDER BUT MAY NOT RUN IN THAT ORDER FOR OPTIMIZATION , HENCE BARRIERS ARE USED
+
+	// INITALIZE RECODRING OF COMMAND BUFFER
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].begin({});
 
+	// MAKE SURE COLOR HAS BEEN PRINTED
 	transition_image_layout(
 		imageIndex,
-		vk::ImageLayout::eUndefined,
-		vk::ImageLayout::eColorAttachmentOptimal,
-		{},
-		vk::AccessFlagBits2::eColorAttachmentWrite,
-		vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-		vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+		vk::ImageLayout::eUndefined, // Image can be in any layout in input
+		vk::ImageLayout::eColorAttachmentOptimal, // must be converted into a color attachment 
+		{}, // No read/write is required prior to this step
+		vk::AccessFlagBits2::eColorAttachmentWrite, // must be in color Write before continuing
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput, // must be in Color ouput mode
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput, // continue in color output mode
 		vk::ImageAspectFlagBits::eColor
 	);
 
+	// Similar transition for Depth Attachment
 	transition_image_layout(
 		imageIndex,
 		vk::ImageLayout::eUndefined,
@@ -1009,12 +1034,11 @@ void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata) {
 		.layerCount = 1,
 		.colorAttachmentCount = 1,
 		.pColorAttachments = &attachmentInfo,
-		.pDepthAttachment = &depthAttachmentInfo
+		.pDepthAttachment = &depthAttachmentInfo,
+		
 	};
 
-
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingInfo);
-
 
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, *vkMonsterStats.graphicsPipeline);
@@ -1031,6 +1055,7 @@ void Monster::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawdata) {
 		vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
 	);
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(vkMemAlloc.indexes, 1, 0, 0, 0);
+
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
 
@@ -1185,6 +1210,14 @@ void Monster::createDescriptorPool()
 		{.type = vk::DescriptorType::eUniformBuffer,
 		.descriptorCount = MAX_FRAMES_IN_FLIGHT
 		},
+		/*{
+			.type = vk::DescriptorType::eSampledImage,
+			.descriptorCount = IMGUI_IMPL_VULKAN_MINIMUM_SAMPLED_IMAGE_POOL_SIZE
+		},
+		{
+			.type = vk::DescriptorType::eSampler,
+			.descriptorCount = IMGUI_IMPL_VULKAN_MINIMUM_SAMPLER_POOL_SIZE
+		},*/
 		{
 		.type = vk::DescriptorType::eCombinedImageSampler,
 		.descriptorCount = MAX_FRAMES_IN_FLIGHT
@@ -1193,10 +1226,14 @@ void Monster::createDescriptorPool()
 
 	vk::DescriptorPoolCreateInfo poolInfo{
 		.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
-		.maxSets = MAX_FRAMES_IN_FLIGHT,
 		.poolSizeCount = static_cast<uint32_t>(poolSize.size()),
 		.pPoolSizes = poolSize.data()
 	};
+
+	for (const auto& pool : poolSize)
+	{
+		poolInfo.maxSets += pool.descriptorCount;
+	}
 
 	vkDescriptors.descriptorPool = vk::raii::DescriptorPool(vkMonsterStats.device, poolInfo);
 
@@ -1266,7 +1303,13 @@ void Monster::createDescriptorSets()
 
 }
 
-std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, VmaAllocationCreateFlags allocFlags, VmaMemoryUsage allocUsage) {
+std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(
+	vk::DeviceSize size, 
+	vk::BufferUsageFlags usage, 
+	VmaAllocationCreateFlags allocFlags, 
+	VmaMemoryUsage allocUsage,
+	VmaAllocationInfo* allocationInfo
+) {
 
 	vk::BufferCreateInfo bufferInfo{
 		.size = size,
@@ -1285,7 +1328,7 @@ std::pair<VkBuffer, VmaAllocation> Monster::createBuffer(vk::DeviceSize size, vk
 	VmaAllocation allocation;
 	//VmaAllocationInfo allocationInfo = {};
 
-	auto result = vmaCreateBuffer(vkMemAlloc.vmaAllocator, bufferInfo, &allocInfo, &buffer, &allocation, nullptr);
+	auto result = vmaCreateBuffer(vkMemAlloc.vmaAllocator, bufferInfo, &allocInfo, &buffer, &allocation, allocationInfo);
 
 	if (result != VkResult::VK_SUCCESS)
 	{
