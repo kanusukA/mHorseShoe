@@ -25,6 +25,8 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRot, float
 	}
 	startImGuiFrame();
 
+	CameraStatsImGuiWindow();
+
 	ImGui::Begin("Random");
 
 	ImGui::End();

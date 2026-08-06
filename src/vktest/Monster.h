@@ -409,6 +409,8 @@ public:
 	void grabMouse(bool grab);
 	void hideMouse(bool hide);
 
+	void CameraStatsImGuiWindow();
+
 /*	void setShadowTechnique();
 
 	// Use this function to add input listner to the application context

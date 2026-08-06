@@ -44,6 +44,37 @@ void Monster::hideMouse(bool hide)
 {
 }
 
+void Monster::CameraStatsImGuiWindow()
+{
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGui::Begin("STATS", nullptr,ImGuiWindowFlags_NoMove);
+
+	ImGui::Text("POSITION : ");
+
+	ImGui::Text("X : ");
+	ImGui::SameLine();
+	ImGui::Text(std::to_string(camera.position.x).c_str());
+	ImGui::SameLine();
+	ImGui::Text(" Y : ");
+	ImGui::SameLine();
+	ImGui::Text(std::to_string(camera.position.y).c_str());
+	ImGui::SameLine();
+	ImGui::Text(" Z : ");
+	ImGui::SameLine();
+	ImGui::Text(std::to_string(camera.position.z).c_str());
+
+	ImGui::Text("ROTATION : ");
+
+	ImGui::Text("PITCH : ");
+	ImGui::SameLine();
+	ImGui::Text(std::to_string(camera.pitch).c_str());
+	ImGui::Text("YAW : ");
+	ImGui::SameLine();
+	ImGui::Text(std::to_string(camera.yaw).c_str());
+
+	ImGui::End();
+}
+
 void Monster::updateSDL()
 {
 

@@ -126,14 +126,14 @@ typedef FeelEvent* MappedEvent;
 
 // CUSTOM KEYCODES
 constexpr MKeyCode MKEY_L_CTRL = 0;
-constexpr MKeyCode MKEY_L_SHIFT = 0;
-constexpr MKeyCode MKEY_FORWARD = 0;
-constexpr MKeyCode MKEY_BACKWARD = 0;
-constexpr MKeyCode MKEY_RIGHT = 0;
-constexpr MKeyCode MKEY_LEFT = 0;
-constexpr MKeyCode MKEY_UP = 0;
-constexpr MKeyCode MKEY_DOWN = 0;
-constexpr MKeyCode MKEY_WINDOW_GRAB = 0;
+constexpr MKeyCode MKEY_L_SHIFT = 1;
+constexpr MKeyCode MKEY_FORWARD = 2;
+constexpr MKeyCode MKEY_BACKWARD = 3;
+constexpr MKeyCode MKEY_RIGHT = 4;
+constexpr MKeyCode MKEY_LEFT = 5;
+constexpr MKeyCode MKEY_UP = 6;
+constexpr MKeyCode MKEY_DOWN = 7;
+constexpr MKeyCode MKEY_WINDOW_GRAB = 8;
 
 struct Keys
 {
