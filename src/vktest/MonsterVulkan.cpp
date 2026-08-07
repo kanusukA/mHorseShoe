@@ -129,7 +129,7 @@ void Monster::InitVulkan() {
 
 	std::cout << "Initalizing Vulkan" << std::endl;
 
-	createVulkanInstance();
+	createVulkanInstance(const char** extensions, uint32_t extensionCount);
 	setupDebugMessenger();
 	createVulkanSurface();
 	pickVulkanPhysicalDevice();
@@ -154,7 +154,7 @@ void Monster::InitVulkan() {
 
 }
 
-void Monster::createVulkanInstance() {
+void Monster::createVulkanInstance(const char** extensions, uint32_t extensionCount) {
 
 	// Validation Layers
 	std::vector<char const*> requiredLayers;

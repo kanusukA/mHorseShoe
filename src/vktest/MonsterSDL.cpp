@@ -75,10 +75,7 @@ void Monster::CameraStatsImGuiWindow()
 	ImGui::End();
 }
 
-void Monster::updateSDL()
-{
 
-}
 
 
 
