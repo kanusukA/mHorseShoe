@@ -1,16 +1,16 @@
 
-#include <GDHandler/GDHandler.h>
+//#include <GDHandler/GDHandler.h>
+#include <monster/Monster.h>
+
 #include <timer/glock.h>
 #include <cons.h>
+
 
 
 
 // Rendering
 // Physics
 // GUI
-
-// 16 millisec in each frame for 60FPS
-const double MS_PER_FRAME = 16;
 
 int main() {
 
@@ -36,6 +36,8 @@ int main() {
 	//setup materials to ogre
 	Monster* monster = new Monster();
 
+	monster->InitMonster();
+
 	std::cout << "Initializing kint" << std::endl;
 	//Kint* kint = new Kint();
 	
@@ -49,13 +51,13 @@ int main() {
 	/*kint = new Kint();
 	kint->InitPhysics();*/
 
-	Feel* feel = new Feel();
-
+	
+	
 
 //	feel->initFeel(monster->sdlWindow,
 	//GDHANDLER
 	
-	GDHandler* gdHandler = new GDHandler(ResourceHandler::GetInstance(),monster,feel); // TODO integrate Feel with GDHandler itself
+	//GDHandler* gdHandler = new GDHandler(ResourceHandler::GetInstance(),monster,feel); // TODO integrate Feel with GDHandler itself
 
 	//monster->setGrid();
 	
@@ -67,36 +69,23 @@ int main() {
 
 	//monster->_createGrassBlade(0.3, 1);
 
+	Glock* glock = new Glock();
+
 	// MAIN LOOP
-	double startTime;
-	double renderTime;
-	double elapsed;
-	double deltaTime;
-
-	double lastTime = getCurrentTime();
-
-	std::cout << "loop started : " << std::endl;
+	bool running = true;
 	
-	while (!InputHandler::GetInstance()->getInputKeys()->QUIT_KEY) {
+	while (running) {
 
-		startTime = getCurrentTime();
-		elapsed = startTime - lastTime;
-		deltaTime = elapsed / 100;
+		glock->setStartTime();
 
-		// Input / GUI Update
-		//gdHandler->update(deltaTime);
+		Feel::GetInstance()->updateFeel();
 
 		
-		renderTime = getCurrentTime();
 
+		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime);
 
-		lastTime = startTime;
-
-		if (startTime + MS_PER_FRAME > getCurrentTime()) {
-			Sleep(startTime + MS_PER_FRAME - getCurrentTime());
-		}
-	
-
+		glock->setEndTime();
+		
 	}
 
 	std::cout << "loop ended : " << std::endl;

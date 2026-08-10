@@ -3,6 +3,8 @@
 
 #include <monster/imgui-1.92.9b/imgui.h>
 
+#include <GDHandler/ResourceHandler.h>
+
 #include <stdio.h>
 #include <iostream>
 
@@ -37,8 +39,6 @@ public:
 
 	MonsterCamera camera = std::make_unique<Camera>();
 
-	bool framebufferResized = false;
-
 	uint32_t windowWidth;
 	uint32_t windowHeight;
 
@@ -68,7 +68,7 @@ public:
 	void createTextureImageView();
 	void createTextureSampler();
 	void createVertexBuffer();
-	void createVertexBuffer(std::vector<Vertex> vertices);
+	void createVertexBuffer(std::vector<horse::Vertex> vertices);
 	void createIndexBuffer();
 	void createIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();
@@ -144,6 +144,11 @@ public:
 	void cleanupSwapChain();
 
 	void InitVulkan(uint16_t windowWidth, uint16_t windowHeight);
+
+
+	void ShutdownVulkan();
+
+	//
 
 };
 

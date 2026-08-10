@@ -278,3 +278,45 @@ void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std:
 
 
 }
+
+const std::string& ResourceReader::readFileContents(std::filesystem::path filePath)
+{
+	std::ifstream file(filePath, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file : " + filePath.string());
+	}
+
+	std::vector<char> buffer(file.tellg());
+
+	file.seekg(0, std::ios::beg);
+
+	file.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+
+	file.close();
+
+	std::string output(buffer.begin(), buffer.end());
+
+	return output;
+}
+
+const std::vector<char>& ResourceReader::readFileContentsChar(std::filesystem::path filePath)
+{
+	std::ifstream file(filePath, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file : " + filePath.string());
+	}
+
+	std::vector<char> buffer(file.tellg());
+
+	file.seekg(0, std::ios::beg);
+
+	file.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+
+	file.close();
+
+	return buffer;
+}

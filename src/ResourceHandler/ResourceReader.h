@@ -2,12 +2,14 @@
 
 #include <Gui/GuiComponents/ToastComponent.h>
 
+
 #include<Windows.h>
 
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
 #include <filesystem>
+#include <vector>
 
 
 enum ShaderVarType
@@ -53,6 +55,9 @@ public:
 
 	void readShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p);
 	void readGLSLShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p);
+
+	const std::string& readFileContents(std::filesystem::path filePath);
+	const std::vector<char>& readFileContentsChar(std::filesystem::path filePath);
 
 
 };

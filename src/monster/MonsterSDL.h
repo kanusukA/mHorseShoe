@@ -7,11 +7,11 @@
 
 struct SDLStats {
 
-	uint16_t windowWidth;
-	uint16_t windowHeight;
+	uint32_t windowWidth;
+	uint32_t windowHeight;
 
-	bool windowGrabed;
-	bool windowFullscreen;
+	bool windowGrabed = false;
+	bool windowFullscreen = false;
 
 	bool framebufferResized = false;
 
@@ -27,6 +27,8 @@ public:
 	void InitSDLWindow(uint16_t windowHeight, uint16_t windowWidth);
 
 	void frameBufferResized();
+
+	void windowGrab(bool state);
 
 	void ShutdownSDL();
 

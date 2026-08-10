@@ -6,8 +6,9 @@
 
 
 // Third-party Headers
-#include <Ogre.h>
 #include "yaml-cpp/yaml.h"
+
+#include <glm/glm.hpp>
 
 // STL Headers
 #include <filesystem>
@@ -330,7 +331,7 @@ public:
 		_id = 10100000000 + index + ((this->scnType) * 10000000); //  Assigns ID Based on SceneType
 	}
 
-	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, SceneType sceneType, Ogre::Vector3 position_p, Ogre::Vector4 orientation_p, Ogre::Vector3 scale_p) {
+	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, SceneType sceneType, glm::vec3  position_p, glm::vec4 orientation_p, glm::vec3 scale_p) {
 		this->resourceHandlerCxt = context;
 
 		scnType = sceneType;
@@ -440,17 +441,17 @@ enum TextureMapType {
 // hTexture hold the texture image path, loaded texture pointer and the texture position from which ShaderTexture can extract values
 struct hTexture {
 	std::filesystem::path imagePath;
-	Ogre::TexturePtr texturePtr;
+	
 };
 
 // ShaderTexture does not hold the Texture it self but referes to it as multiple maps can be packed and extracted using this method
 struct ShaderTexture
 {
 	std::string textureName = "";
-	Ogre::TexturePtr texture = 0;
+	
 	TextureMapType textureType;
 	int texturePosition; // Position of texture in Shader
-	Ogre::TextureAddressingMode addressingMode = Ogre::TAM_WRAP;
+
 	float scale = 1.0f;
 	
 };
@@ -525,7 +526,6 @@ public:
 
 	std::vector<ShaderTexture>* textures;
 
-	Ogre::CullingMode culling = Ogre::CULL_CLOCKWISE;
 
 	bool wireframeMode = false;
 
@@ -617,12 +617,10 @@ public:
 };
 
 
-std::string convertVec3ToString(Ogre::Vector3 vec3);
-std::string convertVec4ToString(Ogre::Vector4 vec4);
-Ogre::Vector4 convertStringToVec4(std::string str);
+
+
 std::string convertFloatPtrToString(float* val_p, int size);
 int convertStringToFloatPtr(std::string str_p,float* &output_p);
-Ogre::Vector3 convertFloatPtrToVec3(float* val_p);
-Ogre::Vector4 convertFloatPtrToVec4(float* val_p);
+
 
 std::string convertShaderVarValueToStr(ShaderVar variable);

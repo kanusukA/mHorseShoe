@@ -1,4 +1,5 @@
 #include "Monster.h"
+#include "Monster.h"
 
 
 
@@ -142,6 +143,8 @@ void Monster::InitMonster() {
 	
 
 }
+
+
 
 /*void Monster::setShadowTechnique()
 {

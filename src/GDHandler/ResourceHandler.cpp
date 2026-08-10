@@ -5,26 +5,7 @@
 ResourceHandler* ResourceHandler::pinstance_{ nullptr };
 std::mutex ResourceHandler::mutex_;
 
-ResourceHandlerType ResourceHandler::_getResourceLocationGroup(std::string groupStr)
-{
-	if (groupStr == RENDER_MESH_LOC) {
-		return ResourceHandlerType::RENDER_MESH;
-	}
-	else if (groupStr == COLLIDER_MESH_LOC) {
-		return ResourceHandlerType::COLLIDER_MESH;
-	}
-	else if (groupStr == MESH_MATERIAL_LOC) {
-		return ResourceHandlerType::MESH_MATERIALS;
-	}
-	else if (groupStr == IMAGES_LOC)
-	{
-		return ResourceHandlerType::IMAGE;
-	}
-	else {
-		return ResourceHandlerType::GLOBAL;
-	}
 
-}
 
 
 
@@ -47,23 +28,12 @@ ResourceHandler::ResourceHandler()
 }
 
 
-
-RLFetchedResource* ResourceHandler::fetchResourcesFromMesh(ResID meshID)
-{
-	return _fetchedResourcesFromMesh(meshID, allResourceParentPaths);
-}
-
-
-
-
 std::filesystem::path ResourceHandler::find(std::string fileName, std::string location)
 {
-	//std::cout << "Opening file " << fileName << std::endl;
 
 	if (location.empty()) {
 		throw ResourceHandlerInvalidRequest();
 	}
-
 	
 	try {
 		for (const auto& entry : fs::directory_iterator(location)) {
@@ -92,24 +62,6 @@ ResourceHandler* ResourceHandler::GetInstance() {
 	}
 	return pinstance_;
 
-
-}
-
-void ResourceHandler::getCases(std::vector<Ogre::String>* outputVec)
-{
-	std::cout << "getcases run" << std::endl;
-	if (!std::filesystem::exists(SourceDir.string() + "/Scenes"))
-	{
-		std::filesystem::create_directory(SourceDir.string() + "/Scenes");
-	}
-
-	for (const auto &entry : std::filesystem::directory_iterator(SourceDir.string() + "/Scenes"))
-	{
-		if (std::filesystem::is_directory(entry.status())) {
-			outputVec->push_back(entry.path().filename().string());
-			std::cout << "Case file : " << entry.path().filename().string() << std::endl;
-		}
-	}
 
 }
 
@@ -179,23 +131,6 @@ void ResourceHandler::syncMasterLoadPaths()
 		}
 	}
 
-	// ASSIGN POINTERS TO THE DP VECTORS.
-	if (this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::MATERIAL_PATH))
-	{
-		*this->MaterialDp = *this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::MATERIAL_PATH);
-	}
-	if (this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::MATERIAL_TEXTURE))
-	{
-		*this->TextureDp = *this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::MATERIAL_TEXTURE);
-	}
-	if (this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::RENDER_MESH_PATH))
-	{
-		*this->MeshDp = *this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::RENDER_MESH_PATH);
-	}
-	if (this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::SHADER))
-	{
-		*this->ShaderDp = *this->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::SHADER);
-	}
 
 }
 
@@ -252,11 +187,6 @@ std::filesystem::path ResourceHandler::getSourceDir()
 	
 	return srcPath.remove_filename();
 
-}
-
-std::filesystem::path ResourceHandler::getDataDir()
-{
-	return this->getSourceDir().string() + DATA_DIRECTORY;
 }
 
 

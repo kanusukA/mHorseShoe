@@ -15,22 +15,23 @@ int getFPS(int framesPerMilli);
 
 
 class Glock {
-	auto startTime;
-	auto endTime;
+	std::chrono::steady_clock::time_point startTime;
+	std::chrono::steady_clock::time_point endTime;
 public:
 
 	double deltaTime = 0;
 
 	void setStartTime() {
-		startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
+		startTime = std::chrono::steady_clock::now();
 	}
 
 	void setEndTime() {
-		endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
+		endTime = std::chrono::steady_clock::now();
 	}
 
 	double getDelta() {
-		return std::chrono::duration<double>(endTime - startTime);
+		deltaTime = std::chrono::duration<double, std::milli>(endTime - startTime).count();
+		return deltaTime;
 	}
 
 	void setSleep(float duration) {

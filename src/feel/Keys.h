@@ -1,235 +1,158 @@
-#pragma once
 
-#include <GDHandler/GDContext.h>
 #include <SDL3/SDL.h>
+#include <vector>
+// THIS CLASS CONTAINS ALL DIFFERENT TYPE OF KEYS (OF VARIOUS COMBINATION ETC.)
+#include <stdio.h>
+#include <iostream>
 
-class HeldKeys {
-public:
-	bool lCrtl = false;
-	bool rCrtl = false;
+typedef uint16_t MKeyCode;
 
-	bool lAlt = false;
-	bool rAlt = false;
-
-	bool lShift = false;
-	bool rShift = false;
-};
-
-class Key {
-protected:
-//	GDBuilderContext* builderCxt;
-	HeldKeys* heldkeys;
-
-	SDL_Keycode SDL_Key;
+class FeelKey {
 
 
 public:
-	Key(/*GDBuilderContext* builderCxt_p,*/ SDL_Keycode SDL_Key_p, HeldKeys* heldKeys_p) {
-		heldkeys = heldKeys_p;
-//		builderCxt = builderCxt_p;
-		SDL_Key = SDL_Key_p;
-		
+
+	// Prevents the button from sustaining true state for more than a single loop
+	bool switchLock = false;
+
+	std::vector<FeelKey*> heldKeys = std::vector<FeelKey*>();
+	SDL_Keycode key;
+
+	bool enabled = true;
+
+	bool pressed = false;
+
+	MKeyCode keyCode;
+
+	FeelKey(uint32_t p_key, uint16_t mkeyCode , std::vector<FeelKey*> p_heldKeys = std::vector<FeelKey*>()) {
+		key = p_key;
+		heldKeys = p_heldKeys;
+		keyCode = mkeyCode;
 	}
 
-	virtual void click(SDL_EventType key_evnt) {
-		
-	}
 
-	void setSDL_Key(SDL_Keycode SDL_Key_p) {
-		SDL_Key = SDL_Key_p;
-	}
+	bool checkHit(SDL_Event& event) {
 
-	SDL_Keycode getSDL_Key() { return SDL_Key; }
-
-};
-
-
-// KEYS _______________________________________________________________________________________
-
-// SYSTEM KEYS ----------------------------------------------------------------------------
-
-class FullScreenKey : public Key {
-private:
-	bool state;
-	bool lock = false;
-public:
-	FullScreenKey(/*GDBuilderContext* builderCxt_p,*/ HeldKeys* heldKeys, bool state_p = true) : Key(/*builderCxt_p,*/SDLK_F,heldKeys) {
-		state = state_p;
-	}
-
-	void click(SDL_EventType key_evnt) override {
-		if(!lock){
-			state = !state;
-//			this->builderCxt->setFullScreen(state);
-			lock = true;
-		}
-		if (key_evnt == SDL_EVENT_KEY_UP)
+		if (switchLock)
 		{
-			lock = false;
+			pressed = false;
 		}
-	}
 
-};
-
-class HideGuiKey : public Key {
-private:
-	bool state; 
-	bool lock = false;
-public:
-	HideGuiKey(/*GDBuilderContext* builderCxt_p,*/ HeldKeys* heldKeys, bool state_p = true) : Key(/*builderCxt_p,*/ SDLK_H, heldKeys) {
-		state = state_p;
-	}
-
-	void click(SDL_EventType key_evnt) override {
-		if (!lock) {
-			state = !state;
-		//	this->builderCxt->setGuiVisibility(state);
-			lock = true;
-		}
-		if (key_evnt == SDL_EVENT_KEY_UP)
+		if (!heldKeys.empty())
 		{
-			lock = false;
-		}
-	}
-
-};
-
-class CheckFunctionKey : public Key {
-private:
-	bool state;
-	bool lock = false;
-public:
-	CheckFunctionKey(/*GDBuilderContext* builderCxt_p,*/ HeldKeys* heldKeys, bool state_p = true) : Key(/*builderCxt_p,*/ SDLK_H,heldKeys) {
-		state = state_p;
-	}
-
-	void click(SDL_EventType key_evnt) override {
-		if (!lock) {
-			state = !state;
-			
-		//	ToastComponent::GetInstance()->addMessage("Width : " + std::to_string(*builderCxt->getWindowSize()->width));
-		//	ToastComponent::GetInstance()->addMessage("Height : " + std::to_string(*builderCxt->getWindowSize()->height));
-
-			lock = true;
-		}
-		if (key_evnt == SDL_EVENT_KEY_UP)
-		{
-			lock = false;
-		}
-	}
-
-};
-
-
-class WinStateKey : public Key {
-private:
-	bool state;
-	bool lock = false;
-public:
-	WinStateKey(/*GDBuilderContext* builderCxt_p,*/ HeldKeys* heldKeys, bool state_p = true) : Key(/*builderCxt_p,*/ SDLK_G,heldKeys) {
-		state = state_p;
-	}
-
-	void click(SDL_EventType key_evnt) override {
-		if (!lock) {
-			state = !state;
-			if (state && heldkeys->lCrtl)
+			for (const auto hKey : heldKeys)
 			{
-				builderCxt->changeWindowState(GDSun::IN_GAME);
+				if (!hKey->pressed)
+				{
+					return false;
+				}
 			}
-			else {
-				builderCxt->changeWindowState(GDSun::GUI);
+		}
+		if (event.key.key == key)
+		{
+			if (event.type == SDL_EVENT_KEY_DOWN) {
+				if (switchLock)
+				{
+					pressed = false;
+					return false;
+				}
+				else {
+					switchLock = true;
+					pressed = true;
+					std::cout << key << " Pressed DOWN " << std::endl;
+				}
+				
 			}
-			
+			else if (event.type == SDL_EVENT_KEY_UP) {
+				switchLock = false;
+				pressed = false;
+				std::cout << key << " Pressed UP " << std::endl;
+			}
+				
+		}
 
-			lock = true;
-		}
-		if (key_evnt == SDL_EVENT_KEY_UP)
-		{
-			lock = false;
-		}
+		return pressed;
 	}
-};
 
-
-// PLAYER MOVEMENT KEYS -----------------------------------------------------------------
-
-/*class CamForwardKey : public Key {
-private:
-	PlayerInput* input;
-
-public:
-	CamForwardKey(GDBuilderContext* builderCxt_p, HeldKeys* heldKeys, PlayerInput* input_p) : Key(builderCxt_p, SDLK_W,heldKeys) {
-		input = input_p;
-	}
-	void click(SDL_EventType key_evnt) override {
-		if (key_evnt == SDL_EVENT_KEY_DOWN)
-		{
-			input->forward = true;
-		}
-		else {
-			input->forward = false;
-		}
-	}
 
 };
 
-class CamBackwardKey : public Key {
-private:
-	PlayerInput* input;
-
+class FeelEvent {
 public:
-	CamBackwardKey(GDBuilderContext* builderCxt_p, HeldKeys* heldKeys, PlayerInput* input_p) : Key(builderCxt_p, SDLK_S,heldKeys) {
-		input = input_p;
+
+	bool enabled = true;
+
+	bool eventState = false;
+	uint32_t evtType;
+
+	FeelEvent(uint32_t p_evtType) {
+		evtType = p_evtType;
 	}
-	void click(SDL_EventType key_evnt) override {
-		if (key_evnt == SDL_EVENT_KEY_DOWN)
+
+	void checkEvent(SDL_Event& event) {
+		if (event.type == evtType)
 		{
-			input->backward = true;
+			eventState = true;
 		}
 		else {
-			input->backward = false;
+			eventState = false;
 		}
 	}
+
 
 };
 
-class CamLeftKey : public Key {
-private:
-	PlayerInput* input;
-
+class FeelMouse {
 public:
-	CamLeftKey(GDBuilderContext* builderCxt_p, HeldKeys* heldKeys, PlayerInput* input_p) : Key(builderCxt_p, SDLK_A,heldKeys) {
-		input = input_p;
-	}
-	void click(SDL_EventType key_evnt) override {
-		if (key_evnt == SDL_EVENT_KEY_DOWN)
+	float xRel;
+	float yRel;
+
+	void updateMousePos(SDL_Event& event) {
+		xRel = 0.0f;
+		yRel = 0.0f;
+		if (event.type == SDL_EVENT_MOUSE_MOTION)
 		{
-			input->left = true;
-		}
-		else {
-			input->left = false;
+			xRel = event.motion.xrel / 10;
+			yRel = event.motion.yrel / 10;
 		}
 	}
 
 };
 
-class CamRightKey : public Key {
-private:
-	PlayerInput* input;
+typedef FeelKey* MappedKey;
+typedef FeelEvent* MappedEvent;
 
-public:
-	CamRightKey(GDBuilderContext* builderCxt_p, HeldKeys* heldKeys, PlayerInput* input_p) : Key(builderCxt_p, SDLK_D,heldKeys) {
-		input = input_p;
-	}
-	void click(SDL_EventType key_evnt) override {
-		if (key_evnt == SDL_EVENT_KEY_DOWN)
-		{
-			input->right = true;
-		}
-		else {
-			input->right = false;
-		}
-	}
+// MAPPED KEYS - KEYS THAT ARE MAPPED TO THEIR PURPOSE
 
-};*/
+// CUSTOM KEYCODES
+constexpr MKeyCode MKEY_L_CTRL = 0;
+constexpr MKeyCode MKEY_L_SHIFT = 1;
+constexpr MKeyCode MKEY_FORWARD = 2;
+constexpr MKeyCode MKEY_BACKWARD = 3;
+constexpr MKeyCode MKEY_RIGHT = 4;
+constexpr MKeyCode MKEY_LEFT = 5;
+constexpr MKeyCode MKEY_UP = 6;
+constexpr MKeyCode MKEY_DOWN = 7;
+constexpr MKeyCode MKEY_WINDOW_GRAB = 8;
+
+struct Keys
+{
+
+	MappedKey lCtrl;
+	MappedKey lShift;
+
+	MappedKey forwardKey;
+	MappedKey backwardKey;
+	MappedKey leftKey;
+	MappedKey rightKey;
+	MappedKey upKey;
+	MappedKey downKey;
+
+	MappedKey windowGrab;
+
+};
+
+struct Events {
+	MappedEvent windowResize;
+	MappedEvent quitApplication;
+};

@@ -34,7 +34,6 @@ public:
 	// Used to update File
 	bool loadIniFile(std::string filename);
 
-
 	// Transfer Data From memory to Disk
 	void saveIni(std::string filename);
 	void resetIni();
@@ -68,8 +67,6 @@ public:
 
 	// LOAD PATHS
 	void saveResourceLoadPaths(std::vector<ResourceLoadPath>* loadPaths, std::string path);
-
-
 
 	void saveMasterList(std::string instanceName, std::vector<ResID>* master_p, std::string path, bool overwrite = true);
 

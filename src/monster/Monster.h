@@ -7,68 +7,37 @@
 #define VK_EXT_DEBUG_REPORT_EXTENSION_NAME "VK_EXT_debug_report"
 #endif
 
-#include "VulkanStats.h"
-
-// Third-party header
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_vulkan.h>
-
-#include <imgui_stdlib.h>
 
 // STL headers
 #if defined (_WIN32)
 	#include <Windows.h>
 #endif
 
-#include <monster/VulkanStats.h>
 
+#include <monster/MonsterImgui.h>
 
-// Third-party header
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_vulkan.h>
-
-#include <imgui.h>
-#include <imgui-1.92.9b/backends/imgui_impl_sdl3.h>
-#include <imgui-1.92.9b/backends/imgui_impl_vulkan.h>
-
-#include <Camera.h>
+#include <feel/feel.h>
 
 
 
 
 
 
-class Monster
+class Monster : public FeelPollEventExtension, public MonsterImgui
 {
 
 private:
 
-	//SDL
-	SDLStats sdlStats = SDLStats();
-	
+	void pollEvent(SDL_Event& event) override;
+	void keyHit(MappedKey key) override;
 
-	// IMGUI
-	
-	void updateSDL();
-
-	void startImGuiFrame();
-	void renderFrame();
-
-
-	// INIT FUNCTIONS
-	void InitSDLWindow();
-	void InitVulkan();
-	void InitImgui();
-	bool createImGuiPipeline();
-	
-	void ShutdownSDL();
-	void ShutdownImGui();
-	void ShutdownVulkan();
-	
 
 public:
 
 	void InitMonster();
+
+
+	void updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime);
 
 
 	void Shutdown();

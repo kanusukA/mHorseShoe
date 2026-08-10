@@ -14,51 +14,6 @@ bool vectorPathContains(std::vector<std::filesystem::path>* checkVec, std::strin
 
 // TOOLS
 
-std::string convertVec3ToString(Ogre::Vector3 vec3) {
-	return std::to_string(vec3[0]) + "|" + std::to_string(vec3[1]) + "|" + std::to_string(vec3[2]) + "|";
-}
-
-Ogre::Vector3 convertStringToVec3(std::string str) {
-	std::string value = "";
-	int count = 0;
-	Ogre::Vector3 vec3 = Ogre::Vector3();
-	for (int i = 0; i < str.size(); i++)
-	{
-		if (str.at(i) == '|')
-		{
-			vec3[count] = std::stof(value);
-			value.clear();
-			count += 1;
-		}
-		else {
-			value += str.at(i);
-		}
-	}
-	return vec3;
-}
-
-std::string convertVec4ToString(Ogre::Vector4 vec4) {
-	return std::to_string(vec4[0]) + "|" + std::to_string(vec4[1]) + "|" + std::to_string(vec4[2]);
-}
-
-Ogre::Vector4 convertStringToVec4(std::string str) {
-	std::string value = "";
-	int count = 0;
-	Ogre::Vector4 vec4 = Ogre::Vector4();
-	for (int i = 0; i < str.size(); i++)
-	{
-		if (str.at(i) == '|')
-		{
-			vec4[count] = std::stof(value);
-			value.clear();
-			count += 1;
-		}
-		else {
-			value += str.at(i);
-		}
-	}
-	return vec4;
-}
 
 std::string convertFloatPtrToString(float* val_p, int size)
 {
@@ -104,15 +59,6 @@ int convertStringToFloatPtr(std::string str_p, float* &output_p)
 
 }
 
-Ogre::Vector3 convertFloatPtrToVec3(float* val_p)
-{
-	return Ogre::Vector3(val_p[0], val_p[1], val_p[2]);
-}
-
-Ogre::Vector4 convertFloatPtrToVec4(float* val_p)
-{
-	return Ogre::Vector4(val_p[0], val_p[1], val_p[2],val_p[3]);
-}
 
 std::string convertShaderVarValueToStr(ShaderVar variable) {
 	switch (variable.varType)

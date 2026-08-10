@@ -35,17 +35,6 @@ struct SceneObject {
 
 
 
-// Types of resources
-enum ResourceHandlerType
-{
-	GLOBAL,
-	RENDER_MESH,
-	COLLIDER_MESH,
-	MESH_MATERIALS,
-	IMAGE
-};
-
-
 
 // Integrate it into gdhandler with Ogre 
 class ResourceHandler : public ResourceHandlerBuilderContext, public ResourceSaver , public ResourceLoader, public ResourceReader
@@ -56,15 +45,8 @@ private:
 	static ResourceHandler* pinstance_;
 	static std::mutex mutex_;
 
-	ResourceHandlerType _getResourceLocationGroup(std::string groupStr);
-
 	CSimpleIniA ini;
 
-	// SOON TO BE DEPRICATED
-	std::vector<std::filesystem::path>* MaterialDp = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* ShaderDp = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* TextureDp = new std::vector<std::filesystem::path>();
-	std::vector<std::filesystem::path>* MeshDp = new std::vector<std::filesystem::path>();
 
 	// MASTER RESOURCE VECTOR
 	// THIS VECTOR STORES ALL THE RESOURCE PATHS. THAT HAS BEEN INITALIZED! i.e. THE PATHS THAT HASS BEEN CONNECTED TO THE ENUM GROUP AND THE RESOURCE_LOAD_PATHS.
@@ -73,9 +55,6 @@ private:
 	// Searching Methods
 	// Main search function
 	std::filesystem::path find(std::string filepath, std::string location);
-
-	// OVERHAUL PROJECT
-	std::vector<std::string>* allResourceParentPaths = new std::vector<std::string>(13);
 
 
 protected:
@@ -87,13 +66,6 @@ protected:
 public:
 
 	static ResourceHandler* GetInstance();
-
-	RLFetchedResource* fetchResourcesFromMesh(ResID meshID);
-
-	std::vector<std::filesystem::path>* getMaterialsLoaded() { return MaterialDp; }
-	std::vector<std::filesystem::path>* getShadersLoaded() { return ShaderDp; }
-	std::vector<std::filesystem::path>* getTexturesLoaded() { return TextureDp; }
-	std::vector<std::filesystem::path>* getRenderMeshLoaded() { return MeshDp; }
 
 	// REOURCE LOADER FUNCTIONS
 	void saveLoadPaths();
@@ -112,37 +84,6 @@ public:
 	// Use RESOURCE_MASTER_GROUP_INDEX to fecth predefined groups.
 	std::filesystem::path* fetchFileInGroup(std::string filename_p, std::string group_p);
 
-
-	void getCases(std::vector<Ogre::String>* outputVec);
-
-	
-	void setPath(std::string path, ResourcePaths pathOf) {
-		if (std::filesystem::exists(path))
-		{
-			allResourceParentPaths->at(pathOf) = path;
-		}
-		else {
-			throw ResourceHandlerIDError(("Invalid Path - " + path).c_str());
-		}
-		
-	}
-	void setPath(std::string path, int pathPos) {
-		if (std::filesystem::exists(path))
-		{
-			allResourceParentPaths->at(pathPos) = path;
-		}
-		else {
-			throw ResourceHandlerIDError(("Invalid Path - " + path).c_str());
-		}
-	}
-	std::string* getPath(ResourcePaths pathOf) {
-		return &allResourceParentPaths->at(pathOf);
-	}
-	std::vector<std::string>* getPaths() {
-		return allResourceParentPaths;
-	}
-
-	std::filesystem::path getDataDir();
 
 	// Resources
 	std::filesystem::path SourceDir;

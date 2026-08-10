@@ -19,7 +19,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-const std::vector<Vertex> p_vertices = {
+const std::vector<horse::Vertex> p_vertices = {
 	{{-0.5f, -0.5f, 0.5f}, {1.0f,1.0f,1.0f},{1.0f, 0.0f} },
 	{{0.5f, -0.5f,0.5f}, {0.0f,1.0f,0.0f}, {0.0f, 0.0f} },
 	{{0.5f, 0.5f,0.5f}, {0.0f,0.0f,1.0f}, {0.0f, 1.0f} },
@@ -43,9 +43,9 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 	// ACQUIRE NEW SWAPCHAIN IMAGE VIEW TO WHICH WE WILL ADD COLOR
 	auto [result, imageIndex] = vkMonsterStats.swapChain.acquireNextImage(UINT64_MAX, *vkSyncStats.presentCompleteSemaphores[vkMonsterStats.frameIndex], nullptr);
 
-	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || framebufferResized)
+	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || sdlStats->framebufferResized)
 	{
-		framebufferResized = false;
+		sdlStats->framebufferResized = false;
 		recreateSwapChain();
 		return;
 	}
@@ -105,9 +105,9 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 
 	auto presentResult = vkMonsterStats.graphicsQueue.presentKHR(presentInfoKHR);
 
-	if ((presentResult == vk::Result::eSuboptimalKHR) || (presentResult == vk::Result::eErrorOutOfDateKHR) || framebufferResized)
+	if ((presentResult == vk::Result::eSuboptimalKHR) || (presentResult == vk::Result::eErrorOutOfDateKHR) || sdlStats->framebufferResized)
 	{
-		framebufferResized = false;
+		sdlStats->framebufferResized = false;
 		recreateSwapChain();
 	}
 
@@ -146,6 +146,12 @@ void MonsterVulkan::InitVulkan(uint16_t windowWidth, uint16_t windowHeight) {
 	createSyncObjects();
 
 
+}
+
+void MonsterVulkan::ShutdownVulkan()
+{
+	vkMonsterStats.device.waitIdle();
+	vmaDestroyAllocator(vkMemAlloc.vmaAllocator);
 }
 
 void MonsterVulkan::createVulkanInstance() {
@@ -647,11 +653,7 @@ void MonsterVulkan::endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffe
 
 void MonsterVulkan::createGraphicsPipeline() {
 
-	std::filesystem::path filePath = std::filesystem::path("../../../src/vktest/shaders/triangle.spv");
-
-	auto shaderCode = readShaderFile(std::filesystem::absolute(filePath).string().c_str());
-
-	vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
+	vk::raii::ShaderModule shaderModule = createShaderModule(ResourceHandler::GetInstance()->readFileContentsChar("../../../src/monster/shaders/triangle.spv"));
 
 	vk::PipelineShaderStageCreateInfo vertexShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eVertex, .module = shaderModule, .pName = "vertMain" };
 
@@ -673,8 +675,8 @@ void MonsterVulkan::createGraphicsPipeline() {
 	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
 
 	// vertex input
-	auto bindingDescription = Vertex::getBindingDescription();
-	auto attributeDescription = Vertex::getAttributeDescriptions();
+	auto bindingDescription = horse::Vertex::getBindingDescription();
+	auto attributeDescription = horse::Vertex::getAttributeDescriptions();
 	vk::PipelineVertexInputStateCreateInfo vertexInputCreateInfo{
 		.vertexBindingDescriptionCount = 1,
 		.pVertexBindingDescriptions = &bindingDescription,
@@ -1120,7 +1122,7 @@ void MonsterVulkan::createVertexBuffer() {
 	createVertexBuffer(p_vertices);
 }
 
-void MonsterVulkan::createVertexBuffer(std::vector<Vertex> vertices) {
+void MonsterVulkan::createVertexBuffer(std::vector<horse::Vertex> vertices) {
 	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 	// Create a staging buffer (stored in the CPU for quick access and change)
 	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(

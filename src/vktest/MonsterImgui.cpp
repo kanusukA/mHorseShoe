@@ -1,4 +1,4 @@
-#include <Monster.h>
+#include <monster/MonsterImgui.h>
 
 void Monster::InitImgui()
 {
@@ -270,8 +270,5 @@ void Monster::ShutdownImGui()
 	ImGui_ImplSDL3_Shutdown();
 	ImGui::DestroyContext();
 }
-
-
-
 
 

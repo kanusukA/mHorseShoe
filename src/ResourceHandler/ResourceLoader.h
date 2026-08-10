@@ -22,7 +22,6 @@ struct RLMaterial {
 	RLShader vertShader;
 	RLShader fragShader;
 	std::vector<ShaderTexture> textures;
-	Ogre::CullingMode culling;
 	bool wireframe;
 };
 
@@ -93,12 +92,7 @@ protected:
 	// Main File through which details of files are fetched
 	YAML::Node loadFile;
 
-
-
-	RLFetchedResource* _fetchedResourcesFromMesh(ResID meshID, std::vector<std::string>* resourcePaths_p);
-
-	RLMesh* _fetchMesh(ResID id, std::string path_p);
-	RLMaterial* _fetchMaterial(ResID id, std::string path_p, std::string matTexPath_p);
+	
 	RLShader* _fetchShader(ResID id, std::string path_p) { return nullptr; };
 	ShaderTexture _fetchShaderTexture(ResID id, std::string path_p) { return ShaderTexture(); };
 	
@@ -151,8 +145,6 @@ public:
 
 	// Loading Saved Data
 	//void loadSavedCases(std::string path_p);
-	void loadSavedScenes(std::string path_p);
-	void loadSavedObject(std::string path_p);
 
 	// GETTER
 	std::vector<std::filesystem::path>* getSavedCaseFiles() {
@@ -165,11 +157,6 @@ public:
 	std::string fetchNodeByMapKey(std::string key);
 
 
-	// Loading Things Not related to Saved Data
-	void loadMaterialsDp(std::vector<std::filesystem::path>* output, std::string extension = ".material", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
-	void loadShadersDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
-	void loadMeshesDp(std::vector<std::filesystem::path>* output, std::string extension = ".mesh", bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
-	void loadTexturesDp(std::vector<std::filesystem::path>* output, std::string extension, bool searchAllResources = false, bool searchFolders = false, bool clearOutput = false);
 
 	
 

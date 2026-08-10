@@ -217,7 +217,7 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p
 	out << YAML::Value << mat_p->wireframeMode;
 
 	out << YAML::Key << MATERIAL_CULLING_KEY;
-	out << YAML::Value << static_cast<int>(mat_p->culling);
+	//out << YAML::Value << static_cast<int>(mat_p->culling);
 
 	out << YAML::Key << MATERIAL_FILENAME_KEY;
 	out << YAML::Value << mat_p->materialFilePath;
@@ -253,7 +253,7 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p
 			out << YAML::BeginMap;
 			out << YAML::Key << MATERIAL_TEXTURE_NAME_KEY << YAML::Value << mat_p->textures->at(i).textureName;
 			out << YAML::Key << MATERIAL_TEXTURE_POSITION_KEY << YAML::Value << mat_p->textures->at(i).texturePosition;
-			out << YAML::Key << MATERIAL_TEXTURE_ADDRESSING_MODE_KEY << YAML::Value << static_cast<int>(mat_p->textures->at(i).addressingMode);
+			//out << YAML::Key << MATERIAL_TEXTURE_ADDRESSING_MODE_KEY << YAML::Value << static_cast<int>(mat_p->textures->at(i).addressingMode);
 			out << YAML::Key << MATERIAL_TEXTURE_SCALE_KEY << YAML::Value << mat_p->textures->at(i).scale;
 			out << YAML::EndMap;
 		}
