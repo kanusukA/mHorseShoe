@@ -31,6 +31,9 @@ private:
 	void pollEvent(SDL_Event& event) override;
 	void keyHit(MappedKey key) override;
 
+	// EXAMPLE
+	Mesh* mesh = new Mesh();
+
 
 public:
 
@@ -38,6 +41,8 @@ public:
 
 
 	void updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime);
+
+	Mesh loadMeshObj(std::filesystem::path& path);
 
 
 	void Shutdown();

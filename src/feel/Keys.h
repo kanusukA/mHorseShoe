@@ -121,6 +121,11 @@ public:
 
 	}
 
+	void resetValues() {
+		xRel = 0.0f;
+		yRel = 0.0f;
+	}
+
 };
 
 typedef FeelKey* MappedKey;

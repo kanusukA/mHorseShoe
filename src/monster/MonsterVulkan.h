@@ -69,9 +69,9 @@ public:
 	void createTextureImageView();
 	void createTextureSampler();
 	void createVertexBuffer();
-	void createVertexBuffer(std::vector<horse::Vertex> vertices);
+	uint32_t createVertexBuffer(std::vector<horse::Vertex> vertices);
 	void createIndexBuffer();
-	void createIndexBuffer(std::vector<uint16_t> indices);
+	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();
 	void createDescriptorPool();
 	void createDescriptorSets();
@@ -149,7 +149,12 @@ public:
 
 	void ShutdownVulkan();
 
-	//
+	// PIPELINE MODIFERS
+	void createSkyBoxPipeline() {};
+	void createTerrainPipeline() {};
+
+	// resturns the index of where buffer is stored (in context with the engine Not physical memory)
+	void loadMeshVertInd(Mesh* mesh);
 
 };
 

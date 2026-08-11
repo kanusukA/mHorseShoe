@@ -262,3 +262,28 @@ void MonsterImgui::ShutdownImgui()
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 }
+
+void MonsterImgui::debugWindow()
+{
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::Begin("Debug",0,ImGuiWindowFlags_::ImGuiWindowFlags_NoMove);
+
+    ImGui::Text("MouseX : "); ImGui::SameLine();
+    if (imDebugStats.mouseXrel)
+    {
+        ImGui::Text(std::to_string(*imDebugStats.mouseXrel).c_str());
+    }
+    else {
+        ImGui::Text("Value is nullptr");
+    }
+    ImGui::Text("MouseY : "); ImGui::SameLine();
+    if (imDebugStats.mouseYrel)
+    {
+        ImGui::Text(std::to_string(*imDebugStats.mouseYrel).c_str());
+    }
+    else {
+        ImGui::Text("Value is nullptr");
+    }
+
+    ImGui::End();
+}

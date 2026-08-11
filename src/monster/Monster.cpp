@@ -25,6 +25,14 @@ void Monster::InitMonster() {
 
 	// Passdown Feel
 	Feel::GetInstance()->addExtension(this);
+
+	imDebugStats.mouseXrel = &Feel::GetInstance()->mouse.xRel;
+	imDebugStats.mouseYrel = &Feel::GetInstance()->mouse.yRel;
+
+	std::filesystem::path filepath = std::filesystem::path("../../../src/monster/shaders/test1.obj");
+	*mesh = loadMeshObj(filepath);
+	MonsterVulkan::loadMeshVertInd(mesh);
+
 }
 
 void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime)
@@ -48,12 +56,7 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, 
 
 	// Imgui Rendering
 
-	ImGui::Begin("Testing");
-
-	ImGui::Text("TESTING");
-
-	ImGui::End();
-
+	MonsterImgui::debugWindow();
 
 	ImGui::EndFrame();
 

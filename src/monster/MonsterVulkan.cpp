@@ -160,6 +160,12 @@ void MonsterVulkan::ShutdownVulkan()
 	vmaDestroyAllocator(vkMemAlloc.vmaAllocator);
 }
 
+
+
+
+
+
+
 void MonsterVulkan::createVulkanInstance() {
 
 	// Validation Layers
@@ -1055,18 +1061,23 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, *vkMonsterStats.graphicsPipeline);
 
-
-
-	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer, { 0 });
-	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer, 0, vk::IndexType::eUint16);
-
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
 		vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
 	);
-	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(vkMemAlloc.indexes, 1, 0, 0, 0);
+
+
+
+	for (int64_t i = 0; i < vkMemAlloc.vertexBuffer.size(); i++)
+	{
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[i], { 0 });
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[i], 0, vk::IndexType::eUint16);
+
+
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(vkMemAlloc.indexes[i], i, 0, 0, 0);
+	}
 
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
@@ -1137,7 +1148,8 @@ void MonsterVulkan::createVertexBuffer() {
 	createVertexBuffer(p_vertices);
 }
 
-void MonsterVulkan::createVertexBuffer(std::vector<horse::Vertex> vertices) {
+uint32_t MonsterVulkan::createVertexBuffer(std::vector<horse::Vertex> vertices) {
+	vkMemAlloc.vertices.push_back(vertices.size());
 	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 	// Create a staging buffer (stored in the CPU for quick access and change)
 	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
@@ -1157,10 +1169,12 @@ void MonsterVulkan::createVertexBuffer(std::vector<horse::Vertex> vertices) {
 		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
 		VMA_MEMORY_USAGE_AUTO
 	);
-	vkMemAlloc.vertexBuffer = vk::raii::Buffer(vkMonsterStats.device, vkBuffer);
-	vkMemAlloc.vertexBufferAlloc = vkBufferAlloc;
+	vkMemAlloc.vertexBuffer.push_back(std::move(vk::raii::Buffer(vkMonsterStats.device, vkBuffer)));
+	vkMemAlloc.vertexBufferAlloc.push_back(std::move(vkBufferAlloc));
 
 	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
+
+	return vkMemAlloc.vertexBuffer.size() - 1;
 }
 
 void MonsterVulkan::createIndexBuffer() {
@@ -1168,9 +1182,9 @@ void MonsterVulkan::createIndexBuffer() {
 
 }
 
-void MonsterVulkan::createIndexBuffer(std::vector<uint16_t> indices) {
+uint32_t MonsterVulkan::createIndexBuffer(std::vector<uint16_t> indices) {
 
-	vkMemAlloc.indexes = indices.size(); // Used during recordCommandBuffer()
+	vkMemAlloc.indexes.push_back(indices.size()); // Used during recordCommandBuffer()
 
 	vk::DeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 	// Create a staging buffer (stored in the CPU for quick access and change)
@@ -1191,10 +1205,12 @@ void MonsterVulkan::createIndexBuffer(std::vector<uint16_t> indices) {
 		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
 		VMA_MEMORY_USAGE_AUTO
 	);
-	vkMemAlloc.indexBuffer = vk::raii::Buffer(vkMonsterStats.device, vkBuffer);
-	vkMemAlloc.indexBufferAlloc = vkBufferAlloc;
+	vkMemAlloc.indexBuffer.push_back(std::move(vk::raii::Buffer(vkMonsterStats.device, vkBuffer)));
+	vkMemAlloc.indexBufferAlloc.push_back(std::move(vkBufferAlloc));
 
 	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
+
+	return vkMemAlloc.indexBuffer.size() - 1;
 }
 
 void MonsterVulkan::createUniformBuffers()
@@ -1467,4 +1483,21 @@ void MonsterVulkan::transitionImageLayout(vk::raii::CommandBuffer& commandBuffer
 	}
 
 	commandBuffer.pipelineBarrier(sourceStage, destinationStage, {}, {}, nullptr, barrier);
+}
+
+
+
+void MonsterVulkan::loadMeshVertInd(Mesh* mesh)
+{
+	mesh->vertBufferIndex = createVertexBuffer(*mesh->vertices);
+	mesh->indBufferIndex = createIndexBuffer(*mesh->indices);
+
+	// VALIDATION - size of index, vertex, vertex buffer, index buffer must be all same!
+	if ((static_cast<int32_t>(vkMemAlloc.indexes.size()) != static_cast<int32_t>(vkMemAlloc.vertexBuffer.size())) || (static_cast<int32_t>(vkMemAlloc.indexBuffer.size()) != static_cast<int32_t>(vkMemAlloc.vertices.size())))
+	{
+		throw std::runtime_error("ERROR IN VERTEX AND INDEX BUFFER CREATION!!!");
+	}
+
+	mesh->loadedVulkanVertInd = true;
+
 }

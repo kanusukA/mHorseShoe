@@ -58,6 +58,9 @@ public:
 	void setupDefaultEvents();
 
 	void updateFeel() {
+		
+		mouse.resetValues();
+
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
@@ -67,6 +70,7 @@ public:
 			}
 
 			mouse.updateMousePos(event);
+			
 
 			for (auto& key : keys)
 			{

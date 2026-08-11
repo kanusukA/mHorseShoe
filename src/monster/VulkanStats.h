@@ -49,8 +49,14 @@ namespace horse {
 
 
 struct Mesh {
+
+	bool loadedVulkanVertInd = false;
+
 	std::vector<horse::Vertex>* vertices = nullptr;
 	std::vector<uint16_t>* indices = nullptr;
+
+	uint32_t vertBufferIndex;
+	uint32_t indBufferIndex;
 
 	glm::vec4 color = glm::vec4(1, 1, 1, 1);
 
@@ -105,12 +111,13 @@ struct VulkanSync {
 struct VulkanMemAlloc {
 	VmaAllocator vmaAllocator;
 
-	vk::raii::Buffer vertexBuffer = nullptr;
-	VmaAllocation vertexBufferAlloc;
-	vk::raii::Buffer indexBuffer = nullptr;
-	VmaAllocation indexBufferAlloc;
+	std::vector<vk::raii::Buffer> vertexBuffer;
+	std::vector<VmaAllocation> vertexBufferAlloc;
+	std::vector<vk::raii::Buffer> indexBuffer;
+	std::vector<VmaAllocation> indexBufferAlloc;
 
-	uint32_t indexes;
+	std::vector<uint32_t> indexes;
+	std::vector<uint32_t> vertices;
 
 	std::vector<vk::raii::Buffer> uniformBuffers;
 	std::vector<VmaAllocation> uniformBufferAlloc;
