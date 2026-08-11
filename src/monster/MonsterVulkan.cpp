@@ -720,7 +720,7 @@ void MonsterVulkan::createGraphicsPipeline() {
 		.depthClampEnable = false,
 		.rasterizerDiscardEnable = false,
 		.polygonMode = vk::PolygonMode::eFill,
-		.cullMode = vk::CullModeFlagBits::eBack,
+		.cullMode = vk::CullModeFlagBits::eNone,
 		.frontFace = vk::FrontFace::eCounterClockwise,
 		.depthBiasEnable = false,
 		.lineWidth = 1.0f
@@ -1440,7 +1440,7 @@ void MonsterVulkan::updateUniformBuffer(uint32_t currentImage)
 
 	ubo.view = glm::lookAt(camera->position, camera->position + camera->front, camera->up);
 
-	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 100.0f);
+	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
 	//ubo.proj[1][1] *= -1;
 
 	memcpy(vkMemAlloc.uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));

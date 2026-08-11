@@ -33,6 +33,7 @@ private:
 
 	// EXAMPLE
 	Mesh* mesh = new Mesh();
+	Mesh* skybox = new Mesh();
 
 
 public:

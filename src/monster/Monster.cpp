@@ -33,6 +33,10 @@ void Monster::InitMonster() {
 	*mesh = loadMeshObj(filepath);
 	MonsterVulkan::loadMeshVertInd(mesh);
 
+	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/skybox.obj");
+	*skybox = loadMeshObj(skyboxPath);
+	MonsterVulkan::loadMeshVertInd(skybox);
+
 }
 
 void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime)

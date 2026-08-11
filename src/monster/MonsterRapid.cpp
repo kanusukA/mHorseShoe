@@ -37,7 +37,6 @@ Mesh Monster::loadMeshObj(std::filesystem::path& path)
 		);
 		vertex.pos = vec3;
 
-		std::cout << "pos : " << vec3.x << " " << vec3.y << " " << vec3.z << std::endl;
 		mesh.vertices->push_back(vertex);
 		//mesh.vertices->at(i).texCoord = glm::vec2(result.attributes.texcoords[2 * i + 0], result.attributes.texcoords[2 * i + 1]);
 		
@@ -68,7 +67,6 @@ Mesh Monster::loadMeshObj(std::filesystem::path& path)
 
 	for (size_t i = 0; i < mesh.indices->size(); i++)
 	{
-		std::cout << "INDEX : " << result.shapes.front().mesh.indices[0].position_index << std::endl;
 		mesh.indices->at(i) = static_cast<uint16_t>(result.shapes.front().mesh.indices[i].position_index);
 	}
 
