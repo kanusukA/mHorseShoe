@@ -35,7 +35,7 @@ public:
 	}
 
 	void setSleep(float duration) {
-		Sleep(duration);
+//		Sleep(duration);
 	}
 
 

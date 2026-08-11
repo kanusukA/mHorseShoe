@@ -7,6 +7,7 @@ double getCurrentTime() {
 		std::chrono::system_clock::now().time_since_epoch());
 
 	return ms.count();
+
 }
 
 std::string getTimeStamp() {

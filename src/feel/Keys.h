@@ -110,11 +110,15 @@ public:
 	void updateMousePos(SDL_Event& event) {
 		xRel = 0.0f;
 		yRel = 0.0f;
+
 		if (event.type == SDL_EVENT_MOUSE_MOTION)
 		{
 			xRel = event.motion.xrel / 10;
 			yRel = event.motion.yrel / 10;
 		}
+
+
+
 	}
 
 };

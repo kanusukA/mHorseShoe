@@ -98,9 +98,12 @@ void MonsterImgui::createImguiPipeline()
 
     vk::raii::PipelineLayout pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutInfo);
 
+    std::vector<char> shaderCode = std::vector<char>();
+
+    ResourceHandler::GetInstance()->readFileContents("../../../src/monster/shaders/imgui.spv", &shaderCode);
 
     // Load shaders
-    vk::raii::ShaderModule shaderModule = createShaderModule(ResourceHandler::GetInstance()->readFileContentsChar("../../../src/monster/shaders/imgui.spv"));
+    vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
 
     // Shader stage creation
     vk::PipelineShaderStageCreateInfo vertShaderStageInfo;
@@ -248,7 +251,7 @@ void MonsterImgui::renderFrame() {
     const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
     if (!isMinimized)
     {
-        renderVulkanFrame(drawData);
+        MonsterVulkan::renderVulkanFrame(drawData);
 
     }
 }

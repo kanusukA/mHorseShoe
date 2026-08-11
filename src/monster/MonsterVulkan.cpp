@@ -1,3 +1,5 @@
+
+
 #include "MonsterVulkan.h"
 
 #include <cstddef>
@@ -7,6 +9,10 @@
 
 #include <algorithm>
 #include <limits.h>
+
+#if defined (_WIN32)
+	#define VK_USE_PLATFORM_WIN32_KHR
+#endif
 
 #define VMA_IMPLEMENTATION
 #include <vulkan/vulkan.h>
@@ -186,11 +192,17 @@ void MonsterVulkan::createVulkanInstance() {
 		throw std::runtime_error("SDL FAILED TO PROVIDE EXTENSION DETAILS TO VULKAN");
 	}
 
+	
+
 	int count_extensions = extensionCount + 1;
 	const char** extensions = static_cast<const char**>(SDL_malloc(count_extensions * sizeof(const char*)));
 	extensions[0] = vk::EXTDebugUtilsExtensionName;
 	SDL_memcpy(&extensions[1], instance_extensions, extensionCount * sizeof(const char*));
 
+	for (size_t i = 0; i < count_extensions; i++)
+	{
+		std::cout << "VULKAN Extension : " << extensions[i] << std::endl;
+	}
 
 
 	vk::ApplicationInfo appInfo{};
@@ -202,7 +214,7 @@ void MonsterVulkan::createVulkanInstance() {
 
 	vk::InstanceCreateInfo createInfo{};
 	createInfo.pApplicationInfo = &appInfo;
-	createInfo.enabledExtensionCount = extensionCount;
+	createInfo.enabledExtensionCount = count_extensions;
 	createInfo.ppEnabledExtensionNames = extensions;
 	createInfo.enabledLayerCount = static_cast<uint32_t>(requiredLayers.size());
 	createInfo.ppEnabledLayerNames = requiredLayers.data();
@@ -246,8 +258,8 @@ void MonsterVulkan::createVulkanSurface() {
 	VkSurfaceKHR surface;
 
 	if (!SDL_Vulkan_CreateSurface(sdlStats->window, *vkMonsterStats.vkInstance, nullptr, &surface)) {
-
-		throw std::runtime_error("UNABLE TO CREATE VULKAN SURFACE FROM SDLWINDOW!");
+		std::cerr << "SDL ERROR : " << SDL_GetError() << std::endl;
+		throw std::runtime_error(SDL_GetError());
 	}
 
 	vkMonsterStats.surface = vk::raii::SurfaceKHR(vkMonsterStats.vkInstance, surface);
@@ -653,7 +665,10 @@ void MonsterVulkan::endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffe
 
 void MonsterVulkan::createGraphicsPipeline() {
 
-	vk::raii::ShaderModule shaderModule = createShaderModule(ResourceHandler::GetInstance()->readFileContentsChar("../../../src/monster/shaders/triangle.spv"));
+	std::vector<char> shaderCode = std::vector<char>();
+	ResourceHandler::GetInstance()->readFileContents("../../../src/monster/shaders/triangle.spv", &shaderCode);
+
+	vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
 
 	vk::PipelineShaderStageCreateInfo vertexShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eVertex, .module = shaderModule, .pName = "vertMain" };
 
@@ -1074,7 +1089,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingImguiInfo);
 
-	//ImGui_ImplVulkan_RenderDrawData(drawData, *vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *vkMonsterStats.imguiPipeline);
+	ImGui_ImplVulkan_RenderDrawData(drawData, *vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex], *vkMonsterStats.imguiPipeline);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
 

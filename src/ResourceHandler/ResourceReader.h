@@ -58,6 +58,7 @@ public:
 
 	const std::string& readFileContents(std::filesystem::path filePath);
 	const std::vector<char>& readFileContentsChar(std::filesystem::path filePath);
+	void readFileContents(std::filesystem::path filePath, std::vector<char>* outputVector);
 
 
 };

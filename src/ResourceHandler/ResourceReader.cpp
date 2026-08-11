@@ -320,3 +320,22 @@ const std::vector<char>& ResourceReader::readFileContentsChar(std::filesystem::p
 
 	return buffer;
 }
+
+void ResourceReader::readFileContents(std::filesystem::path filePath, std::vector<char>* outputVector)
+{
+	std::ifstream file(filePath, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file : " + filePath.string());
+	}
+
+	outputVector->resize(file.tellg());
+
+	file.seekg(0, std::ios::beg);
+
+	file.read(outputVector->data(), static_cast<std::streamsize>(outputVector->size()));
+
+	file.close();
+
+}

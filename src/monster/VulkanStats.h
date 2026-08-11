@@ -8,7 +8,6 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 #endif
 
 
-
 #include "vulkan/vulkan.hpp"
 #include "vulkan/vulkan_core.h"
 
@@ -17,7 +16,7 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 #include <vk_mem_alloc.h>
 
-#include <SDL3/SDL.h>
+#include <stdlib.h>
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>

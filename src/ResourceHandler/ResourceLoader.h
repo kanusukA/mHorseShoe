@@ -129,8 +129,8 @@ public:
 		sourceDir = sourceDir_p;
 		resourceLoaderIniPath = resourceLoaderIniPath_p;
 		dataDirPath = dataDirPath_p;
-		loadSavedPaths();
-		loadSavedCases();
+		/*loadSavedPaths();
+		loadSavedCases();*/
 
 	}
 

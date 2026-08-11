@@ -1,14 +1,24 @@
 
+#if defined (_WIN32)
+	#define NOMINMAX 
+	#include <Windows.h>
+#endif
+
+#if defined (_WIN32)
+	#define VK_USE_PLATFORM_WIN32_KHR
+#endif
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 
 #include <memory>
 
+#include <stdexcept>
 
 struct SDLStats {
 
-	uint32_t windowWidth;
-	uint32_t windowHeight;
+	int windowWidth;
+	int windowHeight;
 
 	bool windowGrabed = false;
 	bool windowFullscreen = false;

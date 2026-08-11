@@ -12,6 +12,7 @@
 // Physics
 // GUI
 
+
 int main() {
 
 	std::cout << "Start : " << std::endl;
@@ -50,7 +51,6 @@ int main() {
 	// Physics INIT
 	/*kint = new Kint();
 	kint->InitPhysics();*/
-
 	
 	
 
@@ -72,14 +72,12 @@ int main() {
 	Glock* glock = new Glock();
 
 	// MAIN LOOP
-	bool running = true;
 	
-	while (running) {
+	while (!Feel::GetInstance()->mappedEvents.quitApplication->eventState) {
 
 		glock->setStartTime();
 
 		Feel::GetInstance()->updateFeel();
-
 		
 
 		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime);

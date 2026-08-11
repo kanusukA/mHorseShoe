@@ -200,7 +200,7 @@ set(SOURCES
 	#src/Stuffs/RenderMesh.cpp
 	#src/Stuffs/SceneObject.cpp
 	#src/Stuffs/ShaderObject.cpp
-	#src/timer/glock.cpp
+	src/timer/glock.cpp
 	#src/vktest/main.cpp
 	#src/vktest/Monster.cpp
 	#src/vktest/MonsterSDL.cpp

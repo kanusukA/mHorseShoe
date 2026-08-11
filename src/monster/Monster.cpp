@@ -2,7 +2,7 @@
 
 
 
-inline void Monster::keyHit(MappedKey key)
+void Monster::keyHit(MappedKey key)
 {
 	if (key->keyCode == MKEY_WINDOW_GRAB)
 	{
@@ -22,12 +22,15 @@ void Monster::InitMonster() {
 	MonsterVulkan::InitVulkan(900, 1600);
 
 	MonsterImgui::InitMonsterImgui();
+
+	// Passdown Feel
+	Feel::GetInstance()->addExtension(this);
 }
 
 void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime)
 {
 	// FRAME BUFFER RESIZED IS SEPERATE FROM POLL EVENTS AS IT MUST RUN BEFOR RENDERING THE FRAME ELSE SWAPCHAIN CAN FAIL, as sdl poll events are run without block main thread;
-	if (Feel::GetInstance()->mappedEvents.windowResize->enabled)
+	if (Feel::GetInstance()->mappedEvents.windowResize->eventState)
 	{
 		MonsterSDL::frameBufferResized();
 	}
@@ -44,6 +47,12 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, 
 	MonsterImgui::startImguiFrame();
 
 	// Imgui Rendering
+
+	ImGui::Begin("Testing");
+
+	ImGui::Text("TESTING");
+
+	ImGui::End();
 
 
 	ImGui::EndFrame();
