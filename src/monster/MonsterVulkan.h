@@ -38,6 +38,11 @@ class MonsterVulkan : public MonsterSDL {
 
 public:
 
+	std::vector<hRes::Mesh> importedMeshes = std::vector<hRes::Mesh>();
+	std::vector<int32_t> loadedMeshes = std::vector<int32_t>();
+
+	std::vector<VulkanMeshsPipe> pipes = std::vector<VulkanMeshsPipe>();
+
 	MonsterCamera camera = std::make_unique<Camera>();
 
 	uint32_t windowWidth;
@@ -62,6 +67,14 @@ public:
 	vk::raii::ImageView createImageView(vk::Image const& image, vk::Format format, vk::ImageAspectFlags flags);
 	void createDescriptiorSetLayout();
 	void createGraphicsPipeline();
+	vk::raii::Pipeline createGraphicsPipeline(
+		const vk::ShaderModule& vertShaderModule,
+		const vk::ShaderModule& fragShaderModule,
+		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
+		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
+		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,
+		float lineWidth = 1.0f
+	);
 	void createCommandPool();
 	void createCommandBuffer();
 	void createDepthResources();
@@ -146,7 +159,6 @@ public:
 
 	void InitVulkan(uint16_t windowWidth, uint16_t windowHeight);
 
-
 	void ShutdownVulkan();
 
 	// PIPELINE MODIFERS
@@ -154,7 +166,10 @@ public:
 	void createTerrainPipeline() {};
 
 	// resturns the index of where buffer is stored (in context with the engine Not physical memory)
-	void loadMeshVertInd(hRes::Mesh* mesh);
+	void loadMeshToVulkan(uint32_t meshIndex);
+
+	// Shaders must be inside mesh file and must be valid!
+	void createShaderPipeline(hRes::Mesh* mesh);
 
 };
 

@@ -620,17 +620,22 @@ public:
 namespace hRes {
 
 	
-
 	class Mesh {
 	public:
 
 		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
 		std::vector<uint16_t> indices = std::vector<uint16_t>();
 
-		uint32_t vertexBufferIndex;
+		uint32_t vertexBufferIndex; // Most likly they'll both be the same but fuck it let's have em both.
 		uint32_t indexBufferIndex;
 
 		bool isMeshVkLoaded = false;
+
+		// Used to set gropuing by vulkan to order rendering objects by the pipeline
+		uint32_t graphicsPipelineIndex; // Default pipeline is used when this is null;
+
+		vulkanUtils::Shader shaders = vulkanUtils::Shader();
+
 
 
 	};

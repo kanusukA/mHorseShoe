@@ -5,12 +5,16 @@
 
 #include <vulkan/vulkan.hpp>
 #include "vulkan/vulkan_core.h"
+
+#include <vulkan/vulkan_raii.hpp>
+
 #include <glm/glm.hpp>
 
 #ifndef VULKAN_UTILS
 #define VULKAN_UTILS
 
 namespace vulkanUtils {
+
 	struct Vertex {
 		glm::vec3 pos;
 		glm::vec3 color;
@@ -28,6 +32,16 @@ namespace vulkanUtils {
 				} };
 		}
 	};
+
+	struct Shader {
+		vk::raii::ShaderModule vertexShader = nullptr;
+		vk::raii::ShaderModule fragmentShader = nullptr;
+
+		uint32_t graphicsPipelineIndex;
+
+
+	};
+
 }
 
 #endif

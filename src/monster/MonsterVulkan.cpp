@@ -166,6 +166,8 @@ void MonsterVulkan::ShutdownVulkan()
 
 
 
+
+
 void MonsterVulkan::createVulkanInstance() {
 
 	// Validation Layers
@@ -670,15 +672,31 @@ void MonsterVulkan::endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffe
 }
 
 void MonsterVulkan::createGraphicsPipeline() {
-
 	std::vector<char> shaderCode = std::vector<char>();
 	ResourceHandler::GetInstance()->readFileContents("../../../src/monster/shaders/triangle.spv", &shaderCode);
 
 	vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
 
-	vk::PipelineShaderStageCreateInfo vertexShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eVertex, .module = shaderModule, .pName = "vertMain" };
+	vkMonsterStats.graphicsPipeline = createGraphicsPipeline(*shaderModule, *shaderModule);
+}
 
-	vk::PipelineShaderStageCreateInfo fragShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eFragment, .module = shaderModule, .pName = "fragMain" };
+vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
+	const vk::ShaderModule& vertShaderModule, // function name must start with vertMain
+	const vk::ShaderModule& fragShaderModule, // function name must start with fragMain
+	vk::PolygonMode polygonMode ,
+	vk::CullModeFlags cullingModes ,
+	vk::FrontFace frontFace ,
+	float lineWidth 
+) {
+
+	/*std::vector<char> shaderCode = std::vector<char>();
+	ResourceHandler::GetInstance()->readFileContents("../../../src/monster/shaders/triangle.spv", &shaderCode);*/
+
+	//vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
+
+	vk::PipelineShaderStageCreateInfo vertexShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eVertex, .module = vertShaderModule, .pName = "vertMain" };
+
+	vk::PipelineShaderStageCreateInfo fragShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eFragment, .module = fragShaderModule, .pName = "fragMain" };
 
 	vk::PipelineShaderStageCreateInfo ShaderStages[] = { vertexShaderStageCreateInfo,fragShaderStageCreateInfo };
 
@@ -719,11 +737,11 @@ void MonsterVulkan::createGraphicsPipeline() {
 	vk::PipelineRasterizationStateCreateInfo rasterizer{
 		.depthClampEnable = false,
 		.rasterizerDiscardEnable = false,
-		.polygonMode = vk::PolygonMode::eFill,
-		.cullMode = vk::CullModeFlagBits::eNone,
-		.frontFace = vk::FrontFace::eCounterClockwise,
+		.polygonMode = polygonMode,
+		.cullMode = cullingModes,
+		.frontFace = frontFace,
 		.depthBiasEnable = false,
-		.lineWidth = 1.0f
+		.lineWidth = lineWidth
 	};
 
 
@@ -782,7 +800,9 @@ void MonsterVulkan::createGraphicsPipeline() {
 	};
 
 
-	vkMonsterStats.graphicsPipeline = vk::raii::Pipeline(vkMonsterStats.device, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
+	vk::raii::Pipeline pipeline = vk::raii::Pipeline(vkMonsterStats.device, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
+
+	return std::move(pipeline);
 
 }
 
@@ -1058,7 +1078,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingInfo);
 
-
+	// ORDER INCOMING MESHES BY THE PIPELINE THEY USE
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, *vkMonsterStats.graphicsPipeline);
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
@@ -1072,6 +1092,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 
 	for (int64_t i = 0; i < vkMemAlloc.vertexBuffer.size(); i++)
 	{
+
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[i], { 0 });
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[i], 0, vk::IndexType::eUint16);
 
@@ -1485,10 +1506,15 @@ void MonsterVulkan::transitionImageLayout(vk::raii::CommandBuffer& commandBuffer
 	commandBuffer.pipelineBarrier(sourceStage, destinationStage, {}, {}, nullptr, barrier);
 }
 
-
-
-void MonsterVulkan::loadMeshVertInd(hRes::Mesh* mesh)
+void MonsterVulkan::loadMeshToVulkan(uint32_t meshIndex)
 {
+	if (importedMeshes.size() <= meshIndex)
+	{
+		throw std::runtime_error("NO SUCH MESH IMPORTED!");
+	}
+
+	hRes::Mesh* mesh = &importedMeshes[meshIndex];
+
 	mesh->vertexBufferIndex = createVertexBuffer(mesh->vertices);
 	mesh->indexBufferIndex = createIndexBuffer(mesh->indices);
 
@@ -1498,6 +1524,11 @@ void MonsterVulkan::loadMeshVertInd(hRes::Mesh* mesh)
 		throw std::runtime_error("ERROR IN VERTEX AND INDEX BUFFER CREATION!!!");
 	}
 
+	
+
 	mesh->isMeshVkLoaded = true;
 
 }
+
+
+

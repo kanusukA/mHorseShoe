@@ -31,6 +31,10 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 
 
+struct VulkanMeshsPipe {
+	vk::raii::Pipeline graphicsPipeline = nullptr;
+	std::vector<int32_t> meshIndexs = std::vector<int32_t>();
+};
 
 
 struct VulkanStatus {
