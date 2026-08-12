@@ -28,7 +28,7 @@ void Feel::setupDefaultKeys() {
 	mappedKeys.rightKey = setKey(SDLK_D, MKEY_RIGHT);
 
 	mappedKeys.windowGrab = setKey(SDLK_G, MKEY_WINDOW_GRAB);
-	mappedKeys.windowGrab->switchLock = true;
+	mappedKeys.windowGrab->setLocking(true);
 
 }
 

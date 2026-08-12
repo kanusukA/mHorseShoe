@@ -8,7 +8,7 @@
 // Third-party Headers
 #include "yaml-cpp/yaml.h"
 
-#include <glm/glm.hpp>
+#include <monster/VulkanUtils.h>
 
 // STL Headers
 #include <filesystem>
@@ -615,6 +615,25 @@ public:
 	~RenderMeshResource() = default;
 
 };
+
+// NEW RESOURCES
+namespace hRes {
+
+	
+
+	class Mesh {
+	public:
+
+		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
+		std::vector<uint32_t> indices = std::vector<uint32_t>();
+
+
+	};
+
+
+}
+
+
 
 
 

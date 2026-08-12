@@ -6,6 +6,7 @@
 //Local
 #include<ResourceHandler/ResourceSaver.h>
 #include<ResourceHandler/ResourceLoader.h>
+#include <ResourceHandler/ResourceGltf.h>
 
 
 // STL Headers
@@ -37,7 +38,7 @@ struct SceneObject {
 
 
 // Integrate it into gdhandler with Ogre 
-class ResourceHandler : public ResourceHandlerBuilderContext, public ResourceSaver , public ResourceLoader, public ResourceReader
+class ResourceHandler : public ResourceHandlerBuilderContext, public ResourceSaver , public ResourceLoader, public ResourceReader , public ResourceGltf
 {
 
 private:

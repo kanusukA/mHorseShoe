@@ -9,30 +9,44 @@ typedef uint16_t MKeyCode;
 
 class FeelKey {
 
-
-public:
+private:
 
 	// Prevents the button from sustaining true state for more than a single loop
 	bool switchLock = false;
 
-	std::vector<FeelKey*> heldKeys = std::vector<FeelKey*>();
-	SDL_Keycode key;
+	bool locking = false;
 
-	bool enabled = true;
+	inline bool _checkHit(SDL_Event& event) {
+		if (!heldKeys.empty())
+		{
+			for (const auto hKey : heldKeys)
+			{
+				if (!hKey->pressed)
+				{
+					return false;
+				}
+			}
+		}
+		if (event.key.key == key)
+		{
+			if (event.type == SDL_EVENT_KEY_DOWN) {
 
-	bool pressed = false;
+				pressed = true;
+				std::cout << key << " Pressed DOWN " << std::endl;
+				
 
-	MKeyCode keyCode;
+			}
+			else if (event.type == SDL_EVENT_KEY_UP) {
+				pressed = false;
+				std::cout << key << " Pressed UP " << std::endl;
+			}
 
-	FeelKey(uint32_t p_key, uint16_t mkeyCode , std::vector<FeelKey*> p_heldKeys = std::vector<FeelKey*>()) {
-		key = p_key;
-		heldKeys = p_heldKeys;
-		keyCode = mkeyCode;
+		}
+
+		return pressed;
 	}
 
-
-	bool checkHit(SDL_Event& event) {
-
+	inline bool _lockingCheckHit(SDL_Event& event) {
 		if (switchLock)
 		{
 			pressed = false;
@@ -61,17 +75,56 @@ public:
 					pressed = true;
 					std::cout << key << " Pressed DOWN " << std::endl;
 				}
-				
+
 			}
 			else if (event.type == SDL_EVENT_KEY_UP) {
 				switchLock = false;
 				pressed = false;
 				std::cout << key << " Pressed UP " << std::endl;
 			}
-				
+
 		}
 
 		return pressed;
+	}
+	
+
+
+
+public:
+
+
+
+	std::vector<FeelKey*> heldKeys = std::vector<FeelKey*>();
+	SDL_Keycode key;
+
+	bool enabled = true;
+
+	bool pressed = false;
+
+	MKeyCode keyCode;
+
+	FeelKey(uint32_t p_key, uint16_t mkeyCode , std::vector<FeelKey*> p_heldKeys = std::vector<FeelKey*>()) {
+		key = p_key;
+		heldKeys = p_heldKeys;
+		keyCode = mkeyCode;
+	}
+
+	void setLocking(bool state) {
+		locking = state;
+		switchLock = state;
+	}
+
+
+	bool checkHit(SDL_Event& event) {
+		if (locking)
+		{
+			return	_lockingCheckHit(event);
+		}
+		else {
+			return _checkHit(event);
+		}
+		
 	}
 
 

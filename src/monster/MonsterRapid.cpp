@@ -22,13 +22,13 @@ Mesh Monster::loadMeshObj(std::filesystem::path& path)
 
 	Mesh mesh = Mesh();
 
-	mesh.vertices = new std::vector<horse::Vertex>();
+	mesh.vertices = new std::vector<vulkanUtils::Vertex>();
 
 
 	for (size_t i = 0; i < vertexCount; ++i)
 	{
 
-		horse::Vertex vertex = horse::Vertex();
+		vulkanUtils::Vertex vertex = vulkanUtils::Vertex();
 
 		auto vec3 = glm::vec3(
 			result.attributes.positions[3 * i + 0],

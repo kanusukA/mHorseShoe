@@ -78,6 +78,18 @@ FetchContent_Declare(
   GIT_TAG release-3.4.8
 )
 
+FetchContent_Declare(
+	gltf
+	GIT_REPOSITORY https://github.com/spnda/fastgltf.git
+	GIT_TAG v0.9.0
+)
+
+CPMADDPACKAGE(
+	NAME ktx
+	GIT_REPOSITORY "https://github.com/KhronosGroup/KTX-Software.git"
+	GIT_TAG "v4.4.2"
+)
+
 
 
 set(OGRE_BUILD_COMPONENT_OVERLAY TRUE CACHE BOOL "" FORCE)
@@ -97,6 +109,10 @@ set(OGRE_COPY_DEPENDENCIES TRUE CACHE BOOL "" FORCE)
 set(OGRE_INSTALL_DEPENDENCIES TRUE CACHE BOOL "" FORCE)
 set(OGRE_INSTALL_TOOLS TRUE CACHE BOOL "" FORCE)
 
+#GLTF VARIBALES
+
+
+
 # set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 
 #CPMADDPACKAGE(
@@ -113,6 +129,12 @@ set(OGRE_INSTALL_TOOLS TRUE CACHE BOOL "" FORCE)
 #)
 
 
+#CPMADDPACKAGE(
+#	NAME glTF
+#	GIT_REPOSITORY "https://github.com/spnda/fastgltf.git"
+#	GIT_TAG "v0.9.0"
+#)
+
 
 
 
@@ -128,7 +150,8 @@ set(OGRE_INSTALL_TOOLS TRUE CACHE BOOL "" FORCE)
 #FetchContent_MakeAvailable(ogre)
 FetchContent_MakeAvailable(yaml_cpp)
 FetchContent_MakeAvailable(sdl)
-
+FetchContent_MakeAvailable(gltf)
+#FetchContent_MakeAvailable(ktx)
 
 #set_target_properties(Plugin_GLSLangProgramManager PROPERTIES
    # MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
@@ -217,7 +240,7 @@ set(SOURCES
 	src/main.cpp
 )
 
-add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  "src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" "src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp")
+add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  "src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" "src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp" "src/ResourceHandler/ResourceGltf.h" "src/ResourceHandler/ResourceGltf.cpp" "src/monster/VulkanUtils.h")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 
@@ -246,6 +269,10 @@ target_include_directories(mHorseShoee PUBLIC "src/" )
 target_include_directories(mHorseShoee PUBLIC "src/monster/imgui-1.92.9b")
 
 target_link_libraries(mHorseShoee PRIVATE glm::glm)
+
+target_link_libraries(mHorseShoee PRIVATE fastgltf::fastgltf)
+
+target_link_libraries(mHorseShoee PRIVATE ktx)
 
 
 #target_link_libraries(mHorseShoee PRIVATE OgreBites)

@@ -69,7 +69,7 @@ public:
 	void createTextureImageView();
 	void createTextureSampler();
 	void createVertexBuffer();
-	uint32_t createVertexBuffer(std::vector<horse::Vertex> vertices);
+	uint32_t createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
 	void createIndexBuffer();
 	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();

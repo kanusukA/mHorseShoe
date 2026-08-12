@@ -62,6 +62,7 @@ public:
 		mouse.resetValues();
 
 		SDL_Event event;
+
 		while (SDL_PollEvent(&event))
 		{
 			for (const auto& extension : extensions)

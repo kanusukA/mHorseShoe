@@ -8,8 +8,8 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 #endif
 
 
-#include "vulkan/vulkan.hpp"
-#include "vulkan/vulkan_core.h"
+
+#include <monster/VulkanUtils.h>
 
 #define VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS
 #include <vulkan/vulkan_raii.hpp>
@@ -27,32 +27,14 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 #include <chrono>
 
 
-namespace horse {
-	struct Vertex {
-		glm::vec3 pos;
-		glm::vec3 color;
-		glm::vec2 texCoord;
 
-		static vk::VertexInputBindingDescription getBindingDescription() {
-			return { .binding = 0, .stride = sizeof(Vertex), .inputRate = vk::VertexInputRate::eVertex };
-		}
-
-		static std::array<vk::VertexInputAttributeDescription, 3> getAttributeDescriptions() {
-			return { {
-				{.location = 0, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(Vertex, pos)},
-				{.location = 1, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(Vertex,color)},
-				{.location = 2, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(Vertex,texCoord)},
-				} };
-		}
-	};
-}
 
 
 struct Mesh {
 
 	bool loadedVulkanVertInd = false;
 
-	std::vector<horse::Vertex>* vertices = nullptr;
+	std::vector<vulkanUtils::Vertex>* vertices = nullptr;
 	std::vector<uint16_t>* indices = nullptr;
 
 	uint32_t vertBufferIndex;

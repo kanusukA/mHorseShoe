@@ -25,7 +25,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-const std::vector<horse::Vertex> p_vertices = {
+const std::vector<vulkanUtils::Vertex> p_vertices = {
 	{{-0.5f, -0.5f, 0.5f}, {1.0f,1.0f,1.0f},{1.0f, 0.0f} },
 	{{0.5f, -0.5f,0.5f}, {0.0f,1.0f,0.0f}, {0.0f, 0.0f} },
 	{{0.5f, 0.5f,0.5f}, {0.0f,0.0f,1.0f}, {0.0f, 1.0f} },
@@ -696,8 +696,8 @@ void MonsterVulkan::createGraphicsPipeline() {
 	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
 
 	// vertex input
-	auto bindingDescription = horse::Vertex::getBindingDescription();
-	auto attributeDescription = horse::Vertex::getAttributeDescriptions();
+	auto bindingDescription = vulkanUtils::Vertex::getBindingDescription();
+	auto attributeDescription = vulkanUtils::Vertex::getAttributeDescriptions();
 	vk::PipelineVertexInputStateCreateInfo vertexInputCreateInfo{
 		.vertexBindingDescriptionCount = 1,
 		.pVertexBindingDescriptions = &bindingDescription,
@@ -1148,7 +1148,7 @@ void MonsterVulkan::createVertexBuffer() {
 	createVertexBuffer(p_vertices);
 }
 
-uint32_t MonsterVulkan::createVertexBuffer(std::vector<horse::Vertex> vertices) {
+uint32_t MonsterVulkan::createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices) {
 	vkMemAlloc.vertices.push_back(vertices.size());
 	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 	// Create a staging buffer (stored in the CPU for quick access and change)
