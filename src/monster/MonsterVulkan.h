@@ -154,7 +154,7 @@ public:
 	void createTerrainPipeline() {};
 
 	// resturns the index of where buffer is stored (in context with the engine Not physical memory)
-	void loadMeshVertInd(Mesh* mesh);
+	void loadMeshVertInd(hRes::Mesh* mesh);
 
 };
 

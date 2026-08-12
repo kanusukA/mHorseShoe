@@ -625,7 +625,12 @@ namespace hRes {
 	public:
 
 		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
-		std::vector<uint32_t> indices = std::vector<uint32_t>();
+		std::vector<uint16_t> indices = std::vector<uint16_t>();
+
+		uint32_t vertexBufferIndex;
+		uint32_t indexBufferIndex;
+
+		bool isMeshVkLoaded = false;
 
 
 	};

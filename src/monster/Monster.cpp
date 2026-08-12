@@ -29,13 +29,15 @@ void Monster::InitMonster() {
 	imDebugStats.mouseXrel = &Feel::GetInstance()->mouse.xRel;
 	imDebugStats.mouseYrel = &Feel::GetInstance()->mouse.yRel;
 
-	std::filesystem::path filepath = std::filesystem::path("../../../src/monster/shaders/test1.obj");
+	loadSkyBox();
+
+	/*std::filesystem::path filepath = std::filesystem::path("../../../src/monster/shaders/test1.obj");
 	*mesh = loadMeshObj(filepath);
 	MonsterVulkan::loadMeshVertInd(mesh);
 
 	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/skybox.obj");
 	*skybox = loadMeshObj(skyboxPath);
-	MonsterVulkan::loadMeshVertInd(skybox);
+	MonsterVulkan::loadMeshVertInd(skybox);*/
 
 }
 
@@ -75,4 +77,17 @@ void Monster::Shutdown() {
 	MonsterVulkan::ShutdownVulkan();
 	MonsterSDL::ShutdownSDL();
 	
+}
+
+
+void Monster::loadSkyBox()
+{
+	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/skybox.glb");
+	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
+
+	*skybox = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
+
+	MonsterVulkan::loadMeshVertInd(skybox);
+
+
 }

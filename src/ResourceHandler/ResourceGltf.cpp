@@ -44,7 +44,7 @@ std::vector<hRes::Mesh> ResourceGltf::generateMesh(fastgltf::Asset& asset)
 			meshes.at(meshIndex).indices.resize(accessor.count);
 	
 			size_t idx = 0;
-			fastgltf::iterateAccessor<std::uint32_t>(asset, accessor, [&](std::uint32_t index) {
+			fastgltf::iterateAccessor<std::uint16_t>(asset, accessor, [&](std::uint16_t index) {
 				meshes.at(meshIndex).indices[idx++] = index;
 			});
 

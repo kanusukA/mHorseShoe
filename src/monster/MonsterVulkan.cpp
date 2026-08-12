@@ -1487,10 +1487,10 @@ void MonsterVulkan::transitionImageLayout(vk::raii::CommandBuffer& commandBuffer
 
 
 
-void MonsterVulkan::loadMeshVertInd(Mesh* mesh)
+void MonsterVulkan::loadMeshVertInd(hRes::Mesh* mesh)
 {
-	mesh->vertBufferIndex = createVertexBuffer(*mesh->vertices);
-	mesh->indBufferIndex = createIndexBuffer(*mesh->indices);
+	mesh->vertexBufferIndex = createVertexBuffer(mesh->vertices);
+	mesh->indexBufferIndex = createIndexBuffer(mesh->indices);
 
 	// VALIDATION - size of index, vertex, vertex buffer, index buffer must be all same!
 	if ((static_cast<int32_t>(vkMemAlloc.indexes.size()) != static_cast<int32_t>(vkMemAlloc.vertexBuffer.size())) || (static_cast<int32_t>(vkMemAlloc.indexBuffer.size()) != static_cast<int32_t>(vkMemAlloc.vertices.size())))
@@ -1498,6 +1498,6 @@ void MonsterVulkan::loadMeshVertInd(Mesh* mesh)
 		throw std::runtime_error("ERROR IN VERTEX AND INDEX BUFFER CREATION!!!");
 	}
 
-	mesh->loadedVulkanVertInd = true;
+	mesh->isMeshVkLoaded = true;
 
 }

@@ -51,9 +51,9 @@ int main() {
 	// Physics INIT
 	/*kint = new Kint();
 	kint->InitPhysics();*/
-	std::filesystem::path skyBox = std::filesystem::path("../../../src/monster/shaders/skybox.glb");
-	fastgltf::Asset* asset = ResourceHandler::GetInstance()->loadGltfFile(skyBox);
-	std::vector<hRes::Mesh> skyBoxMesh = ResourceHandler::GetInstance()->generateMesh(*asset);
+	//std::filesystem::path skyBox = std::filesystem::path("../../../src/monster/shaders/skybox.glb");
+	//fastgltf::Asset* asset = ResourceHandler::GetInstance()->loadGltfFile(skyBox);
+	//std::vector<hRes::Mesh> skyBoxMesh = ResourceHandler::GetInstance()->generateMesh(*asset);
 	
 
 //	feel->initFeel(monster->sdlWindow,

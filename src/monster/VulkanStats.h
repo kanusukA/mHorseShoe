@@ -30,19 +30,7 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 
 
-struct Mesh {
 
-	bool loadedVulkanVertInd = false;
-
-	std::vector<vulkanUtils::Vertex>* vertices = nullptr;
-	std::vector<uint16_t>* indices = nullptr;
-
-	uint32_t vertBufferIndex;
-	uint32_t indBufferIndex;
-
-	glm::vec4 color = glm::vec4(1, 1, 1, 1);
-
-};
 
 
 struct VulkanStatus {
