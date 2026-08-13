@@ -1,15 +1,39 @@
 
-#include <monster/VulkanStats.h>
+#ifndef MONSTERVULKAN_H
+#define MONSTERVULKAN_H
+
+#include <monster/MonsterSlang.h>
 
 #include <monster/imgui-1.92.9b/imgui.h>
 #include <monster/imgui-1.92.9b/backends/imgui_impl_vulkan.h>
 
-#include <GDHandler/ResourceHandler.h>
 
-#include <stdio.h>
+#include <monster/VulkanStats.h>
+
 #include <iostream>
 
 #include "MonsterSDL.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <map>
+
+#include <algorithm>
+#include <limits.h>
+
+#if defined (_WIN32)
+#define VK_USE_PLATFORM_WIN32_KHR
+#endif
+
+//#define VMA_IMPLEMENTATION
+////#include <vulkan/vulkan.h>
+//#include "vk_mem_alloc.h"
+
+
+#include <glm/gtc/matrix_transform.hpp>
+
+
 
 #include <Camera.h>
 // VALIDATION LAYERS
@@ -34,7 +58,7 @@ constexpr bool enableValidationLayers = true;
 typedef std::unique_ptr<Camera> MonsterCamera;
 
 
-class MonsterVulkan : public MonsterSDL {
+class MonsterVulkan : public MonsterSDL , public MonsterSlang {
 
 public:
 
@@ -186,3 +210,4 @@ public:
 
 
 
+#endif

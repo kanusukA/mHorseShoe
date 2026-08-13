@@ -1,28 +1,13 @@
-
-
 #include "MonsterVulkan.h"
 
-#include <cstddef>
-#include <cstdint>
-#include <exception>
-#include <map>
-
-#include <algorithm>
-#include <limits.h>
-
-#if defined (_WIN32)
-	#define VK_USE_PLATFORM_WIN32_KHR
-#endif
 
 #define VMA_IMPLEMENTATION
-#include <vulkan/vulkan.h>
+//#include <vulkan/vulkan.h>
 #include "vk_mem_alloc.h"
-
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <glm/gtc/matrix_transform.hpp>
 
 
 const std::vector<vulkanUtils::Vertex> p_vertices = {

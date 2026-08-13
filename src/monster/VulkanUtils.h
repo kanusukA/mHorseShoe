@@ -3,6 +3,11 @@
 #endif // !VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 
 
+
+
+#ifndef VULKAN_UTILS
+#define VULKAN_UTILS
+
 #include <vulkan/vulkan.hpp>
 #include "vulkan/vulkan_core.h"
 
@@ -11,9 +16,6 @@
 #include <glm/glm.hpp>
 
 #include <filesystem>
-
-#ifndef VULKAN_UTILS
-#define VULKAN_UTILS
 
 namespace vulkanUtils {
 
@@ -37,13 +39,28 @@ namespace vulkanUtils {
 
 	struct Shader {
 
+		bool compiled = false;
+
+		uint32_t shaderIndex;
+		uint32_t graphicsPipelineIndex;
+
 		std::filesystem::path* vertShaderFilePath = nullptr;
 		std::filesystem::path* fragShaderFilePath = nullptr;
+
+		// SLANG CODE IS RETAINED UNTIL THE SPV IS NOT COMPILED AND IS LATER CLEARED;
+		std::vector<char> vertCodeSlang;
+		std::vector<char> fragCodeSlang;
+
+		std::vector<uint8_t> vertCodeSpv;
+		std::vector<uint8_t> fragCodeSpv;
+
+		std::string vertShadername;
+		std::string fragShaderName;
 
 		vk::raii::ShaderModule vertexShader = nullptr;
 		vk::raii::ShaderModule fragmentShader = nullptr;
 
-		uint32_t graphicsPipelineIndex;
+		
 
 
 	};
