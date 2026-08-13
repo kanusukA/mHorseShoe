@@ -35,6 +35,11 @@ struct VulkanMeshsPipe {
 	vk::raii::Pipeline graphicsPipeline = nullptr;
 	std::vector<int32_t> meshIndexs = std::vector<int32_t>();
 };
+struct PassObject {
+	int32_t pipelineIndex;
+	int32_t vertexIndex;
+	int32_t texturesIndex;
+};
 
 
 struct VulkanStatus {

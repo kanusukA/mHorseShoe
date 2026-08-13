@@ -32,7 +32,7 @@ private:
 	void keyHit(MappedKey key) override;
 
 	// EXAMPLE
-	hRes::Mesh* skybox = new hRes::Mesh();
+	
 
 
 public:
@@ -45,6 +45,8 @@ public:
 	/*Mesh loadMeshObj(std::filesystem::path& path);*/
 
 	void loadSkyBox();
+
+	void loadOtherMesh();
 
 
 	void Shutdown();

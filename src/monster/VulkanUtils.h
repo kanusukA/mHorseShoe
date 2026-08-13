@@ -10,6 +10,8 @@
 
 #include <glm/glm.hpp>
 
+#include <filesystem>
+
 #ifndef VULKAN_UTILS
 #define VULKAN_UTILS
 
@@ -34,6 +36,10 @@ namespace vulkanUtils {
 	};
 
 	struct Shader {
+
+		std::filesystem::path* vertShaderFilePath = nullptr;
+		std::filesystem::path* fragShaderFilePath = nullptr;
+
 		vk::raii::ShaderModule vertexShader = nullptr;
 		vk::raii::ShaderModule fragmentShader = nullptr;
 

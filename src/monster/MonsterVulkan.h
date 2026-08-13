@@ -38,10 +38,12 @@ class MonsterVulkan : public MonsterSDL {
 
 public:
 
-	std::vector<hRes::Mesh> importedMeshes = std::vector<hRes::Mesh>();
-	std::vector<int32_t> loadedMeshes = std::vector<int32_t>();
+	std::vector<std::unique_ptr<hRes::Mesh>> importedMeshes = std::vector<std::unique_ptr<hRes::Mesh>>();
+	std::vector<uint32_t> loadedMeshes = std::vector<uint32_t>();
+	std::vector<uint32_t> passObjects = std::vector<uint32_t>();
 
-	std::vector<VulkanMeshsPipe> pipes = std::vector<VulkanMeshsPipe>();
+	std::vector<vk::raii::Pipeline> pipes = std::vector<vk::raii::Pipeline>();
+
 
 	MonsterCamera camera = std::make_unique<Camera>();
 
@@ -167,9 +169,18 @@ public:
 
 	// resturns the index of where buffer is stored (in context with the engine Not physical memory)
 	void loadMeshToVulkan(uint32_t meshIndex);
+	void loadMeshShaders(uint32_t meshIndex);
+
+	void loadMesh(uint32_t meshIndex);
+
+	void importMesh(hRes::Mesh& mesh);
+	void loadAllMeshes();
+	// CAN BE USED LATER TO SYNC AND ALIGN THE GRAPHICS PIPELINE!!
+	// THIS WILL NOT SORT THE RENDER PASS!!
+	void loadMeshToPassObject();
 
 	// Shaders must be inside mesh file and must be valid!
-	void createShaderPipeline(hRes::Mesh* mesh);
+	//void createShaderPipeline(uint32_t meshIndex);
 
 };
 

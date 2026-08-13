@@ -24,7 +24,7 @@ public:
 
 	fastgltf::Asset parseGltfFile(std::filesystem::path& path);
 
-	std::vector<hRes::Mesh> generateMesh(fastgltf::Asset& asset);
+	void generateMesh(fastgltf::Asset& asset, std::vector<hRes::Mesh>* outputMeshes);
 	
 
 };

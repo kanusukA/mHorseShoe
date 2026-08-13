@@ -623,6 +623,8 @@ namespace hRes {
 	class Mesh {
 	public:
 
+		Mesh() {}
+
 		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
 		std::vector<uint16_t> indices = std::vector<uint16_t>();
 
@@ -636,7 +638,15 @@ namespace hRes {
 
 		vulkanUtils::Shader shaders = vulkanUtils::Shader();
 
-
+		Mesh(const Mesh& mesh) {
+			this->graphicsPipelineIndex = mesh.graphicsPipelineIndex;
+			this->indexBufferIndex = mesh.indexBufferIndex;
+			this->vertexBufferIndex - mesh.vertexBufferIndex;
+			this->indices = mesh.indices;
+			this->shaders.fragShaderFilePath = new std::filesystem::path(*mesh.shaders.fragShaderFilePath);
+			this->shaders.vertShaderFilePath = new std::filesystem::path(*mesh.shaders.vertShaderFilePath);
+			this->vertices = mesh.vertices;
+		}
 
 	};
 
