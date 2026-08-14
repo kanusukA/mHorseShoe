@@ -5,30 +5,39 @@
 #include <filesystem>
 
 //#include <monster/VulkanUtils.h>
-#include <GDHandler/ResourceHandler.h>
+#include <monster/MonsterBuffer.h>
 
 #include <slang/slang.h>
 #include <slang/slang-com-ptr.h>
 
 
-class MonsterSlang {
+
+class MonsterSlang : public MonsterBuffer {
 
 	Slang::ComPtr<slang::IGlobalSession> globalSession;
-	
+	VulkanMemAlloc* vkMemAlloc;
+	VulkanDescriptors* vkDescriptors;
+	VulkanStatus* vkMonsterStats;
 
 public:
 
-	MonsterSlang() {
+	// each discriptor has two descriptors for the frame in flight calculation.
+	std::vector<std::shared_ptr<MonsterDescriptors>> descriptorSets = std::vector<std::shared_ptr<MonsterDescriptors>>();
+	std::vector<std::shared_ptr<VulkanTexture>> textures = std::vector<std::shared_ptr<VulkanTexture>>();
+	std::vector<vulkanUtils::Shader*> shaders = std::vector<vulkanUtils::Shader*>();
+
+
+	void InitMonsterSlang(VulkanStatus* vkMonsterStats_p, VulkanDescriptors* vkDescriptors_p, VulkanMemAlloc* vkMemAlloc_p) {
+		vkMonsterStats = vkMonsterStats_p;
+		vkDescriptors = vkDescriptors_p;
+		vkMemAlloc = vkMemAlloc_p;
 		if (SLANG_FAILED(slang::createGlobalSession(globalSession.writeRef())))
 		{
 			throw std::runtime_error("Unable to create Slang Session");
 		}
 	}
 
-	std::vector<vulkanUtils::Shader> shaders = std::vector<vulkanUtils::Shader>();
-	
-
-	uint32_t loadShader(std::string& shadername,std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath);
+	uint32_t loadShader(const std::string& shadername,std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath);
 
 	void compileShaderFiles();
 
@@ -39,5 +48,40 @@ public:
 		const std::filesystem::path& shaderPath,
 		Slang::ComPtr<slang::ISession> session
 	);
+
+	vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;
+	vk::raii::ShaderModule createShaderModule(const std::vector<uint8_t>& code) const;
+	vk::raii::ShaderModule createShaderModule(const uint32_t* code, size_t codeSize) const;
+
+	void compileToShaderModule() {};
+	
+	template <typename T>
+	void setupShaderBuffers(const uint32_t& shaderIndex, T& unifromBufferObj);
+
+	// Buffers for shader
+	template <typename T>
+	std::pair<uint32_t, uint32_t> createUniformBuffers(T& uniformBufferObj);
+
+	uint32_t createDescriptorSets(
+		std::vector<vk::Buffer&> uniformBuffer,
+		uint32_t& uboBinding,
+		VulkanTexture& texture,
+		uint32_t& textureBinding
+	);
+
+
+	std::shared_ptr<VulkanTexture> createTextureImage(std::filesystem::path& texturePath);
+	void createTextureImageView(VulkanTexture* texture);
+	void createTextureSampler(VulkanTexture* texture);
+
+	vk::raii::ImageView createImageView(vk::Image const& image, vk::Format format, vk::ImageAspectFlags flags);
+
+	void transitionImageLayout(
+		vk::raii::CommandBuffer& commandBuffer,
+		const vk::raii::Image& image,
+		vk::ImageLayout oldLayout,
+		vk::ImageLayout newLayout
+	);
+	
 
 };

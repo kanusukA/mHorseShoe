@@ -7,9 +7,6 @@
 #include <monster/imgui-1.92.9b/imgui.h>
 #include <monster/imgui-1.92.9b/backends/imgui_impl_vulkan.h>
 
-
-#include <monster/VulkanStats.h>
-
 #include <iostream>
 
 #include "MonsterSDL.h"
@@ -77,8 +74,10 @@ public:
 	VulkanStatus vkMonsterStats = VulkanStatus();
 	VulkanMemAlloc vkMemAlloc = VulkanMemAlloc();
 	VulkanSync vkSyncStats = VulkanSync();
-	VulkanTextures vkTextures = VulkanTextures();
 	VulkanDescriptors vkDescriptors = VulkanDescriptors();
+
+	VulkanTexture* sampleTexture;
+	VulkanTexture* depthTexture;
 
 	vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
 
@@ -96,6 +95,8 @@ public:
 	vk::raii::Pipeline createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
 		const vk::ShaderModule& fragShaderModule,
+		const std::string& entryPointVert,
+		const std::string& entryPointFrag,
 		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
 		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
 		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,
@@ -116,45 +117,15 @@ public:
 	void createDescriptorSets();
 	void createSyncObjects();
 
-	std::pair<VkBuffer, VmaAllocation> createBuffer(
-		vk::DeviceSize size,
-		vk::BufferUsageFlags usage,
-		VmaAllocationCreateFlags allocFlags,
-		VmaMemoryUsage allocUsage,
-		VmaAllocationInfo* allocationInfo = nullptr
-	);
-	std::pair<vk::raii::Image, VmaAllocation> createImage(
-		uint32_t width,
-		uint32_t height,
-		vk::Format format,
-		vk::ImageTiling tiling,
-		vk::ImageUsageFlags usage,
-		VmaAllocationCreateFlags allocFlags,
-		VmaMemoryUsage allocUsage
-	);
-
-	void copyBuffer(
-		vk::Buffer srcBuffer,
-		vk::Buffer dstBuffer,
-		vk::DeviceSize bufferSize
-	);
-
-	void copyBufferToImage(
-		vk::raii::CommandBuffer& commandBuffer,
-		VkBuffer buffer,
-		vk::raii::Image& image,
-		uint32_t width,
-		uint32_t height
-	);
 
 	void updateUniformBuffer(uint32_t currentImage);
 
-	void transitionImageLayout(
+	/*void transitionImageLayout(
 		vk::raii::CommandBuffer& commandBuffer,
 		const vk::raii::Image& image,
 		vk::ImageLayout oldLayout,
 		vk::ImageLayout newLayout
-	);
+	);*/
 
 	void transition_image_layout(
 		uint32_t imageIndex,
@@ -169,12 +140,6 @@ public:
 
 	vk::Format findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling, vk::FormatFeatureFlags features);
 	vk::Format findDepthFormat();
-
-	vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;
-	vk::raii::ShaderModule createShaderModule(const uint32_t* code, size_t codeSize) const;
-
-	vk::raii::CommandBuffer begineSingleTimeCommands();
-	void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer);
 
 	void recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawData);
 
@@ -205,6 +170,7 @@ public:
 
 	// Shaders must be inside mesh file and must be valid!
 	//void createShaderPipeline(uint32_t meshIndex);
+
 
 };
 

@@ -3,8 +3,6 @@
 #endif // !VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 
 
-
-
 #ifndef VULKAN_UTILS
 #define VULKAN_UTILS
 
@@ -13,9 +11,24 @@
 
 #include <vulkan/vulkan_raii.hpp>
 
+#include <vk_mem_alloc.h>
+
 #include <glm/glm.hpp>
 
 #include <filesystem>
+
+typedef  std::vector<vk::raii::DescriptorSet> MonsterDescriptors;
+
+
+struct VulkanTexture {
+	vk::Format imgFormat;
+	VmaAllocation alloc;
+	vk::raii::Image texture = nullptr;
+	vk::raii::ImageView textureView = nullptr;
+	vk::raii::Sampler textureSampler = nullptr;
+
+
+};
 
 namespace vulkanUtils {
 
@@ -41,8 +54,8 @@ namespace vulkanUtils {
 
 		bool compiled = false;
 
-		uint32_t shaderIndex;
-		uint32_t graphicsPipelineIndex;
+		//uint32_t shaderIndex;
+		std::shared_ptr<vk::raii::Pipeline> graphicsPipeline;
 
 		std::filesystem::path* vertShaderFilePath = nullptr;
 		std::filesystem::path* fragShaderFilePath = nullptr;
@@ -54,14 +67,16 @@ namespace vulkanUtils {
 		std::vector<uint8_t> vertCodeSpv;
 		std::vector<uint8_t> fragCodeSpv;
 
+		std::vector<std::shared_ptr<MonsterDescriptors>> descriptorSet;
+		std::vector<std::shared_ptr<VulkanTexture>> textures;
+		std::vector<std::shared_ptr<vk::Buffer>> uniformBufferIndex;
+
 		std::string vertShadername;
 		std::string fragShaderName;
 
 		vk::raii::ShaderModule vertexShader = nullptr;
 		vk::raii::ShaderModule fragmentShader = nullptr;
-
 		
-
 
 	};
 

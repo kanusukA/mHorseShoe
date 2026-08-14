@@ -7,15 +7,10 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 	#define VK_USE_PLATFORM_WIN32_KHR
 #endif
 
-
-
-
 #include <monster/VulkanUtils.h>
 
 #define VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS
 #include <vulkan/vulkan_raii.hpp>
-
-#include <vk_mem_alloc.h>
 
 #include <stdlib.h>
 
@@ -29,19 +24,16 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 
 
-
-
-
 struct VulkanMeshsPipe {
 	vk::raii::Pipeline graphicsPipeline = nullptr;
 	std::vector<int32_t> meshIndexs = std::vector<int32_t>();
 };
+
 struct PassObject {
 	int32_t pipelineIndex;
 	int32_t vertexIndex;
 	int32_t texturesIndex;
 };
-
 
 struct VulkanStatus {
 
@@ -78,8 +70,6 @@ struct VulkanStatus {
 
 	vk::raii::PipelineLayout imguiPipeLayout = nullptr;
 	
-
-
 };
 
 struct VulkanSync {
@@ -88,7 +78,11 @@ struct VulkanSync {
 	std::vector<vk::raii::Fence> inFlightFences;
 };
 
+
+typedef std::vector<vk::raii::Buffer> MonsterUniBuffers;
+
 struct VulkanMemAlloc {
+
 	VmaAllocator vmaAllocator;
 
 	std::vector<vk::raii::Buffer> vertexBuffer;
@@ -99,7 +93,7 @@ struct VulkanMemAlloc {
 	std::vector<uint32_t> indexes;
 	std::vector<uint32_t> vertices;
 
-	std::vector<vk::raii::Buffer> uniformBuffers;
+	std::vector<std::shared_ptr<MonsterUniBuffers>> uniformBuffers;
 	std::vector<VmaAllocation> uniformBufferAlloc;
 	std::vector<void*> uniformBuffersMapped;
 
@@ -109,25 +103,10 @@ struct VulkanDescriptors {
 	vk::raii::DescriptorPool descriptorPool = nullptr;
 	vk::raii::PipelineLayout pipelineLayout = nullptr;
 	vk::raii::DescriptorSetLayout descriptorSetLayout = nullptr;
-
-	std::vector<vk::raii::DescriptorSet> descriptorSets;
 	
 };
 
-struct VulkanTextures {
 
-	// DEPTH
-	vk::raii::Image depthImage = nullptr;
-	vk::raii::ImageView depthImageView = nullptr;
-	vk::Format depthFormat;
-	VmaAllocation depthImageAlloc;
-
-	// Normal Texture
-	vk::raii::Image textureImage = nullptr;
-	vk::raii::ImageView textureImageView = nullptr;
-	vk::raii::Sampler textureSampler = nullptr;
-	VmaAllocation textureAlloc;
-};
 
 struct UniformBufferObject {
 	/*glm::vec2 foo;
@@ -135,6 +114,24 @@ struct UniformBufferObject {
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 proj;
+};
+
+// UNIFORM BUFFERS
+// SKYBOX
+struct SkyUniformBuffer {
+	float highlightOffset;
+	float highlightSmoothness;
+	float midOffset;
+	float midSmoothness;
+	float coreOffset;
+	float coreSmoothness;
+	float bumpOffset;
+	float bumpRange;
+	float bumpHeight;
+	glm::vec4 baseCol;
+	glm::vec4 highCol;
+	glm::vec4 midCol;
+	glm::vec4 coreCol;
 };
 
 

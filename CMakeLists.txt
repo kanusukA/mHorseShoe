@@ -26,6 +26,10 @@ if(MSVC)
     add_compile_options(/Od )
 endif()
 
+set(slang_DIR "$ENV{SLANG_DIR}")
+
+message("slang_Dir $ENV{SLANG_DIR}")
+
 
 #set(CMAKE_CONFIGURATION_TYPES "Debug" CACHE STRING "" FORCE)
 
@@ -38,7 +42,7 @@ include(FetchContent)
 include(CPM.cmake)
 
 # VULKAN
-find_package(slang CONFIG HINTS "$ENV{VULKAN_SDK}/lib/cmake")
+find_package(slang CONFIG HINTS SLANG_CONFIG_DIR)
 
 find_package(Vulkan REQUIRED)
 
@@ -240,7 +244,7 @@ set(SOURCES
 	src/main.cpp
 )
 
-add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  "src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" "src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp" "src/ResourceHandler/ResourceGltf.h" "src/ResourceHandler/ResourceGltf.cpp" "src/monster/VulkanUtils.h" "src/monster/MonsterSlang.h" "src/monster/MonsterSlang.cpp")
+add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  "src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" "src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp" "src/ResourceHandler/ResourceGltf.h" "src/ResourceHandler/ResourceGltf.cpp" "src/monster/VulkanUtils.h" "src/monster/MonsterSlang.h" "src/monster/MonsterSlang.cpp" "src/monster/MonsterBuffer.h" "src/monster/MonsterBuffer.cpp")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 
@@ -263,6 +267,8 @@ target_include_directories(mHorseShoee PRIVATE "${Vulkan_INCLUDE_DIR}")
 
 
 target_link_libraries(mHorseShoee PRIVATE Vulkan::Vulkan)
+
+target_link_libraries(mHorseShoee PRIVATE slang::slang)
 
 target_include_directories(mHorseShoee PUBLIC "src/" )
 

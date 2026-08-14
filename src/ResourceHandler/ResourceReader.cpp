@@ -339,3 +339,5 @@ void ResourceReader::readFileContents(std::filesystem::path filePath, std::vecto
 	file.close();
 
 }
+
+
