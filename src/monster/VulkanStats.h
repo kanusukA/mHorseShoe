@@ -73,13 +73,16 @@ struct VulkanStatus {
 };
 
 struct VulkanSync {
+
 	std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
 	std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
 	std::vector<vk::raii::Fence> inFlightFences;
+
 };
 
 
-typedef std::vector<vk::raii::Buffer> MonsterUniBuffers;
+
+
 
 struct VulkanMemAlloc {
 
@@ -93,9 +96,7 @@ struct VulkanMemAlloc {
 	std::vector<uint32_t> indexes;
 	std::vector<uint32_t> vertices;
 
-	std::vector<std::shared_ptr<MonsterUniBuffers>> uniformBuffers;
-	std::vector<VmaAllocation> uniformBufferAlloc;
-	std::vector<void*> uniformBuffersMapped;
+	std::vector<std::shared_ptr<MBuffer>> uniformBuffers;
 
 };
 
@@ -119,6 +120,7 @@ struct UniformBufferObject {
 // UNIFORM BUFFERS
 // SKYBOX
 struct SkyUniformBuffer {
+
 	float highlightOffset;
 	float highlightSmoothness;
 	float midOffset;
@@ -132,6 +134,7 @@ struct SkyUniformBuffer {
 	glm::vec4 highCol;
 	glm::vec4 midCol;
 	glm::vec4 coreCol;
+
 };
 
 

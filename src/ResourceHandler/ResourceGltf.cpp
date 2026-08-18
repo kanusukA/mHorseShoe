@@ -29,10 +29,11 @@ fastgltf::Asset ResourceGltf::parseGltfFile(std::filesystem::path& path)
 	
 }
 
-void ResourceGltf::generateMesh(fastgltf::Asset& asset, std::vector<hRes::Mesh>* outputMeshes)
+std::vector<MeshData> ResourceGltf::generateMesh(fastgltf::Asset& asset)
 {
 
-	outputMeshes->resize(static_cast<int>(asset.meshes.size()));
+	std::vector<MeshData> meshes = std::vector<MeshData>();
+	meshes.resize(asset.meshes.size());
 	int32_t meshIndex = 0;
 	for (const auto& mesh: asset.meshes)
 	{
@@ -41,11 +42,12 @@ void ResourceGltf::generateMesh(fastgltf::Asset& asset, std::vector<hRes::Mesh>*
 		{
 			// indices
 			auto& accessor = asset.accessors[prim.indicesAccessor.value()];
-			outputMeshes->at(meshIndex).indices.resize(accessor.count);
+			
+			meshes.at(meshIndex).indices.resize(accessor.count);
 	
 			size_t idx = 0;
 			fastgltf::iterateAccessor<std::uint16_t>(asset, accessor, [&](std::uint16_t index) {
-				outputMeshes->at(meshIndex).indices[idx++] = index;
+				meshes.at(meshIndex).indices[idx++] = index;
 			});
 
 			// vertex
@@ -53,11 +55,11 @@ void ResourceGltf::generateMesh(fastgltf::Asset& asset, std::vector<hRes::Mesh>*
 			if (position)
 			{
 				auto& vertAccesser = asset.accessors[position->accessorIndex];
-				outputMeshes->at(meshIndex).vertices.resize(vertAccesser.count);
+				meshes.at(meshIndex).vertices.resize(vertAccesser.count);
 
 				
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(asset, vertAccesser, [&](glm::vec3 pos,size_t index) {
-					outputMeshes->at(meshIndex).vertices[index].pos = pos;
+					meshes.at(meshIndex).vertices[index].pos = pos;
 				});
 			}
 			else {
@@ -70,7 +72,7 @@ void ResourceGltf::generateMesh(fastgltf::Asset& asset, std::vector<hRes::Mesh>*
 				
 				fastgltf::iterateAccessorWithIndex<glm::vec2>(asset, asset.accessors[(*uv).accessorIndex],
 					[&](glm::vec2 v, size_t index) {
-						outputMeshes->at(meshIndex).vertices[index].texCoord = v;
+						meshes.at(meshIndex).vertices[index].texCoord = v;
 					});
 			}
 			
@@ -79,6 +81,6 @@ void ResourceGltf::generateMesh(fastgltf::Asset& asset, std::vector<hRes::Mesh>*
 		meshIndex++;
 	}
 
-
+	return meshes;
 
 }

@@ -1,18 +1,42 @@
 #pragma once
+
+
 #include <monster/VulkanStats.h>
 #include <GDHandler/ResourceHandler.h>
+
+static VkDeviceSize alignedVkSize(VkDeviceSize value, VkDeviceSize alignment) {
+	return (value + alignment - 1) & ~(alignment - 1);
+}
 
 
 class MonsterBuffer {
 	VulkanMemAlloc* vkMemAlloc;
 	VulkanStatus* vkMonsterStats;
-public:
 
 	
+	
 
-	void InitMonsterBuffer(vk::raii::Device* device_p,VulkanMemAlloc* alloc_p, VulkanStatus* vkMonsterStats_p) {
+public:
+
+	VkPhysicalDeviceDescriptorHeapPropertiesEXT descriptorHeapProperties{};
+	vk::DeviceSize bufferDescriptorSize;
+	std::vector<vk::DeviceSize> bufferHeapSize = std::vector<vk::DeviceSize>();
+	std::vector<vk::DeviceAddress> bufferHeapAddress = std::vector<vk::DeviceAddress>();
+
+	
+	void InitMonsterBuffer(VulkanMemAlloc* alloc_p, VulkanStatus* vkMonsterStats_p) {
 		vkMemAlloc = alloc_p;
 		vkMonsterStats = vkMonsterStats_p;
+
+		// GET PHYSICAL DEVICE PROPS
+		VkPhysicalDeviceProperties2 props{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
+		descriptorHeapProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_HEAP_PROPERTIES_EXT;
+		props.pNext = &descriptorHeapProperties;
+		vkGetPhysicalDeviceProperties2(*vkMonsterStats->gpuDevice, &props);
+
+		// Buffer descriptor Size
+		bufferDescriptorSize = alignedVkSize(descriptorHeapProperties.bufferDescriptorSize, descriptorHeapProperties.bufferDescriptorAlignment);
+
 	}
 
 	std::pair<VkBuffer, VmaAllocation> createBuffer(
@@ -46,6 +70,9 @@ public:
 		uint32_t height
 	);
 
+	void createDescriptorHeapBuffer(
+		std::shared_ptr<MBuffer> buffers
+	);
 
 	vk::raii::CommandBuffer begineSingleTimeCommands();
 	void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer);

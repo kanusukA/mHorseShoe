@@ -59,9 +59,9 @@ class MonsterVulkan : public MonsterSDL , public MonsterSlang {
 
 public:
 
-	std::vector<std::unique_ptr<hRes::Mesh>> importedMeshes = std::vector<std::unique_ptr<hRes::Mesh>>();
-	std::vector<uint32_t> loadedMeshes = std::vector<uint32_t>();
-	std::vector<uint32_t> passObjects = std::vector<uint32_t>();
+	std::vector<std::shared_ptr<hRes::Mesh>> importedMeshes = std::vector<std::shared_ptr<hRes::Mesh>>();
+	std::vector<std::shared_ptr<hRes::Mesh>> loadedMeshes = std::vector<std::shared_ptr<hRes::Mesh>>();
+	std::vector<std::shared_ptr<hRes::Mesh>> passObjects = std::vector<std::shared_ptr<hRes::Mesh>>();
 
 	std::vector<vk::raii::Pipeline> pipes = std::vector<vk::raii::Pipeline>();
 
@@ -90,7 +90,7 @@ public:
 	void createSwapchain();
 	void createImageView();
 	vk::raii::ImageView createImageView(vk::Image const& image, vk::Format format, vk::ImageAspectFlags flags);
-	void createDescriptiorSetLayout();
+	//void createDescriptiorSetLayout();
 	void createGraphicsPipeline();
 	vk::raii::Pipeline createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
@@ -105,16 +105,16 @@ public:
 	void createCommandPool();
 	void createCommandBuffer();
 	void createDepthResources();
-	void createTextureImage();
-	void createTextureImageView();
-	void createTextureSampler();
-	void createVertexBuffer();
+	//void createTextureImage();
+	//void createTextureImageView();
+	//void createTextureSampler();
+	//void createVertexBuffer();
 	uint32_t createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
-	void createIndexBuffer();
+	//void createIndexBuffer();
 	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
-	void createUniformBuffers();
+	//void createUniformBuffers();
 	void createDescriptorPool();
-	void createDescriptorSets();
+	//void createDescriptorSets();
 	void createSyncObjects();
 
 
@@ -157,12 +157,12 @@ public:
 	void createTerrainPipeline() {};
 
 	// resturns the index of where buffer is stored (in context with the engine Not physical memory)
-	void loadMeshToVulkan(uint32_t meshIndex);
-	void loadMeshShaders(uint32_t meshIndex);
+	void loadMeshToVulkan(std::weak_ptr<hRes::Mesh> mesh);
+	void loadMeshShaders(std::weak_ptr<hRes::Mesh> mesh);
 
-	void loadMesh(uint32_t meshIndex);
+	void loadMesh(std::shared_ptr<hRes::Mesh> mesh);
 
-	void importMesh(hRes::Mesh& mesh);
+	std::shared_ptr<hRes::Mesh> createNewMesh();
 	void loadAllMeshes();
 	// CAN BE USED LATER TO SYNC AND ALIGN THE GRAPHICS PIPELINE!!
 	// THIS WILL NOT SORT THE RENDER PASS!!

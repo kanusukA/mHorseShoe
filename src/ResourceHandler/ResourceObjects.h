@@ -616,6 +616,11 @@ public:
 
 };
 
+struct MeshData {
+	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
+	std::vector<uint16_t> indices = std::vector<uint16_t>();
+};
+
 // NEW RESOURCES
 namespace hRes {
 
@@ -632,20 +637,22 @@ namespace hRes {
 		uint32_t indexBufferIndex;
 
 		bool isMeshVkLoaded = false;
+		bool descriptorBound = false;
 
 		// Used to set gropuing by vulkan to order rendering objects by the pipeline
 		uint32_t graphicsPipelineIndex; // Default pipeline is used when this is null;
 
-		uint32_t shaderIndex;
+		std::shared_ptr<vulkanUtils::Shader> shader;
 
 		Mesh(const Mesh& mesh) {
 			this->graphicsPipelineIndex = mesh.graphicsPipelineIndex;
 			this->indexBufferIndex = mesh.indexBufferIndex;
 			this->vertexBufferIndex - mesh.vertexBufferIndex;
 			this->indices = mesh.indices;
-			this->shaderIndex = mesh.shaderIndex;
+			this->shader = std::move(shader);
 			this->vertices = mesh.vertices;
 		}
+
 
 	};
 

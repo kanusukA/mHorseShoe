@@ -22,9 +22,9 @@ class MonsterSlang : public MonsterBuffer {
 public:
 
 	// each discriptor has two descriptors for the frame in flight calculation.
-	std::vector<std::shared_ptr<MonsterDescriptors>> descriptorSets = std::vector<std::shared_ptr<MonsterDescriptors>>();
+	std::vector<std::shared_ptr<vk::raii::DescriptorSets>> descriptorSets = std::vector<std::shared_ptr<vk::raii::DescriptorSets>>();
 	std::vector<std::shared_ptr<VulkanTexture>> textures = std::vector<std::shared_ptr<VulkanTexture>>();
-	std::vector<vulkanUtils::Shader*> shaders = std::vector<vulkanUtils::Shader*>();
+	std::vector<std::shared_ptr<vulkanUtils::Shader>> shaders = std::vector<std::shared_ptr<vulkanUtils::Shader>>();
 
 
 	void InitMonsterSlang(VulkanStatus* vkMonsterStats_p, VulkanDescriptors* vkDescriptors_p, VulkanMemAlloc* vkMemAlloc_p) {
@@ -37,7 +37,7 @@ public:
 		}
 	}
 
-	uint32_t loadShader(const std::string& shadername,std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath);
+	std::shared_ptr<vulkanUtils::Shader> loadShader(const std::string& shadername,std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath);
 
 	void compileShaderFiles();
 
@@ -53,21 +53,21 @@ public:
 	vk::raii::ShaderModule createShaderModule(const std::vector<uint8_t>& code) const;
 	vk::raii::ShaderModule createShaderModule(const uint32_t* code, size_t codeSize) const;
 
-	void compileToShaderModule() {};
+	void compileShaders();
 	
-	template <typename T>
-	void setupShaderBuffers(const uint32_t& shaderIndex, T& unifromBufferObj);
+	void setupShaderBuffers(std::weak_ptr<vulkanUtils::Shader> shader,const vk::DeviceSize& bufferSize);
 
 	// Buffers for shader
-	template <typename T>
-	std::pair<uint32_t, uint32_t> createUniformBuffers(T& uniformBufferObj);
+	std::shared_ptr<MBuffer> createUniformBuffers(const vk::DeviceSize& size);
 
-	uint32_t createDescriptorSets(
-		std::vector<vk::Buffer&> uniformBuffer,
-		uint32_t& uboBinding,
+
+	/*std::shared_ptr<vk::raii::DescriptorSets> createDescriptorSets(
+		std::vector<std::pair<vk::Buffer, vk::ShaderStageFlags>> uniformBuffer,
+		const vk::DeviceSize& bufferSize,
+		std::vector<uint32_t> uboBinding,
 		VulkanTexture& texture,
-		uint32_t& textureBinding
-	);
+		const uint32_t& textureBinding
+	);*/
 
 
 	std::shared_ptr<VulkanTexture> createTextureImage(std::filesystem::path& texturePath);

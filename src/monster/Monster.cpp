@@ -29,12 +29,13 @@ void Monster::InitMonster() {
 	imDebugStats.mouseXrel = &Feel::GetInstance()->mouse.xRel;
 	imDebugStats.mouseYrel = &Feel::GetInstance()->mouse.yRel;
 
+	//loadSkyBox();
 	loadOtherMesh();
-	loadSkyBox();
+	
 	
 	//compile shaders
 	MonsterSlang::compileShaderFiles();
-	MonsterVulkan::compileToShaderModule();
+	MonsterVulkan::compileShaders();
 
 	MonsterVulkan::loadAllMeshes();
 	MonsterVulkan::loadMeshToPassObject();
@@ -94,29 +95,50 @@ void Monster::loadSkyBox()
 	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/sphere.glb");
 	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
 
-	std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
+	std::shared_ptr<hRes::Mesh> mesh = MonsterVulkan::createNewMesh();
 
-	ResourceHandler::GetInstance()->generateMesh(*skyAsset, &meshes);
-	
+
+	std::vector<MeshData> meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset);
+
+	mesh->vertices = meshData.at(0).vertices;
+	mesh->indices = meshData.at(0).indices;
+
 	// Shader
 	std::filesystem::path vertshader = "../../../src/monster/shaders/triangle_vert.slang";
 	std::filesystem::path fragshader = "../../../src/monster/shaders/triangle_frag.slang";
-	meshes[0].shaderIndex = MonsterSlang::loadShader("SkyShader", vertshader, fragshader);
+	mesh->shader = MonsterSlang::loadShader("SkyShader", vertshader, fragshader);
 
-	MonsterVulkan::importMesh(meshes.at(0));
+	setupShaderBuffers(mesh->shader, sizeof(SkyUniformBuffer));
+
 	
 }
 
 void Monster::loadOtherMesh()
 {
-	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/box.glb");
-	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
+	std::filesystem::path boxPath = std::filesystem::path("../../../src/monster/shaders/box.glb");
+	fastgltf::Asset* asset = ResourceHandler::GetInstance()->loadGltfFile(boxPath);
 
-	std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
+	std::shared_ptr<hRes::Mesh> mesh = MonsterVulkan::createNewMesh();
 
-	ResourceHandler::GetInstance()->generateMesh(*skyAsset, &meshes);
-	meshes[0].shaderIndex = 0;
+	auto meshData = ResourceHandler::GetInstance()->generateMesh(*asset);
+
+	mesh->vertices = meshData.at(0).vertices;
+	mesh->indices = meshData.at(0).indices;
+
+	// generate Shader
+	std::filesystem::path vertshader = "../../../src/monster/shaders/triangle_vert.slang";
+	std::filesystem::path fragshader = "../../../src/monster/shaders/triangle_frag.slang";
+	mesh->shader = MonsterVulkan::loadShader("boxShader", vertshader, fragshader);
+
+	// generate UBO
+	mesh->shader->uniformBuffers = MonsterSlang::createUniformBuffers(sizeof(UniformBufferObject));
+
+	// create descriptor heap
+	createDescriptorHeapBuffer(mesh->shader->uniformBuffers);
+
+	mesh->descriptorBound = true;
 	
 
-	MonsterVulkan::importMesh(meshes.at(0));
+
+	
 }

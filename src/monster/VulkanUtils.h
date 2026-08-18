@@ -6,10 +6,13 @@
 #ifndef VULKAN_UTILS
 #define VULKAN_UTILS
 
+#define VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include <vulkan/vulkan.hpp>
 #include "vulkan/vulkan_core.h"
 
 #include <vulkan/vulkan_raii.hpp>
+
+
 
 #include <vk_mem_alloc.h>
 
@@ -17,7 +20,19 @@
 
 #include <filesystem>
 
+static PFN_vkGetBufferDeviceAddressEXT vkGetBufferDeviceAddressMON;
+static PFN_vkWriteResourceDescriptorsEXT vkWriteResourceDescriptorsMON;
+
 typedef  std::vector<vk::raii::DescriptorSet> MonsterDescriptors;
+typedef std::vector<vk::Buffer> MonsterBuffers;
+
+struct MBuffer {
+	MonsterBuffers buffers = MonsterBuffers();
+	std::vector<VmaAllocation> bufferAlloc;
+	void* heapMapped;
+
+	std::vector<vk::DeviceSize> bufferSizes;
+};
 
 
 struct VulkanTexture {
@@ -33,6 +48,7 @@ struct VulkanTexture {
 namespace vulkanUtils {
 
 	struct Vertex {
+
 		glm::vec3 pos;
 		glm::vec3 color;
 		glm::vec2 texCoord;
@@ -48,6 +64,7 @@ namespace vulkanUtils {
 				{.location = 2, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(Vertex,texCoord)},
 				} };
 		}
+
 	};
 
 	struct Shader {
@@ -60,16 +77,16 @@ namespace vulkanUtils {
 		std::filesystem::path* vertShaderFilePath = nullptr;
 		std::filesystem::path* fragShaderFilePath = nullptr;
 
-		// SLANG CODE IS RETAINED UNTIL THE SPV IS NOT COMPILED AND IS LATER CLEARED;
+		// SLANG CODE IS RETAINED UNTIL THE SPV IS NOT COMPILED AND IS LATER CLEARED
 		std::vector<char> vertCodeSlang;
 		std::vector<char> fragCodeSlang;
 
 		std::vector<uint8_t> vertCodeSpv;
 		std::vector<uint8_t> fragCodeSpv;
 
-		std::vector<std::shared_ptr<MonsterDescriptors>> descriptorSet;
+		std::shared_ptr<vk::raii::DescriptorSets> descriptorSets;
 		std::vector<std::shared_ptr<VulkanTexture>> textures;
-		std::vector<std::shared_ptr<vk::Buffer>> uniformBufferIndex;
+		std::shared_ptr<MBuffer> uniformBuffers;
 
 		std::string vertShadername;
 		std::string fragShaderName;
@@ -77,7 +94,6 @@ namespace vulkanUtils {
 		vk::raii::ShaderModule vertexShader = nullptr;
 		vk::raii::ShaderModule fragmentShader = nullptr;
 		
-
 	};
 
 }

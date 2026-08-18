@@ -1,5 +1,8 @@
 #include <monster/MonsterSlang.h>
 
+#define VMA_IMPLEMENTATION
+
+
 
 void printDiagnostics(slang::IBlob* diagnostics) {
 	if (diagnostics) {
@@ -8,9 +11,10 @@ void printDiagnostics(slang::IBlob* diagnostics) {
 	}
 }
 
-uint32_t MonsterSlang::loadShader(const std::string& shaderName,std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath)
+std::shared_ptr<vulkanUtils::Shader> MonsterSlang::loadShader(const std::string& shaderName,std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath)
 {
-	vulkanUtils::Shader* shader = new vulkanUtils::Shader();
+	std::shared_ptr<vulkanUtils::Shader> shader = std::make_shared<vulkanUtils::Shader>();
+
 	shader->vertShaderFilePath = new std::filesystem::path(vertfilepath);
 	shader->fragShaderFilePath = new std::filesystem::path(fragfilepath);
 
@@ -24,7 +28,7 @@ uint32_t MonsterSlang::loadShader(const std::string& shaderName,std::filesystem:
 	ResourceHandler::GetInstance()->readFileContents(fragfilepath, &shader->fragCodeSlang);
 
 	shaders.push_back(std::move(shader));
-	return shaders.size() - 1;
+	return shaders.back();
 
 }
 
@@ -157,7 +161,7 @@ vk::raii::ShaderModule MonsterSlang::createShaderModule(const uint32_t* code, si
 	return std::move(shaderModule);
 }
 
-void MonsterSlang::compileToShaderModule()
+void MonsterSlang::compileShaders()
 {
 	for (auto& shader : MonsterSlang::shaders)
 	{
@@ -166,126 +170,175 @@ void MonsterSlang::compileToShaderModule()
 	}
 }
 
-template<typename T>
-void MonsterSlang::setupShaderBuffers(const uint32_t& shaderIndex, T& unifromBufferObj)
-{
-	vulkanUtils::Shader* shader = shaders[shaderIndex];
-	shader->uniformBufferIndex = createUniformBuffers(unifromBufferObj);
 
-	std::filesystem::path& imagePath = "../../../src/monster/shaders/far_fog_tex.png";
-	VulkanTexture* texture = createTextureImage(imagePath);
-	createImageView(texture);
-	createTextureSampler(texture);
+void MonsterSlang::setupShaderBuffers(std::weak_ptr<vulkanUtils::Shader> shader,const vk::DeviceSize& bufferSize)
+{
 	
-	shader->descriptorSetIndex = createDescriptorSets(
-		{ vkMemAlloc->uniformBuffers.at(shader->uniformBufferIndex.first) ,vkMemAlloc->uniformBuffers.at(shader->uniformBufferIndex.second) },
-		1,
-		*texture,
-		2
-	);
+	shader.lock()->uniformBuffers = createUniformBuffers(bufferSize);
+
+	std::filesystem::path imagePath = "../../../src/monster/shaders/far_fog_tex.png";
+	std::shared_ptr<VulkanTexture> texture = createTextureImage(imagePath);
+	createImageView(texture->texture,texture->imgFormat,vk::ImageAspectFlagBits::eColor);
+	createTextureSampler(texture.get());
+	
+	/*shader.lock()->descriptorSets =
+		createDescriptorSets(
+			shader.lock()->uniformBuffers.get()->buffers,
+			1,
+			bufferSize,
+			*texture,
+			0
+		);*/
 
 }
 
-template <typename T>
-std::pair<uint32_t, uint32_t> MonsterSlang::createUniformBuffers(T& uniformBufferObj)
+std::shared_ptr<MBuffer> MonsterSlang::createUniformBuffers(const vk::DeviceSize& size)
 {
+	std::shared_ptr<MBuffer> mBuffer = std::make_shared<MBuffer>();
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		vk::DeviceSize bufferSize = sizeof(uniformBufferObj);
-
-		auto [buffer, alloc] = createBuffer(bufferSize,
+		auto [buffer, alloc] = createBuffer(size,
 			vk::BufferUsageFlagBits::eUniformBuffer,
 			VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
 			VMA_MEMORY_USAGE_AUTO);
-		vkMemAlloc->uniformBuffers.emplace_back(std::move(vk::raii::Buffer(vkMonsterStats->device, buffer)));
-		vkMemAlloc->uniformBufferAlloc.emplace_back(std::move(alloc));
-		vkMemAlloc->uniformBuffersMapped.emplace_back(std::move(alloc->GetMappedData()));
-
-	}
-	if (vkMemAlloc->uniformBuffersMapped.size() <= 1)
-	{
-		throw std::runtime_error("UNABLE TO CREATE UNIFROM BUFFERS");
-	}
-	return { vkMemAlloc->uniformBuffersMapped.size() - 1, vkMemAlloc->uniformBuffersMapped.size() - 2 };
-}
-
-uint32_t MonsterSlang::createDescriptorSets
-(
-	std::vector<vk::Buffer&> uniformBuffer,
-	uint32_t& uboBinding,
-	VulkanTexture& texture,
-	uint32_t& textureBinding
-)
-{
-	// set layout for descriptor Sets
-	std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *vkDescriptors->descriptorSetLayout);
-	vk::DescriptorSetAllocateInfo allocInfo{
-		.descriptorPool = vkDescriptors->descriptorPool,
-		.descriptorSetCount = static_cast<uint32_t>(layouts.size()),
-		.pSetLayouts = layouts.data()
-	};
-
-	// Allocate Descriptor sets
-	std::shared_ptr<MonsterDescriptors> descriptor = std::make_shared<MonsterDescriptors>();
-	descriptor.reset(&vkMonsterStats->device.allocateDescriptorSets(allocInfo));
-	descriptorSets.push_back(std::move(descriptor));
-
-	//configure allocated descriptor sets
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	{
-		vk::DescriptorBufferInfo bufferInfo{
-			.buffer =  uniformBuffer[i],
-			.offset = 0,
-			.range = sizeof(UniformBufferObject)
-		};
-
-		vk::DescriptorImageInfo imageInfo{
-			.sampler = texture.textureSampler,
-			.imageView = texture.textureView,
-			.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
-		};
-
-		/*
-		vk::WriteDescriptorSet descriptorWrite{
-			.dstSet = vkDescriptors.descriptorSets[i],
-			.dstBinding = 0,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = vk::DescriptorType::eUniformBuffer,
-			.pBufferInfo = &bufferInfo
-		};
-		*/
-		std::array<vk::WriteDescriptorSet, 2>descriptorWrites{ {
-			{
-			.dstSet = descriptorSets.back()->at(0),
-			.dstBinding = uboBinding,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = vk::DescriptorType::eUniformBuffer,
-			.pBufferInfo = &bufferInfo
-			},
-			{
-			.dstSet = descriptorSets.back()->at(1),
-			.dstBinding = textureBinding,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-			.pImageInfo = &imageInfo
-			}
-		} };
-
-		vkMonsterStats->device.updateDescriptorSets(descriptorWrites, {});
-
+		
+		vk::raii::Buffer rBuffer = vk::raii::Buffer(vkMonsterStats->device,buffer);
+		mBuffer->buffers.push_back(std::move(rBuffer));
+		mBuffer->bufferAlloc.push_back(std::move(alloc));
+		mBuffer->bufferSizes.push_back(size);
 		
 	}
 
-	if (descriptorSets.size() <= 0)
-	{
-		throw std::runtime_error("DESCRIPTOR SET FAILED TO CREATE!");
-	}
-
-	return descriptorSets.size() - 1;
+	vkMemAlloc->uniformBuffers.push_back(std::move(mBuffer));
+	
+	return vkMemAlloc->uniformBuffers.back();
 }
+
+//std::shared_ptr<vk::raii::DescriptorSets> MonsterSlang::createDescriptorSets
+//(
+//	std::vector<std::pair<vk::Buffer,vk::ShaderStageFlags>> uniformBuffer,
+//	const vk::DeviceSize& bufferSize,
+//	std::vector<uint32_t> uboBinding,
+//	VulkanTexture& texture,
+//	const uint32_t& textureBinding
+//)
+//{
+//
+//	
+//
+//	// Descriptor layout
+//	//const size_t size = uboBinding.size() + 1;
+//	///*std::array<vk::DescriptorSetLayoutBinding, size> bindings{
+//	//	{{
+//	//	.binding = 0,
+//	//	.descriptorType = vk::DescriptorType::eUniformBuffer,
+//	//	.descriptorCount = 1,
+//	//	.stageFlags = vk::ShaderStageFlagBits::eVertex
+//	//	},{
+//	//	.binding = 1,
+//	//	.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+//	//	.descriptorCount = 1,
+//	//	.stageFlags = vk::ShaderStageFlagBits::eFragment
+//	//	}}
+//	//};*/
+//
+//	//std::vector<vk::DescriptorSetLayoutBinding> bindings(size);
+//	//// uniformBuffers
+//	//for (size_t uboIndex = 0; uboIndex < uniformBuffer.size(); uboIndex++)
+//	//{
+//	//	vk::DescriptorSetLayoutBinding binding{
+//	//		.binding = uboBinding[uboIndex],
+//	//		.descriptorType = vk::DescriptorType::eUniformBuffer,
+//	//		.descriptorCount = 1, // how many descriptors to update
+//	//		.stageFlags = uniformBuffer[uboIndex].second
+//	//	};
+//	//	bindings.push_back(binding);
+//	//}
+//	////texture
+//	//vk::DescriptorSetLayoutBinding binding{
+//	//		.binding = textureBinding,
+//	//		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+//	//		.descriptorCount = 1, // how many descriptors to update
+//	//		.stageFlags = vk::ShaderStageFlagBits::eFragment
+//	//};
+//	//bindings.push_back(binding);
+//
+//	//vk::DescriptorSetLayoutCreateInfo layoutInfo{
+//	//	.bindingCount = static_cast<uint32_t>(bindings.size()),
+//	//	.pBindings = bindings.data()
+//	//};
+//
+//	//vk::raii::DescriptorSetLayout layout = vk::raii::DescriptorSetLayout(vkMonsterStats->device, layoutInfo);
+//
+//	//// set layout for descriptor Sets
+//	////std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *vkDescriptors->descriptorSetLayout);
+//
+//	//vk::DescriptorSetAllocateInfo allocInfo{
+//	//	.descriptorPool = vkDescriptors->descriptorPool,
+//	//	.descriptorSetCount = static_cast<uint32_t>(layouts.size()),
+//	//	.pSetLayouts = layouts.data()
+//	//};
+//
+//	//// Allocate Descriptor sets
+//	//std::shared_ptr<vk::raii::DescriptorSets> descriptors = std::make_shared<vk::raii::DescriptorSets>(vkMonsterStats->device.allocateDescriptorSets(allocInfo));
+//	////descriptors.reset(&vk::raii::DescriptorSets(vkMonsterStats->device.allocateDescriptorSets(allocInfo)));
+//	//descriptorSets.push_back(std::move(descriptors));
+//
+//	////configure allocated descriptor sets
+//	//for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+//	//{
+//	//	vk::DescriptorBufferInfo bufferInfo{
+//	//		.buffer =  uniformBuffer[i],
+//	//		.offset = 0,
+//	//		.range = bufferSize
+//	//	};
+//
+//	//	vk::DescriptorImageInfo imageInfo{
+//	//		.sampler = texture.textureSampler,
+//	//		.imageView = texture.textureView,
+//	//		.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+//	//	};
+//
+//	//	/*
+//	//	vk::WriteDescriptorSet descriptorWrite{
+//	//		.dstSet = vkDescriptors.descriptorSets[i],
+//	//		.dstBinding = 0,
+//	//		.dstArrayElement = 0,
+//	//		.descriptorCount = 1,
+//	//		.descriptorType = vk::DescriptorType::eUniformBuffer,
+//	//		.pBufferInfo = &bufferInfo
+//	//	};
+//	//	*/
+//	//	std::array<vk::WriteDescriptorSet, 2>descriptorWrites{ {
+//	//		{
+//	//		.dstSet = descriptorSets.back()->at(0),
+//	//		.dstBinding = uboBinding,
+//	//		.dstArrayElement = 0,
+//	//		.descriptorCount = 1,
+//	//		.descriptorType = vk::DescriptorType::eUniformBuffer,
+//	//		.pBufferInfo = &bufferInfo
+//	//		},
+//	//		{
+//	//		.dstSet = descriptorSets.back()->at(1),
+//	//		.dstBinding = textureBinding,
+//	//		.dstArrayElement = 0,
+//	//		.descriptorCount = 1,
+//	//		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+//	//		.pImageInfo = &imageInfo
+//	//		}
+//	//	} };
+//
+//	//	vkMonsterStats->device.updateDescriptorSets(descriptorWrites, {});
+//
+//	//}
+//
+//	//if (!descriptorSets.back())
+//	//{
+//	//	throw std::runtime_error("DESCRIPTOR SET FAILED TO CREATE!");
+//	//}
+//
+//	//return descriptorSets.back();
+//}
 
 std::shared_ptr<VulkanTexture> MonsterSlang::createTextureImage(
 	std::filesystem::path& texturePath

@@ -1,9 +1,12 @@
+#pragma once
+
 #include "MonsterVulkan.h"
 
 
-#define VMA_IMPLEMENTATION
-//#include <vulkan/vulkan.h>
-#include "vk_mem_alloc.h"
+//#define VMA_IMPLEMENTATION
+////#include <vulkan/vulkan.h>
+#include <vk_mem_alloc.h>
+
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -20,7 +23,6 @@ const std::vector<vulkanUtils::Vertex> p_vertices = {
 const std::vector<uint16_t> p_indices = {
 	0, 1, 2, 2, 3, 0
 };
-
 
 void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 
@@ -122,21 +124,24 @@ void MonsterVulkan::InitVulkan(uint16_t windowWidth, uint16_t windowHeight) {
 	createVulkanMemAllocator();
 	createSwapchain();
 	createImageView();
-	createDescriptiorSetLayout();
+
+	InitMonsterSlang(&vkMonsterStats, &vkDescriptors, &vkMemAlloc);
+	InitMonsterBuffer( &vkMemAlloc, &vkMonsterStats);
+	createDepthResources();
 	createGraphicsPipeline();
 	createCommandPool();
 	createCommandBuffer();
-	createTextureImage();
-	createTextureImageView();
-	createTextureSampler();
-	createVertexBuffer();
-	createIndexBuffer();
-	createUniformBuffers();
+	//createTextureImage();
+	//createTextureImageView();
+	//createTextureSampler();
+	//createVertexBuffer();
+	//createIndexBuffer();
+	//createUniformBuffers();
 	createDescriptorPool();
-	createDescriptorSets();
+	//createDescriptorSets();
 	createSyncObjects();
 
-	MonsterSlang::InitMonsterSlang(&vkMonsterStats.device, &vkDescriptors);
+
 
 
 }
@@ -150,6 +155,18 @@ void MonsterVulkan::ShutdownVulkan()
 
 
 void MonsterVulkan::createVulkanInstance() {
+
+	uint32_t major = VK_VERSION_MAJOR(VK_HEADER_VERSION_COMPLETE);
+	uint32_t minor = VK_VERSION_MINOR(VK_HEADER_VERSION_COMPLETE);
+	uint32_t patch = VK_HEADER_VERSION; // Alternately: VK_VERSION_PATCH(VK_HEADER_VERSION_COMPLETE)
+
+	
+
+	// 2. Print the version string
+	std::cout << "Vulkan SDK Header Version: "
+		<< major << "."
+		<< minor << "."
+		<< patch << std::endl;
 
 	// Validation Layers
 	std::vector<char const*> requiredLayers;
@@ -181,12 +198,28 @@ void MonsterVulkan::createVulkanInstance() {
 		throw std::runtime_error("SDL FAILED TO PROVIDE EXTENSION DETAILS TO VULKAN");
 	}
 
+	for (const auto& layer : layerProperties)
+	{
+		std::cout << "LAYER : " << layer.layerName << std::endl;
+	}
+
+	auto availExt = vkMonsterStats.Context.enumerateInstanceExtensionProperties();
+	for (const auto& ext: availExt)
+	{
+		std::cout << "EXTENSION : " << ext.extensionName << std::endl;
+	}
 	
 
 	int count_extensions = extensionCount + 1;
 	const char** extensions = static_cast<const char**>(SDL_malloc(count_extensions * sizeof(const char*)));
 	extensions[0] = vk::EXTDebugUtilsExtensionName;
+	//extensions[1] = vk::KHRGetDisplayProperties2ExtensionName;
+	//extensions[1] = vk::KHRBufferDeviceAddressExtensionName;
+	//extensions[2] = vk::KHRShaderUntypedPointersExtensionName;
+	/*extensions[2] = vk::EXTDescriptorBufferExtensionName;*/
 	SDL_memcpy(&extensions[1], instance_extensions, extensionCount * sizeof(const char*));
+	
+	
 
 	for (size_t i = 0; i < count_extensions; i++)
 	{
@@ -199,7 +232,7 @@ void MonsterVulkan::createVulkanInstance() {
 	appInfo.pApplicationName = "Psycho";
 	appInfo.applicationVersion = 10000;
 	appInfo.engineVersion = 10001;
-	appInfo.apiVersion = VK_API_VERSION_1_3;
+	appInfo.apiVersion = VK_API_VERSION_1_4;
 
 	vk::InstanceCreateInfo createInfo{};
 	createInfo.pApplicationInfo = &appInfo;
@@ -209,8 +242,6 @@ void MonsterVulkan::createVulkanInstance() {
 	createInfo.ppEnabledLayerNames = requiredLayers.data();
 
 	vkMonsterStats.vkInstance = vk::raii::Instance(vkMonsterStats.Context, createInfo);
-
-
 
 
 }
@@ -423,7 +454,8 @@ void MonsterVulkan::createVulkanDevice() {
 	// required extensions
 
 	std::vector<const char*> requiredDeviceExtension = {
-		vk::KHRSwapchainExtensionName
+		vk::KHRSwapchainExtensionName,
+		vk::EXTDescriptorBufferExtensionName
 	};
 
 	// Create Device
@@ -442,6 +474,10 @@ void MonsterVulkan::createVulkanDevice() {
 		queueIndex,
 		0
 	);
+
+	// EXT FUNCTIONS
+	vkGetBufferDeviceAddressMON = (PFN_vkGetBufferDeviceAddressEXT)vkGetDeviceProcAddr(*vkMonsterStats.device, "vkGetBufferDeviceAddressEXT");
+	vkWriteResourceDescriptorsMON = (PFN_vkWriteResourceDescriptorsEXT)vkGetDeviceProcAddr(*vkMonsterStats.device, "vkWriteResourceDescriptorsEXT");
 
 }
 
@@ -576,29 +612,29 @@ vk::raii::ImageView MonsterVulkan::createImageView(vk::Image const& image, vk::F
 	return std::move(imageView);
 }
 
-void MonsterVulkan::createDescriptiorSetLayout()
-{
-
-	std::array<vk::DescriptorSetLayoutBinding, 2> bindings{
-		{{
-		.binding = 0,
-		.descriptorType = vk::DescriptorType::eUniformBuffer,
-		.descriptorCount = 1,
-		.stageFlags = vk::ShaderStageFlagBits::eVertex
-		},{
-		.binding = 1,
-		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-		.descriptorCount = 1,
-		.stageFlags = vk::ShaderStageFlagBits::eFragment
-		}}
-	};
-
-	vk::DescriptorSetLayoutCreateInfo layoutInfo{
-		.bindingCount = static_cast<uint32_t>(bindings.size()),
-		.pBindings = bindings.data()
-	};
-	vkDescriptors.descriptorSetLayout = vk::raii::DescriptorSetLayout(vkMonsterStats.device, layoutInfo);
-}
+//void MonsterVulkan::createDescriptiorSetLayout()
+//{
+//
+//	std::array<vk::DescriptorSetLayoutBinding, 2> bindings{
+//		{{
+//		.binding = 0,
+//		.descriptorType = vk::DescriptorType::eUniformBuffer,
+//		.descriptorCount = 1,
+//		.stageFlags = vk::ShaderStageFlagBits::eVertex
+//		},{
+//		.binding = 1,
+//		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+//		.descriptorCount = 1,
+//		.stageFlags = vk::ShaderStageFlagBits::eFragment
+//		}}
+//	};
+//
+//	vk::DescriptorSetLayoutCreateInfo layoutInfo{
+//		.bindingCount = static_cast<uint32_t>(bindings.size()),
+//		.pBindings = bindings.data()
+//	};
+//	vkDescriptors.descriptorSetLayout = vk::raii::DescriptorSetLayout(vkMonsterStats.device, layoutInfo);
+//}
 
 
 void MonsterVulkan::createGraphicsPipeline() {
@@ -694,20 +730,43 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 		.pAttachments = &colorBlendState
 	};
 
-	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{
+	/*vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{
 		.setLayoutCount = 1,
 		.pSetLayouts = &*vkDescriptors.descriptorSetLayout,
 		.pushConstantRangeCount = 0,
 
+	};*/
+
+	//vkDescriptors.pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
+
+	// DESCRIPTOR HEAP
+	VkDescriptorSetAndBindingMappingEXT bufferBindings{
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_AND_BINDING_MAPPING_EXT,
+		.descriptorSet = 0,
+		.firstBinding = 0,
+		.bindingCount = 1,
+		.resourceMask = VK_SPIRV_RESOURCE_TYPE_UNIFORM_BUFFER_BIT_EXT,
+		.source = VK_DESCRIPTOR_MAPPING_SOURCE_HEAP_WITH_CONSTANT_OFFSET_EXT,
+		.sourceData = {
+			.constantOffset = {
+				.heapArrayStride = static_cast<uint32_t>(bufferDescriptorSize)
+			}
+		}
 	};
 
-	vkDescriptors.pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
+	VkShaderDescriptorSetAndBindingMappingInfoEXT shaderDescriptorInfo{
+		.mappingCount = 1,
+		.pMappings = &bufferBindings
+	};
+
+	ShaderStages[0].pNext = &shaderDescriptorInfo;
+	ShaderStages[1].pNext = &shaderDescriptorInfo;
 
 
 	vk::PipelineRenderingCreateInfo renderingCreateInfo{
 		.colorAttachmentCount = 1,
 		.pColorAttachmentFormats = &vkMonsterStats.swapChainSurfaceFormat.format,
-		.depthAttachmentFormat = depthTexture->imgFormat
+		.depthAttachmentFormat = depthTexture->imgFormat 
 	};
 
 	vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo{
@@ -721,10 +780,16 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 		.pDepthStencilState = &depthStencil,
 		.pColorBlendState = &colorBlendInfo,
 		.pDynamicState = &dynamicStateCreateInfo,
-		.layout = vkDescriptors.pipelineLayout,
 		.renderPass = nullptr,
 
 	};
+
+	vk::PipelineCreateFlags2CreateInfo pipelineCreateFlags{
+		.pNext = &renderingCreateInfo,
+		.flags = vk::PipelineCreateFlagBits2::eDescriptorHeapEXT
+	};
+
+	graphicsPipelineCreateInfo.pNext = &pipelineCreateFlags;
 
 	vk::StructureChain<vk::GraphicsPipelineCreateInfo, vk::PipelineRenderingCreateInfo> pipelineCreateInfoChain = {
 		graphicsPipelineCreateInfo,
@@ -767,6 +832,7 @@ void MonsterVulkan::createDepthResources()
 
 	vk::Format::eD24UnormS8Uint: 24-bit float for depth and 8 bit stencil component
 	*/
+	depthTexture = new VulkanTexture();
 
 	depthTexture->imgFormat = findDepthFormat();
 
@@ -786,13 +852,13 @@ void MonsterVulkan::createDepthResources()
 
 
 
-void MonsterVulkan::createTextureImage()
-{
-	std::filesystem::path filepath = std::filesystem::path("../../../src/vktest/textures/praise_the_sun.png");
-	sampleTexture = MonsterSlang::createTextureImage(filepath);
-	MonsterSlang::createTextureImageView(sampleTexture);
-	MonsterSlang::createTextureSampler(sampleTexture);
-}
+//void MonsterVulkan::createTextureImage()
+//{
+//	std::filesystem::path filepath = std::filesystem::path("../../../src/vktest/textures/praise_the_sun.png");
+//	sampleTexture = MonsterSlang::createTextureImage(filepath).get();
+//	MonsterSlang::createTextureImageView(sampleTexture);
+//	MonsterSlang::createTextureSampler(sampleTexture);
+//}
 
 
 void MonsterVulkan::transition_image_layout(
@@ -921,25 +987,42 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 
 	// ORDER INCOMING MESHES BY THE PIPELINE THEY USE
 
+	// add descriptor single time per objects
+	for (size_t bufferDescripIdx = 0; bufferDescripIdx < bufferHeapAddress.size(); bufferDescripIdx++)
+	{
+		vk::BindHeapInfoEXT bindHeapInfo{
+		.heapRange = {
+			.address = bufferHeapAddress[bufferDescripIdx],
+			.size = bufferHeapSize[bufferDescripIdx]
+		},
+		.reservedRangeOffset = bufferHeapSize[bufferDescripIdx] - descriptorHeapProperties.minResourceHeapReservedRange,
+		.reservedRangeSize = descriptorHeapProperties.minResourceHeapReservedRange
+
+		};
+
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindResourceHeapEXT(bindHeapInfo);
+	}
+
+
 	int32_t instance = 0;
-	for (const auto& passObjIndex: passObjects)
+	for (const auto& passObj: passObjects)
 	{
 		//hRes::Mesh* passObj = importedMeshes[passObjIndex];
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics,  pipes[importedMeshes[passObjIndex]->graphicsPipelineIndex]);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics,  pipes[passObj->graphicsPipelineIndex]);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
-			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, descriptorSets[importedMeshes[passObjIndex]->], nullptr
-		);
+		//vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
+		//	vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *passObj->shader->descriptorSets.get()->at(vkMonsterStats.frameIndex), nullptr
+		//);
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[importedMeshes[passObjIndex]->vertexBufferIndex], { 0 });
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[importedMeshes[passObjIndex]->indexBufferIndex], 0, vk::IndexType::eUint16);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[passObj->vertexBufferIndex], { 0 });
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[passObj->indexBufferIndex], 0, vk::IndexType::eUint16);
 
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(importedMeshes[passObjIndex]->indices.size(), instance, 0, 0, 0);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(passObj->indices.size(), instance, 0, 0, 0);
 		instance++;
 	}
 
@@ -1008,9 +1091,9 @@ void MonsterVulkan::recreateSwapChain() {
 
 }
 
-void MonsterVulkan::createVertexBuffer() {
-	createVertexBuffer(p_vertices);
-}
+//void MonsterVulkan::createVertexBuffer() {
+//	createVertexBuffer(p_vertices);
+//}
 
 uint32_t MonsterVulkan::createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices) {
 	vkMemAlloc.vertices.push_back(vertices.size());
@@ -1041,10 +1124,9 @@ uint32_t MonsterVulkan::createVertexBuffer(std::vector<vulkanUtils::Vertex> vert
 	return vkMemAlloc.vertexBuffer.size() - 1;
 }
 
-void MonsterVulkan::createIndexBuffer() {
-	createIndexBuffer(p_indices);
-
-}
+//void MonsterVulkan::createIndexBuffer() {
+//	createIndexBuffer(p_indices);
+//}
 
 uint32_t MonsterVulkan::createIndexBuffer(std::vector<uint16_t> indices) {
 
@@ -1077,23 +1159,11 @@ uint32_t MonsterVulkan::createIndexBuffer(std::vector<uint16_t> indices) {
 	return vkMemAlloc.indexBuffer.size() - 1;
 }
 
-void MonsterVulkan::createUniformBuffers()
-{
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	{
-		vk::DeviceSize bufferSize = sizeof(UniformBufferObject);
-
-
-		auto [buffer, alloc] = createBuffer(bufferSize,
-			vk::BufferUsageFlagBits::eUniformBuffer,
-			VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
-			VMA_MEMORY_USAGE_AUTO);
-		vkMemAlloc.uniformBuffers.emplace_back(std::move(vk::raii::Buffer(vkMonsterStats.device, buffer)));
-		vkMemAlloc.uniformBufferAlloc.emplace_back(std::move(alloc));
-		vkMemAlloc.uniformBuffersMapped.emplace_back(std::move(alloc->GetMappedData()));
-
-	}
-}
+//void MonsterVulkan::createUniformBuffers()
+//{
+//	UniformBufferObject obj = UniformBufferObject();
+//	MonsterSlang::createUniformBuffers(obj);
+//}
 
 void MonsterVulkan::createDescriptorPool()
 {
@@ -1212,25 +1282,32 @@ void MonsterVulkan::updateUniformBuffer(uint32_t currentImage)
 
 	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
 	//ubo.proj[1][1] *= -1;
-
-	memcpy(vkMemAlloc.uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
+	for (auto& mBuffer : vkMemAlloc.uniformBuffers)
+	{
+		if (mBuffer && mBuffer->buffers.size() > 0)
+		{
+			// FIRST BUFFER IS OF VERTEX MVP BUFFER;
+			VmaAllocationInfo allocInfo;
+			vmaGetAllocationInfo(vkMemAlloc.vmaAllocator, mBuffer->bufferAlloc.at(0), &allocInfo);
+			memcpy(allocInfo.pMappedData, &ubo, sizeof(ubo));
+		}
+		
+	}
+	
 
 }
 
-void MonsterVulkan::loadMeshToVulkan(uint32_t meshIndex)
+void MonsterVulkan::loadMeshToVulkan(std::weak_ptr<hRes::Mesh> mesh)
 {
-	if (importedMeshes.size() <= meshIndex)
-	{
-		throw std::runtime_error("NO SUCH MESH IMPORTED!");
-	}
 
-	//std::unique_ptr<hRes::Mesh> mesh = importedMeshes[meshIndex];
-
-	importedMeshes[meshIndex]->vertexBufferIndex = createVertexBuffer(importedMeshes[meshIndex]->vertices);
-	importedMeshes[meshIndex]->indexBufferIndex = createIndexBuffer(importedMeshes[meshIndex]->indices);
+	mesh.lock()->vertexBufferIndex = createVertexBuffer(mesh.lock()->vertices);
+	mesh.lock()->indexBufferIndex = createIndexBuffer(mesh.lock()->indices);
 
 	// VALIDATION - size of index, vertex, vertex buffer, index buffer must be all same!
-	if ((static_cast<int32_t>(vkMemAlloc.indexes.size()) != static_cast<int32_t>(vkMemAlloc.vertexBuffer.size())) || (static_cast<int32_t>(vkMemAlloc.indexBuffer.size()) != static_cast<int32_t>(vkMemAlloc.vertices.size())))
+	if (
+		(static_cast<int32_t>(vkMemAlloc.indexes.size()) != static_cast<int32_t>(vkMemAlloc.vertexBuffer.size())) || 
+		(static_cast<int32_t>(vkMemAlloc.indexBuffer.size()) != static_cast<int32_t>(vkMemAlloc.vertices.size()))
+	)
 	{
 		throw std::runtime_error("ERROR IN VERTEX AND INDEX BUFFER CREATION!!!");
 	}
@@ -1239,7 +1316,7 @@ void MonsterVulkan::loadMeshToVulkan(uint32_t meshIndex)
 
 }
 
-void MonsterVulkan::loadMeshShaders(uint32_t meshIndex)
+void MonsterVulkan::loadMeshShaders(std::weak_ptr<hRes::Mesh> mesh)
 {
 	//hRes::Mesh* mesh = importedMeshes[meshIndex];
 
@@ -1263,48 +1340,47 @@ void MonsterVulkan::loadMeshShaders(uint32_t meshIndex)
 		throw std::runtime_error("NO FRAGMENT SHADER FOUND");
 	}*/
 
-	vulkanUtils::Shader* shader = MonsterSlang::shaders[importedMeshes[meshIndex]->shaderIndex];
+	std::weak_ptr<vulkanUtils::Shader> shader = mesh.lock()->shader;
 
 	// load graphics pipeline
-	pipes.push_back(createGraphicsPipeline(*shader->vertexShader, *shader->fragmentShader,"main","main"));
+	pipes.push_back(std::move(createGraphicsPipeline(shader.lock()->vertexShader, shader.lock()->fragmentShader, "main", "main")));
 
-	importedMeshes[meshIndex]->graphicsPipelineIndex = pipes.size() - 1;
+	mesh.lock()->graphicsPipelineIndex = pipes.size() - 1;
 
-	if (!importedMeshes[meshIndex]->vertices.empty() && !importedMeshes[meshIndex]->indices.empty())
+	if (!mesh.lock()->vertices.empty() && !mesh.lock()->indices.empty())
 	{
-		importedMeshes[meshIndex]->isMeshVkLoaded = true;
+		mesh.lock()->isMeshVkLoaded = true;
 	}
 
 	
 }
 
-void MonsterVulkan::loadMesh(uint32_t meshIndex)
+void MonsterVulkan::loadMesh(std::shared_ptr<hRes::Mesh> mesh)
 {
-	loadMeshToVulkan(meshIndex);
-	loadMeshShaders(meshIndex);
+	loadMeshToVulkan(mesh);
+	loadMeshShaders(mesh);
 
-	//hRes::Mesh* mesh = importedMeshes[meshIndex];
-
-	if (importedMeshes[meshIndex]->isMeshVkLoaded)
+	if (mesh->isMeshVkLoaded)
 	{
-		loadedMeshes.push_back(meshIndex);
+		std::shared_ptr<hRes::Mesh> sharedMesh = mesh;
+		loadedMeshes.push_back(std::move(sharedMesh));
 	}
 
 }
 
-void MonsterVulkan::importMesh(hRes::Mesh& mesh)
+
+
+std::shared_ptr<hRes::Mesh> MonsterVulkan::createNewMesh()
 {
-	hRes::Mesh* newMesh = new hRes::Mesh(mesh);
-	std::unique_ptr<hRes::Mesh> uniqMesh = std::make_unique<hRes::Mesh>();
-	uniqMesh.reset(newMesh);
-	importedMeshes.push_back(std::move(uniqMesh));
+	importedMeshes.push_back(std::make_shared<hRes::Mesh>());
+	return importedMeshes.back();
 }
 
 void MonsterVulkan::loadAllMeshes()
 {
-	for (size_t i = 0; i < importedMeshes.size(); i++)
+	for (auto& mesh : importedMeshes)
 	{
-		loadMesh(i);
+		loadMesh(mesh);
 	}
 }
 
@@ -1315,12 +1391,13 @@ void MonsterVulkan::loadMeshToPassObject()
 	{
 		for (size_t VertBufIndex = 0; VertBufIndex < vkMemAlloc.vertexBuffer.size(); VertBufIndex++)
 		{
-			for (const auto& meshIndex: loadedMeshes)
+			for (auto mesh: loadedMeshes)
 			{
-				//hRes::Mesh* mesh = importedMeshes[meshIndex];
-				if (importedMeshes[meshIndex]->vertexBufferIndex == VertBufIndex && pipeIndex == importedMeshes[meshIndex]->graphicsPipelineIndex)
+				
+				if (mesh->vertexBufferIndex == VertBufIndex && pipeIndex == mesh->graphicsPipelineIndex)
 				{
-					passObjects.push_back(meshIndex);
+					std::shared_ptr<hRes::Mesh> sharedMesh = mesh;
+					passObjects.push_back(std::move(sharedMesh));
 				}
 			}
 		}

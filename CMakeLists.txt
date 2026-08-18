@@ -261,12 +261,13 @@ add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/mon
 
 
 
-target_include_directories(mHorseShoee PRIVATE "${Vulkan_INCLUDE_DIR}")
+target_include_directories(mHorseShoee PRIVATE "$ENV{VULKAN_SDK}/include")
 
 #set_target_properties(mHorseShoee PROPERTIES CXX_STANDARD 20)
 
 
 target_link_libraries(mHorseShoee PRIVATE Vulkan::Vulkan)
+
 
 target_link_libraries(mHorseShoee PRIVATE slang::slang)
 
