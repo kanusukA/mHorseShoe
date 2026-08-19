@@ -27,11 +27,9 @@ typedef  std::vector<vk::raii::DescriptorSet> MonsterDescriptors;
 typedef std::vector<vk::Buffer> MonsterBuffers;
 
 struct MBuffer {
-	MonsterBuffers buffers = MonsterBuffers();
+	std::vector<vk::raii::Buffer> uboBuffer;
 	std::vector<VmaAllocation> bufferAlloc;
-	void* heapMapped;
-
-	std::vector<vk::DeviceSize> bufferSizes;
+	std::vector<VmaAllocationInfo> bufferMapped;
 };
 
 
@@ -67,9 +65,13 @@ namespace vulkanUtils {
 
 	};
 
-	struct Shader {
+	class Shader {
+
+	public:
 
 		bool compiled = false;
+		bool bufferChanged = false;
+		bool transformChanged = false;
 
 		//uint32_t shaderIndex;
 		std::shared_ptr<vk::raii::Pipeline> graphicsPipeline;
@@ -84,9 +86,46 @@ namespace vulkanUtils {
 		std::vector<uint8_t> vertCodeSpv;
 		std::vector<uint8_t> fragCodeSpv;
 
-		std::shared_ptr<vk::raii::DescriptorSets> descriptorSets;
+		// common Buffer containing Tranformation changes
+		std::unique_ptr<MBuffer> transformBuffers;
+		std::unique_ptr<vk::raii::DescriptorSet> transfromDescriptorSet;
+
+		// Custom Buffers for various shader structures
+		std::unique_ptr<MBuffer> uniformBuffers;
+		std::unique_ptr<vk::raii::DescriptorSets> descriptorSets;
+
+		virtual void updateBuffers() {};
+
+		void updateTransformBuffer(
+			glm::vec3 position,
+			glm::vec3 rotation,
+			float radiance,
+			glm::vec3 scale,
+			glm::vec3 camPosition, 
+			glm::vec3 camFront, 
+			glm::vec3 camUp, 
+			float width, 
+			float height
+		) {
+			UniformBufferObject ubo{};
+
+			ubo.model = glm::mat4(1.0f);
+			ubo.model = glm::translate(ubo.model, position);
+			ubo.model = glm::rotate(ubo.model, glm::radians(radiance), rotation);
+			ubo.model = glm::scale(ubo.model, scale);
+
+			ubo.view = glm::lookAt(camPosition, camPosition + camFront, camUp);
+
+			ubo.proj = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 1000.0f);
+			
+			for (auto tBuffer : transformBuffers->bufferAlloc)
+			{
+				memcpy(tBuffer, &ubo, sizeof(ubo));
+			}
+			
+		};
+
 		std::vector<std::shared_ptr<VulkanTexture>> textures;
-		std::shared_ptr<MBuffer> uniformBuffers;
 
 		std::string vertShadername;
 		std::string fragShaderName;

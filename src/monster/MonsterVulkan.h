@@ -171,6 +171,9 @@ public:
 	// Shaders must be inside mesh file and must be valid!
 	//void createShaderPipeline(uint32_t meshIndex);
 
+	void updateObjectTransforms();
+	
+
 
 };
 

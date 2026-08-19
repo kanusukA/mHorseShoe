@@ -630,6 +630,11 @@ namespace hRes {
 
 		Mesh() {}
 
+		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 rotationAxis = glm::vec3(0.0f, 0.0f, 0.0f);
+		float radiance = 0.0f;
+		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+
 		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
 		std::vector<uint16_t> indices = std::vector<uint16_t>();
 
@@ -643,6 +648,19 @@ namespace hRes {
 		uint32_t graphicsPipelineIndex; // Default pipeline is used when this is null;
 
 		std::shared_ptr<vulkanUtils::Shader> shader;
+
+		void updateTransformBuffer(
+			glm::vec3 camPosition,
+			glm::vec3 camFront,
+			glm::vec3 camUp,
+			float width,
+			float height
+		) {
+			if (shader)
+			{
+				shader->updateTransformBuffer(position, rotationAxis, radiance, scale, camPosition, camFront, camUp, width, height);
+			}
+		}
 
 		Mesh(const Mesh& mesh) {
 			this->graphicsPipelineIndex = mesh.graphicsPipelineIndex;

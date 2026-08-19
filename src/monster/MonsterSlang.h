@@ -57,17 +57,17 @@ public:
 	
 	void setupShaderBuffers(std::weak_ptr<vulkanUtils::Shader> shader,const vk::DeviceSize& bufferSize);
 
-	// Buffers for shader
+	// creats buffer as per set MAX FRAMES 
 	std::shared_ptr<MBuffer> createUniformBuffers(const vk::DeviceSize& size);
 
 
-	/*std::shared_ptr<vk::raii::DescriptorSets> createDescriptorSets(
+	std::shared_ptr<vk::raii::DescriptorSets> createDescriptorSets(
 		std::vector<std::pair<vk::Buffer, vk::ShaderStageFlags>> uniformBuffer,
 		const vk::DeviceSize& bufferSize,
 		std::vector<uint32_t> uboBinding,
 		VulkanTexture& texture,
 		const uint32_t& textureBinding
-	);*/
+	);
 
 
 	std::shared_ptr<VulkanTexture> createTextureImage(std::filesystem::path& texturePath);

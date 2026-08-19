@@ -1277,7 +1277,6 @@ void MonsterVulkan::updateUniformBuffer(uint32_t currentImage)
 
 	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-
 	ubo.view = glm::lookAt(camera->position, camera->position + camera->front, camera->up);
 
 	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
@@ -1294,7 +1293,6 @@ void MonsterVulkan::updateUniformBuffer(uint32_t currentImage)
 		
 	}
 	
-
 }
 
 void MonsterVulkan::loadMeshToVulkan(std::weak_ptr<hRes::Mesh> mesh)
@@ -1404,6 +1402,16 @@ void MonsterVulkan::loadMeshToPassObject()
 		
 	}
 }
+
+void MonsterVulkan::updateObjectTransforms()
+{
+	for (auto& passObj : passObjects)
+	{
+		passObj->updateTransformBuffer(camera->position, camera->front, camera->up, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height));
+	}
+}
+
+
 
 
 
