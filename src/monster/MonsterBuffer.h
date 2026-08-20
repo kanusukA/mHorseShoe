@@ -56,6 +56,9 @@ public:
 		VmaMemoryUsage allocUsage
 	);
 
+	MBuffer* createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
+	MBuffer* createIndexBuffer(std::vector<uint16_t> indices);
+
 	void copyBuffer(
 		vk::Buffer srcBuffer,
 		vk::Buffer dstBuffer,

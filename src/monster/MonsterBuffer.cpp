@@ -108,70 +108,70 @@ void MonsterBuffer::createDescriptorHeapBuffer
 	std::shared_ptr<MBuffer> buffers
 )
 {
-	vk::DeviceSize offset = 0;
-	// craete Heap buffers
-	bufferHeapSize.push_back(alignedVkSize(bufferDescriptorSize + offset + descriptorHeapProperties.minResourceHeapReservedRange, descriptorHeapProperties.resourceHeapAlignment));
-	auto [heapBuffer, heapAlloc] = createBuffer(
-		bufferHeapSize.back(),
-		vk::BufferUsageFlagBits::eShaderDeviceAddressEXT | vk::BufferUsageFlagBits::eDescriptorHeapEXT,
-		VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
-		VmaMemoryUsage::VMA_MEMORY_USAGE_AUTO
-	);
+	//vk::DeviceSize offset = 0;
+	//// craete Heap buffers
+	//bufferHeapSize.push_back(alignedVkSize(bufferDescriptorSize + offset + descriptorHeapProperties.minResourceHeapReservedRange, descriptorHeapProperties.resourceHeapAlignment));
+	//auto [heapBuffer, heapAlloc] = createBuffer(
+	//	bufferHeapSize.back(),
+	//	vk::BufferUsageFlagBits::eShaderDeviceAddressEXT | vk::BufferUsageFlagBits::eDescriptorHeapEXT,
+	//	VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+	//	VmaMemoryUsage::VMA_MEMORY_USAGE_AUTO
+	//);
 
-	std::vector<VkResourceDescriptorInfoEXT> resources;
-	std::vector<VkHostAddressRangeEXT> hostAddrs;
+	//std::vector<VkResourceDescriptorInfoEXT> resources;
+	//std::vector<VkHostAddressRangeEXT> hostAddrs;
 
-	VkBufferDeviceAddressInfoKHR heapAddr{
-			.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO_KHR,
-			.buffer = heapBuffer
-	};
+	//VkBufferDeviceAddressInfoKHR heapAddr{
+	//		.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO_KHR,
+	//		.buffer = heapBuffer
+	//};
 
-	bufferHeapAddress.push_back(vkGetBufferDeviceAddressMON(*vkMonsterStats->device, &heapAddr));
+	//bufferHeapAddress.push_back(vkGetBufferDeviceAddressMON(*vkMonsterStats->device, &heapAddr));
 
-	for (size_t i = 0; i < buffers->buffers.size(); i++)
-	{
-		// GET BUFFER ADDRESS
-		VkBufferDeviceAddressInfoKHR deviceAddr{
-			.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO_KHR,
-			.buffer =  buffers->buffers[i]
-		};
+	//for (size_t i = 0; i < buffers->buffers.size(); i++)
+	//{
+	//	// GET BUFFER ADDRESS
+	//	VkBufferDeviceAddressInfoKHR deviceAddr{
+	//		.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO_KHR,
+	//		.buffer =  buffers->buffers[i]
+	//	};
 
-		VkDeviceAddress bufferAddr = vkGetBufferDeviceAddressMON(*vkMonsterStats->device, &deviceAddr);
+	//	VkDeviceAddress bufferAddr = vkGetBufferDeviceAddressMON(*vkMonsterStats->device, &deviceAddr);
 
-		VkDeviceAddressRangeEXT addressRange{
-			.address = bufferAddr,
-			.size = buffers->bufferSizes[i]
-		};
+	//	VkDeviceAddressRangeEXT addressRange{
+	//		.address = bufferAddr,
+	//		.size = buffers->bufferSizes[i]
+	//	};
 
-		// WRITE THE RESOURCE TO DESCRIPTOR HEAP
-		VkResourceDescriptorDataEXT resourceData{
-			.pAddressRange = &addressRange
-		};
+	//	// WRITE THE RESOURCE TO DESCRIPTOR HEAP
+	//	VkResourceDescriptorDataEXT resourceData{
+	//		.pAddressRange = &addressRange
+	//	};
 
-		VkResourceDescriptorInfoEXT resourceInfo{
-			.type = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.data = resourceData
-		};
+	//	VkResourceDescriptorInfoEXT resourceInfo{
+	//		.type = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+	//		.data = resourceData
+	//	};
 
-		resources.push_back(resourceInfo);
+	//	resources.push_back(resourceInfo);
 
-		VkHostAddressRangeEXT hostAddressRange{
-			.address = static_cast<uint8_t*>(heapAlloc->GetMappedData()) + bufferDescriptorSize * i,
-			.size = bufferDescriptorSize
-		};
+	//	VkHostAddressRangeEXT hostAddressRange{
+	//		.address = static_cast<uint8_t*>(heapAlloc->GetMappedData()) + bufferDescriptorSize * i,
+	//		.size = bufferDescriptorSize
+	//	};
 
-		hostAddrs.push_back(hostAddressRange);
+	//	hostAddrs.push_back(hostAddressRange);
 
-	}
+	//}
 
-	buffers->heapMapped = heapAlloc->GetMappedData();
+	//buffers->heapMapped = heapAlloc->GetMappedData();
 
-	VkResult result = vkWriteResourceDescriptorsMON(*vkMonsterStats->device, buffers->buffers.size(), resources.data(), hostAddrs.data());
+	//VkResult result = vkWriteResourceDescriptorsMON(*vkMonsterStats->device, buffers->buffers.size(), resources.data(), hostAddrs.data());
 
-	if (result != VkResult::VK_SUCCESS)
-	{
-		throw std::runtime_error("ERROR CREATING DESCRIPTOR HEAP!");
-	}
+	//if (result != VkResult::VK_SUCCESS)
+	//{
+	//	throw std::runtime_error("ERROR CREATING DESCRIPTOR HEAP!");
+	//}
 
 	// DESCRIPTOR MAPPED DATA IS CREATED NOW TRANSFER THE DATA INTO THE UNIFORM BUFFERS USING GETMAPPERDATA();
 
@@ -204,4 +204,74 @@ void MonsterBuffer::endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffe
 	vkMonsterStats->graphicsQueue.submit(submitInfo, nullptr);
 	vkMonsterStats->graphicsQueue.waitIdle();
 
+}
+
+
+MBuffer* MonsterBuffer::createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices) {
+	MBuffer* mBuffer = new MBuffer();
+	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+	// Create a staging buffer (stored in the CPU for quick access and change)
+	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eTransferSrc,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+		VMA_MEMORY_USAGE_AUTO
+	);
+
+	// add data to the staging buffer
+	vmaCopyMemoryToAllocation(vkMemAlloc->vmaAllocator, vertices.data(), stagingBufferAlloc, 0, bufferSize);
+
+	// create the device_local(graphics crad memory) buffer
+	VmaAllocationInfo allocInfo;
+	auto [vkBuffer, vkBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+		VMA_MEMORY_USAGE_AUTO,
+		&allocInfo
+	);
+	mBuffer->uboBuffer.push_back(std::move(vk::raii::Buffer(vkMonsterStats->device, vkBuffer)));
+	mBuffer->bufferAlloc.push_back(std::move(vkBufferAlloc));
+	mBuffer->bufferMapped.push_back(std::move(allocInfo));
+	copyBuffer(stagingBuffer, mBuffer->uboBuffer.back(), bufferSize);
+
+	return mBuffer;
+}
+
+//void MonsterVulkan::createIndexBuffer() {
+//	createIndexBuffer(p_indices);
+//}
+
+MBuffer* MonsterBuffer::createIndexBuffer(std::vector<uint16_t> indices) {
+
+	MBuffer* mBuffer = new MBuffer();
+
+	vk::DeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+	// Create a staging buffer (stored in the CPU for quick access and change)
+	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eTransferSrc,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+		VMA_MEMORY_USAGE_AUTO
+	);
+
+	// add data to the staging buffer
+	vmaCopyMemoryToAllocation(vkMemAlloc->vmaAllocator, indices.data(), stagingBufferAlloc, 0, bufferSize);
+
+	// create the device_local(graphics crad memory) buffer
+	VmaAllocationInfo allocInfo;
+	auto [vkBuffer, vkBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+		VMA_MEMORY_USAGE_AUTO,
+		&allocInfo
+	);
+	mBuffer->uboBuffer.push_back(std::move(vk::raii::Buffer(vkMonsterStats->device, vkBuffer)));
+	mBuffer->bufferAlloc.push_back(std::move(vkBufferAlloc));
+	mBuffer->bufferMapped.push_back(std::move(allocInfo));
+
+	copyBuffer(stagingBuffer, mBuffer->uboBuffer.back(), bufferSize);
+
+	return mBuffer;
 }

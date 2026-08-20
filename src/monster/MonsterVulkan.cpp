@@ -643,14 +643,15 @@ void MonsterVulkan::createGraphicsPipeline() {
 
 	vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
 
-	vkMonsterStats.graphicsPipeline = createGraphicsPipeline(*shaderModule, *shaderModule,"vertMain","fragMain");
+	//vkMonsterStats.graphicsPipeline = createGraphicsPipeline(*shaderModule, *shaderModule,"vertMain","fragMain");
 }
 
-vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
+std::shared_ptr<vk::raii::Pipeline> MonsterVulkan::createGraphicsPipeline(
 	const vk::ShaderModule& vertShaderModule, // function name must start with vertMain
 	const vk::ShaderModule& fragShaderModule, // function name must start with fragMain
 	const std::string& entryPointVert,
 	const std::string& entryPointFrag,
+	const vk::DescriptorSetLayout& descriptorLayouts,
 	vk::PolygonMode polygonMode ,
 	vk::CullModeFlags cullingModes ,
 	vk::FrontFace frontFace ,
@@ -730,17 +731,17 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 		.pAttachments = &colorBlendState
 	};
 
-	/*vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{
+	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{
 		.setLayoutCount = 1,
-		.pSetLayouts = &*vkDescriptors.descriptorSetLayout,
+		.pSetLayouts = &descriptorLayouts,
 		.pushConstantRangeCount = 0,
 
-	};*/
+	};
 
-	//vkDescriptors.pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
+	vkDescriptors.pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
 
 	// DESCRIPTOR HEAP
-	VkDescriptorSetAndBindingMappingEXT bufferBindings{
+	/*VkDescriptorSetAndBindingMappingEXT bufferBindings{
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_AND_BINDING_MAPPING_EXT,
 		.descriptorSet = 0,
 		.firstBinding = 0,
@@ -760,7 +761,7 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 	};
 
 	ShaderStages[0].pNext = &shaderDescriptorInfo;
-	ShaderStages[1].pNext = &shaderDescriptorInfo;
+	ShaderStages[1].pNext = &shaderDescriptorInfo;*/
 
 
 	vk::PipelineRenderingCreateInfo renderingCreateInfo{
@@ -780,6 +781,7 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 		.pDepthStencilState = &depthStencil,
 		.pColorBlendState = &colorBlendInfo,
 		.pDynamicState = &dynamicStateCreateInfo,
+		.layout = *vkDescriptors.pipelineLayout,
 		.renderPass = nullptr,
 
 	};
@@ -796,10 +798,10 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 		renderingCreateInfo
 	};
 
+	std::shared_ptr<vk::raii::Pipeline> pipe = std::make_shared<vk::raii::Pipeline>(vk::raii::Pipeline(vkMonsterStats.device, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>()));
+	pipes.push_back(std::move(pipe));
 
-	vk::raii::Pipeline pipeline = vk::raii::Pipeline(vkMonsterStats.device, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
-
-	return std::move(pipeline);
+	return pipes.back();
 
 }
 
@@ -988,7 +990,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 	// ORDER INCOMING MESHES BY THE PIPELINE THEY USE
 
 	// add descriptor single time per objects
-	for (size_t bufferDescripIdx = 0; bufferDescripIdx < bufferHeapAddress.size(); bufferDescripIdx++)
+	/*for (size_t bufferDescripIdx = 0; bufferDescripIdx < bufferHeapAddress.size(); bufferDescripIdx++)
 	{
 		vk::BindHeapInfoEXT bindHeapInfo{
 		.heapRange = {
@@ -1001,28 +1003,35 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		};
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindResourceHeapEXT(bindHeapInfo);
-	}
+	}*/
 
 
 	int32_t instance = 0;
-	for (const auto& passObj: passObjects)
+	for (const auto& passObj: importedMeshes)
 	{
 		//hRes::Mesh* passObj = importedMeshes[passObjIndex];
+		if (!passObj->shader)
+		{
+			throw std::runtime_error("OBJECT HAS NO SHADER!!!!");
+			continue;
+		}
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics,  pipes[passObj->graphicsPipelineIndex]);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics,  *passObj->shader->graphicsPipeline);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
-		//vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
-		//	vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *passObj->shader->descriptorSets.get()->at(vkMonsterStats.frameIndex), nullptr
-		//);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
+			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *passObj->shader->descriptorSets->at(vkMonsterStats.frameIndex), nullptr
+		);
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[passObj->vertexBufferIndex], { 0 });
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[passObj->indexBufferIndex], 0, vk::IndexType::eUint16);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *passObj->vertexBuffer->uboBuffer.back(), {0});
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(passObj->indexBuffer->uboBuffer.back(), 0, vk::IndexType::eUint16);
 
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(passObj->indices.size(), instance, 0, 0, 0);
+
+		//vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].draw(3, 1, 0, 0);
 		instance++;
 	}
 
@@ -1095,69 +1104,69 @@ void MonsterVulkan::recreateSwapChain() {
 //	createVertexBuffer(p_vertices);
 //}
 
-uint32_t MonsterVulkan::createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices) {
-	vkMemAlloc.vertices.push_back(vertices.size());
-	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-	// Create a staging buffer (stored in the CPU for quick access and change)
-	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
-		bufferSize,
-		vk::BufferUsageFlagBits::eTransferSrc,
-		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
-		VMA_MEMORY_USAGE_AUTO
-	);
-
-	// add data to the staging buffer
-	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, vertices.data(), stagingBufferAlloc, 0, bufferSize);
-
-	// create the device_local(graphics crad memory) buffer
-	auto [vkBuffer, vkBufferAlloc] = createBuffer(
-		bufferSize,
-		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
-		VMA_MEMORY_USAGE_AUTO
-	);
-	vkMemAlloc.vertexBuffer.push_back(std::move(vk::raii::Buffer(vkMonsterStats.device, vkBuffer)));
-	vkMemAlloc.vertexBufferAlloc.push_back(std::move(vkBufferAlloc));
-
-	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
-
-	return vkMemAlloc.vertexBuffer.size() - 1;
-}
-
-//void MonsterVulkan::createIndexBuffer() {
-//	createIndexBuffer(p_indices);
+//uint32_t MonsterVulkan::createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices) {
+//	vkMemAlloc.vertices.push_back(vertices.size());
+//	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+//	// Create a staging buffer (stored in the CPU for quick access and change)
+//	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
+//		bufferSize,
+//		vk::BufferUsageFlagBits::eTransferSrc,
+//		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+//		VMA_MEMORY_USAGE_AUTO
+//	);
+//
+//	// add data to the staging buffer
+//	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, vertices.data(), stagingBufferAlloc, 0, bufferSize);
+//
+//	// create the device_local(graphics crad memory) buffer
+//	auto [vkBuffer, vkBufferAlloc] = createBuffer(
+//		bufferSize,
+//		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+//		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+//		VMA_MEMORY_USAGE_AUTO
+//	);
+//	vkMemAlloc.vertexBuffer.push_back(std::move(vk::raii::Buffer(vkMonsterStats.device, vkBuffer)));
+//	vkMemAlloc.vertexBufferAlloc.push_back(std::move(vkBufferAlloc));
+//
+//	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
+//
+//	return vkMemAlloc.vertexBuffer.size() - 1;
 //}
-
-uint32_t MonsterVulkan::createIndexBuffer(std::vector<uint16_t> indices) {
-
-	vkMemAlloc.indexes.push_back(indices.size()); // Used during recordCommandBuffer()
-
-	vk::DeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-	// Create a staging buffer (stored in the CPU for quick access and change)
-	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
-		bufferSize,
-		vk::BufferUsageFlagBits::eTransferSrc,
-		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
-		VMA_MEMORY_USAGE_AUTO
-	);
-
-	// add data to the staging buffer
-	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, indices.data(), stagingBufferAlloc, 0, bufferSize);
-
-	// create the device_local(graphics crad memory) buffer
-	auto [vkBuffer, vkBufferAlloc] = createBuffer(
-		bufferSize,
-		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
-		VMA_MEMORY_USAGE_AUTO
-	);
-	vkMemAlloc.indexBuffer.push_back(std::move(vk::raii::Buffer(vkMonsterStats.device, vkBuffer)));
-	vkMemAlloc.indexBufferAlloc.push_back(std::move(vkBufferAlloc));
-
-	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
-
-	return vkMemAlloc.indexBuffer.size() - 1;
-}
+//
+////void MonsterVulkan::createIndexBuffer() {
+////	createIndexBuffer(p_indices);
+////}
+//
+//uint32_t MonsterVulkan::createIndexBuffer(std::vector<uint16_t> indices) {
+//
+//	vkMemAlloc.indexes.push_back(indices.size()); // Used during recordCommandBuffer()
+//
+//	vk::DeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+//	// Create a staging buffer (stored in the CPU for quick access and change)
+//	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
+//		bufferSize,
+//		vk::BufferUsageFlagBits::eTransferSrc,
+//		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+//		VMA_MEMORY_USAGE_AUTO
+//	);
+//
+//	// add data to the staging buffer
+//	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, indices.data(), stagingBufferAlloc, 0, bufferSize);
+//
+//	// create the device_local(graphics crad memory) buffer
+//	auto [vkBuffer, vkBufferAlloc] = createBuffer(
+//		bufferSize,
+//		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+//		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+//		VMA_MEMORY_USAGE_AUTO
+//	);
+//	vkMemAlloc.indexBuffer.push_back(std::move(vk::raii::Buffer(vkMonsterStats.device, vkBuffer)));
+//	vkMemAlloc.indexBufferAlloc.push_back(std::move(vkBufferAlloc));
+//
+//	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
+//
+//	return vkMemAlloc.indexBuffer.size() - 1;
+//}
 
 //void MonsterVulkan::createUniformBuffers()
 //{
@@ -1170,19 +1179,11 @@ void MonsterVulkan::createDescriptorPool()
 
 	std::array<vk::DescriptorPoolSize, 2>poolSize{ {
 		{.type = vk::DescriptorType::eUniformBuffer,
-		.descriptorCount = MAX_FRAMES_IN_FLIGHT
+		.descriptorCount = MAX_FRAMES_IN_FLIGHT * MAX_OBJECT
 		},
-		/*{
-			.type = vk::DescriptorType::eSampledImage,
-			.descriptorCount = IMGUI_IMPL_VULKAN_MINIMUM_SAMPLED_IMAGE_POOL_SIZE
-		},
-		{
-			.type = vk::DescriptorType::eSampler,
-			.descriptorCount = IMGUI_IMPL_VULKAN_MINIMUM_SAMPLER_POOL_SIZE
-		},*/
 		{
 		.type = vk::DescriptorType::eCombinedImageSampler,
-		.descriptorCount = MAX_FRAMES_IN_FLIGHT
+		.descriptorCount = MAX_FRAMES_IN_FLIGHT * MAX_OBJECT
 		}
 	} };
 
@@ -1215,7 +1216,7 @@ void MonsterVulkan::createDescriptorPool()
 //	vkDescriptors.descriptorSets = vkMonsterStats.device.allocateDescriptorSets(allocInfo);
 //
 //	//configure allocated descriptor sets
-//	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+//	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * MAX_OBJECT; i++)
 //	{
 //		vk::DescriptorBufferInfo bufferInfo{
 //			.buffer = vkMemAlloc.uniformBuffers[i],
@@ -1268,38 +1269,52 @@ void MonsterVulkan::createDescriptorPool()
 
 void MonsterVulkan::updateUniformBuffer(uint32_t currentImage)
 {
-	static auto startTime = std::chrono::high_resolution_clock::now();
 
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-	UniformBufferObject ubo{};
-
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-	ubo.view = glm::lookAt(camera->position, camera->position + camera->front, camera->up);
-
-	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
-	//ubo.proj[1][1] *= -1;
-	for (auto& mBuffer : vkMemAlloc.uniformBuffers)
+	for (auto& passObj: passObjects)
 	{
-		if (mBuffer && mBuffer->buffers.size() > 0)
+		if (passObj->shader && passObj->shader->buffers)
 		{
-			// FIRST BUFFER IS OF VERTEX MVP BUFFER;
-			VmaAllocationInfo allocInfo;
-			vmaGetAllocationInfo(vkMemAlloc.vmaAllocator, mBuffer->bufferAlloc.at(0), &allocInfo);
-			memcpy(allocInfo.pMappedData, &ubo, sizeof(ubo));
+			passObj->updateTransformBuffer(
+				camera->position, 
+				camera->front, camera->up, 
+				static_cast<float>(vkMonsterStats.swapChainExtent.width), 
+				static_cast<float>(vkMonsterStats.swapChainExtent.height)
+			);
 		}
-		
+
 	}
+	//static auto startTime = std::chrono::high_resolution_clock::now();
+
+	//auto currentTime = std::chrono::high_resolution_clock::now();
+	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+	//UniformBufferObject ubo{};
+
+	//ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	//ubo.view = glm::lookAt(camera->position, camera->position + camera->front, camera->up);
+
+	//ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
+	////ubo.proj[1][1] *= -1;
+	//for (auto& mBuffer : vkMemAlloc.uniformBuffers)
+	//{
+	//	if (mBuffer && mBuffer->buffers.size() > 0)
+	//	{
+	//		// FIRST BUFFER IS OF VERTEX MVP BUFFER;
+	//		VmaAllocationInfo allocInfo;
+	//		vmaGetAllocationInfo(vkMemAlloc.vmaAllocator, mBuffer->bufferAlloc.at(0), &allocInfo);
+	//		memcpy(allocInfo.pMappedData, &ubo, sizeof(ubo));
+	//	}
+	//	
+	//}
 	
 }
 
 void MonsterVulkan::loadMeshToVulkan(std::weak_ptr<hRes::Mesh> mesh)
 {
 
-	mesh.lock()->vertexBufferIndex = createVertexBuffer(mesh.lock()->vertices);
-	mesh.lock()->indexBufferIndex = createIndexBuffer(mesh.lock()->indices);
+	/*mesh.lock()->vertexBufferIndex = createVertexBuffer(mesh.lock()->vertices);
+	mesh.lock()->indexBufferIndex = createIndexBuffer(mesh.lock()->indices);*/
 
 	// VALIDATION - size of index, vertex, vertex buffer, index buffer must be all same!
 	if (
@@ -1338,17 +1353,17 @@ void MonsterVulkan::loadMeshShaders(std::weak_ptr<hRes::Mesh> mesh)
 		throw std::runtime_error("NO FRAGMENT SHADER FOUND");
 	}*/
 
-	std::weak_ptr<vulkanUtils::Shader> shader = mesh.lock()->shader;
+	//std::weak_ptr<vulkanUtils::Shader> shader = mesh.lock()->shader;
 
-	// load graphics pipeline
-	pipes.push_back(std::move(createGraphicsPipeline(shader.lock()->vertexShader, shader.lock()->fragmentShader, "main", "main")));
+	//// load graphics pipeline
+	//pipes.push_back(std::move(createGraphicsPipeline(shader.lock()->vertexShader, shader.lock()->fragmentShader, "main", "main")));
 
-	mesh.lock()->graphicsPipelineIndex = pipes.size() - 1;
+	//mesh.lock()->graphicsPipelineIndex = pipes.size() - 1;
 
-	if (!mesh.lock()->vertices.empty() && !mesh.lock()->indices.empty())
-	{
-		mesh.lock()->isMeshVkLoaded = true;
-	}
+	//if (!mesh.lock()->vertices.empty() && !mesh.lock()->indices.empty())
+	//{
+	//	mesh.lock()->isMeshVkLoaded = true;
+	//}
 
 	
 }
@@ -1385,7 +1400,17 @@ void MonsterVulkan::loadAllMeshes()
 void MonsterVulkan::loadMeshToPassObject()
 {
 	// check pipeline index
-	for (size_t pipeIndex = 0; pipeIndex < pipes.size(); pipeIndex++)
+	
+	for (const auto& impMesh: importedMeshes)
+	{
+		if (impMesh->isMeshVkLoaded)
+		{
+			std::shared_ptr<hRes::Mesh> sharedMesh = impMesh;
+			passObjects.push_back(std::move(sharedMesh));
+		}
+	}
+
+	/*for (size_t pipeIndex = 0; pipeIndex < pipes.size(); pipeIndex++)
 	{
 		for (size_t VertBufIndex = 0; VertBufIndex < vkMemAlloc.vertexBuffer.size(); VertBufIndex++)
 		{
@@ -1400,7 +1425,7 @@ void MonsterVulkan::loadMeshToPassObject()
 			}
 		}
 		
-	}
+	}*/
 }
 
 void MonsterVulkan::updateObjectTransforms()

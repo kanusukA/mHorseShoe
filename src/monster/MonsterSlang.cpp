@@ -27,6 +27,28 @@ std::shared_ptr<vulkanUtils::Shader> MonsterSlang::loadShader(const std::string&
 	ResourceHandler::GetInstance()->readFileContents(vertfilepath, &shader->vertCodeSlang);
 	ResourceHandler::GetInstance()->readFileContents(fragfilepath, &shader->fragCodeSlang);
 
+	// target
+	slang::TargetDesc targetDesc{};
+	targetDesc.format = SLANG_SPIRV;
+	targetDesc.profile = globalSession->findProfile("spirv_1_4");
+
+	// session
+	slang::SessionDesc sessionDesc{};
+	sessionDesc.targets = &targetDesc;
+	sessionDesc.targetCount = 1;
+
+	Slang::ComPtr<slang::ISession> session;
+	if (SLANG_FAILED(globalSession->createSession(sessionDesc, session.writeRef())))
+	{
+		throw std::runtime_error("UNABLE TO CREATE SLANG RUNTIME SESSION");
+	}
+
+	shader->vertCodeSpv = std::move(compileSlangFile(shader->vertShadername, shader->vertCodeSlang, "main", vertfilepath, session));
+	shader->fragCodeSpv = std::move(compileSlangFile(shader->fragShaderName, shader->fragCodeSlang, "main", fragfilepath, session));
+
+	shader->vertexShader = std::move(createShaderModule(shader->vertCodeSpv));
+	shader->fragmentShader = std::move(createShaderModule(shader->fragCodeSpv));
+	
 	shaders.push_back(std::move(shader));
 	return shaders.back();
 
@@ -174,12 +196,12 @@ void MonsterSlang::compileShaders()
 void MonsterSlang::setupShaderBuffers(std::weak_ptr<vulkanUtils::Shader> shader,const vk::DeviceSize& bufferSize)
 {
 	
-	shader.lock()->uniformBuffers = createUniformBuffers(bufferSize);
+	/*shader.lock()->uniformBuffers = createUniformBuffers(bufferSize);
 
 	std::filesystem::path imagePath = "../../../src/monster/shaders/far_fog_tex.png";
 	std::shared_ptr<VulkanTexture> texture = createTextureImage(imagePath);
 	createImageView(texture->texture,texture->imgFormat,vk::ImageAspectFlagBits::eColor);
-	createTextureSampler(texture.get());
+	createTextureSampler(texture.get());*/
 	
 	/*shader.lock()->descriptorSets =
 		createDescriptorSets(
@@ -192,26 +214,25 @@ void MonsterSlang::setupShaderBuffers(std::weak_ptr<vulkanUtils::Shader> shader,
 
 }
 
-std::shared_ptr<MBuffer> MonsterSlang::createUniformBuffers(const vk::DeviceSize& size)
+MBuffer* MonsterSlang::createUniformBuffers(const vk::DeviceSize& size)
 {
-	std::shared_ptr<MBuffer> mBuffer = std::make_shared<MBuffer>();
+	MBuffer* mBuffer = new MBuffer();
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
+		VmaAllocationInfo allocInfo;
 		auto [buffer, alloc] = createBuffer(size,
 			vk::BufferUsageFlagBits::eUniformBuffer,
 			VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
-			VMA_MEMORY_USAGE_AUTO);
+			VMA_MEMORY_USAGE_AUTO,&allocInfo);
 		
 		vk::raii::Buffer rBuffer = vk::raii::Buffer(vkMonsterStats->device,buffer);
-		mBuffer->buffers.push_back(std::move(rBuffer));
+		mBuffer->uboBuffer.push_back(std::move(rBuffer));
 		mBuffer->bufferAlloc.push_back(std::move(alloc));
-		mBuffer->bufferSizes.push_back(size);
+		mBuffer->bufferMapped.push_back(std::move(allocInfo));
 		
 	}
 
-	vkMemAlloc->uniformBuffers.push_back(std::move(mBuffer));
-	
-	return vkMemAlloc->uniformBuffers.back();
+	return mBuffer;
 }
 
 //std::shared_ptr<vk::raii::DescriptorSets> MonsterSlang::createDescriptorSets
@@ -224,23 +245,21 @@ std::shared_ptr<MBuffer> MonsterSlang::createUniformBuffers(const vk::DeviceSize
 //)
 //{
 //
-//	
-//
 //	// Descriptor layout
-//	//const size_t size = uboBinding.size() + 1;
-//	///*std::array<vk::DescriptorSetLayoutBinding, size> bindings{
-//	//	{{
-//	//	.binding = 0,
-//	//	.descriptorType = vk::DescriptorType::eUniformBuffer,
-//	//	.descriptorCount = 1,
-//	//	.stageFlags = vk::ShaderStageFlagBits::eVertex
-//	//	},{
-//	//	.binding = 1,
-//	//	.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-//	//	.descriptorCount = 1,
-//	//	.stageFlags = vk::ShaderStageFlagBits::eFragment
-//	//	}}
-//	//};*/
+//	const size_t size = uboBinding.size() + 1;
+//	std::array<vk::DescriptorSetLayoutBinding, 2> bindings{
+//		{{
+//		.binding = 0,
+//		.descriptorType = vk::DescriptorType::eUniformBuffer,
+//		.descriptorCount = 1,
+//		.stageFlags = vk::ShaderStageFlagBits::eVertex
+//		},{
+//		.binding = 1,
+//		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+//		.descriptorCount = 1,
+//		.stageFlags = vk::ShaderStageFlagBits::eFragment
+//		}}
+//	};
 //
 //	//std::vector<vk::DescriptorSetLayoutBinding> bindings(size);
 //	//// uniformBuffers
@@ -338,6 +357,7 @@ std::shared_ptr<MBuffer> MonsterSlang::createUniformBuffers(const vk::DeviceSize
 //	//}
 //
 //	//return descriptorSets.back();
+//
 //}
 
 std::shared_ptr<VulkanTexture> MonsterSlang::createTextureImage(

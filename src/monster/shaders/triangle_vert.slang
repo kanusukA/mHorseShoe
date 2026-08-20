@@ -17,7 +17,6 @@ struct UniformBuffer {
 };
 ConstantBuffer<UniformBuffer> ubo;
 
-Sampler2D texture;
 
 
 [shader("vertex")]

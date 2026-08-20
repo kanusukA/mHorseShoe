@@ -82,7 +82,7 @@ int main() {
 		Feel::GetInstance()->updateFeel();
 		
 
-		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime);
+		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->getDelta());
 
 		glock->setEndTime();
 		

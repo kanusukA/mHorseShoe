@@ -630,7 +630,7 @@ namespace hRes {
 
 		Mesh() {}
 
-		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 position = glm::vec3(0.0f, 0.0f, 5.0f);
 		glm::vec3 rotationAxis = glm::vec3(0.0f, 0.0f, 0.0f);
 		float radiance = 0.0f;
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -638,8 +638,8 @@ namespace hRes {
 		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
 		std::vector<uint16_t> indices = std::vector<uint16_t>();
 
-		uint32_t vertexBufferIndex; // Most likly they'll both be the same but fuck it let's have em both.
-		uint32_t indexBufferIndex;
+		std::unique_ptr<MBuffer> vertexBuffer;
+		std::unique_ptr<MBuffer> indexBuffer;
 
 		bool isMeshVkLoaded = false;
 		bool descriptorBound = false;
@@ -650,9 +650,9 @@ namespace hRes {
 		std::shared_ptr<vulkanUtils::Shader> shader;
 
 		void updateTransformBuffer(
-			glm::vec3 camPosition,
-			glm::vec3 camFront,
-			glm::vec3 camUp,
+			glm::vec3& camPosition,
+			glm::vec3& camFront,
+			glm::vec3& camUp,
 			float width,
 			float height
 		) {
@@ -664,8 +664,8 @@ namespace hRes {
 
 		Mesh(const Mesh& mesh) {
 			this->graphicsPipelineIndex = mesh.graphicsPipelineIndex;
-			this->indexBufferIndex = mesh.indexBufferIndex;
-			this->vertexBufferIndex - mesh.vertexBufferIndex;
+			this->vertexBuffer.reset(std::move(mesh.vertexBuffer.get()));
+			this->indexBuffer.reset(std::move(mesh.indexBuffer.get()));
 			this->indices = mesh.indices;
 			this->shader = std::move(shader);
 			this->vertices = mesh.vertices;

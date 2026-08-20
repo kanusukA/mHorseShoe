@@ -63,7 +63,7 @@ public:
 	std::vector<std::shared_ptr<hRes::Mesh>> loadedMeshes = std::vector<std::shared_ptr<hRes::Mesh>>();
 	std::vector<std::shared_ptr<hRes::Mesh>> passObjects = std::vector<std::shared_ptr<hRes::Mesh>>();
 
-	std::vector<vk::raii::Pipeline> pipes = std::vector<vk::raii::Pipeline>();
+	std::vector<std::shared_ptr<vk::raii::Pipeline>> pipes = std::vector<std::shared_ptr<vk::raii::Pipeline>>();
 
 
 	MonsterCamera camera = std::make_unique<Camera>();
@@ -92,14 +92,15 @@ public:
 	vk::raii::ImageView createImageView(vk::Image const& image, vk::Format format, vk::ImageAspectFlags flags);
 	//void createDescriptiorSetLayout();
 	void createGraphicsPipeline();
-	vk::raii::Pipeline createGraphicsPipeline(
+	std::shared_ptr<vk::raii::Pipeline> createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
 		const vk::ShaderModule& fragShaderModule,
 		const std::string& entryPointVert,
 		const std::string& entryPointFrag,
+		const vk::DescriptorSetLayout& descriptorLayouts,
 		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
 		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
-		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,
+		vk::FrontFace frontFace = vk::FrontFace::eClockwise,
 		float lineWidth = 1.0f
 	);
 	void createCommandPool();
@@ -109,9 +110,9 @@ public:
 	//void createTextureImageView();
 	//void createTextureSampler();
 	//void createVertexBuffer();
-	uint32_t createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
-	//void createIndexBuffer();
-	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
+	//uint32_t createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
+	////void createIndexBuffer();
+	//uint32_t createIndexBuffer(std::vector<uint16_t> indices);
 	//void createUniformBuffers();
 	void createDescriptorPool();
 	//void createDescriptorSets();

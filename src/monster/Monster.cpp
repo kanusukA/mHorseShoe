@@ -29,15 +29,15 @@ void Monster::InitMonster() {
 	imDebugStats.mouseXrel = &Feel::GetInstance()->mouse.xRel;
 	imDebugStats.mouseYrel = &Feel::GetInstance()->mouse.yRel;
 
-	//loadSkyBox();
-	loadOtherMesh();
+	loadSkyBox();
+	//loadOtherMesh();
 	
 	
 	//compile shaders
-	MonsterSlang::compileShaderFiles();
-	MonsterVulkan::compileShaders();
+//	MonsterSlang::compileShaderFiles();
+//	MonsterVulkan::compileShaders();
 
-	MonsterVulkan::loadAllMeshes();
+//	MonsterVulkan::loadAllMeshes();
 	MonsterVulkan::loadMeshToPassObject();
 
 
@@ -103,12 +103,33 @@ void Monster::loadSkyBox()
 	mesh->vertices = meshData.at(0).vertices;
 	mesh->indices = meshData.at(0).indices;
 
+	mesh->vertexBuffer.reset(std::move(MonsterBuffer::createVertexBuffer(mesh->vertices)));
+	mesh->indexBuffer.reset(std::move(MonsterBuffer::createIndexBuffer(mesh->indices)));
+
 	// Shader
 	std::filesystem::path vertshader = "../../../src/monster/shaders/triangle_vert.slang";
 	std::filesystem::path fragshader = "../../../src/monster/shaders/triangle_frag.slang";
 	mesh->shader = MonsterSlang::loadShader("SkyShader", vertshader, fragshader);
 
-	setupShaderBuffers(mesh->shader, sizeof(SkyUniformBuffer));
+	mesh->shader->buffers.reset(std::move(MonsterSlang::createUniformBuffers(sizeof(UniformBufferObject))));
+
+	std::filesystem::path imagePath = "../../../src/monster/shaders/far_fog_tex.png";
+
+	mesh->shader->textures.push_back(MonsterVulkan::createTextureImage(imagePath));
+	MonsterVulkan::createTextureImageView(mesh->shader->textures.back().get());
+	MonsterVulkan::createTextureSampler(mesh->shader->textures.back().get());
+
+	mesh->shader->createDescriptorSetLayouts(&vkMonsterStats.device, &*vkDescriptors.descriptorPool);
+	mesh->shader->createDescriptorWriteInfo(&vkMonsterStats.device);
+
+
+	// create pipeline
+	mesh->shader->graphicsPipeline = MonsterVulkan::createGraphicsPipeline(mesh->shader->vertexShader, mesh->shader->fragmentShader, "main", "main", *mesh->shader->descriptorSetLayout);
+
+
+	mesh->descriptorBound = true;
+
+	mesh->isMeshVkLoaded = true;
 
 	
 }
@@ -125,20 +146,32 @@ void Monster::loadOtherMesh()
 	mesh->vertices = meshData.at(0).vertices;
 	mesh->indices = meshData.at(0).indices;
 
+	mesh->vertexBuffer.reset(std::move(MonsterBuffer::createVertexBuffer(mesh->vertices)));
+	mesh->indexBuffer.reset(std::move(MonsterBuffer::createIndexBuffer(mesh->indices)));
+
 	// generate Shader
-	std::filesystem::path vertshader = "../../../src/monster/shaders/triangle_vert.slang";
-	std::filesystem::path fragshader = "../../../src/monster/shaders/triangle_frag.slang";
+	std::filesystem::path vertshader = "../../../src/monster/shaders/sample_shader_vert.slang";
+	std::filesystem::path fragshader = "../../../src/monster/shaders/sample_shader_frag.slang";
 	mesh->shader = MonsterVulkan::loadShader("boxShader", vertshader, fragshader);
 
 	// generate UBO
-	mesh->shader->uniformBuffers = MonsterSlang::createUniformBuffers(sizeof(UniformBufferObject));
+	mesh->shader->buffers.reset(std::move(MonsterSlang::createUniformBuffers(sizeof(UniformBufferObject))));
 
 	// create descriptor heap
-	createDescriptorHeapBuffer(mesh->shader->uniformBuffers);
+	//createDescriptorHeapBuffer(mesh->shader->uniformBuffers); // CANNOT CREATE HEAP BUFFERS ON OLDER (NOT SO OLD HARDWARE)
+
+	// create descriptor
+	mesh->shader->createDescriptorSetLayouts(&vkMonsterStats.device, &*vkDescriptors.descriptorPool);
+	mesh->shader->createDescriptorWriteInfo(&vkMonsterStats.device);
+
+	// create pipeline
+	mesh->shader->graphicsPipeline = MonsterVulkan::createGraphicsPipeline(mesh->shader->vertexShader, mesh->shader->fragmentShader, "main", "main",*mesh->shader->descriptorSetLayout);
+
 
 	mesh->descriptorBound = true;
-	
 
+	mesh->isMeshVkLoaded = true;
+	
 
 	
 }
