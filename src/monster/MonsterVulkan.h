@@ -67,11 +67,13 @@ public:
 	void createSwapchain();
 	void createImageView();
 	vk::raii::ImageView createImageView(vk::Image const& image, vk::Format format, vk::ImageAspectFlags flags);
-	void createDescriptiorSetLayout();
+	void createDescriptorSetLayout();
+	uint32_t createDescriptorSetLayout(const std::vector<vk::DescriptorSetLayoutBinding>& bindings);
 	void createGraphicsPipeline();
 	vk::raii::Pipeline createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
 		const vk::ShaderModule& fragShaderModule,
+		uint32_t pipelineLayoutIndex,
 		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
 		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
 		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,

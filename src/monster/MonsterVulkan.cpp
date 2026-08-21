@@ -137,7 +137,7 @@ void MonsterVulkan::InitVulkan(uint16_t windowWidth, uint16_t windowHeight) {
 	createVulkanMemAllocator();
 	createSwapchain();
 	createImageView();
-	createDescriptiorSetLayout();
+	createDescriptorSetLayout();
 	createGraphicsPipeline();
 	createCommandPool();
 	createCommandBuffer();
@@ -589,28 +589,45 @@ vk::raii::ImageView MonsterVulkan::createImageView(vk::Image const& image, vk::F
 	return std::move(imageView);
 }
 
-void MonsterVulkan::createDescriptiorSetLayout()
+void MonsterVulkan::createDescriptorSetLayout()
 {
-
-	std::array<vk::DescriptorSetLayoutBinding, 2> bindings{
-		{{
+	std::vector<vk::DescriptorSetLayoutBinding> bindings(2);
+	bindings.at(0) = vk::DescriptorSetLayoutBinding{
 		.binding = 0,
 		.descriptorType = vk::DescriptorType::eUniformBuffer,
 		.descriptorCount = 1,
 		.stageFlags = vk::ShaderStageFlagBits::eVertex
-		},{
+	};
+	bindings.at(1) = vk::DescriptorSetLayoutBinding{
 		.binding = 1,
 		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
 		.descriptorCount = 1,
 		.stageFlags = vk::ShaderStageFlagBits::eFragment
-		}}
 	};
 
+	createDescriptorSetLayout(bindings);
+
+	/*vk::DescriptorSetLayoutCreateInfo layoutInfo{
+		.bindingCount = static_cast<uint32_t>(bindings.size()),
+		.pBindings = bindings.data()
+	};
+	vkDescriptors.descriptorSetLayout = vk::raii::DescriptorSetLayout(vkMonsterStats.device, layoutInfo);*/
+}
+
+uint32_t MonsterVulkan::createDescriptorSetLayout(const std::vector<vk::DescriptorSetLayoutBinding>& bindings)
+{
 	vk::DescriptorSetLayoutCreateInfo layoutInfo{
 		.bindingCount = static_cast<uint32_t>(bindings.size()),
 		.pBindings = bindings.data()
 	};
-	vkDescriptors.descriptorSetLayout = vk::raii::DescriptorSetLayout(vkMonsterStats.device, layoutInfo);
+	vkDescriptors.descriptorSetLayout.push_back(std::move(vk::raii::DescriptorSetLayout(vkMonsterStats.device, layoutInfo)));
+
+	if (vkDescriptors.descriptorSetLayout.size() < 1)
+	{
+		throw std::runtime_error("UNABLE TO CREATE DESCRIPTOR SET LAYOUT");
+	}
+
+	return vkDescriptors.descriptorSetLayout.size() - 1;
 }
 
 [[nodiscard]] vk::raii::ShaderModule MonsterVulkan::createShaderModule(const std::vector<char>& code) const {
@@ -671,12 +688,13 @@ void MonsterVulkan::createGraphicsPipeline() {
 
 	vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
 
-	vkMonsterStats.graphicsPipeline = createGraphicsPipeline(*shaderModule, *shaderModule);
+	vkMonsterStats.graphicsPipeline = createGraphicsPipeline(*shaderModule, *shaderModule, 0);
 }
 
 vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 	const vk::ShaderModule& vertShaderModule, // function name must start with vertMain
 	const vk::ShaderModule& fragShaderModule, // function name must start with fragMain
+	uint32_t pipelineLayoutIndex,
 	vk::PolygonMode polygonMode ,
 	vk::CullModeFlags cullingModes ,
 	vk::FrontFace frontFace ,
@@ -758,7 +776,7 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 
 	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{
 		.setLayoutCount = 1,
-		.pSetLayouts = &*vkDescriptors.descriptorSetLayout,
+		.pSetLayouts = &*vkDescriptors.descriptorSetLayout.at(pipelineLayoutIndex),
 		.pushConstantRangeCount = 0,
 
 	};
@@ -1291,7 +1309,7 @@ void MonsterVulkan::createDescriptorPool()
 void MonsterVulkan::createDescriptorSets()
 {
 	// set layout for descriptor Sets
-	std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *vkDescriptors.descriptorSetLayout);
+	std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *vkDescriptors.descriptorSetLayout.at(0));
 	vk::DescriptorSetAllocateInfo allocInfo{
 		.descriptorPool = vkDescriptors.descriptorPool,
 		.descriptorSetCount = static_cast<uint32_t>(layouts.size()),
@@ -1553,7 +1571,7 @@ void MonsterVulkan::loadMeshShaders(uint32_t meshIndex)
 	}
 
 	// load graphics pipeline
-	pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders.vertexShader, importedMeshes[meshIndex]->shaders.fragmentShader));
+	pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders.vertexShader, importedMeshes[meshIndex]->shaders.fragmentShader, 0));
 
 	importedMeshes[meshIndex]->graphicsPipelineIndex = pipes.size() - 1;
 
