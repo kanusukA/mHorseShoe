@@ -1115,7 +1115,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
-			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout[importedMeshes[passObjIndex]->shaders.pipelineLayoutIndex], 0, *vkDescriptors.descriptorSets[importedMeshes[passObjIndex]->shaders.descriptorSetIndex][vkMonsterStats.frameIndex], nullptr
+			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout[importedMeshes[passObjIndex]->shaders.descriptorSetLayoutIndex], 0, *vkDescriptors.descriptorSets[importedMeshes[passObjIndex]->shaders.descriptorSetIndex][vkMonsterStats.frameIndex], nullptr
 		);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[importedMeshes[passObjIndex]->vertexBufferIndex], { 0 });
@@ -1512,7 +1512,7 @@ uint32_t MonsterVulkan::createDescriptorSets(uint32_t descriptorSetLayoutIndex,c
 
 }
 
-uint32_t MonsterVulkan::createDescriptorSets(uint32_t descriptorSetLayoutIndex, const std::vector<vk::raii::Buffer>& uboBufferIndices)
+uint32_t MonsterVulkan::createDescriptorSets(uint32_t descriptorSetLayoutIndex, const std::vector<MonsterBuffer>& uboBufferIndices)
 {
 	std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *vkDescriptors.descriptorSetLayout.at(descriptorSetLayoutIndex));
 	vk::DescriptorSetAllocateInfo allocInfo{
@@ -1532,7 +1532,7 @@ uint32_t MonsterVulkan::createDescriptorSets(uint32_t descriptorSetLayoutIndex, 
 		for (const auto& ubo : uboBufferIndices)
 		{
 			vk::DescriptorBufferInfo bufferInfo{
-			.buffer = *ubo,
+			.buffer = *ubo.buffers[i],
 			.offset = 0,
 			.range = sizeof(UniformBufferObject)
 			};
@@ -1799,7 +1799,7 @@ void MonsterVulkan::loadMeshShaders(uint32_t meshIndex)
 	layouts.push_back(imgLayout);
 	uint32_t setLayoutIdx = createDescriptorSetLayout(layouts);
 	importedMeshes[meshIndex]->shaders.descriptorSetLayoutIndex = setLayoutIdx;
-	importedMeshes[meshIndex]->shaders.descriptorSetIndex = createDescriptorSets(setLayoutIdx, importedMeshes[meshIndex]->shaders.transformBuffer.buffers);
+	importedMeshes[meshIndex]->shaders.descriptorSetIndex = createDescriptorSets(setLayoutIdx, { importedMeshes[meshIndex]->shaders.transformBuffer });
 
 	// load graphics pipeline
 	pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders.vertexShader, importedMeshes[meshIndex]->shaders.fragmentShader, vkDescriptors.pipelineLayout[importedMeshes[meshIndex]->shaders.descriptorSetLayoutIndex]));

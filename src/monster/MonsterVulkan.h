@@ -95,7 +95,7 @@ public:
 	void createDescriptorPool();
 	void createDescriptorSets();
 	uint32_t createDescriptorSets(uint32_t descriptorSetLayoutIndex, const std::vector<uint32_t>& uboBufferIndexes);
-	uint32_t createDescriptorSets(uint32_t descriptorSetLayoutIndex, const std::vector<vk::raii::Buffer>& uboBuffers);
+	uint32_t createDescriptorSets(uint32_t descriptorSetLayoutIndex, const std::vector<MonsterBuffer>& uboBuffers);
 	void createSyncObjects();
 
 	std::pair<VkBuffer, VmaAllocation> createBuffer(
