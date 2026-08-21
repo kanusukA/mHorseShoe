@@ -73,7 +73,7 @@ public:
 	vk::raii::Pipeline createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
 		const vk::ShaderModule& fragShaderModule,
-		uint32_t pipelineLayoutIndex,
+		const vk::raii::PipelineLayout& pipelineLayout,
 		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
 		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
 		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,
@@ -90,8 +90,12 @@ public:
 	void createIndexBuffer();
 	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();
+	uint32_t createUniformBuffer(const vk::DeviceSize& size);
+	MonsterBuffer createMonsterBuffer(const vk::DeviceSize& size);
 	void createDescriptorPool();
 	void createDescriptorSets();
+	uint32_t createDescriptorSets(uint32_t descriptorSetLayoutIndex, const std::vector<uint32_t>& uboBufferIndexes);
+	uint32_t createDescriptorSets(uint32_t descriptorSetLayoutIndex, const std::vector<vk::raii::Buffer>& uboBuffers);
 	void createSyncObjects();
 
 	std::pair<VkBuffer, VmaAllocation> createBuffer(

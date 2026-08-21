@@ -28,7 +28,7 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 
 
-
+constexpr uint32_t MAX_OBJECTS = 20;
 
 
 struct VulkanMeshsPipe {
@@ -99,6 +99,7 @@ struct VulkanMemAlloc {
 	std::vector<uint32_t> vertices;
 
 	std::vector<vk::raii::Buffer> uniformBuffers;
+	std::vector<vk::DeviceSize> uboSizes;
 	std::vector<VmaAllocation> uniformBufferAlloc;
 	std::vector<void*> uniformBuffersMapped;
 
@@ -106,11 +107,10 @@ struct VulkanMemAlloc {
 
 struct VulkanDescriptors {
 	vk::raii::DescriptorPool descriptorPool = nullptr;
-	vk::raii::PipelineLayout pipelineLayout = nullptr;
+	std::vector<vk::raii::PipelineLayout> pipelineLayout{};
 	std::vector<vk::raii::DescriptorSetLayout> descriptorSetLayout{};
 
-	std::vector<vk::raii::DescriptorSet> descriptorSets;
-	
+	std::vector<vk::raii::DescriptorSets> descriptorSets;
 };
 
 struct VulkanTextures {
@@ -128,12 +128,6 @@ struct VulkanTextures {
 	VmaAllocation textureAlloc;
 };
 
-struct UniformBufferObject {
-	/*glm::vec2 foo;
-	alignas(16)*/ // YOU CAN ALSO USE GLM_FORCE_DEFAULT_ALIGNED_GENTYPES for consistent alignment but it does not work in nested struct
-	glm::mat4 model;
-	glm::mat4 view;
-	glm::mat4 proj;
-};
+
 
 
