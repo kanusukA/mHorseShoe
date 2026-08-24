@@ -44,6 +44,10 @@ namespace vulkanUtils {
 		vk::raii::ShaderModule fragmentShader = nullptr;
 
 		uint32_t graphicsPipelineIndex;
+		
+		// descriptors
+		uint32_t descriptorPipeLayout;
+		uint32_t descriptorSetLayout;
 
 
 	};

@@ -781,7 +781,7 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 
 	};
 
-	vkDescriptors.pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
+	vkDescriptors.pipelineLayout.push_back(std::move(vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo)));
 
 
 	vk::PipelineRenderingCreateInfo renderingCreateInfo{
@@ -801,7 +801,7 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 		.pDepthStencilState = &depthStencil,
 		.pColorBlendState = &colorBlendInfo,
 		.pDynamicState = &dynamicStateCreateInfo,
-		.layout = vkDescriptors.pipelineLayout,
+		.layout = vkDescriptors.pipelineLayout.back(),
 		.renderPass = nullptr,
 
 	};
@@ -1107,7 +1107,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
-			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout, 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
+			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout[importedMeshes[passObjIndex]->shaders.descriptorPipeLayout], 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
 		);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[importedMeshes[passObjIndex]->vertexBufferIndex], { 0 });
@@ -1570,10 +1570,29 @@ void MonsterVulkan::loadMeshShaders(uint32_t meshIndex)
 		throw std::runtime_error("NO FRAGMENT SHADER FOUND");
 	}
 
+	std::vector<vk::DescriptorSetLayoutBinding> bindings(2);
+	bindings.at(0) = vk::DescriptorSetLayoutBinding{
+		.binding = 0,
+		.descriptorType = vk::DescriptorType::eUniformBuffer,
+		.descriptorCount = 1,
+		.stageFlags = vk::ShaderStageFlagBits::eVertex
+	};
+	bindings.at(1) = vk::DescriptorSetLayoutBinding{
+		.binding = 1,
+		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+		.descriptorCount = 1,
+		.stageFlags = vk::ShaderStageFlagBits::eFragment
+	};
+
+
+	// descriptor layout
+	importedMeshes[meshIndex]->shaders.descriptorSetLayout = createDescriptorSetLayout(bindings);
+
 	// load graphics pipeline
-	pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders.vertexShader, importedMeshes[meshIndex]->shaders.fragmentShader, 0));
+	pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders.vertexShader, importedMeshes[meshIndex]->shaders.fragmentShader, importedMeshes[meshIndex]->shaders.descriptorSetLayout));
 
 	importedMeshes[meshIndex]->graphicsPipelineIndex = pipes.size() - 1;
+	importedMeshes[meshIndex]->shaders.descriptorPipeLayout = vkDescriptors.pipelineLayout.size() - 1;
 
 	if (!importedMeshes[meshIndex]->vertices.empty() && !importedMeshes[meshIndex]->indices.empty())
 	{

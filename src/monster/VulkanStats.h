@@ -106,7 +106,7 @@ struct VulkanMemAlloc {
 
 struct VulkanDescriptors {
 	vk::raii::DescriptorPool descriptorPool = nullptr;
-	vk::raii::PipelineLayout pipelineLayout = nullptr;
+	std::vector<vk::raii::PipelineLayout> pipelineLayout{};
 	std::vector<vk::raii::DescriptorSetLayout> descriptorSetLayout{};
 
 	std::vector<vk::raii::DescriptorSet> descriptorSets;
