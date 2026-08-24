@@ -92,6 +92,11 @@ public:
 	void createUniformBuffers();
 	void createDescriptorPool();
 	void createDescriptorSets();
+	uint32_t createDescriptorSets(
+		uint32_t descriptorSetLayout
+		
+	);
+	void updateDescriptorSets(const std::vector<std::vector<vk::WriteDescriptorSet>>& descriptorWrites);
 	void createSyncObjects();
 
 	std::pair<VkBuffer, VmaAllocation> createBuffer(

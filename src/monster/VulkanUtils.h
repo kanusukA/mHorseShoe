@@ -48,6 +48,7 @@ namespace vulkanUtils {
 		// descriptors
 		uint32_t descriptorPipeLayout;
 		uint32_t descriptorSetLayout;
+		uint32_t descriptorSets;
 
 
 	};

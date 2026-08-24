@@ -109,7 +109,7 @@ struct VulkanDescriptors {
 	std::vector<vk::raii::PipelineLayout> pipelineLayout{};
 	std::vector<vk::raii::DescriptorSetLayout> descriptorSetLayout{};
 
-	std::vector<vk::raii::DescriptorSet> descriptorSets;
+	std::vector<vk::raii::DescriptorSets> descriptorSets;
 	
 };
 

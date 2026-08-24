@@ -1093,9 +1093,6 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 	// ORDER INCOMING MESHES BY THE PIPELINE THEY USE
 	
 
-	
-
-
 	int32_t instance = 0;
 	for (size_t passObjIndex = 0; passObjIndex < passObjects.size(); passObjIndex++)
 	{
@@ -1107,7 +1104,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
-			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout[importedMeshes[passObjIndex]->shaders.descriptorPipeLayout], 0, *vkDescriptors.descriptorSets[vkMonsterStats.frameIndex], nullptr
+			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout[importedMeshes[passObjIndex]->shaders.descriptorPipeLayout], 0, *vkDescriptors.descriptorSets[importedMeshes[passObjIndex]->shaders.descriptorSets][vkMonsterStats.frameIndex], nullptr
 		);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[importedMeshes[passObjIndex]->vertexBufferIndex], { 0 });
@@ -1275,7 +1272,7 @@ void MonsterVulkan::createDescriptorPool()
 
 	std::array<vk::DescriptorPoolSize, 2>poolSize{ {
 		{.type = vk::DescriptorType::eUniformBuffer,
-		.descriptorCount = MAX_FRAMES_IN_FLIGHT
+		.descriptorCount = MAX_FRAMES_IN_FLIGHT * 20
 		},
 		/*{
 			.type = vk::DescriptorType::eSampledImage,
@@ -1287,7 +1284,7 @@ void MonsterVulkan::createDescriptorPool()
 		},*/
 		{
 		.type = vk::DescriptorType::eCombinedImageSampler,
-		.descriptorCount = MAX_FRAMES_IN_FLIGHT
+		.descriptorCount = MAX_FRAMES_IN_FLIGHT * 20
 		}
 	} };
 
@@ -1317,7 +1314,7 @@ void MonsterVulkan::createDescriptorSets()
 	};
 
 	// Allocate Descriptor sets
-	vkDescriptors.descriptorSets = vkMonsterStats.device.allocateDescriptorSets(allocInfo);
+	vkDescriptors.descriptorSets.push_back(std::move(vkMonsterStats.device.allocateDescriptorSets(allocInfo)));
 
 	//configure allocated descriptor sets
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -1344,9 +1341,10 @@ void MonsterVulkan::createDescriptorSets()
 			.pBufferInfo = &bufferInfo
 		};
 		*/
+
 		std::array<vk::WriteDescriptorSet, 2>descriptorWrites{ {
 			{
-			.dstSet = vkDescriptors.descriptorSets[i],
+			.dstSet = vkDescriptors.descriptorSets.back()[i],
 			.dstBinding = 0,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
@@ -1354,7 +1352,7 @@ void MonsterVulkan::createDescriptorSets()
 			.pBufferInfo = &bufferInfo
 			},
 			{
-			.dstSet = vkDescriptors.descriptorSets[i],
+			.dstSet = vkDescriptors.descriptorSets.back()[i],
 			.dstBinding = 1,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
@@ -1368,6 +1366,30 @@ void MonsterVulkan::createDescriptorSets()
 	}
 
 
+}
+
+uint32_t MonsterVulkan::createDescriptorSets(uint32_t descriptorSetLayout)
+{
+	std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *vkDescriptors.descriptorSetLayout[descriptorSetLayout]);
+	vk::DescriptorSetAllocateInfo allocInfo{
+		.descriptorPool = vkDescriptors.descriptorPool,
+		.descriptorSetCount = static_cast<uint32_t>(layouts.size()),
+		.pSetLayouts = layouts.data()
+	};
+
+	// Allocate Descriptor sets
+	vkDescriptors.descriptorSets.push_back(std::move(vkMonsterStats.device.allocateDescriptorSets(allocInfo)));
+	
+	return vkDescriptors.descriptorSets.size() - 1;
+
+}
+
+void MonsterVulkan::updateDescriptorSets(const std::vector<std::vector<vk::WriteDescriptorSet>>& descriptorWrites)
+{
+	for (const auto& write : descriptorWrites)
+	{
+		vkMonsterStats.device.updateDescriptorSets(write, {});
+	}
 }
 
 std::pair<VkBuffer, VmaAllocation> MonsterVulkan::createBuffer(
@@ -1587,6 +1609,60 @@ void MonsterVulkan::loadMeshShaders(uint32_t meshIndex)
 
 	// descriptor layout
 	importedMeshes[meshIndex]->shaders.descriptorSetLayout = createDescriptorSetLayout(bindings);
+
+	importedMeshes[meshIndex]->shaders.descriptorSets = createDescriptorSets(importedMeshes[meshIndex]->shaders.descriptorSetLayout);
+
+	std::vector<vk::WriteDescriptorSet> descriptorWrites{};
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		vk::DescriptorBufferInfo bufferInfo{
+			.buffer = vkMemAlloc.uniformBuffers[i],
+			.offset = 0,
+			.range = sizeof(UniformBufferObject)
+		};
+
+		vk::DescriptorImageInfo imageInfo{
+			.sampler = vkTextures.textureSampler,
+			.imageView = vkTextures.textureImageView,
+			.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+		};
+
+		/*
+		vk::WriteDescriptorSet descriptorWrite{
+			.dstSet = vkDescriptors.descriptorSets[i],
+			.dstBinding = 0,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = vk::DescriptorType::eUniformBuffer,
+			.pBufferInfo = &bufferInfo
+		};
+		*/
+		descriptorWrites.push_back({
+			.dstSet = vkDescriptors.descriptorSets.back()[i],
+			.dstBinding = 0,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = vk::DescriptorType::eUniformBuffer,
+			.pBufferInfo = &bufferInfo
+			});
+
+		descriptorWrites.push_back(
+			{
+			.dstSet = vkDescriptors.descriptorSets.back()[i],
+			.dstBinding = 1,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+			.pImageInfo = &imageInfo
+			}
+		);
+
+
+	}
+	// descriptor Sets
+	updateDescriptorSets({ descriptorWrites });
+	
 
 	// load graphics pipeline
 	pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders.vertexShader, importedMeshes[meshIndex]->shaders.fragmentShader, importedMeshes[meshIndex]->shaders.descriptorSetLayout));
