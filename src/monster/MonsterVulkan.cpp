@@ -64,7 +64,11 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 	vkMonsterStats.device.resetFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
 
 	// UPDATE BUFFERS
-	updateUniformBuffer(vkMonsterStats.frameIndex);
+	for (const auto& mesh: importedMeshes)
+	{
+		updateUniformBuffer(vkMonsterStats.frameIndex, mesh->shaders.tUBOIndex);
+	}
+	
 
 	// RESET COMMAND BUFFERS
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].reset();
@@ -1094,24 +1098,24 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 	
 
 	int32_t instance = 0;
-	for (size_t passObjIndex = 0; passObjIndex < passObjects.size(); passObjIndex++)
+	for (auto& passObj: importedMeshes)
 	{
 		//hRes::Mesh* passObj = importedMeshes[passObjIndex];
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, pipes[importedMeshes[passObjIndex]->graphicsPipelineIndex]);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, pipes[passObj->graphicsPipelineIndex]);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
-			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout[importedMeshes[passObjIndex]->shaders.descriptorPipeLayout], 0, *vkDescriptors.descriptorSets[importedMeshes[passObjIndex]->shaders.descriptorSets][vkMonsterStats.frameIndex], nullptr
+			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout[passObj->shaders.descriptorPipeLayout], 0, *vkDescriptors.descriptorSets[passObj->shaders.descriptorSets][vkMonsterStats.frameIndex], nullptr
 		);
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[importedMeshes[passObjIndex]->vertexBufferIndex], { 0 });
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[importedMeshes[passObjIndex]->indexBufferIndex], 0, vk::IndexType::eUint16);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[passObj->vertexBufferIndex], { 0 });
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[passObj->indexBufferIndex], 0, vk::IndexType::eUint16);
 
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(importedMeshes[passObjIndex]->indices.size(), instance, 0, 0, 0);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(passObj->indices.size(), instance, 0, 0, 0);
 		instance++;
 	}
 
@@ -1265,6 +1269,26 @@ void MonsterVulkan::createUniformBuffers()
 		vkMemAlloc.uniformBuffersMapped.emplace_back(std::move(alloc->GetMappedData()));
 
 	}
+}
+
+uint32_t MonsterVulkan::createUniformBuffers(vk::DeviceSize bufferSize)
+{
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		vk::DeviceSize bufferSize = sizeof(bufferSize);
+
+
+		auto [buffer, alloc] = createBuffer(bufferSize,
+			vk::BufferUsageFlagBits::eUniformBuffer,
+			VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+			VMA_MEMORY_USAGE_AUTO);
+		vkMemAlloc.uniformBuffers.emplace_back(std::move(vk::raii::Buffer(vkMonsterStats.device, buffer)));
+		vkMemAlloc.uniformBufferAlloc.emplace_back(std::move(alloc));
+		vkMemAlloc.uniformBuffersMapped.emplace_back(std::move(alloc->GetMappedData()));
+
+	}
+
+	return vkMemAlloc.uniformBuffers.size() - MAX_FRAMES_IN_FLIGHT;
 }
 
 void MonsterVulkan::createDescriptorPool()
@@ -1487,7 +1511,7 @@ void MonsterVulkan::copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, Vk
 
 }
 
-void MonsterVulkan::updateUniformBuffer(uint32_t currentImage)
+void MonsterVulkan::updateUniformBuffer(uint32_t currentImage, uint32_t uboIndex)
 {
 	static auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -1504,7 +1528,7 @@ void MonsterVulkan::updateUniformBuffer(uint32_t currentImage)
 	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
 	//ubo.proj[1][1] *= -1;
 
-	memcpy(vkMemAlloc.uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
+	memcpy(vkMemAlloc.uniformBuffersMapped[uboIndex + currentImage], &ubo, sizeof(ubo));
 
 }
 
@@ -1612,12 +1636,14 @@ void MonsterVulkan::loadMeshShaders(uint32_t meshIndex)
 
 	importedMeshes[meshIndex]->shaders.descriptorSets = createDescriptorSets(importedMeshes[meshIndex]->shaders.descriptorSetLayout);
 
+	importedMeshes[meshIndex]->shaders.tUBOIndex = createUniformBuffers(sizeof(UniformBufferObject));
+
 	std::vector<vk::WriteDescriptorSet> descriptorWrites{};
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		vk::DescriptorBufferInfo bufferInfo{
-			.buffer = vkMemAlloc.uniformBuffers[i],
+			.buffer = vkMemAlloc.uniformBuffers[importedMeshes[meshIndex]->shaders.tUBOIndex + i],
 			.offset = 0,
 			.range = sizeof(UniformBufferObject)
 		};

@@ -90,6 +90,7 @@ public:
 	void createIndexBuffer();
 	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();
+	uint32_t createUniformBuffers(vk::DeviceSize bufferSize);
 	void createDescriptorPool();
 	void createDescriptorSets();
 	uint32_t createDescriptorSets(
@@ -130,7 +131,7 @@ public:
 		uint32_t height
 	);
 
-	void updateUniformBuffer(uint32_t currentImage);
+	void updateUniformBuffer(uint32_t currentImage,uint32_t uboIndex);
 
 	void transitionImageLayout(
 		vk::raii::CommandBuffer& commandBuffer,
