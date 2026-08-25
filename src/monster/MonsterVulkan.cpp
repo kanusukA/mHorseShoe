@@ -88,7 +88,7 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 		.commandBufferCount = 1,
 		.pCommandBuffers = &*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex],
 		.signalSemaphoreCount = 1,
-		.pSignalSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex] // triggers this semaphore
+		.pSignalSemaphores = &*vkSyncStats.renderFinishedSemaphores[imageIndex] // triggers this semaphore
 	};
 
 	vkMonsterStats.graphicsQueue.submit(submitInfo, *vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
@@ -106,7 +106,7 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 
 	const vk::PresentInfoKHR presentInfoKHR{
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &*vkSyncStats.renderFinishedSemaphores[vkMonsterStats.frameIndex], // waits for this
+		.pWaitSemaphores = &*vkSyncStats.renderFinishedSemaphores[imageIndex], // waits for this
 		.swapchainCount = 1,
 		.pSwapchains = &*vkMonsterStats.swapChain,
 		.pImageIndices = &imageIndex,
@@ -1174,10 +1174,14 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 
 void MonsterVulkan::createSyncObjects() {
 
+	for (size_t i = 0; i < vkMonsterStats.swapChainImages.size(); i++)
+	{
+		vkSyncStats.renderFinishedSemaphores.emplace_back(vkMonsterStats.device, vk::SemaphoreCreateInfo());
+	}
+
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		vkSyncStats.presentCompleteSemaphores.emplace_back(vkMonsterStats.device, vk::SemaphoreCreateInfo());
-		vkSyncStats.renderFinishedSemaphores.emplace_back(vkMonsterStats.device, vk::SemaphoreCreateInfo());
 		vkSyncStats.inFlightFences.emplace_back(vkMonsterStats.device, vk::FenceCreateInfo{ .flags = vk::FenceCreateFlagBits::eSignaled });
 	}
 
@@ -1255,7 +1259,7 @@ uint32_t MonsterVulkan::createIndexBuffer(std::vector<uint16_t> indices) {
 	// create the device_local(graphics crad memory) buffer
 	auto [vkBuffer, vkBufferAlloc] = createBuffer(
 		bufferSize,
-		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
 		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
 		VMA_MEMORY_USAGE_AUTO
 	);
@@ -1365,7 +1369,8 @@ void MonsterVulkan::createDescriptorSets()
 		vk::DescriptorImageInfo imageInfo{
 			.sampler = vkTextures.textureSampler,
 			.imageView = vkTextures.textureImageView,
-			.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+			.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
+			
 		};
 
 		/*
