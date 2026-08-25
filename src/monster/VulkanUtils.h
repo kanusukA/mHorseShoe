@@ -8,12 +8,20 @@
 
 #include <vulkan/vulkan_raii.hpp>
 
+#include <vk_mem_alloc.h>
+
 #include <glm/glm.hpp>
 
 #include <filesystem>
 
 #ifndef VULKAN_UTILS
 #define VULKAN_UTILS
+
+struct MonsterBuffer {
+	vk::Buffer buffer;
+	VmaAllocation alloc;
+	void* bufferMapped;
+};
 
 namespace vulkanUtils {
 
@@ -46,6 +54,8 @@ namespace vulkanUtils {
 		uint32_t graphicsPipelineIndex;
 
 		uint32_t tUBOIndex;
+
+		MonsterBuffer transformBuffer;
 		
 		// descriptors
 		uint32_t descriptorPipeLayout;

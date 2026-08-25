@@ -14,8 +14,6 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 #define VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS
 #include <vulkan/vulkan_raii.hpp>
 
-#include <vk_mem_alloc.h>
-
 #include <stdlib.h>
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -31,10 +29,12 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 
 
+
 struct VulkanMeshsPipe {
 	vk::raii::Pipeline graphicsPipeline = nullptr;
 	std::vector<int32_t> meshIndexs = std::vector<int32_t>();
 };
+
 struct PassObject {
 	int32_t pipelineIndex;
 	int32_t vertexIndex;

@@ -91,6 +91,7 @@ public:
 	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();
 	uint32_t createUniformBuffers(vk::DeviceSize bufferSize);
+
 	void createDescriptorPool();
 	void createDescriptorSets();
 	uint32_t createDescriptorSets(
@@ -141,7 +142,7 @@ public:
 	);
 
 	void transition_image_layout(
-		uint32_t imageIndex,
+		vk::Image image,
 		vk::ImageLayout old_layout,
 		vk::ImageLayout new_layout,
 		vk::AccessFlags2 src_access_mask,

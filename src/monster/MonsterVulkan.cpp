@@ -145,6 +145,7 @@ void MonsterVulkan::InitVulkan(uint16_t windowWidth, uint16_t windowHeight) {
 	createGraphicsPipeline();
 	createCommandPool();
 	createCommandBuffer();
+	createDepthResources();
 	createTextureImage();
 	createTextureImageView();
 	createTextureSampler();
@@ -154,8 +155,6 @@ void MonsterVulkan::InitVulkan(uint16_t windowWidth, uint16_t windowHeight) {
 	createDescriptorPool();
 	createDescriptorSets();
 	createSyncObjects();
-
-
 }
 
 void MonsterVulkan::ShutdownVulkan()
@@ -936,7 +935,7 @@ void MonsterVulkan::createTextureImageView()
 
 	vkTextures.textureImageView = createImageView(
 		*vkTextures.textureImage,
-		vk::Format::eR8G8B8A8Srgb,
+		vkMonsterStats.swapChainSurfaceFormat.format,
 		{ vk::ImageAspectFlagBits::eColor }
 	);
 
@@ -971,7 +970,7 @@ void MonsterVulkan::createTextureSampler()
 
 
 void MonsterVulkan::transition_image_layout(
-	uint32_t imageIndex,
+	vk::Image image,
 	vk::ImageLayout old_layout,
 	vk::ImageLayout new_layout,
 	vk::AccessFlags2 src_access_mask,
@@ -989,7 +988,7 @@ void MonsterVulkan::transition_image_layout(
 		.newLayout = new_layout,
 		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.image = vkMonsterStats.swapChainImages[imageIndex],
+		.image = image,
 		.subresourceRange = {
 			.aspectMask = flags,
 			.baseMipLevel = 0,
@@ -1038,9 +1037,13 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 	// INITALIZE RECODRING OF COMMAND BUFFER
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].begin({});
 
+	vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f);
+	vk::ClearValue clearDepth = vk::ClearDepthStencilValue(1.0f, 0);
+
+
 	// MAKE SURE COLOR HAS BEEN PRINTED
 	transition_image_layout(
-		imageIndex,
+		vkMonsterStats.swapChainImages[imageIndex],
 		vk::ImageLayout::eUndefined, // Image can be in any layout in input
 		vk::ImageLayout::eColorAttachmentOptimal, // must be converted into a color attachment 
 		{}, // No read/write is required prior to this step
@@ -1050,9 +1053,17 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		vk::ImageAspectFlagBits::eColor
 	);
 
+	vk::RenderingAttachmentInfo attachmentInfo = {
+		.imageView = vkMonsterStats.swapChainImageViews[imageIndex],
+		.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+		.loadOp = vk::AttachmentLoadOp::eClear,
+		.storeOp = vk::AttachmentStoreOp::eStore,
+		.clearValue = clearColor
+	};
+
 	// Similar transition for Depth Attachment
 	transition_image_layout(
-		imageIndex,
+		*vkTextures.depthImage,
 		vk::ImageLayout::eUndefined,
 		vk::ImageLayout::eDepthAttachmentOptimal,
 		vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
@@ -1062,19 +1073,8 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		vk::ImageAspectFlagBits::eDepth
 	);
 
-	vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f);
-	vk::ClearValue clearDepth = vk::ClearDepthStencilValue(1.0f, 0);
 
 	// SWAPCHAIN ATTACHMENT
-	vk::RenderingAttachmentInfo attachmentInfo = {
-		.imageView = vkMonsterStats.swapChainImageViews[imageIndex],
-		.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-		.loadOp = vk::AttachmentLoadOp::eClear,
-		.storeOp = vk::AttachmentStoreOp::eStore,
-		.clearValue = clearColor
-
-	};
-
 	vk::RenderingAttachmentInfo depthAttachmentInfo = {
 		.imageView = vkTextures.depthImageView,
 		.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
@@ -1082,6 +1082,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		.storeOp = vk::AttachmentStoreOp::eDontCare,
 		.clearValue = clearDepth
 	};
+
 
 	vk::RenderingInfo renderingInfo = {
 		.renderArea = {.offset = {0, 0}, .extent = vkMonsterStats.swapChainExtent},
@@ -1091,6 +1092,19 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		.pDepthAttachment = &depthAttachmentInfo,
 
 	};
+
+	transition_image_layout(
+		vkMonsterStats.swapChainImages[imageIndex],
+		vk::ImageLayout::eUndefined, // Image can be in any layout in input
+		vk::ImageLayout::eColorAttachmentOptimal, // must be converted into a color attachment 
+		{}, // No read/write is required prior to this step
+		vk::AccessFlagBits2::eColorAttachmentWrite, // must be in color Write before continuing
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput, // must be in Color ouput mode
+		vk::PipelineStageFlagBits2::eColorAttachmentOutput, // continue in color output mode
+		vk::ImageAspectFlagBits::eColor
+	);
+
+
 
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].beginRendering(renderingInfo);
 
@@ -1145,7 +1159,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].endRendering();
 
 	transition_image_layout(
-		imageIndex,
+		vkMonsterStats.swapChainImages[imageIndex],
 		vk::ImageLayout::eColorAttachmentOptimal,
 		vk::ImageLayout::ePresentSrcKHR,
 		vk::AccessFlagBits2::eColorAttachmentWrite,
@@ -1275,8 +1289,6 @@ uint32_t MonsterVulkan::createUniformBuffers(vk::DeviceSize bufferSize)
 {
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		vk::DeviceSize bufferSize = sizeof(bufferSize);
-
 
 		auto [buffer, alloc] = createBuffer(bufferSize,
 			vk::BufferUsageFlagBits::eUniformBuffer,
@@ -1296,7 +1308,7 @@ void MonsterVulkan::createDescriptorPool()
 
 	std::array<vk::DescriptorPoolSize, 2>poolSize{ {
 		{.type = vk::DescriptorType::eUniformBuffer,
-		.descriptorCount = MAX_FRAMES_IN_FLIGHT * 20
+		.descriptorCount = MAX_FRAMES_IN_FLIGHT * 20,
 		},
 		/*{
 			.type = vk::DescriptorType::eSampledImage,
@@ -1315,7 +1327,8 @@ void MonsterVulkan::createDescriptorPool()
 	vk::DescriptorPoolCreateInfo poolInfo{
 		.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
 		.poolSizeCount = static_cast<uint32_t>(poolSize.size()),
-		.pPoolSizes = poolSize.data()
+		.pPoolSizes = poolSize.data(),
+		
 	};
 
 	for (const auto& pool : poolSize)
