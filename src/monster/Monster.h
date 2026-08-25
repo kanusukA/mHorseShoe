@@ -28,6 +28,8 @@ class Monster : public FeelPollEventExtension, public MonsterImgui
 
 private:
 
+	uint32_t triangleShaderIndex;
+
 	void pollEvent(SDL_Event& event) override;
 	void keyHit(MappedKey key) override;
 
@@ -43,6 +45,8 @@ public:
 	void updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime);
 
 	/*Mesh loadMeshObj(std::filesystem::path& path);*/
+
+	void createRequiredShaders();
 
 	void loadSkyBox();
 

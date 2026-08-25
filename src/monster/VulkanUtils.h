@@ -31,6 +31,7 @@ struct UniformBufferObject {
 struct MonsterBuffer {
 	vk::Buffer buffer;
 	VmaAllocation alloc;
+	VmaAllocationInfo allocInfo;
 	void* bufferMapped;
 	vk::DeviceSize bufferSize;
 };
@@ -45,6 +46,7 @@ struct MonsterTexture {
 struct MonsterPipe {
 	vk::raii::Pipeline graphicsPipeline = nullptr;
 	vk::raii::PipelineLayout descriptorPipeLayout = nullptr;
+	vk::raii::DescriptorSetLayout descriptorSetLayout = nullptr;
 	std::vector<vk::raii::DescriptorSets> descritorSets {};
 };
 
@@ -70,15 +72,20 @@ namespace vulkanUtils {
 
 	struct Shader {
 
+		bool shaderLoaded = false;
+
 		std::filesystem::path* vertShaderFilePath = nullptr;
 		std::filesystem::path* fragShaderFilePath = nullptr;
 
 		vk::raii::ShaderModule vertexShader = nullptr;
 		vk::raii::ShaderModule fragmentShader = nullptr;
 
-		uint32_t graphicsPipelineIndex;
+		std::string vertShaderName;
+		std::string fragShaderName;
 
-		uint32_t tUBOIndex;
+		//uint32_t graphicsPipelineIndex;
+
+		//uint32_t tUBOIndex
 
 		std::vector<MonsterBuffer> transformBuffers;
 

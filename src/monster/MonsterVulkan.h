@@ -1,5 +1,5 @@
 
-#include <monster/MonsterBuffer.h>
+#include <monster/MonsterSlang.h>
 
 #include <monster/imgui-1.92.9b/imgui.h>
 #include <monster/imgui-1.92.9b/backends/imgui_impl_vulkan.h>
@@ -34,11 +34,11 @@ constexpr bool enableValidationLayers = true;
 typedef std::unique_ptr<Camera> MonsterCamera;
 
 
-class MonsterVulkan :public MonsterBufferManager , public MonsterSDL {
+class MonsterVulkan :public MonsterSlang , public MonsterSDL {
 
 public:
 
-	std::vector<std::unique_ptr<hRes::Mesh>> importedMeshes = std::vector<std::unique_ptr<hRes::Mesh>>();
+	std::vector<std::shared_ptr<hRes::Mesh>> importedMeshes = std::vector<std::shared_ptr<hRes::Mesh>>();
 	std::vector<uint32_t> loadedMeshes = std::vector<uint32_t>();
 	std::vector<uint32_t> passObjects = std::vector<uint32_t>();
 
@@ -149,8 +149,8 @@ public:
 	vk::Format findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling, vk::FormatFeatureFlags features);
 	vk::Format findDepthFormat();
 
-	vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;
-	vk::raii::ShaderModule createShaderModule(const uint32_t* code, size_t codeSize) const;
+	/*vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;
+	vk::raii::ShaderModule createShaderModule(const uint32_t* code, size_t codeSize) const;*/
 
 	void recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawData);
 
@@ -169,11 +169,14 @@ public:
 
 	// resturns the index of where buffer is stored (in context with the engine Not physical memory)
 	void loadMeshToVulkan(uint32_t meshIndex);
-	void loadMeshShaders(uint32_t meshIndex);
+	void loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex);
 
-	void loadMesh(uint32_t meshIndex);
+	void loadMesh(uint32_t shaderIndex, uint32_t meshIndex);
 
 	void importMesh(hRes::Mesh& mesh);
+	
+	std::weak_ptr<hRes::Mesh> createMesh();
+
 	void loadAllMeshes();
 	// CAN BE USED LATER TO SYNC AND ALIGN THE GRAPHICS PIPELINE!!
 	// THIS WILL NOT SORT THE RENDER PASS!!

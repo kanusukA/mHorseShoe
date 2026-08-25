@@ -121,14 +121,14 @@ uint32_t MonsterBufferManager::createUniformBuffers(vk::DeviceSize bufferSize)
 
 void MonsterBufferManager::createMonsterBuffer(vk::DeviceSize bufferSize, MonsterBuffer* buffer)
 {
-	VmaAllocationInfo info;
+	
 	std::tie(buffer->buffer, buffer->alloc) = createBuffer(bufferSize,
 		vk::BufferUsageFlagBits::eUniformBuffer,
 		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
 		VMA_MEMORY_USAGE_AUTO,
-		&info);
+		&buffer->allocInfo);
 	buffer->bufferSize = bufferSize;
-	buffer->bufferMapped = info.pMappedData;
+	
 
 }
 
