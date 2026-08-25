@@ -91,17 +91,16 @@ public:
 	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();
 	uint32_t createUniformBuffers(vk::DeviceSize bufferSize);
-
+	void createMonsterBuffer(vk::DeviceSize bufferSize, MonsterBuffer* buffer);
 	void createDescriptorPool();
 	void createDescriptorSets();
 	uint32_t createDescriptorSets(
 		uint32_t descriptorSetLayout
-		
 	);
 	void updateDescriptorSets(const std::vector<std::vector<vk::WriteDescriptorSet>>& descriptorWrites);
 	void createSyncObjects();
 
-	std::pair<VkBuffer, VmaAllocation> createBuffer(
+	std::pair<vk::Buffer, VmaAllocation> createBuffer(
 		vk::DeviceSize size,
 		vk::BufferUsageFlags usage,
 		VmaAllocationCreateFlags allocFlags,
@@ -133,6 +132,8 @@ public:
 	);
 
 	void updateUniformBuffer(uint32_t currentImage,uint32_t uboIndex);
+
+	void updateUniformBuffer(uint32_t currentImage, void* bufferMapped);
 
 	void transitionImageLayout(
 		vk::raii::CommandBuffer& commandBuffer,

@@ -21,6 +21,7 @@ struct MonsterBuffer {
 	vk::Buffer buffer;
 	VmaAllocation alloc;
 	void* bufferMapped;
+	vk::DeviceSize bufferSize;
 };
 
 namespace vulkanUtils {
@@ -55,7 +56,7 @@ namespace vulkanUtils {
 
 		uint32_t tUBOIndex;
 
-		MonsterBuffer transformBuffer;
+		std::vector<MonsterBuffer> transformBuffers;
 		
 		// descriptors
 		uint32_t descriptorPipeLayout;
