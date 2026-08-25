@@ -1,5 +1,5 @@
 
-#include <monster/VulkanStats.h>
+#include <monster/MonsterBuffer.h>
 
 #include <monster/imgui-1.92.9b/imgui.h>
 #include <monster/imgui-1.92.9b/backends/imgui_impl_vulkan.h>
@@ -34,7 +34,7 @@ constexpr bool enableValidationLayers = true;
 typedef std::unique_ptr<Camera> MonsterCamera;
 
 
-class MonsterVulkan : public MonsterSDL {
+class MonsterVulkan :public MonsterBufferManager , public MonsterSDL {
 
 public:
 
@@ -51,7 +51,7 @@ public:
 	uint32_t windowHeight;
 
 	VulkanStatus vkMonsterStats = VulkanStatus();
-	VulkanMemAlloc vkMemAlloc = VulkanMemAlloc();
+	/*VulkanMemAlloc vkMemAlloc = VulkanMemAlloc();*/
 	VulkanSync vkSyncStats = VulkanSync();
 	VulkanTextures vkTextures = VulkanTextures();
 	VulkanDescriptors vkDescriptors = VulkanDescriptors();
@@ -98,13 +98,13 @@ public:
 	void createTextureImageView(const vk::raii::Image& image, vk::raii::ImageView* imageView);
 	void createTextureSampler();
 	void craeteTextureSampler(vk::raii::Sampler* sampler);
-	void createVertexBuffer();
+	/*void createVertexBuffer();
 	uint32_t createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
 	void createIndexBuffer();
 	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();
 	uint32_t createUniformBuffers(vk::DeviceSize bufferSize);
-	void createMonsterBuffer(vk::DeviceSize bufferSize, MonsterBuffer* buffer);
+	void createMonsterBuffer(vk::DeviceSize bufferSize, MonsterBuffer* buffer);*/
 	void createDescriptorPool();
 	void createDescriptorSets();
 	void createDescriptorSets(const vk::raii::DescriptorSetLayout& setLayout,std::vector<vk::raii::DescriptorSets>* descriptorSets);
@@ -114,13 +114,13 @@ public:
 	void updateDescriptorSets(const std::vector<std::vector<vk::WriteDescriptorSet>>& descriptorWrites);
 	void createSyncObjects();
 
-	std::pair<vk::Buffer, VmaAllocation> createBuffer(
+	/*std::pair<vk::Buffer, VmaAllocation> createBuffer(
 		vk::DeviceSize size,
 		vk::BufferUsageFlags usage,
 		VmaAllocationCreateFlags allocFlags,
 		VmaMemoryUsage allocUsage,
 		VmaAllocationInfo* allocationInfo = nullptr
-	);
+	);*/
 	std::pair<vk::raii::Image, VmaAllocation> createImage(
 		uint32_t width,
 		uint32_t height,
@@ -131,11 +131,11 @@ public:
 		VmaMemoryUsage allocUsage
 	);
 
-	void copyBuffer(
+	/*void copyBuffer(
 		vk::Buffer srcBuffer,
 		vk::Buffer dstBuffer,
 		vk::DeviceSize bufferSize
-	);
+	);*/
 
 	void copyBufferToImage(
 		vk::raii::CommandBuffer& commandBuffer,
@@ -173,8 +173,8 @@ public:
 	vk::raii::ShaderModule createShaderModule(const std::vector<char>& code) const;
 	vk::raii::ShaderModule createShaderModule(const uint32_t* code, size_t codeSize) const;
 
-	vk::raii::CommandBuffer begineSingleTimeCommands();
-	void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer);
+	/*vk::raii::CommandBuffer begineSingleTimeCommands();
+	void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer);*/
 
 	void recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawData);
 
