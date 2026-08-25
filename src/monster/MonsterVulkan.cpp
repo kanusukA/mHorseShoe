@@ -633,6 +633,17 @@ uint32_t MonsterVulkan::createDescriptorSetLayout(const std::vector<vk::Descript
 	return vkDescriptors.descriptorSetLayout.size() - 1;
 }
 
+void MonsterVulkan::createDescriptorSetLayout(const std::vector<vk::DescriptorSetLayoutBinding>& bindings, vk::raii::DescriptorSetLayout* descriptorLayout)
+{
+	vk::DescriptorSetLayoutCreateInfo layoutInfo{
+		.bindingCount = static_cast<uint32_t>(bindings.size()),
+		.pBindings = bindings.data()
+	};
+	
+	*descriptorLayout = std::move(vk::raii::DescriptorSetLayout(vkMonsterStats.device, layoutInfo));
+
+}
+
 [[nodiscard]] vk::raii::ShaderModule MonsterVulkan::createShaderModule(const std::vector<char>& code) const {
 
 	vk::ShaderModuleCreateInfo shaderModuleCreateInfo{
@@ -821,6 +832,126 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 
 }
 
+std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGraphicsPipeline(
+	const vk::ShaderModule& vertShaderModule, 
+	const vk::ShaderModule& fragShaderModule, 
+	const vk::raii::DescriptorSetLayout& setLayout, 
+	vk::PolygonMode polygonMode, 
+	vk::CullModeFlags cullingModes, 
+	vk::FrontFace frontFace, 
+	float lineWidth
+){
+	vk::PipelineShaderStageCreateInfo vertexShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eVertex, .module = vertShaderModule, .pName = "vertMain" };
+
+	vk::PipelineShaderStageCreateInfo fragShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eFragment, .module = fragShaderModule, .pName = "fragMain" };
+
+	vk::PipelineShaderStageCreateInfo ShaderStages[] = { vertexShaderStageCreateInfo,fragShaderStageCreateInfo };
+
+
+	vk::PipelineDepthStencilStateCreateInfo depthStencil{
+		.depthTestEnable = vk::True,
+		.depthWriteEnable = vk::True,
+		.depthCompareOp = vk::CompareOp::eLess,
+		.depthBoundsTestEnable = vk::False,
+		.stencilTestEnable = vk::False
+	};
+
+	// Dynamic state
+	std::vector<vk::DynamicState> dynamicStates{ vk::DynamicState::eViewport, vk::DynamicState::eScissor };
+	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
+
+	// vertex input
+	auto bindingDescription = vulkanUtils::Vertex::getBindingDescription();
+	auto attributeDescription = vulkanUtils::Vertex::getAttributeDescriptions();
+	vk::PipelineVertexInputStateCreateInfo vertexInputCreateInfo{
+		.vertexBindingDescriptionCount = 1,
+		.pVertexBindingDescriptions = &bindingDescription,
+		.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescription.size()),
+		.pVertexAttributeDescriptions = attributeDescription.data()
+	};
+	vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo{ .topology = vk::PrimitiveTopology::eTriangleList };
+
+	// viewport - screen size being rendered
+	// scissor - crop on that viewport
+	vk::Viewport viewport{ 0.0f,0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f };
+	vk::Rect2D scissor{ vk::Offset2D(0.0f,0.0f), vkMonsterStats.swapChainExtent };
+
+	vk::PipelineViewportStateCreateInfo viewportCreateStateInfo{ .viewportCount = 1, .pViewports = &viewport, .scissorCount = 1, .pScissors = &scissor };
+
+
+	// RASTERIZER
+
+	vk::PipelineRasterizationStateCreateInfo rasterizer{
+		.depthClampEnable = false,
+		.rasterizerDiscardEnable = false,
+		.polygonMode = polygonMode,
+		.cullMode = cullingModes,
+		.frontFace = frontFace,
+		.depthBiasEnable = false,
+		.lineWidth = lineWidth
+	};
+
+
+	// MULTISAMPLING
+	vk::PipelineMultisampleStateCreateInfo multisampleCreateInfo{ .rasterizationSamples = vk::SampleCountFlagBits::e1, .sampleShadingEnable = false };
+
+	// Color-blending
+	vk::PipelineColorBlendAttachmentState colorBlendState{
+		.blendEnable = false,
+		.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA
+	};
+
+
+	vk::PipelineColorBlendStateCreateInfo colorBlendInfo{
+		.logicOpEnable = false,
+		.logicOp = vk::LogicOp::eCopy,
+		.attachmentCount = 1,
+		.pAttachments = &colorBlendState
+	};
+
+	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{
+		.setLayoutCount = 1,
+		.pSetLayouts = &*setLayout,
+		.pushConstantRangeCount = 0,
+
+	};
+	vk::raii::PipelineLayout pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
+	//vkDescriptors.pipelineLayout.push_back(std::move(vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo)));
+
+
+	vk::PipelineRenderingCreateInfo renderingCreateInfo{
+		.colorAttachmentCount = 1,
+		.pColorAttachmentFormats = &vkMonsterStats.swapChainSurfaceFormat.format,
+		.depthAttachmentFormat = vkTextures.depthFormat
+	};
+
+	vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo{
+		.stageCount = 2,
+		.pStages = ShaderStages,
+		.pVertexInputState = &vertexInputCreateInfo,
+		.pInputAssemblyState = &inputAssemblyStateCreateInfo,
+		.pViewportState = &viewportCreateStateInfo,
+		.pRasterizationState = &rasterizer,
+		.pMultisampleState = &multisampleCreateInfo,
+		.pDepthStencilState = &depthStencil,
+		.pColorBlendState = &colorBlendInfo,
+		.pDynamicState = &dynamicStateCreateInfo,
+		.layout = pipelineLayout,
+		.renderPass = nullptr,
+
+	};
+
+	vk::StructureChain<vk::GraphicsPipelineCreateInfo, vk::PipelineRenderingCreateInfo> pipelineCreateInfoChain = {
+		graphicsPipelineCreateInfo,
+		renderingCreateInfo
+	};
+
+
+	vk::raii::Pipeline pipeline = vk::raii::Pipeline(vkMonsterStats.device, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
+
+	return std::pair(std::move(pipeline),std::move(pipelineLayout));
+}
+
 void MonsterVulkan::createCommandPool() {
 	vk::CommandPoolCreateInfo poolInfo{
 		.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
@@ -930,6 +1061,66 @@ void MonsterVulkan::createTextureImage()
 	stbi_image_free(pixels);
 }
 
+void MonsterVulkan::createTextureImage(const std::filesystem::path& path, vk::raii::Image* image)
+{
+	int texWidth, texHeight, texChannels;
+	stbi_uc* pixels = stbi_load(
+		std::filesystem::absolute(path).string().c_str(),
+		&texWidth,
+		&texHeight,
+		&texChannels,
+		STBI_rgb_alpha
+	);
+	vk::DeviceSize imageSize = texWidth * texHeight * 4;
+
+
+
+	if (!pixels)
+	{
+		throw std::runtime_error("Failed to load image");
+	}
+
+	// staging buffer for texture
+	auto [stagingBuffer, stagingAlloc] =
+		createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,
+			VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+			VMA_MEMORY_USAGE_AUTO
+		);
+
+	void* data = nullptr;
+	vmaMapMemory(vkMemAlloc.vmaAllocator, stagingAlloc, &data);
+	memcpy(data, pixels, imageSize);
+	vmaUnmapMemory(vkMemAlloc.vmaAllocator, stagingAlloc);
+
+	//vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, pixels, stagingAlloc, 0, imageSize);
+
+	std::tie(*image, vkTextures.textureAlloc) = createImage(
+		texWidth,
+		texHeight,
+		vkMonsterStats.swapChainSurfaceFormat.format,
+		vk::ImageTiling::eOptimal,
+		vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
+		0,
+		VMA_MEMORY_USAGE_AUTO
+	);
+
+	vk::raii::CommandBuffer commandBuffer = begineSingleTimeCommands();
+	transitionImageLayout(commandBuffer, *image, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
+	copyBufferToImage(
+		commandBuffer,
+		stagingBuffer,
+		vkTextures.textureImage,
+		static_cast<uint32_t>(texWidth),
+		static_cast<uint32_t>(texHeight)
+	);
+	transitionImageLayout(commandBuffer, *image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+	endSingleTimeCommands(std::move(commandBuffer));
+
+	vmaDestroyBuffer(vkMemAlloc.vmaAllocator, stagingBuffer, stagingAlloc);
+
+	stbi_image_free(pixels);
+}
+
 void MonsterVulkan::createTextureImageView()
 {
 
@@ -939,6 +1130,11 @@ void MonsterVulkan::createTextureImageView()
 		{ vk::ImageAspectFlagBits::eColor }
 	);
 
+}
+
+void MonsterVulkan::createTextureImageView(const vk::raii::Image& image, vk::raii::ImageView* imageView)
+{
+	*imageView = createImageView(*image, vkMonsterStats.swapChainSurfaceFormat.format, { vk::ImageAspectFlagBits::eColor });
 }
 
 void MonsterVulkan::createTextureSampler()
@@ -964,8 +1160,28 @@ void MonsterVulkan::createTextureSampler()
 	vkTextures.textureSampler = vk::raii::Sampler(vkMonsterStats.device, samplerInfo);
 
 
+}
 
+void MonsterVulkan::craeteTextureSampler(vk::raii::Sampler* sampler)
+{
+	vk::PhysicalDeviceProperties properties = vkMonsterStats.gpuDevice.getProperties();
 
+	vk::SamplerCreateInfo samplerInfo{
+		.magFilter = vk::Filter::eLinear,
+		.minFilter = vk::Filter::eLinear,
+		.mipmapMode = vk::SamplerMipmapMode::eLinear,
+		.addressModeU = vk::SamplerAddressMode::eRepeat,
+		.addressModeV = vk::SamplerAddressMode::eRepeat,
+		.addressModeW = vk::SamplerAddressMode::eRepeat,
+		.anisotropyEnable = vk::True,
+		.maxAnisotropy = properties.limits.maxSamplerAnisotropy,
+		.compareEnable = vk::False,
+		.compareOp = vk::CompareOp::eAlways,
+		.borderColor = vk::BorderColor::eIntOpaqueBlack,
+		.unnormalizedCoordinates = vk::False,
+	};
+
+	*sampler = std::move(vk::raii::Sampler(vkMonsterStats.device, samplerInfo));
 }
 
 
@@ -1116,13 +1332,13 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 	{
 		//hRes::Mesh* passObj = importedMeshes[passObjIndex];
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, pipes[passObj->graphicsPipelineIndex]);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, passObj->shaders.monsterPipe.graphicsPipeline);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
-			vk::PipelineBindPoint::eGraphics, vkDescriptors.pipelineLayout[passObj->shaders.descriptorPipeLayout], 0, *vkDescriptors.descriptorSets[passObj->shaders.descriptorSets][vkMonsterStats.frameIndex], nullptr
+			vk::PipelineBindPoint::eGraphics, passObj->shaders.monsterPipe.descriptorPipeLayout, 0, *passObj->shaders.monsterPipe.descritorSets.front()[vkMonsterStats.frameIndex], nullptr
 		);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[passObj->vertexBufferIndex], { 0 });
@@ -1421,6 +1637,21 @@ void MonsterVulkan::createDescriptorSets()
 
 }
 
+void MonsterVulkan::createDescriptorSets(const vk::raii::DescriptorSetLayout& setLayout, std::vector<vk::raii::DescriptorSets>* descriptorSets)
+{
+	std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *setLayout);
+	vk::DescriptorSetAllocateInfo allocInfo{
+		.descriptorPool = vkDescriptors.descriptorPool,
+		.descriptorSetCount = static_cast<uint32_t>(layouts.size()),
+		.pSetLayouts = layouts.data()
+	};
+
+	// Allocate Descriptor sets
+	descriptorSets->push_back(std::move(vkMonsterStats.device.allocateDescriptorSets(allocInfo)));
+}
+
+
+
 uint32_t MonsterVulkan::createDescriptorSets(uint32_t descriptorSetLayout)
 {
 	std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *vkDescriptors.descriptorSetLayout[descriptorSetLayout]);
@@ -1665,25 +1896,21 @@ void MonsterVulkan::loadMeshShaders(uint32_t meshIndex)
 		throw std::runtime_error("NO FRAGMENT SHADER FOUND");
 	}
 
-	std::vector<vk::DescriptorSetLayoutBinding> bindings(2);
-	bindings.at(0) = vk::DescriptorSetLayoutBinding{
-		.binding = 0,
-		.descriptorType = vk::DescriptorType::eUniformBuffer,
-		.descriptorCount = 1,
-		.stageFlags = vk::ShaderStageFlagBits::eVertex
-	};
-	bindings.at(1) = vk::DescriptorSetLayoutBinding{
-		.binding = 1,
-		.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-		.descriptorCount = 1,
-		.stageFlags = vk::ShaderStageFlagBits::eFragment
-	};
+	
+	std::vector<vk::DescriptorSetLayoutBinding> bindings = importedMeshes[meshIndex]->shaders.getBindings();
 
+	createTextureImage("../../../src/vktest/textures/praise_the_sun.png", &importedMeshes[meshIndex]->shaders.monsterTexture.textureImage);
+	createTextureImageView(importedMeshes[meshIndex]->shaders.monsterTexture.textureImage, &importedMeshes[meshIndex]->shaders.monsterTexture.textureImageView);
+	craeteTextureSampler(&importedMeshes[meshIndex]->shaders.monsterTexture.textureSampler);
 
 	// descriptor layout
-	importedMeshes[meshIndex]->shaders.descriptorSetLayout = createDescriptorSetLayout(bindings);
+	vk::raii::DescriptorSetLayout setLayout = nullptr;
+	//importedMeshes[meshIndex]->shaders.descriptorSetLayout = createDescriptorSetLayout(bindings);
 
-	importedMeshes[meshIndex]->shaders.descriptorSets = createDescriptorSets(importedMeshes[meshIndex]->shaders.descriptorSetLayout);
+	createDescriptorSetLayout(bindings, &setLayout);
+
+	//importedMeshes[meshIndex]->shaders.descriptorSets = createDescriptorSets(importedMeshes[meshIndex]->shaders.descriptorSetLayout);
+	createDescriptorSets(setLayout, &importedMeshes[meshIndex]->shaders.monsterPipe.descritorSets);
 
 	//importedMeshes[meshIndex]->shaders.tUBOIndex = createUniformBuffers(sizeof(UniformBufferObject));
 
@@ -1691,70 +1918,17 @@ void MonsterVulkan::loadMeshShaders(uint32_t meshIndex)
 	{
 		MonsterBuffer buffer = MonsterBuffer();
 		createMonsterBuffer(sizeof(UniformBufferObject), &buffer);
+
 		importedMeshes[meshIndex]->shaders.transformBuffers.push_back(std::move(buffer));
 	}
-	
-
-	std::vector<vk::WriteDescriptorSet> descriptorWrites{};
-
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	{
-		/*vk::DescriptorBufferInfo bufferInfo{
-			.buffer = vkMemAlloc.uniformBuffers[importedMeshes[meshIndex]->shaders.tUBOIndex + i],
-			.offset = 0,
-			.range = sizeof(UniformBufferObject)
-		};*/
-
-		vk::DescriptorBufferInfo bufferInfo{
-			.buffer = importedMeshes[meshIndex]->shaders.transformBuffers.at(i).buffer,
-			.offset = 0,
-			.range = sizeof(UniformBufferObject)
-		};
-
-		vk::DescriptorImageInfo imageInfo{
-			.sampler = vkTextures.textureSampler,
-			.imageView = vkTextures.textureImageView,
-			.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
-		};
-
-		/*
-		vk::WriteDescriptorSet descriptorWrite{
-			.dstSet = vkDescriptors.descriptorSets[i],
-			.dstBinding = 0,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = vk::DescriptorType::eUniformBuffer,
-			.pBufferInfo = &bufferInfo
-		};
-		*/
-		descriptorWrites.push_back({
-			.dstSet = vkDescriptors.descriptorSets.back()[i],
-			.dstBinding = 0,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = vk::DescriptorType::eUniformBuffer,
-			.pBufferInfo = &bufferInfo
-			});
-
-		descriptorWrites.push_back(
-			{
-			.dstSet = vkDescriptors.descriptorSets.back()[i],
-			.dstBinding = 1,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-			.pImageInfo = &imageInfo
-			}
-		);
-
-
-	}
+	importedMeshes[meshIndex]->shaders.updateDescriptorWrites(&vkMonsterStats.device);
 	// descriptor Sets
-	updateDescriptorSets({ descriptorWrites });
+	//updateDescriptorSets({  });
 	
-
 	// load graphics pipeline
-	pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders.vertexShader, importedMeshes[meshIndex]->shaders.fragmentShader, importedMeshes[meshIndex]->shaders.descriptorSetLayout));
+	//pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders.vertexShader, importedMeshes[meshIndex]->shaders.fragmentShader, importedMeshes[meshIndex]->shaders.descriptorSetLayout));
+	std::tie(importedMeshes[meshIndex]->shaders.monsterPipe.graphicsPipeline,
+		importedMeshes[meshIndex]->shaders.monsterPipe.descriptorPipeLayout) = createGraphicsPipeline(importedMeshes[meshIndex]->shaders.vertexShader, importedMeshes[meshIndex]->shaders.fragmentShader, setLayout);
 
 	importedMeshes[meshIndex]->graphicsPipelineIndex = pipes.size() - 1;
 	importedMeshes[meshIndex]->shaders.descriptorPipeLayout = vkDescriptors.pipelineLayout.size() - 1;

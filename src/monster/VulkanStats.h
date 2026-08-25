@@ -1,7 +1,6 @@
 #define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 
 // VULKAN
-constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 #if defined (_WIN32)
 	#define VK_USE_PLATFORM_WIN32_KHR
@@ -128,12 +127,6 @@ struct VulkanTextures {
 	VmaAllocation textureAlloc;
 };
 
-struct UniformBufferObject {
-	/*glm::vec2 foo;
-	alignas(16)*/ // YOU CAN ALSO USE GLM_FORCE_DEFAULT_ALIGNED_GENTYPES for consistent alignment but it does not work in nested struct
-	glm::mat4 model;
-	glm::mat4 view;
-	glm::mat4 proj;
-};
+
 
 

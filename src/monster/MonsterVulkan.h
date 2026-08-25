@@ -69,6 +69,7 @@ public:
 	vk::raii::ImageView createImageView(vk::Image const& image, vk::Format format, vk::ImageAspectFlags flags);
 	void createDescriptorSetLayout();
 	uint32_t createDescriptorSetLayout(const std::vector<vk::DescriptorSetLayoutBinding>& bindings);
+	void createDescriptorSetLayout(const std::vector<vk::DescriptorSetLayoutBinding>& bindings, vk::raii::DescriptorSetLayout* descriptorLayout);
 	void createGraphicsPipeline();
 	vk::raii::Pipeline createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
@@ -79,12 +80,24 @@ public:
 		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,
 		float lineWidth = 1.0f
 	);
+	std::pair<vk::raii::Pipeline,vk::raii::PipelineLayout> createGraphicsPipeline(
+		const vk::ShaderModule& vertShaderModule,
+		const vk::ShaderModule& fragShaderModule,
+		const vk::raii::DescriptorSetLayout& setLayout,
+		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
+		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
+		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,
+		float lineWidth = 1.0f
+	);
 	void createCommandPool();
 	void createCommandBuffer();
 	void createDepthResources();
 	void createTextureImage();
+	void createTextureImage(const std::filesystem::path& path, vk::raii::Image* image);
 	void createTextureImageView();
+	void createTextureImageView(const vk::raii::Image& image, vk::raii::ImageView* imageView);
 	void createTextureSampler();
+	void craeteTextureSampler(vk::raii::Sampler* sampler);
 	void createVertexBuffer();
 	uint32_t createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
 	void createIndexBuffer();
@@ -94,6 +107,7 @@ public:
 	void createMonsterBuffer(vk::DeviceSize bufferSize, MonsterBuffer* buffer);
 	void createDescriptorPool();
 	void createDescriptorSets();
+	void createDescriptorSets(const vk::raii::DescriptorSetLayout& setLayout,std::vector<vk::raii::DescriptorSets>* descriptorSets);
 	uint32_t createDescriptorSets(
 		uint32_t descriptorSetLayout
 	);
