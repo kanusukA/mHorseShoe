@@ -626,7 +626,7 @@ namespace hRes {
 		Mesh() {}
 
 		glm::vec3 position = glm::vec3(0.0f);
-		glm::vec3 rotation = glm::vec3(1.0f);
+		glm::vec3 rotation = glm::vec3(0.0f);
 		glm::vec3 scale = glm::vec3(1.0f);
 
 		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
@@ -648,6 +648,26 @@ namespace hRes {
 
 		void updateDescriptorWrites(vk::raii::Device* device) {
 			shaders->_updateDescriptorWrites(device, transformBuffers, descritorSets.front());
+		}
+
+		void updateTransformations(const glm::mat4& view, const glm::mat4& proj) {
+			UniformBufferObject ubo{};
+			ubo.model = glm::mat4(1.0f);
+			ubo.model = glm::translate(ubo.model, position);
+			ubo.model = glm::rotate(ubo.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+			ubo.model = glm::rotate(ubo.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+			ubo.model = glm::rotate(ubo.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+			ubo.model = glm::scale(ubo.model, scale);
+			ubo.view = view;
+			ubo.proj = proj;
+			ubo.model = glm::transpose(ubo.model);
+			ubo.view = glm::transpose(ubo.view);
+			ubo.proj = glm::transpose(ubo.proj);
+			for (auto& tBuffer: transformBuffers)
+			{
+				memcpy(tBuffer.allocInfo.pMappedData, &ubo, sizeof(ubo));
+			}
+
 		}
 
 		Mesh(const Mesh& mesh) {

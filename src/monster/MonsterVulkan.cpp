@@ -57,7 +57,8 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 	// UPDATE BUFFERS
 	for (const auto& mesh: importedMeshes)
 	{
-		updateUniformBuffer(vkMonsterStats.frameIndex, mesh->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
+		mesh->updateTransformations(camera->getViewMatrix(), camera->getProjectionMatrix(static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f));
+		//updateUniformBuffer(vkMonsterStats.frameIndex, mesh->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
 	}
 	
 
