@@ -95,6 +95,11 @@ void Monster::createRequiredShaders()
 	loadShader("triangleShader", vertShader , fragShader);
 	triangleShaderIndex = shaders.size() - 1;
 
+	// skybox shader
+	auto vertShader = std::filesystem::path("../../../src/monster/shaders/sky_vert.slang");
+	auto fragShader = std::filesystem::path("../../../src/monster/shaders/sky_frag.slang");
+	loadShader("skyShader", vertShader, fragShader);
+
 }
 
 void Monster::loadSkyBox()
@@ -105,9 +110,12 @@ void Monster::loadSkyBox()
 	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
 
 	// get mesh from monstervulkan
-	std::weak_ptr<hRes::Mesh> mesh = createMesh();
+	//std::weak_ptr<hRes::Mesh> mesh = createMesh();
+	Sky
 	mesh.lock()->vertices = meshData.vertices;
 	mesh.lock()->indices = meshData.indices;
+
+
 	
 	//load mesh
 	loadMesh(0, 0);

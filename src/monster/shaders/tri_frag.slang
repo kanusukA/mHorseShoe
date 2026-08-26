@@ -1,3 +1,9 @@
+struct UniformBuffer {
+    float3 color;
+};
+[[vk::binding(2,0)]]
+ConstantBuffer<UniformBuffer> ubo;
+
 
 struct VertexOutput {
     float4 sv_position : SV_Position;
@@ -10,5 +16,5 @@ Sampler2D texture;
 
 [shader("fragment")]
 float4 fragMain(VertexOutput inVert) : SV_Target {
-    return float4(1.0,0.0,0.0,1.0);
+    return float4(ubo.color,1.0);
 }

@@ -1707,10 +1707,17 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 			createMonsterBuffer(sizeof(UniformBufferObject), &buffer);
 
 			importedMeshes[meshIndex]->transformBuffers.push_back(std::move(buffer));
+
+			MonsterBuffer colBuffer = MonsterBuffer();
+			createMonsterBuffer(sizeof(ColorBufferObject), &colBuffer);
+
+			importedMeshes[meshIndex]->colorBuffers.push_back(std::move(colBuffer));
+
 		}
 		importedMeshes[meshIndex]->updateDescriptorWrites(&vkMonsterStats.device);
 
 		importedMeshes[meshIndex]->isMeshVkLoaded = true;
+		importedMeshes[meshIndex]->setColor(glm::vec3(0.0f, 0.0f, 1.0f));
 		return;
 	}
 	
@@ -1737,6 +1744,11 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 		createMonsterBuffer(sizeof(UniformBufferObject), &buffer);
 
 		importedMeshes[meshIndex]->transformBuffers.push_back(std::move(buffer));
+
+		MonsterBuffer colBuffer = MonsterBuffer();
+		createMonsterBuffer(sizeof(ColorBufferObject), &colBuffer);
+
+		importedMeshes[meshIndex]->colorBuffers.push_back(std::move(colBuffer));
 	}
 	importedMeshes[meshIndex]->updateDescriptorWrites(&vkMonsterStats.device);
 	// descriptor Sets
@@ -1758,6 +1770,9 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 	{
 		importedMeshes[meshIndex]->isMeshVkLoaded = true;
 	}
+
+	//set Color
+	importedMeshes[meshIndex]->setColor(glm::vec3(0.0f, 1.0f, 0.0f));
 
 	
 }
@@ -1789,6 +1804,11 @@ std::weak_ptr<hRes::Mesh> MonsterVulkan::createMesh()
 	importedMeshes.push_back(std::move(std::make_shared<hRes::Mesh>()));
 
 	return importedMeshes.back();
+}
+
+void MonsterVulkan::addMesh(std::shared_ptr<hRes::Mesh> mesh)
+{
+	importedMeshes.push_back(mesh);
 }
 
 void MonsterVulkan::loadAllMeshes()

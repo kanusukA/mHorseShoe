@@ -12,6 +12,7 @@ private:
 	VulkanStatus* vkMonsterStats;
 
 public:
+	std::shared_ptr<>
 	
 	std::vector<std::shared_ptr<vulkanUtils::Shader>> shaders{};
 

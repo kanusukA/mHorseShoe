@@ -176,6 +176,8 @@ public:
 	
 	std::weak_ptr<hRes::Mesh> createMesh();
 
+	void addMesh(std::shared_ptr<hRes::Mesh> mesh);
+
 	void loadAllMeshes();
 	// CAN BE USED LATER TO SYNC AND ALIGN THE GRAPHICS PIPELINE!!
 	// THIS WILL NOT SORT THE RENDER PASS!!

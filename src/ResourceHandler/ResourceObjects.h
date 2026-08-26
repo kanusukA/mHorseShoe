@@ -621,6 +621,8 @@ namespace hRes {
 
 	
 	class Mesh {
+	private:
+		std::shared_ptr<vulkanUtils::Shader> shaders = std::make_shared<vulkanUtils::Shader>();
 	public:
 
 		Mesh() {}
@@ -639,15 +641,33 @@ namespace hRes {
 
 		std::vector<MonsterBuffer> transformBuffers;
 
+		std::vector<MonsterBuffer> colorBuffers;
+		ColorBufferObject colorBufObj = ColorBufferObject();
+
 		std::vector<vk::raii::DescriptorSets> descritorSets{};
 
 		// Used to set gropuing by vulkan to order rendering objects by the pipeline
 		//uint32_t graphicsPipelineIndex; // Default pipeline is used when this is null;
 
-		std::shared_ptr<vulkanUtils::Shader> shaders = std::make_shared<vulkanUtils::Shader>();
+		virtual std::weak_ptr<vulkanUtils::Shader> getShader() {
+			return shaders;
+		}
 
-		void updateDescriptorWrites(vk::raii::Device* device) {
-			shaders->_updateDescriptorWrites(device, transformBuffers, descritorSets.front());
+		virtual void setShader(const std::shared_ptr<vulkanUtils::Shader>& shader) {
+			shaders = shader;
+		}
+		
+
+		virtual void updateDescriptorWrites(vk::raii::Device* device) {
+			shaders->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(),colorBuffers);
+		}
+
+		void setColor(const glm::vec3& col) {
+			colorBufObj.color = col;
+			for (auto& colBuf: colorBuffers)
+			{
+				memcpy(colBuf.allocInfo.pMappedData, &colorBufObj, sizeof(ColorBufferObject));
+			}
 		}
 
 		void updateTransformations(const glm::mat4& view, const glm::mat4& proj) {
@@ -680,6 +700,104 @@ namespace hRes {
 			this->vertices = mesh.vertices;
 		}
 
+	};
+
+	class Mesh {
+	private:
+		std::shared_ptr<vulkanUtils::Shader> shaders = std::make_shared<vulkanUtils::Shader>();
+	public:
+
+		Mesh() {}
+
+		glm::vec3 position = glm::vec3(0.0f);
+		glm::vec3 rotation = glm::vec3(0.0f);
+		glm::vec3 scale = glm::vec3(1.0f);
+
+		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
+		std::vector<uint16_t> indices = std::vector<uint16_t>();
+
+		uint32_t vertexBufferIndex; // Most likly they'll both be the same but fuck it let's have em both.
+		uint32_t indexBufferIndex;
+
+		bool isMeshVkLoaded = false;
+
+		std::vector<MonsterBuffer> transformBuffers;
+
+		std::vector<MonsterBuffer> colorBuffers;
+		ColorBufferObject colorBufObj = ColorBufferObject();
+
+		std::vector<vk::raii::DescriptorSets> descritorSets{};
+
+		// Used to set gropuing by vulkan to order rendering objects by the pipeline
+		//uint32_t graphicsPipelineIndex; // Default pipeline is used when this is null;
+
+		virtual std::weak_ptr<vulkanUtils::Shader> getShader() {
+			return shaders;
+		}
+
+		virtual void setShader(const std::shared_ptr<vulkanUtils::Shader>& shader) {
+			shaders = shader;
+		}
+		
+
+		virtual void updateDescriptorWrites(vk::raii::Device* device) {
+			shaders->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(),colorBuffers);
+		}
+
+		void setColor(const glm::vec3& col) {
+			colorBufObj.color = col;
+			for (auto& colBuf: colorBuffers)
+			{
+				memcpy(colBuf.allocInfo.pMappedData, &colorBufObj, sizeof(ColorBufferObject));
+			}
+		}
+
+		void updateTransformations(const glm::mat4& view, const glm::mat4& proj) {
+			UniformBufferObject ubo{};
+			ubo.model = glm::mat4(1.0f);
+			ubo.model = glm::translate(ubo.model, position);
+			ubo.model = glm::rotate(ubo.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+			ubo.model = glm::rotate(ubo.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+			ubo.model = glm::rotate(ubo.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+			ubo.model = glm::scale(ubo.model, scale);
+			ubo.view = view;
+			ubo.proj = proj;
+			ubo.model = glm::transpose(ubo.model);
+			ubo.view = glm::transpose(ubo.view);
+			ubo.proj = glm::transpose(ubo.proj);
+			for (auto& tBuffer: transformBuffers)
+			{
+				memcpy(tBuffer.allocInfo.pMappedData, &ubo, sizeof(ubo));
+			}
+
+		}
+
+		Mesh(const Mesh& mesh) {
+			//this->graphicsPipelineIndex = mesh.graphicsPipelineIndex;
+			this->indexBufferIndex = mesh.indexBufferIndex;
+			this->vertexBufferIndex - mesh.vertexBufferIndex;
+			this->indices = mesh.indices;
+			/*this->shaders.fragShaderFilePath = new std::filesystem::path(*mesh.shaders.fragShaderFilePath);
+			this->shaders.vertShaderFilePath = new std::filesystem::path(*mesh.shaders.vertShaderFilePath);*/
+			this->vertices = mesh.vertices;
+		}
+
+	};
+
+	class SkyMesh : public Mesh
+	{
+
+	public:
+		std::vector<MonsterBuffer> skyBuffers{};
+		SkyBufferObj skyBufObj = SkyBufferObj();
+
+		void updateBuffer() {
+			for (auto& skyBuf: skyBuffers)
+			{
+				memcpy(&skyBuf.allocInfo.pMappedData, &skyBufObj, sizeof(SkyBufferObj));
+			}
+		}
+		
 	};
 
 
