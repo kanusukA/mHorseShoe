@@ -30,7 +30,7 @@ void Monster::InitMonster() {
 	imDebugStats.mouseYrel = &Feel::GetInstance()->mouse.yRel;
 
 	loadOtherMesh();
-	loadSkyBox();
+	//loadSkyBox();
 	
 
 	MonsterVulkan::loadAllMeshes();
@@ -114,5 +114,13 @@ void Monster::loadOtherMesh()
 	meshes[0].shaders.vertShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
 	meshes[0].shaders.fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
 
-	MonsterVulkan::importMesh(meshes.at(0));
+	auto mesh = createMesh();
+
+	auto lockedMesh = mesh.lock();
+	lockedMesh->vertices = meshes[0].vertices;
+	lockedMesh->indices = meshes[0].indices;
+	lockedMesh->shaders.vertShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
+	lockedMesh->shaders.fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
+
+	/*MonsterVulkan::importMesh(meshes.at(0));*/
 }

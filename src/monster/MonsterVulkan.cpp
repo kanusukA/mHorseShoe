@@ -1287,7 +1287,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 	// ORDER INCOMING MESHES BY THE PIPELINE THEY USE
 	
 
-	int32_t instance = 0;
+	int32_t instance = 1;
 	for (auto& passObj: importedMeshes)
 	{
 		//hRes::Mesh* passObj = importedMeshes[passObjIndex];
@@ -1761,6 +1761,12 @@ void MonsterVulkan::importMesh(hRes::Mesh& mesh)
 	std::unique_ptr<hRes::Mesh> uniqMesh = std::make_unique<hRes::Mesh>();
 	uniqMesh.reset(newMesh);
 	importedMeshes.push_back(std::move(uniqMesh));
+}
+
+std::weak_ptr<hRes::Mesh> MonsterVulkan::createMesh()
+{
+	importedMeshes.push_back(std::move(std::make_shared<hRes::Mesh>()));
+	return importedMeshes.back();
 }
 
 void MonsterVulkan::loadAllMeshes()

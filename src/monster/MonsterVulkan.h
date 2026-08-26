@@ -38,12 +38,11 @@ class MonsterVulkan :public MonsterBufferManager , public MonsterSDL {
 
 public:
 
-	std::vector<std::unique_ptr<hRes::Mesh>> importedMeshes = std::vector<std::unique_ptr<hRes::Mesh>>();
+	std::vector<std::shared_ptr<hRes::Mesh>> importedMeshes = std::vector<std::shared_ptr<hRes::Mesh>>();
 	std::vector<uint32_t> loadedMeshes = std::vector<uint32_t>();
 	std::vector<uint32_t> passObjects = std::vector<uint32_t>();
 
 	std::vector<vk::raii::Pipeline> pipes = std::vector<vk::raii::Pipeline>();
-
 
 	MonsterCamera camera = std::make_unique<Camera>();
 
@@ -174,6 +173,9 @@ public:
 	void loadMesh(uint32_t meshIndex);
 
 	void importMesh(hRes::Mesh& mesh);
+
+	std::weak_ptr<hRes::Mesh> createMesh();
+
 	void loadAllMeshes();
 	// CAN BE USED LATER TO SYNC AND ALIGN THE GRAPHICS PIPELINE!!
 	// THIS WILL NOT SORT THE RENDER PASS!!
