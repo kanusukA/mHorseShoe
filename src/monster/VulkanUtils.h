@@ -47,7 +47,6 @@ struct MonsterPipe {
 	vk::raii::Pipeline graphicsPipeline = nullptr;
 	vk::raii::PipelineLayout descriptorPipeLayout = nullptr;
 	vk::raii::DescriptorSetLayout descriptorSetLayout = nullptr;
-	std::vector<vk::raii::DescriptorSets> descritorSets {};
 };
 
 namespace vulkanUtils {
@@ -72,6 +71,67 @@ namespace vulkanUtils {
 
 	struct Shader {
 
+		virtual void _updateDescriptorWrites(vk::raii::Device* device, const std::vector<MonsterBuffer>& buffer, const vk::raii::DescriptorSets& sets) {
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+			{
+				std::vector<vk::WriteDescriptorSet> descriptorWrites{};
+				/*vk::DescriptorBufferInfo bufferInfo{
+					.buffer = vkMemAlloc.uniformBuffers[importedMeshes[meshIndex]->shaders.tUBOIndex + i],
+					.offset = 0,
+					.range = sizeof(UniformBufferObject)
+				};*/
+
+				vk::DescriptorBufferInfo bufferInfo{
+					.buffer = buffer.at(i).buffer,
+					.offset = vk::DeviceSize(0),
+					.range = sizeof(UniformBufferObject)
+				};
+
+				vk::DescriptorImageInfo imageInfo{
+					.sampler = monsterTexture.textureSampler,
+					.imageView = monsterTexture.textureImageView,
+					.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+				};
+
+				/*
+				vk::WriteDescriptorSet descriptorWrite{
+					.dstSet = vkDescriptors.descriptorSets[i],
+					.dstBinding = 0,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = vk::DescriptorType::eUniformBuffer,
+					.pBufferInfo = &bufferInfo
+				};
+				*/
+				descriptorWrites.push_back({
+					.dstSet = sets[i],
+					.dstBinding = 0,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = vk::DescriptorType::eUniformBuffer,
+					.pBufferInfo = &bufferInfo
+					});
+
+				descriptorWrites.push_back(
+					{
+					.dstSet = sets[i],
+					.dstBinding = 1,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+					.pImageInfo = &imageInfo
+					}
+				);
+
+				device->updateDescriptorSets(descriptorWrites, {});
+
+			}
+
+		}
+
+	
+
 		bool shaderLoaded = false;
 
 		std::filesystem::path* vertShaderFilePath = nullptr;
@@ -86,8 +146,6 @@ namespace vulkanUtils {
 		//uint32_t graphicsPipelineIndex;
 
 		//uint32_t tUBOIndex
-
-		std::vector<MonsterBuffer> transformBuffers;
 
 		MonsterPipe monsterPipe = MonsterPipe();
 
@@ -113,64 +171,7 @@ namespace vulkanUtils {
 			
 		}
 
-		virtual void updateDescriptorWrites(vk::raii::Device* device) {
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-			{
-				std::vector<vk::WriteDescriptorSet> descriptorWrites{};
-				/*vk::DescriptorBufferInfo bufferInfo{
-					.buffer = vkMemAlloc.uniformBuffers[importedMeshes[meshIndex]->shaders.tUBOIndex + i],
-					.offset = 0,
-					.range = sizeof(UniformBufferObject)
-				};*/
-
-				vk::DescriptorBufferInfo bufferInfo{
-					.buffer = transformBuffers.at(i).buffer,
-					.offset = vk::DeviceSize(0),
-					.range = sizeof(UniformBufferObject)
-				};
-
-				vk::DescriptorImageInfo imageInfo{
-					.sampler = monsterTexture.textureSampler,
-					.imageView = monsterTexture.textureImageView,
-					.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
-				};
-
-				/*
-				vk::WriteDescriptorSet descriptorWrite{
-					.dstSet = vkDescriptors.descriptorSets[i],
-					.dstBinding = 0,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = vk::DescriptorType::eUniformBuffer,
-					.pBufferInfo = &bufferInfo
-				};
-				*/
-				descriptorWrites.push_back({
-					.dstSet = monsterPipe.descritorSets.front()[i],
-					.dstBinding = 0,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = vk::DescriptorType::eUniformBuffer,
-					.pBufferInfo = &bufferInfo
-					});
-
-				descriptorWrites.push_back(
-					{
-					.dstSet = monsterPipe.descritorSets.front()[i],
-					.dstBinding = 1,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-					.pImageInfo = &imageInfo
-					}
-				);
-
-				device->updateDescriptorSets(descriptorWrites, {});
-
-			}
-			
-		}
+		
 		
 		// descriptors
 		uint32_t descriptorPipeLayout;

@@ -57,7 +57,7 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 	// UPDATE BUFFERS
 	for (const auto& mesh: importedMeshes)
 	{
-		updateUniformBuffer(vkMonsterStats.frameIndex, mesh->shaders->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
+		updateUniformBuffer(vkMonsterStats.frameIndex, mesh->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
 	}
 	
 
@@ -1301,7 +1301,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
-			vk::PipelineBindPoint::eGraphics, passObj->shaders->monsterPipe.descriptorPipeLayout, 0, *passObj->shaders->monsterPipe.descritorSets.front()[vkMonsterStats.frameIndex], nullptr
+			vk::PipelineBindPoint::eGraphics, passObj->shaders->monsterPipe.descriptorPipeLayout, 0, *passObj->descritorSets.front()[vkMonsterStats.frameIndex], nullptr
 		);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[passObj->vertexBufferIndex], { 0 });
@@ -1713,7 +1713,7 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 	createDescriptorSetLayout(bindings, &importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout);
 
 	//importedMeshes[meshIndex]->shaders->descriptorSets = createDescriptorSets(importedMeshes[meshIndex]->shaders->descriptorSetLayout);
-	createDescriptorSets(importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout, &importedMeshes[meshIndex]->shaders->monsterPipe.descritorSets);
+	createDescriptorSets(importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout, &importedMeshes[meshIndex]->descritorSets);
 
 	//importedMeshes[meshIndex]->shaders.tUBOIndex = createUniformBuffers(sizeof(UniformBufferObject));
 
@@ -1722,9 +1722,9 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 		MonsterBuffer buffer = MonsterBuffer();
 		createMonsterBuffer(sizeof(UniformBufferObject), &buffer);
 
-		importedMeshes[meshIndex]->shaders->transformBuffers.push_back(std::move(buffer));
+		importedMeshes[meshIndex]->transformBuffers.push_back(std::move(buffer));
 	}
-	importedMeshes[meshIndex]->shaders->updateDescriptorWrites(&vkMonsterStats.device);
+	importedMeshes[meshIndex]->updateDescriptorWrites(&vkMonsterStats.device);
 	// descriptor Sets
 	//updateDescriptorSets({  });
 	

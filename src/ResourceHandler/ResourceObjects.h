@@ -625,6 +625,10 @@ namespace hRes {
 
 		Mesh() {}
 
+		glm::vec3 position = glm::vec3(0.0f);
+		glm::vec3 rotation = glm::vec3(1.0f);
+		glm::vec3 scale = glm::vec3(1.0f);
+
 		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
 		std::vector<uint16_t> indices = std::vector<uint16_t>();
 
@@ -633,10 +637,18 @@ namespace hRes {
 
 		bool isMeshVkLoaded = false;
 
+		std::vector<MonsterBuffer> transformBuffers;
+
+		std::vector<vk::raii::DescriptorSets> descritorSets{};
+
 		// Used to set gropuing by vulkan to order rendering objects by the pipeline
 		//uint32_t graphicsPipelineIndex; // Default pipeline is used when this is null;
 
 		std::shared_ptr<vulkanUtils::Shader> shaders = std::make_shared<vulkanUtils::Shader>();
+
+		void updateDescriptorWrites(vk::raii::Device* device) {
+			shaders->_updateDescriptorWrites(device, transformBuffers, descritorSets.front());
+		}
 
 		Mesh(const Mesh& mesh) {
 			//this->graphicsPipelineIndex = mesh.graphicsPipelineIndex;
