@@ -31,7 +31,7 @@ void Monster::InitMonster() {
 
 	createRequiredShaders();
 
-	//loadSkyBox();
+	loadSkyBox();
 	loadOtherMesh();
 
 	
@@ -127,8 +127,9 @@ void Monster::loadOtherMesh()
 	std::weak_ptr<hRes::Mesh> mesh = createMesh();
 	mesh.lock()->vertices = meshData.vertices;
 	mesh.lock()->indices = meshData.indices;
+	mesh.lock()->position = glm::vec3(3.0f, 0.0f, 0.0f);
 
-	loadMesh(0, 0);
+	loadMesh(0, 1);
 
 	/*std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
 

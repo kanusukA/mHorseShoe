@@ -3,6 +3,7 @@
 class MonsterBufferManager {
 private:
 	VulkanStatus* vkMonsterStats;
+
 public:
 	VulkanMemAlloc vkMemAlloc = VulkanMemAlloc();
 

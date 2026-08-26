@@ -1696,8 +1696,21 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 
 	importedMeshes[meshIndex]->shaders = MonsterSlang::shaders.at(shaderIndex);
 
+
+
 	if (importedMeshes[meshIndex]->shaders->shaderLoaded)
 	{
+		createDescriptorSets(importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout, &importedMeshes[meshIndex]->descritorSets);
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			MonsterBuffer buffer = MonsterBuffer();
+			createMonsterBuffer(sizeof(UniformBufferObject), &buffer);
+
+			importedMeshes[meshIndex]->transformBuffers.push_back(std::move(buffer));
+		}
+		importedMeshes[meshIndex]->updateDescriptorWrites(&vkMonsterStats.device);
+
+		importedMeshes[meshIndex]->isMeshVkLoaded = true;
 		return;
 	}
 	
