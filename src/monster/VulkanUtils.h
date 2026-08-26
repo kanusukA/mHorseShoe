@@ -126,7 +126,7 @@ namespace vulkanUtils {
 
 				vk::DescriptorBufferInfo bufferInfo{
 					.buffer = transformBuffers.at(i).buffer,
-					.offset = 0,
+					.offset = vk::DeviceSize(0),
 					.range = sizeof(UniformBufferObject)
 				};
 

@@ -82,7 +82,7 @@ public:
 		const vk::ShaderModule& vertShaderModule,
 		const vk::ShaderModule& fragShaderModule,
 		const vk::raii::DescriptorSetLayout& setLayout,
-		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
+		vk::PolygonMode polygonMode = vk::PolygonMode::eFillRectangleNV,
 		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
 		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,
 		float lineWidth = 1.0f

@@ -897,7 +897,7 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 		.pDepthStencilState = &depthStencil,
 		.pColorBlendState = &colorBlendInfo,
 		.pDynamicState = &dynamicStateCreateInfo,
-		.layout = pipelineLayout,
+		.layout = *pipelineLayout,
 		.renderPass = nullptr,
 
 	};
@@ -1734,7 +1734,11 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 	// load graphics pipeline
 	//pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders->vertexShader, importedMeshes[meshIndex]->shaders->fragmentShader, importedMeshes[meshIndex]->shaders->descriptorSetLayout));
 	std::tie(importedMeshes[meshIndex]->shaders->monsterPipe.graphicsPipeline,
-		importedMeshes[meshIndex]->shaders->monsterPipe.descriptorPipeLayout) = createGraphicsPipeline(importedMeshes[meshIndex]->shaders->vertexShader, importedMeshes[meshIndex]->shaders->fragmentShader, importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout);
+		importedMeshes[meshIndex]->shaders->monsterPipe.descriptorPipeLayout) = createGraphicsPipeline(
+			importedMeshes[meshIndex]->shaders->vertexShader, 
+			importedMeshes[meshIndex]->shaders->fragmentShader, 
+			importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout
+		);
 
 	//importedMeshes[meshIndex]->graphicsPipelineIndex = pipes.size() - 1;
 	//importedMeshes[meshIndex]->shaders->descriptorPipeLayout = vkDescriptors.pipelineLayout.size() - 1;

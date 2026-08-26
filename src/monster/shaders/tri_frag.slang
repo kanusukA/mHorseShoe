@@ -5,6 +5,8 @@ struct VertexOutput {
     float2 texCoord;
 };
 
+Sampler2D texture;
+
 
 [shader("fragment")]
 float4 fragMain(VertexOutput inVert) : SV_Target {

@@ -26,7 +26,7 @@ std::shared_ptr<vulkanUtils::Shader> MonsterSlang::loadShader(const std::string&
 	// target
 	slang::TargetDesc targetDesc{};
 	targetDesc.format = SLANG_SPIRV;
-	targetDesc.profile = globalSession->findProfile("spirv_1_4");
+	targetDesc.profile = globalSession->findProfile("spirv_1_5");
 
 	// session
 	slang::SessionDesc sessionDesc{};
