@@ -22,6 +22,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 
@@ -1243,9 +1245,9 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		*vkTextures.depthImage,
 		vk::ImageLayout::eUndefined,
 		vk::ImageLayout::eDepthAttachmentOptimal,
+		{},
 		vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
-		vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
-		vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+		vk::PipelineStageFlagBits2::eTopOfPipe,
 		vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
 		vk::ImageAspectFlagBits::eDepth
 	);
@@ -1256,7 +1258,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		.imageView = vkTextures.depthImageView,
 		.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
 		.loadOp = vk::AttachmentLoadOp::eClear,
-		.storeOp = vk::AttachmentStoreOp::eDontCare,
+		.storeOp = vk::AttachmentStoreOp::eStore,
 		.clearValue = clearDepth
 	};
 
@@ -1270,16 +1272,16 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 
 	};
 
-	transition_image_layout(
-		vkMonsterStats.swapChainImages[imageIndex],
-		vk::ImageLayout::eUndefined, // Image can be in any layout in input
-		vk::ImageLayout::eColorAttachmentOptimal, // must be converted into a color attachment 
-		{}, // No read/write is required prior to this step
-		vk::AccessFlagBits2::eColorAttachmentWrite, // must be in color Write before continuing
-		vk::PipelineStageFlagBits2::eColorAttachmentOutput, // must be in Color ouput mode
-		vk::PipelineStageFlagBits2::eColorAttachmentOutput, // continue in color output mode
-		vk::ImageAspectFlagBits::eColor
-	);
+	//transition_image_layout(
+	//	vkMonsterStats.swapChainImages[imageIndex],
+	//	vk::ImageLayout::eUndefined, // Image can be in any layout in input
+	//	vk::ImageLayout::eColorAttachmentOptimal, // must be converted into a color attachment 
+	//	{}, // No read/write is required prior to this step
+	//	vk::AccessFlagBits2::eColorAttachmentWrite, // must be in color Write before continuing
+	//	vk::PipelineStageFlagBits2::eColorAttachmentOutput, // must be in Color ouput mode
+	//	vk::PipelineStageFlagBits2::eColorAttachmentOutput, // continue in color output mode
+	//	vk::ImageAspectFlagBits::eColor
+	//);
 
 
 
@@ -1306,7 +1308,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[passObj->indexBufferIndex], 0, vk::IndexType::eUint16);
 
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(passObj->indices.size(), instance, 0, 0, 0);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(passObj->indices.size(), instance, 0, 0, 1);
 		instance++;
 	}
 
@@ -1574,22 +1576,7 @@ void MonsterVulkan::copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, Vk
 
 void MonsterVulkan::updateUniformBuffer(uint32_t currentImage, uint32_t uboIndex)
 {
-	static auto startTime = std::chrono::high_resolution_clock::now();
-
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-	UniformBufferObject ubo{};
-
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-
-	ubo.view = glm::lookAt(camera->position, camera->position + camera->front, camera->up);
-
-	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
-	//ubo.proj[1][1] *= -1;
-
-	memcpy(vkMemAlloc.uniformBuffersMapped[uboIndex + currentImage], &ubo, sizeof(ubo));
+	updateUniformBuffer(currentImage, vkMemAlloc.uniformBuffersMapped[uboIndex + currentImage]);
 
 }
 
@@ -1602,12 +1589,22 @@ void MonsterVulkan::updateUniformBuffer(uint32_t currentImage, void* bufferMappe
 
 	UniformBufferObject ubo{};
 
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//ubo.model = glm::transpose(glm::rotate(glm::mat4(1.0f), 1 * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
 
-	ubo.view = glm::lookAt(camera->position, camera->position + camera->front, camera->up);
+	
 
-	ubo.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
+	ubo.model = glm::rotate(glm::mat4(1.0f), 1 * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	ubo.view = camera->getViewMatrix();
+
+	//ubo.view = glm::lookAt(camera->position, camera->position + camera->front, camera->up);
+	ubo.proj = camera->getProjectionMatrix(static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
+	//ubo.proj = glm::perspectiveLH_ZO(glm::radians(45.0f), static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f);
+	//ubo.proj = glm::transpose(ubo.proj);
 	//ubo.proj[1][1] *= -1;
+	ubo.model = glm::transpose(ubo.model);
+	ubo.view = glm::transpose(ubo.view);
+	ubo.proj = glm::transpose(ubo.proj);
 
 	memcpy(bufferMapped, &ubo, sizeof(ubo));
 }
