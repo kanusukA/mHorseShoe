@@ -29,12 +29,15 @@ void Monster::InitMonster() {
 	imDebugStats.mouseXrel = &Feel::GetInstance()->mouse.xRel;
 	imDebugStats.mouseYrel = &Feel::GetInstance()->mouse.yRel;
 
-	loadOtherMesh();
+	createRequiredShaders();
+
 	//loadSkyBox();
+	loadOtherMesh();
+
 	
 
-	MonsterVulkan::loadAllMeshes();
-	MonsterVulkan::loadMeshToPassObject();
+//	MonsterVulkan::loadAllMeshes();
+//	MonsterVulkan::loadMeshToPassObject();
 	/*std::filesystem::path filepath = std::filesystem::path("../../../src/monster/shaders/test1.obj");
 	*mesh = loadMeshObj(filepath);
 	MonsterVulkan::loadMeshVertInd(mesh);
@@ -84,19 +87,30 @@ void Monster::Shutdown() {
 }
 
 
+void Monster::createRequiredShaders()
+{
+	// triangle shader
+	auto vertShader = std::filesystem::path("../../../src/monster/shaders/tri_vert.slang");
+	auto fragShader = std::filesystem::path("../../../src/monster/shaders/tri_frag.slang");
+	loadShader("triangleShader", vertShader , fragShader);
+	triangleShaderIndex = shaders.size() - 1;
+
+}
+
 void Monster::loadSkyBox()
 {
 	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/sphere_s.glb");
 	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
 
-	std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
+	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
 
-	ResourceHandler::GetInstance()->generateMesh(*skyAsset, &meshes);
+	// get mesh from monstervulkan
+	std::weak_ptr<hRes::Mesh> mesh = createMesh();
+	mesh.lock()->vertices = meshData.vertices;
+	mesh.lock()->indices = meshData.indices;
 	
-	meshes[0].shaders.vertShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
-	meshes[0].shaders.fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
-
-	MonsterVulkan::importMesh(meshes.at(0));
+	//load mesh
+	loadMesh(0, 0);
 	
 
 
@@ -107,20 +121,21 @@ void Monster::loadOtherMesh()
 	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/box.glb");
 	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
 
-	std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
+	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
+
+	// get mesh from monstervulkan
+	std::weak_ptr<hRes::Mesh> mesh = createMesh();
+	mesh.lock()->vertices = meshData.vertices;
+	mesh.lock()->indices = meshData.indices;
+
+	loadMesh(0, 0);
+
+	/*std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
 
 	ResourceHandler::GetInstance()->generateMesh(*skyAsset, &meshes);
 
 	meshes[0].shaders.vertShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
-	meshes[0].shaders.fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
+	meshes[0].shaders.fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");*/
 
-	auto mesh = createMesh();
-
-	auto lockedMesh = mesh.lock();
-	lockedMesh->vertices = meshes[0].vertices;
-	lockedMesh->indices = meshes[0].indices;
-	lockedMesh->shaders.vertShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
-	lockedMesh->shaders.fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
-
-	/*MonsterVulkan::importMesh(meshes.at(0));*/
+	//MonsterVulkan::importMesh(meshes.at(0));
 }

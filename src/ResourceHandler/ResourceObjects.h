@@ -634,17 +634,17 @@ namespace hRes {
 		bool isMeshVkLoaded = false;
 
 		// Used to set gropuing by vulkan to order rendering objects by the pipeline
-		uint32_t graphicsPipelineIndex; // Default pipeline is used when this is null;
+		//uint32_t graphicsPipelineIndex; // Default pipeline is used when this is null;
 
-		vulkanUtils::Shader shaders = vulkanUtils::Shader();
+		std::shared_ptr<vulkanUtils::Shader> shaders = std::make_shared<vulkanUtils::Shader>();
 
 		Mesh(const Mesh& mesh) {
-			this->graphicsPipelineIndex = mesh.graphicsPipelineIndex;
+			//this->graphicsPipelineIndex = mesh.graphicsPipelineIndex;
 			this->indexBufferIndex = mesh.indexBufferIndex;
 			this->vertexBufferIndex - mesh.vertexBufferIndex;
 			this->indices = mesh.indices;
-			this->shaders.fragShaderFilePath = new std::filesystem::path(*mesh.shaders.fragShaderFilePath);
-			this->shaders.vertShaderFilePath = new std::filesystem::path(*mesh.shaders.vertShaderFilePath);
+			/*this->shaders.fragShaderFilePath = new std::filesystem::path(*mesh.shaders.fragShaderFilePath);
+			this->shaders.vertShaderFilePath = new std::filesystem::path(*mesh.shaders.vertShaderFilePath);*/
 			this->vertices = mesh.vertices;
 		}
 
