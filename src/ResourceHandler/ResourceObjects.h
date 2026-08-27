@@ -719,6 +719,11 @@ namespace hRes {
 		std::vector<MonsterBuffer> skyBuffers{};
 		SkyBufferObject skyBufObj = SkyBufferObject();
 
+		SkyMesh() {
+			//rotation.y = 90.0f;
+			scale = glm::vec3(80.f);
+		}
+
 		const std::vector<vk::DeviceSize> getAllocatingBufferInfo() override { return {sizeof(UniformBufferObject), sizeof(ColorBufferObject), sizeof(SkyBufferObject)}; }
 
 		void setAllocatingBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) override {
@@ -733,7 +738,7 @@ namespace hRes {
 
 		void updateDescriptorWrites(vk::raii::Device* device) override {
 			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), skyBuffers, sizeof(SkyBufferObject));
-			
+			updateBuffer();
 		}
 
 		void updateBuffer() {

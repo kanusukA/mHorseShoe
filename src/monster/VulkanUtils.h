@@ -40,29 +40,28 @@ struct SkyBufferObject {
 	alignas(16)
 	float windSpeed;
 	alignas(16)*/
-	/*float highlightOffset;
-	alignas(16)
-	float highlightSmoothness;
-	alignas(16)
-	float middleOffset;
-	alignas(16)
-	float middleSmoothness;
-	alignas(16)
-	float coreOffset;
-	alignas(16)
-	float coreSmoothness;
-	alignas(16)
+	float highlightOffset = 0.421f;
+	/*alignas(16)*/
+	float highlightSmoothness = 0.236f;
+	//alignas(16)
+	float middleOffset = 0.584f;
+	//alignas(16)
+	float middleSmoothness = 0.067f;
+	//alignas(16)
+	float coreOffset = 0.638f;
+	//alignas(16)
+	float coreSmoothness = 0.231f;
+	//alignas(16)
 	float bumpOffset;
-	alignas(16)
+	//alignas(16)
 	float bumprange;
-	alignas(16)
+	//alignas(16)
 	float bumpHeight;
 	alignas(16)
-	glm::vec4 baseColor;
-	glm::vec4 highlightColor;
-	glm::vec4 middleColor;
-	glm::vec4 coreColor;*/
-	glm::vec4 color;
+	glm::vec4 baseColor = glm::vec4(0.247f,0.0f,0.205f,1.0f);
+	glm::vec4 highlightColor = glm::vec4(0.07f,0.063f,0.182f,1.0f);
+	glm::vec4 middleColor = glm::vec4(0.039f,0.003f,0.237f,1.0f);
+	glm::vec4 coreColor = glm::vec4(0.0f,0.0f,0.055f,1.0f);
 	
 
 };

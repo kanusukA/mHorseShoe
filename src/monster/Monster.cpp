@@ -145,12 +145,8 @@ void Monster::skyBoxImguiMenu()
 	ImGui::SetNextWindowPos(ImVec2(0, 300));
 	ImGui::Begin("Skybox", 0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove);
 
-	if (ImGui::DragFloat4("color", glm::value_ptr(skyMesh->skyBufObj.color), 0.0005f, 0.0f, 1.0f))
-	{
-		skyMesh->updateBuffer();
-	}
 
-	/*if (ImGui::DragFloat("highlightOffset", &skyMesh->skyBufObj.highlightOffset,0.0005f,0.0f,1.0f))
+	if (ImGui::DragFloat("highlightOffset", &skyMesh->skyBufObj.highlightOffset,0.0005f,0.0f,1.0f))
 	{
 		skyMesh->updateBuffer();
 	}
@@ -202,7 +198,7 @@ void Monster::skyBoxImguiMenu()
 	if (ImGui::DragFloat4("coreColor", glm::value_ptr(skyMesh->skyBufObj.coreColor), 0.0005f, 0.0f, 1.0f))
 	{
 		skyMesh->updateBuffer();
-	}*/
+	}
 	
 
 	ImGui::End();
