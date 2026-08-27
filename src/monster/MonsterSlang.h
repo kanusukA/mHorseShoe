@@ -11,8 +11,9 @@ private:
 	Slang::ComPtr<slang::IGlobalSession> globalSession;
 	VulkanStatus* vkMonsterStats;
 
+	void _loadShader(std::shared_ptr<vulkanUtils::Shader> shader);
+
 public:
-	std::shared_ptr<>
 	
 	std::vector<std::shared_ptr<vulkanUtils::Shader>> shaders{};
 
@@ -23,6 +24,8 @@ public:
 			throw std::runtime_error("Unable to create global session");
 		}
 	}
+
+	void loadShader(std::shared_ptr<vulkanUtils::Shader> shader);
 
 	std::shared_ptr<vulkanUtils::Shader> loadShader(const std::string& shadername, std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath);
 

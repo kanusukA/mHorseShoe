@@ -169,8 +169,10 @@ public:
 	// resturns the index of where buffer is stored (in context with the engine Not physical memory)
 	void loadMeshToVulkan(uint32_t meshIndex);
 	void loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex);
+	void loadMeshShader(uint32_t meshIndex);
 
 	void loadMesh(uint32_t shaderIndex, uint32_t meshIndex);
+	void loadMeshContainingShader(uint32_t meshIndex);
 
 	void importMesh(hRes::Mesh& mesh);
 	

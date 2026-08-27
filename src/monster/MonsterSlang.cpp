@@ -7,21 +7,14 @@ void printDiagnostics(slang::IBlob* diagnostics) {
 	}
 }
 
-std::shared_ptr<vulkanUtils::Shader> MonsterSlang::loadShader(const std::string& shadername, std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath)
+void MonsterSlang::_loadShader(std::shared_ptr<vulkanUtils::Shader> shader)
 {
-	std::shared_ptr<vulkanUtils::Shader> shader = std::make_shared<vulkanUtils::Shader>();
-
-	shader->vertShaderFilePath = new std::filesystem::path(vertfilepath);
-	shader->fragShaderFilePath = new std::filesystem::path(fragfilepath);
-
-	shader->vertShaderName = shadername + "_vert";
-	shader->fragShaderName = shadername + "_frag";
 
 	auto vertCodeSlang = std::vector<char>();
 	auto fragCodeSlang = std::vector<char>();
 
-	ResourceHandler::GetInstance()->readFileContents(vertfilepath, &vertCodeSlang);
-	ResourceHandler::GetInstance()->readFileContents(fragfilepath, &fragCodeSlang);
+	ResourceHandler::GetInstance()->readFileContents(*shader->vertShaderFilePath, &vertCodeSlang);
+	ResourceHandler::GetInstance()->readFileContents(*shader->fragShaderFilePath, &fragCodeSlang);
 
 	// target
 	slang::TargetDesc targetDesc{};
@@ -39,11 +32,33 @@ std::shared_ptr<vulkanUtils::Shader> MonsterSlang::loadShader(const std::string&
 		throw std::runtime_error("UNABLE TO CREATE SLANG RUNTIME SESSION");
 	}
 
-	auto vertCodeSpv = std::move(compileSlangFile(shader->vertShaderName, vertCodeSlang, "vertMain", vertfilepath, session));
-	auto fragCodeSpv = std::move(compileSlangFile(shader->fragShaderName, fragCodeSlang, "fragMain", fragfilepath, session));
+	auto vertCodeSpv = std::move(compileSlangFile(shader->vertShaderName, vertCodeSlang, "vertMain", *shader->vertShaderFilePath, session));
+	auto fragCodeSpv = std::move(compileSlangFile(shader->fragShaderName, fragCodeSlang, "fragMain", *shader->fragShaderFilePath, session));
 
 	shader->vertexShader = std::move(createShaderModule(vertCodeSpv));
 	shader->fragmentShader = std::move(createShaderModule(fragCodeSpv));
+}
+
+// MAKE SUR THE SHADER OBJ CONTAINS VER/FRAG NAME, FILEPATH
+void MonsterSlang::loadShader(std::shared_ptr<vulkanUtils::Shader> shader)
+{
+	_loadShader(shader);
+	shaders.push_back(shader);
+
+}
+
+std::shared_ptr<vulkanUtils::Shader> MonsterSlang::loadShader(const std::string& shadername, std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath)
+{
+	std::shared_ptr<vulkanUtils::Shader> shader = std::make_shared<vulkanUtils::Shader>();
+
+	shader->vertShaderFilePath = new std::filesystem::path(vertfilepath);
+	shader->fragShaderFilePath = new std::filesystem::path(fragfilepath);
+
+	shader->vertShaderName = shadername + "_vert";
+	shader->fragShaderName = shadername + "_frag";
+
+	_loadShader(shader);
+	
 
 	shaders.push_back(std::move(shader));
 	return shaders.back();

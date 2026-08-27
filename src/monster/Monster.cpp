@@ -1,6 +1,6 @@
 #include "Monster.h"
 
-
+#include <glm/gtc/type_ptr.hpp>
 
 void Monster::keyHit(MappedKey key)
 {
@@ -70,6 +70,7 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, 
 	// Imgui Rendering
 
 	MonsterImgui::debugWindow();
+	skyBoxImguiMenu();
 
 	ImGui::EndFrame();
 
@@ -96,9 +97,9 @@ void Monster::createRequiredShaders()
 	triangleShaderIndex = shaders.size() - 1;
 
 	// skybox shader
-	auto vertShader = std::filesystem::path("../../../src/monster/shaders/sky_vert.slang");
-	auto fragShader = std::filesystem::path("../../../src/monster/shaders/sky_frag.slang");
-	loadShader("skyShader", vertShader, fragShader);
+	/*vertShader = std::filesystem::path("../../../src/monster/shaders/sky_vert.slang");
+	fragShader = std::filesystem::path("../../../src/monster/shaders/sky_frag.slang");
+	loadShader("skyShader", vertShader, fragShader);*/
 
 }
 
@@ -110,19 +111,103 @@ void Monster::loadSkyBox()
 	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
 
 	// get mesh from monstervulkan
-	//std::weak_ptr<hRes::Mesh> mesh = createMesh();
-	Sky
-	mesh.lock()->vertices = meshData.vertices;
-	mesh.lock()->indices = meshData.indices;
+	std::shared_ptr<vulkanUtils::SkyBoxShader> sbs = std::make_shared<vulkanUtils::SkyBoxShader>();
+	sbs->vertShaderName = "SKY_BOX_VERT_SHADER";
+	sbs->fragShaderName = "SKY_BOX_FRAG_SHADER";
+	sbs->vertShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/sky_vert.slang");
+	sbs->fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/sky_frag.slang");
+	loadShader(sbs);
 
+	skyMesh->setShader(sbs);
+	
+
+	skyMesh->vertices = meshData.vertices;
+	skyMesh->indices = meshData.indices;
+	
 
 	
 	//load mesh
-	loadMesh(0, 0);
+	addMesh(skyMesh);
+
+	loadMeshContainingShader(0);
+
+	// mesh is loaded!!!!!
+
+	
 	
 
 
 }
+
+
+void Monster::skyBoxImguiMenu()
+{
+	ImGui::SetNextWindowPos(ImVec2(0, 300));
+	ImGui::Begin("Skybox", 0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove);
+
+	if (ImGui::DragFloat4("color", glm::value_ptr(skyMesh->skyBufObj.color), 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+
+	/*if (ImGui::DragFloat("highlightOffset", &skyMesh->skyBufObj.highlightOffset,0.0005f,0.0f,1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("highlightSmoothness", &skyMesh->skyBufObj.highlightSmoothness,0.0005f,0.0f,1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("middleOffset", &skyMesh->skyBufObj.middleOffset,0.0005f,0.0f,1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("middleSmoothness", &skyMesh->skyBufObj.middleSmoothness,0.0005f,0.0f,1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("coreOffset", &skyMesh->skyBufObj.coreOffset,0.0005f,0.0f,1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("coreSmoothness", &skyMesh->skyBufObj.coreSmoothness,0.0005f,0.0f,1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("bumpOffset", &skyMesh->skyBufObj.bumpOffset,0.0005f,0.0f,1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("bumprange", &skyMesh->skyBufObj.bumprange,0.0005f,0.0f,1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("bumpHeight", &skyMesh->skyBufObj.bumpHeight,0.0005f,0.0f,1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+
+	if (ImGui::DragFloat4("baseColor", glm::value_ptr(skyMesh->skyBufObj.baseColor), 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat4("highlightColor", glm::value_ptr(skyMesh->skyBufObj.highlightColor), 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat4("middleColor", glm::value_ptr(skyMesh->skyBufObj.middleColor), 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat4("coreColor", glm::value_ptr(skyMesh->skyBufObj.coreColor), 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}*/
+	
+
+	ImGui::End();
+}
+
 
 void Monster::loadOtherMesh()
 {

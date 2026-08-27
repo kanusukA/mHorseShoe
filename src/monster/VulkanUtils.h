@@ -33,14 +33,14 @@ struct ColorBufferObject {
 	glm::vec3 color;
 };
 
-struct SkyBufferObj {
+struct SkyBufferObject {
 	
 	
 	/*float time;
 	alignas(16)
 	float windSpeed;
 	alignas(16)*/
-	float highlightOffset;
+	/*float highlightOffset;
 	alignas(16)
 	float highlightSmoothness;
 	alignas(16)
@@ -61,7 +61,8 @@ struct SkyBufferObj {
 	glm::vec4 baseColor;
 	glm::vec4 highlightColor;
 	glm::vec4 middleColor;
-	glm::vec4 coreColor;
+	glm::vec4 coreColor;*/
+	glm::vec4 color;
 	
 
 };
@@ -111,7 +112,13 @@ namespace vulkanUtils {
 	{
 	public:
 
-		virtual void _updateDescriptorWrites(vk::raii::Device* device, const std::vector<MonsterBuffer>& buffer, const vk::raii::DescriptorSets& sets, const std::vector<MonsterBuffer>& fragBuf) {
+		virtual void _updateDescriptorWrites(
+			vk::raii::Device* device,
+			const std::vector<MonsterBuffer>& buffer, 
+			const vk::raii::DescriptorSets& sets, 
+			const std::vector<MonsterBuffer>& fragBuf,
+			vk::DeviceSize fragBufSize
+		) {
 
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 			{
@@ -131,7 +138,7 @@ namespace vulkanUtils {
 				vk::DescriptorBufferInfo buffer2Info{
 					.buffer = fragBuf.at(i).buffer,
 					.offset = vk::DeviceSize(0),
-					.range = sizeof(ColorBufferObject)
+					.range = fragBufSize
 				};
 
 				vk::DescriptorImageInfo imageInfo{
@@ -273,7 +280,7 @@ namespace vulkanUtils {
 
 		}
 
-		virtual void _updateDescriptorWrites(vk::raii::Device* device, const std::vector<MonsterBuffer>& buffer, const vk::raii::DescriptorSets& sets, const std::vector<MonsterBuffer>& fragBuf) {
+		/*void _updateDescriptorWrites(vk::raii::Device* device, const std::vector<MonsterBuffer>& buffer, const vk::raii::DescriptorSets& sets, const std::vector<MonsterBuffer>& fragBuf)override {
 
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 			{
@@ -288,7 +295,7 @@ namespace vulkanUtils {
 				vk::DescriptorBufferInfo buffer2Info{
 					.buffer = fragBuf.at(i).buffer,
 					.offset = vk::DeviceSize(0),
-					.range = sizeof(SkyBufferObj)
+					.range = sizeof(SkyBufferObject) 
 				};
 
 				vk::DescriptorImageInfo imageInfo{
@@ -332,7 +339,7 @@ namespace vulkanUtils {
 
 			}
 
-		}
+		}*/
 
 	};
 

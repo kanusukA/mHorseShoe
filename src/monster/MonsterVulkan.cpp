@@ -1296,13 +1296,13 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 	{
 		//hRes::Mesh* passObj = importedMeshes[passObjIndex];
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, passObj->shaders->monsterPipe.graphicsPipeline);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, passObj->getShader().lock()->monsterPipe.graphicsPipeline);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
-			vk::PipelineBindPoint::eGraphics, passObj->shaders->monsterPipe.descriptorPipeLayout, 0, *passObj->descritorSets.front()[vkMonsterStats.frameIndex], nullptr
+			vk::PipelineBindPoint::eGraphics, passObj->getShader().lock()->monsterPipe.descriptorPipeLayout, 0, *passObj->descritorSets.front()[vkMonsterStats.frameIndex], nullptr
 		);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[passObj->vertexBufferIndex], { 0 });
@@ -1675,10 +1675,10 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 	//hRes::Mesh* mesh = importedMeshes[meshIndex];
 
 	// read shader files
-	/*if (importedMeshes[meshIndex]->shaders.vertShaderFilePath)
+	/*if (shader.vertShaderFilePath)
 	{
 		std::vector<char> vertshadercode;
-		ResourceHandler::GetInstance()->readFileContents(*importedMeshes[meshIndex]->shaders.vertShaderFilePath, &vertshadercode);
+		ResourceHandler::GetInstance()->readFileContents(*shader.vertShaderFilePath, &vertshadercode);
 		importedMeshes[meshIndex]->shaders.vertexShader = createShaderModule(vertshadercode);
 	}
 	else {
@@ -1694,14 +1694,35 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 		throw std::runtime_error("NO FRAGMENT SHADER FOUND");
 	}*/
 
-	importedMeshes[meshIndex]->shaders = MonsterSlang::shaders.at(shaderIndex);
+	importedMeshes[meshIndex]->setShader(MonsterSlang::shaders.at(shaderIndex));
 
+	loadMeshShader(meshIndex);
 
+	
+}
 
-	if (importedMeshes[meshIndex]->shaders->shaderLoaded)
+void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
+{
+	auto shader = importedMeshes[meshIndex]->getShader().lock();
+
+	if (shader->shaderLoaded)
 	{
-		createDescriptorSets(importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout, &importedMeshes[meshIndex]->descritorSets);
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		createDescriptorSets(shader->monsterPipe.descriptorSetLayout, &importedMeshes[meshIndex]->descritorSets);
+		std::vector<std::vector<MonsterBuffer>> allocatedBuffers{};
+		for (const auto& bufferInfo: importedMeshes[meshIndex]->getAllocatingBufferInfo())
+		{
+			std::vector<MonsterBuffer> bufferVec{};
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+			{
+				MonsterBuffer buffer = MonsterBuffer();
+				createMonsterBuffer(bufferInfo, &buffer);
+				bufferVec.push_back(std::move(buffer));
+			}
+			allocatedBuffers.push_back(std::move(bufferVec));
+			
+		}
+		importedMeshes[meshIndex]->setAllocatingBufferInfo(allocatedBuffers);
+		/*for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
 			MonsterBuffer buffer = MonsterBuffer();
 			createMonsterBuffer(sizeof(UniformBufferObject), &buffer);
@@ -1718,27 +1739,43 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 
 		importedMeshes[meshIndex]->isMeshVkLoaded = true;
 		importedMeshes[meshIndex]->setColor(glm::vec3(0.0f, 0.0f, 1.0f));
-		return;
-	}
-	
-	std::vector<vk::DescriptorSetLayoutBinding> bindings = importedMeshes[meshIndex]->shaders->getBindings();
+		return;*/
 
-	createTextureImage("../../../src/vktest/textures/praise_the_sun.png", &importedMeshes[meshIndex]->shaders->monsterTexture.textureImage);
-	createTextureImageView(importedMeshes[meshIndex]->shaders->monsterTexture.textureImage, &importedMeshes[meshIndex]->shaders->monsterTexture.textureImageView);
-	craeteTextureSampler(&importedMeshes[meshIndex]->shaders->monsterTexture.textureSampler);
+	}
+
+	std::vector<vk::DescriptorSetLayoutBinding> bindings = shader->getBindings();
+
+	createTextureImage("../../../src/vktest/textures/praise_the_sun.png", &shader->monsterTexture.textureImage);
+	createTextureImageView(shader->monsterTexture.textureImage, &shader->monsterTexture.textureImageView);
+	craeteTextureSampler(&shader->monsterTexture.textureSampler);
 
 	// descriptor layout
 	//vk::raii::DescriptorSetLayout setLayout = nullptr;
-	//importedMeshes[meshIndex]->shaders->descriptorSetLayout = createDescriptorSetLayout(bindings);
+	//shader->descriptorSetLayout = createDescriptorSetLayout(bindings);
 
-	createDescriptorSetLayout(bindings, &importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout);
+	createDescriptorSetLayout(bindings, &shader->monsterPipe.descriptorSetLayout);
 
-	//importedMeshes[meshIndex]->shaders->descriptorSets = createDescriptorSets(importedMeshes[meshIndex]->shaders->descriptorSetLayout);
-	createDescriptorSets(importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout, &importedMeshes[meshIndex]->descritorSets);
+	//shader->descriptorSets = createDescriptorSets(shader->descriptorSetLayout);
+	createDescriptorSets(shader->monsterPipe.descriptorSetLayout, &importedMeshes[meshIndex]->descritorSets);
 
-	//importedMeshes[meshIndex]->shaders.tUBOIndex = createUniformBuffers(sizeof(UniformBufferObject));
+	//shader.tUBOIndex = createUniformBuffers(sizeof(UniformBufferObject));
+	std::vector<std::vector<MonsterBuffer>> allocatedBuffers{};
+	auto allocatedBufInfo = importedMeshes[meshIndex]->getAllocatingBufferInfo();
+	for (const auto& bufferInfo : allocatedBufInfo)
+	{
+		std::vector<MonsterBuffer> bufferVec{};
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			MonsterBuffer buffer = MonsterBuffer();
+			createMonsterBuffer(bufferInfo, &buffer);
+			bufferVec.push_back(std::move(buffer));
+		}
+		allocatedBuffers.push_back(std::move(bufferVec));
 
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	}
+	importedMeshes[meshIndex]->setAllocatingBufferInfo(allocatedBuffers);
+	importedMeshes[meshIndex]->updateDescriptorWrites(&vkMonsterStats.device);
+	/*for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		MonsterBuffer buffer = MonsterBuffer();
 		createMonsterBuffer(sizeof(UniformBufferObject), &buffer);
@@ -1750,22 +1787,22 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 
 		importedMeshes[meshIndex]->colorBuffers.push_back(std::move(colBuffer));
 	}
-	importedMeshes[meshIndex]->updateDescriptorWrites(&vkMonsterStats.device);
+	importedMeshes[meshIndex]->updateDescriptorWrites(&vkMonsterStats.device);*/
 	// descriptor Sets
 	//updateDescriptorSets({  });
-	
+
 	// load graphics pipeline
-	//pipes.push_back(createGraphicsPipeline(importedMeshes[meshIndex]->shaders->vertexShader, importedMeshes[meshIndex]->shaders->fragmentShader, importedMeshes[meshIndex]->shaders->descriptorSetLayout));
-	std::tie(importedMeshes[meshIndex]->shaders->monsterPipe.graphicsPipeline,
-		importedMeshes[meshIndex]->shaders->monsterPipe.descriptorPipeLayout) = createGraphicsPipeline(
-			importedMeshes[meshIndex]->shaders->vertexShader, 
-			importedMeshes[meshIndex]->shaders->fragmentShader, 
-			importedMeshes[meshIndex]->shaders->monsterPipe.descriptorSetLayout
+	//pipes.push_back(createGraphicsPipeline(shader->vertexShader, shader->fragmentShader, shader->descriptorSetLayout));
+	std::tie(shader->monsterPipe.graphicsPipeline,
+		shader->monsterPipe.descriptorPipeLayout) = createGraphicsPipeline(
+			shader->vertexShader,
+			shader->fragmentShader,
+			shader->monsterPipe.descriptorSetLayout
 		);
 
 	//importedMeshes[meshIndex]->graphicsPipelineIndex = pipes.size() - 1;
-	//importedMeshes[meshIndex]->shaders->descriptorPipeLayout = vkDescriptors.pipelineLayout.size() - 1;
-	importedMeshes[meshIndex]->shaders->shaderLoaded = true;
+	//shader->descriptorPipeLayout = vkDescriptors.pipelineLayout.size() - 1;
+	shader->shaderLoaded = true;
 	if (!importedMeshes[meshIndex]->vertices.empty() && !importedMeshes[meshIndex]->indices.empty())
 	{
 		importedMeshes[meshIndex]->isMeshVkLoaded = true;
@@ -1773,8 +1810,6 @@ void MonsterVulkan::loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex)
 
 	//set Color
 	importedMeshes[meshIndex]->setColor(glm::vec3(0.0f, 1.0f, 0.0f));
-
-	
 }
 
 void MonsterVulkan::loadMesh(uint32_t shaderIndex,uint32_t meshIndex)
@@ -1789,6 +1824,12 @@ void MonsterVulkan::loadMesh(uint32_t shaderIndex,uint32_t meshIndex)
 		loadedMeshes.push_back(meshIndex);
 	}
 
+}
+
+void MonsterVulkan::loadMeshContainingShader(uint32_t meshIndex)
+{
+	loadMeshToVulkan(meshIndex);
+	loadMeshShader(meshIndex);
 }
 
 void MonsterVulkan::importMesh(hRes::Mesh& mesh)

@@ -34,8 +34,7 @@ private:
 	void keyHit(MappedKey key) override;
 
 	// EXAMPLE
-	
-
+	std::shared_ptr<hRes::SkyMesh> skyMesh = std::make_shared<hRes::SkyMesh>();
 
 public:
 
@@ -49,6 +48,7 @@ public:
 	void createRequiredShaders();
 
 	void loadSkyBox();
+	void skyBoxImguiMenu();
 
 	void loadOtherMesh();
 
