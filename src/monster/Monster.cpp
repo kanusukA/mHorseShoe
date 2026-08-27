@@ -132,11 +132,6 @@ void Monster::loadSkyBox()
 	loadMeshContainingShader(0);
 
 	// mesh is loaded!!!!!
-
-	
-	
-
-
 }
 
 

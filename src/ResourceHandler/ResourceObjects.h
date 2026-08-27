@@ -714,8 +714,8 @@ namespace hRes {
 
 	class SkyMesh : public Mesh
 	{
-
 	public:
+
 		std::vector<MonsterBuffer> skyBuffers{};
 		SkyBufferObject skyBufObj = SkyBufferObject();
 
@@ -742,7 +742,6 @@ namespace hRes {
 		}
 
 		void updateBuffer() {
-			/*glm::vec4*/
 			for (auto& skyBuf: skyBuffers)
 			{
 				memcpy(skyBuf.allocInfo.pMappedData, &skyBufObj, sizeof(SkyBufferObject));
@@ -753,10 +752,6 @@ namespace hRes {
 
 
 }
-
-
-
-
 
 
 std::string convertFloatPtrToString(float* val_p, int size);

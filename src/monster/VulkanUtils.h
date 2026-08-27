@@ -122,11 +122,6 @@ namespace vulkanUtils {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 			{
 				std::vector<vk::WriteDescriptorSet> descriptorWrites{};
-				/*vk::DescriptorBufferInfo bufferInfo{
-					.buffer = vkMemAlloc.uniformBuffers[importedMeshes[meshIndex]->shaders.tUBOIndex + i],
-					.offset = 0,
-					.range = sizeof(UniformBufferObject)
-				};*/
 
 				vk::DescriptorBufferInfo bufferInfo{
 					.buffer = buffer.at(i).buffer,
@@ -146,16 +141,6 @@ namespace vulkanUtils {
 					.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
 				};
 
-				/*
-				vk::WriteDescriptorSet descriptorWrite{
-					.dstSet = vkDescriptors.descriptorSets[i],
-					.dstBinding = 0,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = vk::DescriptorType::eUniformBuffer,
-					.pBufferInfo = &bufferInfo
-				};
-				*/
 				descriptorWrites.push_back({
 					.dstSet = sets[i],
 					.dstBinding = 0,
@@ -206,10 +191,6 @@ namespace vulkanUtils {
 		std::string vertShaderName;
 		std::string fragShaderName;
 
-		//uint32_t graphicsPipelineIndex;
-
-		//uint32_t tUBOIndex
-
 		MonsterPipe monsterPipe = MonsterPipe();
 
 		MonsterTexture monsterTexture = MonsterTexture(); // init consistent
@@ -240,8 +221,6 @@ namespace vulkanUtils {
 			
 		}
 
-		
-		
 		// descriptors
 		uint32_t descriptorPipeLayout;
 		uint32_t descriptorSetLayout;
@@ -278,67 +257,6 @@ namespace vulkanUtils {
 			};
 
 		}
-
-		/*void _updateDescriptorWrites(vk::raii::Device* device, const std::vector<MonsterBuffer>& buffer, const vk::raii::DescriptorSets& sets, const std::vector<MonsterBuffer>& fragBuf)override {
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-			{
-				std::vector<vk::WriteDescriptorSet> descriptorWrites{};
-
-				vk::DescriptorBufferInfo bufferInfo{
-					.buffer = buffer.at(i).buffer,
-					.offset = vk::DeviceSize(0),
-					.range = sizeof(UniformBufferObject)
-				};
-
-				vk::DescriptorBufferInfo buffer2Info{
-					.buffer = fragBuf.at(i).buffer,
-					.offset = vk::DeviceSize(0),
-					.range = sizeof(SkyBufferObject) 
-				};
-
-				vk::DescriptorImageInfo imageInfo{
-					.sampler = monsterTexture.textureSampler,
-					.imageView = monsterTexture.textureImageView,
-					.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
-				};
-
-				descriptorWrites.push_back({
-					.dstSet = sets[i],
-					.dstBinding = 0,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = vk::DescriptorType::eUniformBuffer,
-					.pBufferInfo = &bufferInfo
-					});
-
-				descriptorWrites.push_back(
-					{
-					.dstSet = sets[i],
-					.dstBinding = 1,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-					.pImageInfo = &imageInfo
-					}
-				);
-
-				descriptorWrites.push_back(
-					{
-					.dstSet = sets[i],
-					.dstBinding = 2,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = vk::DescriptorType::eUniformBuffer,
-					.pBufferInfo = &buffer2Info
-					}
-				);
-
-				device->updateDescriptorSets(descriptorWrites, {});
-
-			}
-
-		}*/
 
 	};
 
