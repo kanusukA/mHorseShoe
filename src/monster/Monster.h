@@ -28,12 +28,13 @@ class Monster : public FeelPollEventExtension, public MonsterImgui
 
 private:
 
+	uint32_t triangleShaderIndex;
+
 	void pollEvent(SDL_Event& event) override;
 	void keyHit(MappedKey key) override;
 
 	// EXAMPLE
-	
-
+	std::shared_ptr<hRes::SkyMesh> skyMesh = std::make_shared<hRes::SkyMesh>();
 
 public:
 
@@ -44,7 +45,10 @@ public:
 
 	/*Mesh loadMeshObj(std::filesystem::path& path);*/
 
+	void createRequiredShaders();
+
 	void loadSkyBox();
+	void skyBoxImguiMenu();
 
 	void loadOtherMesh();
 

@@ -279,7 +279,7 @@ void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std:
 
 }
 
-const std::string& ResourceReader::readFileContents(std::filesystem::path filePath)
+const std::string& ResourceReader::readFileContents(const std::filesystem::path& filePath)
 {
 	std::ifstream file(filePath, std::ios::ate | std::ios::binary);
 
@@ -301,7 +301,7 @@ const std::string& ResourceReader::readFileContents(std::filesystem::path filePa
 	return output;
 }
 
-const std::vector<char>& ResourceReader::readFileContentsChar(std::filesystem::path filePath)
+const std::vector<char>& ResourceReader::readFileContentsChar(const std::filesystem::path& filePath)
 {
 	std::ifstream file(filePath, std::ios::ate | std::ios::binary);
 
@@ -321,7 +321,7 @@ const std::vector<char>& ResourceReader::readFileContentsChar(std::filesystem::p
 	return buffer;
 }
 
-void ResourceReader::readFileContents(std::filesystem::path filePath, std::vector<char>* outputVector)
+void ResourceReader::readFileContents(const std::filesystem::path& filePath, std::vector<char>* outputVector)
 {
 	std::ifstream file(filePath, std::ios::ate | std::ios::binary);
 
