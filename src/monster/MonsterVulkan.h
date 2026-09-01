@@ -85,17 +85,19 @@ public:
 		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
 		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
 		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,
+		bool colorBlending = false,
 		float lineWidth = 1.0f
 	);
 	void createCommandPool();
 	void createCommandBuffer();
 	void createDepthResources();
 	void createTextureImage();
+	void createTexture(const std::filesystem::path& path, MonsterTexture* texture);
 	void createTextureImage(const std::filesystem::path& path, vk::raii::Image* image);
 	void createTextureImageView();
 	void createTextureImageView(const vk::raii::Image& image, vk::raii::ImageView* imageView);
 	void createTextureSampler();
-	void craeteTextureSampler(vk::raii::Sampler* sampler);
+	void createTextureSampler(vk::raii::Sampler* sampler);
 	void createDescriptorPool();
 	void createDescriptorSets();
 	void createDescriptorSets(const vk::raii::DescriptorSetLayout& setLayout,std::vector<vk::raii::DescriptorSets>* descriptorSets);

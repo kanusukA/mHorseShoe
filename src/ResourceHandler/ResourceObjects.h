@@ -721,7 +721,7 @@ namespace hRes {
 
 		SkyMesh() {
 			//rotation.y = 90.0f;
-			scale = glm::vec3(80.f);
+			scale = glm::vec3(160.f);
 		}
 
 		const std::vector<vk::DeviceSize> getAllocatingBufferInfo() override { return {sizeof(UniformBufferObject), sizeof(ColorBufferObject), sizeof(SkyBufferObject)}; }

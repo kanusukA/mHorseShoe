@@ -57,6 +57,9 @@ struct SkyBufferObject {
 	float bumprange;
 	//alignas(16)
 	float bumpHeight;
+
+	float starOffset;
+
 	alignas(16)
 	glm::vec4 baseColor = glm::vec4(0.247f,0.0f,0.205f,1.0f);
 	glm::vec4 highlightColor = glm::vec4(0.07f,0.063f,0.182f,1.0f);
@@ -134,12 +137,7 @@ namespace vulkanUtils {
 					.offset = vk::DeviceSize(0),
 					.range = fragBufSize
 				};
-
-				vk::DescriptorImageInfo imageInfo{
-					.sampler = monsterTexture.textureSampler,
-					.imageView = monsterTexture.textureImageView,
-					.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
-				};
+				uint32_t texIndex = 2;
 
 				descriptorWrites.push_back({
 					.dstSet = sets[i],
@@ -156,21 +154,34 @@ namespace vulkanUtils {
 					.dstBinding = 1,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
-					.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-					.pImageInfo = &imageInfo
-					}
-				);
-
-				descriptorWrites.push_back(
-					{
-					.dstSet = sets[i],
-					.dstBinding = 2,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
 					.descriptorType = vk::DescriptorType::eUniformBuffer,
 					.pBufferInfo = &buffer2Info
 					}
 				);
+
+				for (auto& texture: textures)
+				{
+					vk::DescriptorImageInfo imageInfo{
+					.sampler = texture.textureSampler,
+					.imageView = texture.textureImageView,
+					.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+					};
+
+					descriptorWrites.push_back(
+						{
+						.dstSet = sets[i],
+						.dstBinding = texIndex,
+						.dstArrayElement = 0,
+						.descriptorCount = 1,
+						.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+						.pImageInfo = &imageInfo
+						}
+					);
+
+					texIndex += 1;
+
+				}
+				
 
 				device->updateDescriptorSets(descriptorWrites, {});
 
@@ -178,9 +189,11 @@ namespace vulkanUtils {
 
 		}
 
-	
-
 		bool shaderLoaded = false;
+
+		bool colorBlending = false;
+
+		vk::PolygonMode mode = vk::PolygonMode::eFill;
 
 		std::filesystem::path* vertShaderFilePath = nullptr;
 		std::filesystem::path* fragShaderFilePath = nullptr;
@@ -193,31 +206,40 @@ namespace vulkanUtils {
 
 		MonsterPipe monsterPipe = MonsterPipe();
 
-		MonsterTexture monsterTexture = MonsterTexture(); // init consistent
+		std::vector<MonsterTexture> textures{};
+
+		//MonsterTexture monsterTexture = MonsterTexture();
 
 		virtual std::vector<vk::DescriptorSetLayoutBinding> getBindings() {
-			
-			return
-			{
-				vk::DescriptorSetLayoutBinding{
+			std::vector<vk::DescriptorSetLayoutBinding> binds{};
+			binds.push_back(vk::DescriptorSetLayoutBinding{
 					.binding = 0,
 					.descriptorType = vk::DescriptorType::eUniformBuffer,
 					.descriptorCount = 1,
 					.stageFlags = vk::ShaderStageFlagBits::eVertex
-				},
+				});
+			binds.push_back(
 				vk::DescriptorSetLayoutBinding{
 					.binding = 1,
-					.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-					.descriptorCount = 1,
-					.stageFlags = vk::ShaderStageFlagBits::eFragment
-				},
-				vk::DescriptorSetLayoutBinding{
-					.binding = 2,
 					.descriptorType = vk::DescriptorType::eUniformBuffer,
 					.descriptorCount = 1,
 					.stageFlags = vk::ShaderStageFlagBits::eFragment
 				}
-			};
+			);
+
+			for (uint32_t i = 0; i < textures.size(); i++)
+			{
+				binds.push_back(
+					vk::DescriptorSetLayoutBinding{
+					.binding = 2 + i,
+					.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+					.descriptorCount = 1,
+					.stageFlags = vk::ShaderStageFlagBits::eFragment
+					}
+				);
+			}
+
+			return binds;
 			
 		}
 
@@ -232,7 +254,8 @@ namespace vulkanUtils {
 	// skyBoxshader
 	class SkyBoxShader : public Shader {
 	public:
-		std::vector<vk::DescriptorSetLayoutBinding> getBindings() override{
+
+		/*std::vector<vk::DescriptorSetLayoutBinding> getBindings() override{
 
 			return
 			{
@@ -256,7 +279,7 @@ namespace vulkanUtils {
 				}
 			};
 
-		}
+		}*/
 
 	};
 

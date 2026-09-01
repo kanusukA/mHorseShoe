@@ -105,7 +105,7 @@ void Monster::createRequiredShaders()
 
 void Monster::loadSkyBox()
 {
-	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/sphere_s.glb");
+	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/Sphere_s.glb");
 	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
 
 	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
@@ -118,18 +118,60 @@ void Monster::loadSkyBox()
 	sbs->fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/sky_frag.slang");
 	loadShader(sbs);
 
+	/*MonsterTexture starTextrue = MonsterTexture();
+	createTexture("../../../src/monster/shaders/uvtest.png", &starTextrue);*/
+
+	//sbs->textures.push_back(std::move(starTextrue));
+
+	sbs->colorBlending = true;
+
 	skyMesh->setShader(sbs);
 	
 
 	skyMesh->vertices = meshData.vertices;
 	skyMesh->indices = meshData.indices;
+
+	// top half
+	auto topMesh = createMesh().lock();
 	
+
+	std::filesystem::path topPath = std::filesystem::path("../../../src/monster/shaders/top.glb");
+	fastgltf::Asset* topAsset = ResourceHandler::GetInstance()->loadGltfFile(topPath);
+
+	MeshData topMeshData = ResourceHandler::GetInstance()->generateMesh(*topAsset).front();
+
+
+	std::shared_ptr<vulkanUtils::Shader> top_shader = std::make_shared<vulkanUtils::Shader>();
+	top_shader->vertShaderName = "SKY_BOX_TOP_VERT_SHADER";
+	top_shader->fragShaderName = "SKY_BOX__TOP_FRAG_SHADER";
+	top_shader->vertShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/sky_tex_vert.slang");
+	top_shader->fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/sky_tex_frag.slang");
+	loadShader(top_shader);
+
+	MonsterTexture starTextrue = MonsterTexture();
+	createTexture("../../../src/monster/shaders/stars.png", &starTextrue);
+
+	top_shader->textures.push_back(std::move(starTextrue));
+	//sbs->textures.push_back(std::move(starTextrue));
+
+	top_shader->colorBlending = true;
+
+	topMesh->setShader(top_shader);
+
+
+	topMesh->vertices = topMeshData.vertices;
+	topMesh->indices = topMeshData.indices;
+
+	topMesh->position = glm::vec3(0.0f, 150.0f, 0.0f);
+	topMesh->rotation = glm::vec3(0.0f, 0.0f, 180.0f);
+	topMesh->scale = glm::vec3(300.0f);
 
 	
 	//load mesh
 	addMesh(skyMesh);
-
 	loadMeshContainingShader(0);
+
+	loadMeshContainingShader(1);
 
 	// mesh is loaded!!!!!
 }
@@ -194,6 +236,10 @@ void Monster::skyBoxImguiMenu()
 	{
 		skyMesh->updateBuffer();
 	}
+	if (ImGui::DragFloat("starOffset", &skyMesh->skyBufObj.starOffset, 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
 	
 
 	ImGui::End();
@@ -213,7 +259,7 @@ void Monster::loadOtherMesh()
 	mesh.lock()->indices = meshData.indices;
 	mesh.lock()->position = glm::vec3(3.0f, 0.0f, 0.0f);
 
-	loadMesh(0, 1);
+	loadMesh(0, 2);
 
 	/*std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
 

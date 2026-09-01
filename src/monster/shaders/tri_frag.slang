@@ -1,7 +1,7 @@
 struct UniformBuffer {
     float3 color;
 };
-[[vk::binding(2,0)]]
+[[vk::binding(1,0)]]
 ConstantBuffer<UniformBuffer> ubo;
 
 

@@ -802,7 +802,8 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 	const vk::raii::DescriptorSetLayout& setLayout, 
 	vk::PolygonMode polygonMode, 
 	vk::CullModeFlags cullingModes, 
-	vk::FrontFace frontFace, 
+	vk::FrontFace frontFace,
+	bool colorBlending,
 	float lineWidth
 ){
 	vk::PipelineShaderStageCreateInfo vertexShaderStageCreateInfo{ .stage = vk::ShaderStageFlagBits::eVertex, .module = vertShaderModule, .pName = "main" };
@@ -861,8 +862,15 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 
 	// Color-blending
 	vk::PipelineColorBlendAttachmentState colorBlendState{
-		.blendEnable = false,
-		.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA
+		.blendEnable = colorBlending,
+		.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha,
+		.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha,
+		.colorBlendOp = vk::BlendOp::eAdd,
+		.srcAlphaBlendFactor = vk::BlendFactor::eOne,
+		.dstAlphaBlendFactor = vk::BlendFactor::eZero,
+		.alphaBlendOp = vk::BlendOp::eAdd,
+		.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA,
+		
 	};
 
 
@@ -870,7 +878,7 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 		.logicOpEnable = false,
 		.logicOp = vk::LogicOp::eCopy,
 		.attachmentCount = 1,
-		.pAttachments = &colorBlendState
+		.pAttachments = &colorBlendState,
 	};
 
 	vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{
@@ -1025,6 +1033,13 @@ void MonsterVulkan::createTextureImage()
 	stbi_image_free(pixels);
 }
 
+void MonsterVulkan::createTexture(const std::filesystem::path& path, MonsterTexture* texture)
+{
+	createTextureImage(path, &texture->textureImage);
+	createTextureImageView(texture->textureImage, &texture->textureImageView);
+	createTextureSampler(&texture->textureSampler);
+}
+
 void MonsterVulkan::createTextureImage(const std::filesystem::path& path, vk::raii::Image* image)
 {
 	int texWidth, texHeight, texChannels;
@@ -1073,7 +1088,7 @@ void MonsterVulkan::createTextureImage(const std::filesystem::path& path, vk::ra
 	copyBufferToImage(
 		commandBuffer,
 		stagingBuffer,
-		vkTextures.textureImage,
+		*image,
 		static_cast<uint32_t>(texWidth),
 		static_cast<uint32_t>(texHeight)
 	);
@@ -1126,7 +1141,7 @@ void MonsterVulkan::createTextureSampler()
 
 }
 
-void MonsterVulkan::craeteTextureSampler(vk::raii::Sampler* sampler)
+void MonsterVulkan::createTextureSampler(vk::raii::Sampler* sampler)
 {
 	vk::PhysicalDeviceProperties properties = vkMonsterStats.gpuDevice.getProperties();
 
@@ -1745,9 +1760,9 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 
 	std::vector<vk::DescriptorSetLayoutBinding> bindings = shader->getBindings();
 
-	createTextureImage("../../../src/vktest/textures/praise_the_sun.png", &shader->monsterTexture.textureImage);
+	/*createTextureImage("../../../src/vktest/textures/praise_the_sun.png", &shader->monsterTexture.textureImage);
 	createTextureImageView(shader->monsterTexture.textureImage, &shader->monsterTexture.textureImageView);
-	craeteTextureSampler(&shader->monsterTexture.textureSampler);
+	createTextureSampler(&shader->monsterTexture.textureSampler);*/
 
 	// descriptor layout
 	//vk::raii::DescriptorSetLayout setLayout = nullptr;
@@ -1797,7 +1812,11 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 		shader->monsterPipe.descriptorPipeLayout) = createGraphicsPipeline(
 			shader->vertexShader,
 			shader->fragmentShader,
-			shader->monsterPipe.descriptorSetLayout
+			shader->monsterPipe.descriptorSetLayout,
+			shader->mode,
+			vk::CullModeFlagBits::eNone,
+			vk::FrontFace::eCounterClockwise,
+			shader->colorBlending
 		);
 
 	//importedMeshes[meshIndex]->graphicsPipelineIndex = pipes.size() - 1;
