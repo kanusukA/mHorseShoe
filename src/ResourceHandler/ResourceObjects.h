@@ -616,6 +616,11 @@ public:
 
 };
 
+struct MeshData {
+	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
+	std::vector<uint16_t> indices = std::vector<uint16_t>();
+};
+
 // NEW RESOURCES
 namespace hRes {
 
@@ -633,10 +638,11 @@ namespace hRes {
 		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
 		std::vector<uint16_t> indices = std::vector<uint16_t>();
 
-		uint32_t vertexBufferIndex; // Most likly they'll both be the same but fuck it let's have em both.
-		uint32_t indexBufferIndex;
+		std::unique_ptr<MBuffer> vertexBuffer;
+		std::unique_ptr<MBuffer> indexBuffer;
 
 		bool isMeshVkLoaded = false;
+		bool descriptorBound = false;
 
 		std::vector<MonsterBuffer> transformBuffers;
 
@@ -709,6 +715,7 @@ namespace hRes {
 			this->shaders.vertShaderFilePath = new std::filesystem::path(*mesh.shaders.vertShaderFilePath);*/
 			this->vertices = mesh.vertices;
 		}
+
 
 	};
 

@@ -4,12 +4,30 @@
 #include <monster/imgui-1.92.9b/imgui.h>
 #include <monster/imgui-1.92.9b/backends/imgui_impl_vulkan.h>
 
-#include <GDHandler/ResourceHandler.h>
-
-#include <stdio.h>
 #include <iostream>
 
 #include "MonsterSDL.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <map>
+
+#include <algorithm>
+#include <limits.h>
+
+#if defined (_WIN32)
+#define VK_USE_PLATFORM_WIN32_KHR
+#endif
+
+//#define VMA_IMPLEMENTATION
+////#include <vulkan/vulkan.h>
+//#include "vk_mem_alloc.h"
+
+
+#include <glm/gtc/matrix_transform.hpp>
+
+
 
 #include <Camera.h>
 // VALIDATION LAYERS
@@ -42,7 +60,7 @@ public:
 	std::vector<uint32_t> loadedMeshes = std::vector<uint32_t>();
 	std::vector<uint32_t> passObjects = std::vector<uint32_t>();
 
-	std::vector<vk::raii::Pipeline> pipes = std::vector<vk::raii::Pipeline>();
+	std::vector<std::shared_ptr<vk::raii::Pipeline>> pipes = std::vector<std::shared_ptr<vk::raii::Pipeline>>();
 
 	MonsterCamera camera = std::make_unique<Camera>();
 
@@ -51,8 +69,10 @@ public:
 
 	VulkanStatus vkMonsterStats = VulkanStatus();
 	VulkanSync vkSyncStats = VulkanSync();
-	VulkanTextures vkTextures = VulkanTextures();
 	VulkanDescriptors vkDescriptors = VulkanDescriptors();
+
+	VulkanTexture* sampleTexture;
+	VulkanTexture* depthTexture;
 
 	vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
 
@@ -69,7 +89,7 @@ public:
 	uint32_t createDescriptorSetLayout(const std::vector<vk::DescriptorSetLayoutBinding>& bindings);
 	void createDescriptorSetLayout(const std::vector<vk::DescriptorSetLayoutBinding>& bindings, vk::raii::DescriptorSetLayout* descriptorLayout);
 	void createGraphicsPipeline();
-	vk::raii::Pipeline createGraphicsPipeline(
+	std::shared_ptr<vk::raii::Pipeline> createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
 		const vk::ShaderModule& fragShaderModule,
 		uint32_t pipelineLayoutIndex,
@@ -84,7 +104,7 @@ public:
 		const vk::raii::DescriptorSetLayout& setLayout,
 		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
 		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
-		vk::FrontFace frontFace = vk::FrontFace::eCounterClockwise,
+		vk::FrontFace frontFace = vk::FrontFace::eClockwise,
 		float lineWidth = 1.0f
 	);
 	void createCommandPool();
@@ -127,12 +147,12 @@ public:
 
 	void updateUniformBuffer(uint32_t currentImage, void* bufferMapped);
 
-	void transitionImageLayout(
+	/*void transitionImageLayout(
 		vk::raii::CommandBuffer& commandBuffer,
 		const vk::raii::Image& image,
 		vk::ImageLayout oldLayout,
 		vk::ImageLayout newLayout
-	);
+	);*/
 
 	void transition_image_layout(
 		vk::Image image,
@@ -188,7 +208,12 @@ public:
 	// Shaders must be inside mesh file and must be valid!
 	//void createShaderPipeline(uint32_t meshIndex);
 
+	void updateObjectTransforms();
+	
+
+
 };
 
 
 
+#endif

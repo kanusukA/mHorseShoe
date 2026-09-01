@@ -6,8 +6,6 @@
 	#define VK_USE_PLATFORM_WIN32_KHR
 #endif
 
-
-
 #include <monster/VulkanUtils.h>
 
 #define VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS
@@ -39,7 +37,6 @@ struct PassObject {
 	int32_t vertexIndex;
 	int32_t texturesIndex;
 };
-
 
 struct VulkanStatus {
 
@@ -76,17 +73,22 @@ struct VulkanStatus {
 
 	vk::raii::PipelineLayout imguiPipeLayout = nullptr;
 	
-
-
 };
 
 struct VulkanSync {
+
 	std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
 	std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
 	std::vector<vk::raii::Fence> inFlightFences;
+
 };
 
+
+
+
+
 struct VulkanMemAlloc {
+
 	VmaAllocator vmaAllocator;
 
 	std::vector<vk::raii::Buffer> vertexBuffer;
@@ -97,9 +99,7 @@ struct VulkanMemAlloc {
 	std::vector<uint32_t> indexes;
 	std::vector<uint32_t> vertices;
 
-	std::vector<vk::raii::Buffer> uniformBuffers;
-	std::vector<VmaAllocation> uniformBufferAlloc;
-	std::vector<void*> uniformBuffersMapped;
+	std::vector<std::shared_ptr<MBuffer>> uniformBuffers;
 
 };
 
@@ -112,20 +112,8 @@ struct VulkanDescriptors {
 	
 };
 
-struct VulkanTextures {
 
-	// DEPTH
-	vk::raii::Image depthImage = nullptr;
-	vk::raii::ImageView depthImageView = nullptr;
-	vk::Format depthFormat;
-	VmaAllocation depthImageAlloc;
 
-	// Normal Texture
-	vk::raii::Image textureImage = nullptr;
-	vk::raii::ImageView textureImageView = nullptr;
-	vk::raii::Sampler textureSampler = nullptr;
-	VmaAllocation textureAlloc;
-};
 
 
 

@@ -98,9 +98,6 @@ float4 mainPS(
     col += star * sOffset;
     
     
-    
-    // far fog
-    
     // time calculation
     float timing = (windSpeed * 0.01) * time;
    

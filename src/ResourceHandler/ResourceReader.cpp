@@ -339,3 +339,5 @@ void ResourceReader::readFileContents(const std::filesystem::path& filePath, std
 	file.close();
 
 }
+
+

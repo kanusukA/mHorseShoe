@@ -16,8 +16,58 @@
 
 #include <filesystem>
 
-#ifndef VULKAN_UTILS
-#define VULKAN_UTILS
+// BUFFERS FOR SHADERS
+struct UniformBufferObject {
+	/*glm::vec2 foo;
+	alignas(16)*/ // YOU CAN ALSO USE GLM_FORCE_DEFAULT_ALIGNED_GENTYPES for consistent alignment but it does not work in nested struct
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 proj;
+};
+
+// UNIFORM BUFFERS
+// SKYBOX
+struct SkyUniformBuffer {
+
+	float highlightOffset;
+	float highlightSmoothness;
+	float midOffset;
+	float midSmoothness;
+	float coreOffset;
+	float coreSmoothness;
+	float bumpOffset;
+	float bumpRange;
+	float bumpHeight;
+	glm::vec4 baseCol;
+	glm::vec4 highCol;
+	glm::vec4 midCol;
+	glm::vec4 coreCol;
+
+};
+
+
+static PFN_vkGetBufferDeviceAddressEXT vkGetBufferDeviceAddressMON;
+static PFN_vkWriteResourceDescriptorsEXT vkWriteResourceDescriptorsMON;
+
+typedef  std::vector<vk::raii::DescriptorSet> MonsterDescriptors;
+typedef std::vector<vk::Buffer> MonsterBuffers;
+
+struct MBuffer {
+	std::vector<vk::raii::Buffer> uboBuffer;
+	std::vector<VmaAllocation> bufferAlloc;
+	std::vector<VmaAllocationInfo> bufferMapped;
+};
+
+
+struct VulkanTexture {
+	vk::Format imgFormat;
+	VmaAllocation alloc;
+	vk::raii::Image texture = nullptr;
+	vk::raii::ImageView textureView = nullptr;
+	vk::raii::Sampler textureSampler = nullptr;
+
+
+};
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -90,6 +140,7 @@ struct MonsterPipe {
 namespace vulkanUtils {
 
 	struct Vertex {
+
 		glm::vec3 pos;
 		glm::vec3 color;
 		glm::vec2 texCoord;
@@ -105,6 +156,7 @@ namespace vulkanUtils {
 				{.location = 2, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(Vertex,texCoord)},
 				} };
 		}
+
 	};
 
 	class Shader
@@ -184,6 +236,29 @@ namespace vulkanUtils {
 
 		std::filesystem::path* vertShaderFilePath = nullptr;
 		std::filesystem::path* fragShaderFilePath = nullptr;
+
+		// SLANG CODE IS RETAINED UNTIL THE SPV IS NOT COMPILED AND IS LATER CLEARED
+		std::vector<char> vertCodeSlang;
+		std::vector<char> fragCodeSlang;
+
+		std::vector<uint8_t> vertCodeSpv;
+		std::vector<uint8_t> fragCodeSpv;
+
+		// common Buffer containing Tranformation changes
+		std::unique_ptr<MBuffer> buffers;
+		std::unique_ptr<vk::raii::DescriptorSets> descriptorSets;
+		std::unique_ptr<vk::raii::DescriptorSetLayout> descriptorSetLayout;
+
+		// Custom Buffers for various shader structures
+		//std::unique_ptr<MBuffer> uniformBuffers;
+		// The outer vector contains each descriptor for each frame in flight
+		//std::unique_ptr<vk::raii::DescriptorSets> descriptorSets;
+		std::unique_ptr<MBuffer> CustomBuffers;
+
+		std::vector<std::shared_ptr<VulkanTexture>> textures;
+
+		std::string vertShadername;
+		std::string fragShaderName;
 
 		vk::raii::ShaderModule vertexShader = nullptr;
 		vk::raii::ShaderModule fragmentShader = nullptr;

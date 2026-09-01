@@ -35,6 +35,10 @@ void Monster::InitMonster() {
 	loadOtherMesh();
 
 	
+	
+	//compile shaders
+//	MonsterSlang::compileShaderFiles();
+//	MonsterVulkan::compileShaders();
 
 //	MonsterVulkan::loadAllMeshes();
 //	MonsterVulkan::loadMeshToPassObject();
@@ -105,7 +109,7 @@ void Monster::createRequiredShaders()
 
 void Monster::loadSkyBox()
 {
-	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/sphere_s.glb");
+	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/sphere.glb");
 	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
 
 	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
@@ -202,8 +206,18 @@ void Monster::skyBoxImguiMenu()
 
 void Monster::loadOtherMesh()
 {
-	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/box.glb");
-	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
+	std::filesystem::path boxPath = std::filesystem::path("../../../src/monster/shaders/box.glb");
+	fastgltf::Asset* asset = ResourceHandler::GetInstance()->loadGltfFile(boxPath);
+
+	std::shared_ptr<hRes::Mesh> mesh = MonsterVulkan::createNewMesh();
+
+	auto meshData = ResourceHandler::GetInstance()->generateMesh(*asset);
+
+	mesh->vertices = meshData.at(0).vertices;
+	mesh->indices = meshData.at(0).indices;
+
+	mesh->vertexBuffer.reset(std::move(MonsterBuffer::createVertexBuffer(mesh->vertices)));
+	mesh->indexBuffer.reset(std::move(MonsterBuffer::createIndexBuffer(mesh->indices)));
 
 	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
 
@@ -217,7 +231,8 @@ void Monster::loadOtherMesh()
 
 	/*std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
 
-	ResourceHandler::GetInstance()->generateMesh(*skyAsset, &meshes);
+	// generate UBO
+	mesh->shader->buffers.reset(std::move(MonsterSlang::createUniformBuffers(sizeof(UniformBufferObject))));
 
 	meshes[0].shaders.vertShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");
 	meshes[0].shaders.fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");*/
