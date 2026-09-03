@@ -33,6 +33,11 @@ struct ColorBufferObject {
 	glm::vec3 color;
 };
 
+
+struct SkyTexBufferObject {
+	float offset;
+};
+
 struct SkyBufferObject {
 	
 	
@@ -116,8 +121,8 @@ namespace vulkanUtils {
 
 		virtual void _updateDescriptorWrites(
 			vk::raii::Device* device,
-			const std::vector<MonsterBuffer>& buffer, 
-			const vk::raii::DescriptorSets& sets, 
+			const std::vector<MonsterBuffer>& buffer,
+			const vk::raii::DescriptorSets& sets,
 			const std::vector<MonsterBuffer>& fragBuf,
 			vk::DeviceSize fragBufSize
 		) {
@@ -137,7 +142,7 @@ namespace vulkanUtils {
 					.offset = vk::DeviceSize(0),
 					.range = fragBufSize
 				};
-				uint32_t texIndex = 2;
+				
 
 				descriptorWrites.push_back({
 					.dstSet = sets[i],
@@ -158,6 +163,8 @@ namespace vulkanUtils {
 					.pBufferInfo = &buffer2Info
 					}
 				);
+
+				uint32_t texIndex = 2;
 
 				for (auto& texture: textures)
 				{
@@ -242,11 +249,6 @@ namespace vulkanUtils {
 			return binds;
 			
 		}
-
-		// descriptors
-		uint32_t descriptorPipeLayout;
-		uint32_t descriptorSetLayout;
-		uint32_t descriptorSets;
 
 
 	};

@@ -126,13 +126,16 @@ void Monster::loadSkyBox()
 	sbs->colorBlending = true;
 
 	skyMesh->setShader(sbs);
-	
+
+	skyMesh->setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(SkyBufferObject) });
 
 	skyMesh->vertices = meshData.vertices;
 	skyMesh->indices = meshData.indices;
 
+	addMesh(skyMesh);
+	loadMeshContainingShader(0);
+
 	// top half
-	auto topMesh = createMesh().lock();
 	
 
 	std::filesystem::path topPath = std::filesystem::path("../../../src/monster/shaders/top.glb");
@@ -156,21 +159,20 @@ void Monster::loadSkyBox()
 
 	top_shader->colorBlending = true;
 
-	topMesh->setShader(top_shader);
+	skyTexMesh->setShader(top_shader);
 
+	skyTexMesh->setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(SkyTexBufferObject) });
 
-	topMesh->vertices = topMeshData.vertices;
-	topMesh->indices = topMeshData.indices;
+	skyTexMesh->vertices = topMeshData.vertices;
+	skyTexMesh->indices = topMeshData.indices;
 
-	topMesh->position = glm::vec3(0.0f, 150.0f, 0.0f);
-	topMesh->rotation = glm::vec3(0.0f, 0.0f, 180.0f);
-	topMesh->scale = glm::vec3(300.0f);
+	skyTexMesh->position = glm::vec3(0.0f, 150.0f, 0.0f);
+	skyTexMesh->rotation = glm::vec3(0.0f, 0.0f, 180.0f);
+	skyTexMesh->scale = glm::vec3(300.0f); 
 
 	
 	//load mesh
-	addMesh(skyMesh);
-	loadMeshContainingShader(0);
-
+	addMesh(skyTexMesh);
 	loadMeshContainingShader(1);
 
 	// mesh is loaded!!!!!
@@ -259,7 +261,7 @@ void Monster::loadOtherMesh()
 	mesh.lock()->indices = meshData.indices;
 	mesh.lock()->position = glm::vec3(3.0f, 0.0f, 0.0f);
 
-	loadMesh(0, 2);
+	loadMesh(triangleShaderIndex, 2);
 
 	/*std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
 

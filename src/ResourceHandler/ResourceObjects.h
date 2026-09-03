@@ -622,6 +622,7 @@ namespace hRes {
 	class Mesh {
 	private:
 		std::shared_ptr<vulkanUtils::Shader> shaders = std::make_shared<vulkanUtils::Shader>();
+		std::vector<vk::DeviceSize> allocatingBufferSizes{sizeof(UniformBufferObject)};
 	public:
 
 		Mesh() {}
@@ -640,20 +641,21 @@ namespace hRes {
 
 		std::vector<MonsterBuffer> transformBuffers;
 
-		std::vector<MonsterBuffer> colorBuffers;
-		ColorBufferObject colorBufObj = ColorBufferObject();
+		std::vector<MonsterBuffer> fragBuffers;
 
 		std::vector<vk::raii::DescriptorSets> descritorSets{};
 
-		virtual const std::vector<vk::DeviceSize> getAllocatingBufferInfo() { return { sizeof(UniformBufferObject), sizeof(ColorBufferObject) }; }
+		virtual const std::vector<vk::DeviceSize>& getAllocatingBufferInfo() { return allocatingBufferSizes; }
 
-		virtual void setAllocatingBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
+		void setAllocatingBufferInfo(std::vector<vk::DeviceSize> buffers) { allocatingBufferSizes = buffers; }
+
+		virtual void allocatBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
 			if (buffers.size() != getAllocatingBufferInfo().size())
 			{
 				throw std::runtime_error("IMPROPER BUFFER ALLOCATION");
 			}
 			transformBuffers = std::move(buffers.at(0));
-			colorBuffers = std::move(buffers.at(1));
+			fragBuffers = std::move(buffers.at(1));
 		}
 
 		// Used to set gropuing by vulkan to order rendering objects by the pipeline
@@ -669,16 +671,16 @@ namespace hRes {
 		
 
 		virtual void updateDescriptorWrites(vk::raii::Device* device) {
-			shaders->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(),colorBuffers, sizeof(ColorBufferObject));
+			shaders->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(),fragBuffers, allocatingBufferSizes.back());
 		}
 
-		void setColor(const glm::vec3& col) {
+		/*void setColor(const glm::vec3& col) {
 			colorBufObj.color = col;
 			for (auto& colBuf: colorBuffers)
 			{
 				memcpy(colBuf.allocInfo.pMappedData, &colorBufObj, sizeof(ColorBufferObject));
 			}
-		}
+		}*/
 
 		void updateTransformations(const glm::mat4& view, const glm::mat4& proj) {
 			UniformBufferObject ubo{};
@@ -724,18 +726,6 @@ namespace hRes {
 			scale = glm::vec3(160.f);
 		}
 
-		const std::vector<vk::DeviceSize> getAllocatingBufferInfo() override { return {sizeof(UniformBufferObject), sizeof(ColorBufferObject), sizeof(SkyBufferObject)}; }
-
-		void setAllocatingBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) override {
-			if (buffers.size() != getAllocatingBufferInfo().size())
-			{
-				throw std::runtime_error("IMPROPER BUFFER ALLOCATION");
-			}
-			transformBuffers = std::move(buffers.at(0));
-			colorBuffers = std::move(buffers.at(1));
-			skyBuffers = std::move(buffers.at(2));
-		}
-
 		void updateDescriptorWrites(vk::raii::Device* device) override {
 			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), skyBuffers, sizeof(SkyBufferObject));
 			updateBuffer();
@@ -748,6 +738,33 @@ namespace hRes {
 			}
 		}
 		
+	};
+
+	class SkyTexMesh : public Mesh
+	{
+	public:
+
+		std::vector<MonsterBuffer> skyTexBuffers{};
+		SkyTexBufferObject skyTexBufObj = SkyTexBufferObject();
+
+		SkyTexMesh() {
+			//rotation.y = 90.0f;
+			scale = glm::vec3(300.0f);
+			rotation.z = 180.f;
+		}
+
+		void updateDescriptorWrites(vk::raii::Device* device) override {
+			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), skyTexBuffers, sizeof(SkyTexBufferObject));
+			updateBuffer();
+		}
+
+		void updateBuffer() {
+			for (auto& skyBuf : skyTexBuffers)
+			{
+				memcpy(skyBuf.allocInfo.pMappedData, &skyTexBufObj, sizeof(SkyTexBufferObject));
+			}
+		}
+
 	};
 
 

@@ -35,6 +35,7 @@ private:
 
 	// EXAMPLE
 	std::shared_ptr<hRes::SkyMesh> skyMesh = std::make_shared<hRes::SkyMesh>();
+	std::shared_ptr<hRes::SkyTexMesh> skyTexMesh = std::make_shared<hRes::SkyTexMesh>();
 
 public:
 

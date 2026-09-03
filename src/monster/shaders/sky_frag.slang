@@ -29,7 +29,6 @@ struct VertexOutput {
 // [[vk::binding(2,0)]]
 // Sampler2D starTexture;
 
-
 [shader("fragment")]
 float4 fragMain(VertexOutput inVert) : SV_Target {
     float2 uv = inVert.texCoord ;
@@ -49,7 +48,6 @@ float4 fragMain(VertexOutput inVert) : SV_Target {
     // float4 star = starTexture.Sample(uv);
     // float sOffset = smoothstep(ubo.starOffset, ubo.starOffset + 0.45, uv.y);
     // col = star; //* sOffset;
-
 
     return col;
 

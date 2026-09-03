@@ -11,7 +11,7 @@ struct VertexOutput {
     float2 texCoord;
 };
 
-Sampler2D texture;
+// Sampler2D texture;
 
 
 [shader("fragment")]

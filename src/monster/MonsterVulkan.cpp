@@ -876,7 +876,7 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 
 	vk::PipelineColorBlendStateCreateInfo colorBlendInfo{
 		.logicOpEnable = false,
-		.logicOp = vk::LogicOp::eCopy,
+		//.logicOp = vk::LogicOp::eCopy,
 		.attachmentCount = 1,
 		.pAttachments = &colorBlendState,
 	};
@@ -920,7 +920,7 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 
 
 	vk::raii::Pipeline pipeline = vk::raii::Pipeline(vkMonsterStats.device, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
-
+	
 	return std::pair(std::move(pipeline),std::move(pipelineLayout));
 }
 
@@ -1322,8 +1322,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[passObj->vertexBufferIndex], { 0 });
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[passObj->indexBufferIndex], 0, vk::IndexType::eUint16);
-
-
+		
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(passObj->indices.size(), instance, 0, 0, 1);
 		instance++;
 	}
@@ -1737,6 +1736,8 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 			
 		}
 		importedMeshes[meshIndex]->setAllocatingBufferInfo(allocatedBuffers);
+
+		return;
 		/*for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
 			MonsterBuffer buffer = MonsterBuffer();
