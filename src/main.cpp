@@ -80,11 +80,12 @@ int main() {
 		glock->setStartTime();
 
 		Feel::GetInstance()->updateFeel();
-		
 
-		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime);
+		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime, glock->getShaderTime());
 
 		glock->setEndTime();
+
+		//std::cout << glock->getShaderTime() << std::endl;
 		
 	}
 

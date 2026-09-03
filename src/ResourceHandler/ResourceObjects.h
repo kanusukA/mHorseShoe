@@ -639,6 +639,11 @@ namespace hRes {
 
 		bool isMeshVkLoaded = false;
 
+		bool containsPushConstants = false;
+		uint32_t pushConstSize = uint32_t(0);
+
+		virtual const void* getPushConst() { return nullptr; }
+
 		std::vector<MonsterBuffer> transformBuffers;
 
 		std::vector<MonsterBuffer> fragBuffers;
@@ -649,7 +654,7 @@ namespace hRes {
 
 		void setAllocatingBufferInfo(std::vector<vk::DeviceSize> buffers) { allocatingBufferSizes = buffers; }
 
-		virtual void allocatBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
+		virtual void allocateBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
 			if (buffers.size() != getAllocatingBufferInfo().size())
 			{
 				throw std::runtime_error("IMPROPER BUFFER ALLOCATION");
@@ -714,25 +719,55 @@ namespace hRes {
 
 	};
 
+	class SampleCube : public Mesh {
+	public:
+		//std::vector<MonsterBuffer> skyBuffers{};
+		ColorBufferObject colBufObj = ColorBufferObject();
+
+		SampleCube() {
+			setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(ColorBufferObject) });
+		}
+
+		void updateDescriptorWrites(vk::raii::Device* device) override {
+			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), fragBuffers, sizeof(ColorBufferObject));
+			updateBuffer();
+		}
+
+		void updateBuffer() {
+			for (auto& skyBuf : fragBuffers)
+			{
+				memcpy(skyBuf.allocInfo.pMappedData, &colBufObj, sizeof(SkyBufferObject));
+			}
+		}
+	};
+
 	class SkyMesh : public Mesh
 	{
 	public:
 
 		std::vector<MonsterBuffer> skyBuffers{};
 		SkyBufferObject skyBufObj = SkyBufferObject();
+		PushConstObject pushConstObj = PushConstObject();
 
 		SkyMesh() {
+			pushConstObj.time = 0.5f;
+			pushConstSize = sizeof(pushConstObj);
+			containsPushConstants = true;
 			//rotation.y = 90.0f;
 			scale = glm::vec3(160.f);
+			setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(SkyBufferObject) });
+
 		}
 
+		virtual const void* getPushConst() { return &pushConstObj; }
+
 		void updateDescriptorWrites(vk::raii::Device* device) override {
-			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), skyBuffers, sizeof(SkyBufferObject));
+			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), fragBuffers, sizeof(SkyBufferObject));
 			updateBuffer();
 		}
 
 		void updateBuffer() {
-			for (auto& skyBuf: skyBuffers)
+			for (auto& skyBuf: fragBuffers)
 			{
 				memcpy(skyBuf.allocInfo.pMappedData, &skyBufObj, sizeof(SkyBufferObject));
 			}
@@ -751,15 +786,18 @@ namespace hRes {
 			//rotation.y = 90.0f;
 			scale = glm::vec3(300.0f);
 			rotation.z = 180.f;
+			setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(SkyTexBufferObject) });
+			skyTexBufObj.offset = 0.466f;
+			skyTexBufObj.smoothness = 0.413f;
 		}
 
 		void updateDescriptorWrites(vk::raii::Device* device) override {
-			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), skyTexBuffers, sizeof(SkyTexBufferObject));
+			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), fragBuffers, sizeof(SkyTexBufferObject));
 			updateBuffer();
 		}
 
 		void updateBuffer() {
-			for (auto& skyBuf : skyTexBuffers)
+			for (auto& skyBuf : fragBuffers)
 			{
 				memcpy(skyBuf.allocInfo.pMappedData, &skyTexBufObj, sizeof(SkyTexBufferObject));
 			}

@@ -3,6 +3,7 @@ struct UniformBuffer{
     // float windSpeed;
 
     float starOffset;
+    float starSmoothness;
 }
 [[vk::binding(1, 0)]]
 ConstantBuffer<UniformBuffer> ubo;
@@ -21,7 +22,9 @@ Sampler2D starTexture;
 float4 fragMain(VertexOutput inVert) : SV_Target {
     float2 uv = inVert.texCoord;
     float4 col = starTexture.Sample(uv);
-    col.w = clamp(col.x + col.y + col.z,0.0f,1.0f) * (1 - distance(float2(0.5,0.5), uv));
+    col.w = clamp(col.x + col.y + col.z, 0.0f, 1.0f);
+    col *= smoothstep(ubo.starOffset, ubo.starOffset + ubo.starSmoothness, 1 - distance(float2(0.5, 0.5), uv));
+
 
     return col;
 

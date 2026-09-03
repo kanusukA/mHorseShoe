@@ -20,6 +20,11 @@ struct UniformBuffer{
 [[vk::binding(1, 0)]]
 ConstantBuffer<UniformBuffer> ubo;
 
+struct PushConstants {
+    float time;
+}
+[[vk::push_constant]] PushConstants pConst;
+
 struct VertexOutput {
     float4 sv_position : SV_Position;
     float4 color;
@@ -44,6 +49,8 @@ float4 fragMain(VertexOutput inVert) : SV_Target {
     float4 col = lerp(ubo.baseColor, ubo.highlightCol, highOffset);
     col = lerp(col, ubo.middleColor, mOffset);
     col = lerp(col, ubo.coreColor, cOffset);
+
+    col.r = pConst.time;
 
     // float4 star = starTexture.Sample(uv);
     // float sOffset = smoothstep(ubo.starOffset, ubo.starOffset + 0.45, uv.y);

@@ -800,6 +800,7 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 	const vk::ShaderModule& vertShaderModule, 
 	const vk::ShaderModule& fragShaderModule, 
 	const vk::raii::DescriptorSetLayout& setLayout, 
+	const uint32_t& pushConstantSize,
 	vk::PolygonMode polygonMode, 
 	vk::CullModeFlags cullingModes, 
 	vk::FrontFace frontFace,
@@ -885,8 +886,20 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 		.setLayoutCount = 1,
 		.pSetLayouts = &*setLayout,
 		.pushConstantRangeCount = 0,
-
 	};
+	vk::PushConstantRange pushConstantRange;
+	if (pushConstantSize > uint32_t(0)) {
+		
+		pushConstantRange
+			.setStageFlags(vk::ShaderStageFlagBits::eFragment)
+			.setOffset(0)
+			.setSize(pushConstantSize);
+
+		pipelineLayoutCreateInfo.pushConstantRangeCount = 1;
+		pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
+
+	}
+
 	vk::raii::PipelineLayout pipelineLayout = vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo);
 	//vkDescriptors.pipelineLayout.push_back(std::move(vk::raii::PipelineLayout(vkMonsterStats.device, pipelineLayoutCreateInfo)));
 
@@ -1320,6 +1333,18 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 			vk::PipelineBindPoint::eGraphics, passObj->getShader().lock()->monsterPipe.descriptorPipeLayout, 0, *passObj->descritorSets.front()[vkMonsterStats.frameIndex], nullptr
 		);
 
+		if (passObj->containsPushConstants)
+		{
+			vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].pushConstants(
+				*passObj->getShader().lock()->monsterPipe.descriptorPipeLayout,
+				vk::ShaderStageFlagBits::eFragment,
+				0,
+				passObj->pushConstSize,
+				passObj->getPushConst()
+			);
+		}
+		
+
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *vkMemAlloc.vertexBuffer[passObj->vertexBufferIndex], { 0 });
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[passObj->indexBufferIndex], 0, vk::IndexType::eUint16);
 		
@@ -1735,7 +1760,7 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 			allocatedBuffers.push_back(std::move(bufferVec));
 			
 		}
-		importedMeshes[meshIndex]->setAllocatingBufferInfo(allocatedBuffers);
+		importedMeshes[meshIndex]->allocateBufferInfo(allocatedBuffers);
 
 		return;
 		/*for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -1789,7 +1814,7 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 		allocatedBuffers.push_back(std::move(bufferVec));
 
 	}
-	importedMeshes[meshIndex]->setAllocatingBufferInfo(allocatedBuffers);
+	importedMeshes[meshIndex]->allocateBufferInfo(allocatedBuffers);
 	importedMeshes[meshIndex]->updateDescriptorWrites(&vkMonsterStats.device);
 	/*for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
@@ -1814,6 +1839,7 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 			shader->vertexShader,
 			shader->fragmentShader,
 			shader->monsterPipe.descriptorSetLayout,
+			importedMeshes[meshIndex]->pushConstSize,
 			shader->mode,
 			vk::CullModeFlagBits::eNone,
 			vk::FrontFace::eCounterClockwise,
@@ -1829,7 +1855,7 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 	}
 
 	//set Color
-	importedMeshes[meshIndex]->setColor(glm::vec3(0.0f, 1.0f, 0.0f));
+	/*importedMeshes[meshIndex]->setColor(glm::vec3(0.0f, 1.0f, 0.0f));*/
 }
 
 void MonsterVulkan::loadMesh(uint32_t shaderIndex,uint32_t meshIndex)

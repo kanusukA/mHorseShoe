@@ -36,6 +36,11 @@ struct ColorBufferObject {
 
 struct SkyTexBufferObject {
 	float offset;
+	float smoothness;
+};
+
+struct PushConstObject {
+	float time;
 };
 
 struct SkyBufferObject {

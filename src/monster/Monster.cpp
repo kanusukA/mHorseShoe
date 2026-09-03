@@ -48,7 +48,7 @@ void Monster::InitMonster() {
 
 }
 
-void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime)
+void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime, float shaderTime)
 {
 	// FRAME BUFFER RESIZED IS SEPERATE FROM POLL EVENTS AS IT MUST RUN BEFOR RENDERING THE FRAME ELSE SWAPCHAIN CAN FAIL, as sdl poll events are run without block main thread;
 	if (Feel::GetInstance()->mappedEvents.windowResize->eventState)
@@ -66,6 +66,8 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, 
 
 	// rendering
 	MonsterImgui::startImguiFrame();
+
+	skyMesh->pushConstObj.time = shaderTime;
 
 	// Imgui Rendering
 
@@ -127,7 +129,7 @@ void Monster::loadSkyBox()
 
 	skyMesh->setShader(sbs);
 
-	skyMesh->setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(SkyBufferObject) });
+	
 
 	skyMesh->vertices = meshData.vertices;
 	skyMesh->indices = meshData.indices;
@@ -161,7 +163,6 @@ void Monster::loadSkyBox()
 
 	skyTexMesh->setShader(top_shader);
 
-	skyTexMesh->setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(SkyTexBufferObject) });
 
 	skyTexMesh->vertices = topMeshData.vertices;
 	skyTexMesh->indices = topMeshData.indices;
@@ -238,9 +239,17 @@ void Monster::skyBoxImguiMenu()
 	{
 		skyMesh->updateBuffer();
 	}
-	if (ImGui::DragFloat("starOffset", &skyMesh->skyBufObj.starOffset, 0.0005f, 0.0f, 1.0f))
+	if (ImGui::DragFloat("starOffset", &skyTexMesh->skyTexBufObj.offset, 0.0005f, 0.0f, 1.0f))
 	{
-		skyMesh->updateBuffer();
+		skyTexMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("starSmoothness", &skyTexMesh->skyTexBufObj.smoothness, 0.0005f, 0.0f, 1.0f))
+	{
+		skyTexMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat3("sampleCubeCol", glm::value_ptr(sampleCube->colBufObj.color), 0.0005f, 0.0f, 1.0f))
+	{
+		sampleCube->updateBuffer();
 	}
 	
 
@@ -256,11 +265,12 @@ void Monster::loadOtherMesh()
 	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
 
 	// get mesh from monstervulkan
-	std::weak_ptr<hRes::Mesh> mesh = createMesh();
-	mesh.lock()->vertices = meshData.vertices;
-	mesh.lock()->indices = meshData.indices;
-	mesh.lock()->position = glm::vec3(3.0f, 0.0f, 0.0f);
+	
+	sampleCube->vertices = meshData.vertices;
+	sampleCube->indices = meshData.indices;
+	sampleCube->position = glm::vec3(3.0f, 0.0f, 0.0f);
 
+	addMesh(sampleCube);
 	loadMesh(triangleShaderIndex, 2);
 
 	/*std::vector<hRes::Mesh> meshes = std::vector<hRes::Mesh>();
