@@ -8,6 +8,8 @@ struct UniformBuffer{
 [[vk::binding(1, 0)]]
 ConstantBuffer<UniformBuffer> ubo;
 
+
+
 struct VertexOutput {
     float4 sv_position : SV_Position;
     float4 color;

@@ -70,11 +70,18 @@ struct SkyBufferObject {
 
 	float starOffset;
 
+	float farFogOffset;
+
+	float farFogSmoothness;
+
+	float windSpeed;
+
 	alignas(16)
 	glm::vec4 baseColor = glm::vec4(0.247f,0.0f,0.205f,1.0f);
 	glm::vec4 highlightColor = glm::vec4(0.07f,0.063f,0.182f,1.0f);
 	glm::vec4 middleColor = glm::vec4(0.039f,0.003f,0.237f,1.0f);
 	glm::vec4 coreColor = glm::vec4(0.0f,0.0f,0.055f,1.0f);
+	glm::vec4 farFogColor = glm::vec4(0.0f);
 	
 
 };

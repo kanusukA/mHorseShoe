@@ -42,7 +42,7 @@ public:
 	}
 
 	float getShaderTime() {
-		return glm::fract(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - initTime).count() / 10000);
+		return glm::fract(std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - initTime).count() / 100000);
 		 
 	}
 

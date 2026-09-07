@@ -125,6 +125,11 @@ void Monster::loadSkyBox()
 
 	//sbs->textures.push_back(std::move(starTextrue));
 
+	MonsterTexture farFogTexture = MonsterTexture();
+	createTexture("../../../src/monster/shaders/far_fog_tex.png", &farFogTexture);
+
+	sbs->textures.push_back(std::move(farFogTexture));
+
 	sbs->colorBlending = true;
 
 	skyMesh->setShader(sbs);
@@ -222,6 +227,18 @@ void Monster::skyBoxImguiMenu()
 	{
 		skyMesh->updateBuffer();
 	}
+	if (ImGui::DragFloat("farFogOffset", &skyMesh->skyBufObj.farFogOffset, 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("farFogSmoothness", &skyMesh->skyBufObj.farFogSmoothness, 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat("windSpeed", &skyMesh->skyBufObj.windSpeed, 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
 
 	if (ImGui::DragFloat4("baseColor", glm::value_ptr(skyMesh->skyBufObj.baseColor), 0.0005f, 0.0f, 1.0f))
 	{
@@ -236,6 +253,10 @@ void Monster::skyBoxImguiMenu()
 		skyMesh->updateBuffer();
 	}
 	if (ImGui::DragFloat4("coreColor", glm::value_ptr(skyMesh->skyBufObj.coreColor), 0.0005f, 0.0f, 1.0f))
+	{
+		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat4("farFogColor", glm::value_ptr(skyMesh->skyBufObj.farFogColor), 0.0005f, 0.0f, 1.0f))
 	{
 		skyMesh->updateBuffer();
 	}
