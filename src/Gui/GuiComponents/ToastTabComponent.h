@@ -1,6 +1,6 @@
 #pragma once
 #include <base/Mediator.h>
-#include <OgreImGuiOverlay.h>
+//#include <OgreImGuiOverlay.h>
 
 
 class ToastTabModelComponent : public ModelComponent
@@ -32,7 +32,7 @@ public:
 		toastModel = model_p;
 	}
 
-	void view() override;
+	void view() override {};
 
 
 };

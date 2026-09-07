@@ -3,21 +3,27 @@
 
 
 
-void Gui::initGui(Ogre::ImGuiOverlay* overlay) {
+//void Gui::initGui(Ogre::ImGuiOverlay* overlay) {
+//
+//	overlay->setZOrder(300);
+//	overlay->show();
+//
+//	imOverlay = overlay;
+//
+//	std::cout << "ImGui version" << ImGui::GetVersion() << std::endl;
+//
+//	this->viewport = ImGui::GetMainViewport();
+//
+//	//resourceHandler->updateOgreMaterials();
+//
+//	this->initGuiComponents();
+//
+//}
 
-	overlay->setZOrder(300);
-	overlay->show();
 
-	imOverlay = overlay;
-
-	std::cout << "ImGui version" << ImGui::GetVersion() << std::endl;
-
-	this->viewport = ImGui::GetMainViewport();
-
-	//resourceHandler->updateOgreMaterials();
-
+void Gui::initGui()
+{
 	this->initGuiComponents();
-
 }
 
 
@@ -26,7 +32,9 @@ void Gui::updateGui()
 
 	//IKEYS* inputKeys = InputHandler::GetInstance()->getInputKeys();
 
-	imOverlay->NewFrame();
+	//imOverlay->NewFrame();
+
+	ImGui::NewFrame();
 
 	
 
@@ -43,7 +51,7 @@ void Gui::shutdown()
 
 void Gui::loadFonts()
 {
-	ImGuiIO& io = ImGui::GetIO();
+	/*ImGuiIO& io = ImGui::GetIO();
 	fontSet->title48Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFont_compressed_data, ubuntuFont_compressed_size, 28);
 	if (!fontSet->title48Font->IsLoaded()) {
 		fontSet->title48Font->FontSize = 48;
@@ -57,7 +65,7 @@ void Gui::loadFonts()
 	fontSet->body16Font = io.Fonts->AddFontFromMemoryCompressedTTF(ubuntuFontRegular_compressed_data, ubuntuFontRegular_compressed_size, 8);
 	
 	
-	io.FontDefault = fontSet->body32Font;
+	io.FontDefault = fontSet->body32Font;*/
 
 	/*std::vector<std::filesystem::path>* fontsPath = this->guiFramework->getResourceHandler()->fetchResourceGroupVecByIndex(ResourceGroup::RESOURCE_MASTER_GROUP_INDEX::FONT);
 	if (fontsPath)
@@ -77,15 +85,16 @@ void Gui::loadFonts()
 }
 
 
+
 // NEW FRAMEWORK
 void Gui::initGuiComponents()
 {
 	// Models
-	SceneTabModelComponent* scnTabModel = new SceneTabModelComponent(GD_SCENE_TAB_MODEL_COMP_NAME);
+	/*SceneTabModelComponent* scnTabModel = new SceneTabModelComponent(GD_SCENE_TAB_MODEL_COMP_NAME);
 	this->addModelComponent(scnTabModel);
 
 	ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent(GD_RESOURCE_TAB_MODEL_COMP_NAME);
-	this->addModelComponent(resourceTabModel);
+	this->addModelComponent(resourceTabModel);*/
 
 	///*StatusTabModelComponent* statusModel = new StatusTabModelComponent("Status tab Model");
 	//this->addModelComponent(statusModel);*/
@@ -93,14 +102,14 @@ void Gui::initGuiComponents()
 	//AddTabModelComponent* addModel = new AddTabModelComponent("Add tab Model");
 	//this->addModelComponent(addModel);
 
-	ObjectTabModelComponent* objectModel = new ObjectTabModelComponent(GD_OBJECT_TAB_MODEL_COMP_NAME);
-	this->addModelComponent(objectModel);
+	/*ObjectTabModelComponent* objectModel = new ObjectTabModelComponent(GD_OBJECT_TAB_MODEL_COMP_NAME);
+	this->addModelComponent(objectModel);*/
 
 	//ScenePanelTabModelComponent* scenePanelModel = new ScenePanelTabModelComponent("Scene Panel tab Model");
 	//this->addModelComponent(scenePanelModel);
 
-	RSUSTabModelComponent* rsusModel = new RSUSTabModelComponent(GD_RSUS_MODEL_COMP_NAME);
-	this->addModelComponent(rsusModel);
+	/*RSUSTabModelComponent* rsusModel = new RSUSTabModelComponent(GD_RSUS_MODEL_COMP_NAME);
+	this->addModelComponent(rsusModel);*/
 
 	/*TestingTabModelComponent* testModel = new TestingTabModelComponent("Testing tab model");
 	this->addModelComponent(testModel);*/
@@ -108,12 +117,18 @@ void Gui::initGuiComponents()
 	ToastTabModelComponent* toastModel = new ToastTabModelComponent(GD_TOAST_MODEL_COMP_NAME);
 	this->addModelComponent(toastModel);
 
+	GuiVulkanUtilsComponent* vulkanUtilModel = new GuiVulkanUtilsComponent("VULKAN_UTIL_MODEL");
+	this->addModelComponent(vulkanUtilModel);
+
+	GuiGenStatsModelComponent* genStatModel = new GuiGenStatsModelComponent("GENERAL_STATS");
+	this->addModelComponent(genStatModel);
+
 	// Views
-	SceneTabComponent* scnTab = new SceneTabComponent(GD_SCENE_TAB_VIEW_COMP_NAME,scnTabModel);
+	/*SceneTabComponent* scnTab = new SceneTabComponent(GD_SCENE_TAB_VIEW_COMP_NAME,scnTabModel);
 	this->addViewComponent(scnTab);
 
 	ResourceTabComponent* resourceTab = new ResourceTabComponent(GD_RESOURCE_TAB_VIEW_COMP_NAME, resourceTabModel);
-	this->addViewComponent(resourceTab);
+	this->addViewComponent(resourceTab);*/
 
 	///*StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
 	//this->addViewComponent(statusTab);*/
@@ -121,14 +136,14 @@ void Gui::initGuiComponents()
 	//AddTabComponent* addTab = new AddTabComponent("Add Tab", addModel);
 	//this->addViewComponent(addTab);
 
-	ObjectTabComponent* objectTab = new ObjectTabComponent(GD_OBJECT_TAB_VIEW_COMP_NAME, objectModel);
-	this->addViewComponent(objectTab);
+	/*ObjectTabComponent* objectTab = new ObjectTabComponent(GD_OBJECT_TAB_VIEW_COMP_NAME, objectModel);
+	this->addViewComponent(objectTab);*/
 
 	//ScenePanelTabComponent* scenePanelTab = new ScenePanelTabComponent("Scene Panel Tab", scenePanelModel);
 	//this->addViewComponent(scenePanelTab);
 
-	RSUSTabComponent* rsusTab = new RSUSTabComponent(GD_RSUS_COMP_NAME, rsusModel);
-	this->addViewComponent(rsusTab);
+	/*RSUSTabComponent* rsusTab = new RSUSTabComponent(GD_RSUS_COMP_NAME, rsusModel);
+	this->addViewComponent(rsusTab);*/
 
 	//HUDComponent* hudTab = new HUDComponent("Hud tab");
 	//this->addViewComponent(hudTab);
@@ -139,15 +154,25 @@ void Gui::initGuiComponents()
 	ToastTabViewComponent* toastView = new ToastTabViewComponent(GD_TOAST_COMP_NAME, toastModel);
 	this->addViewComponent(toastView);
 
+	GuiVulkanUtilsView* vulkanUtilView = new GuiVulkanUtilsView("VULKAN_UTIL_VIEW", vulkanUtilModel);
+	this->addViewComponent(vulkanUtilView);
+
+	GuiGenStatsView* genStatView = new GuiGenStatsView("GENERAL_STATS_VIEW", genStatModel);
+	this->addViewComponent(genStatView);
 }
 
 void Gui::updateGuiComponents()
 {
-	if(this->getGdSystem()->getGuiVisibility()){
+	/*if(this->getGdSystem()->getGuiVisibility()){
 		for (int i = 0; i < Views.size(); i++)
 		{
 			Views.at(i)->view();
 		}
+	}*/
+
+	for (int i = 0; i < Views.size(); i++)
+	{
+		Views.at(i)->view();
 	}
 }
 

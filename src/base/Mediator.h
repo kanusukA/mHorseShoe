@@ -5,7 +5,8 @@
 
 //Local
 #include<Gui/GuiConsts.h>
-#include <GDHandler/Connector/MasterB.h>
+//#include <GDHandler/Connector/MasterB.h>
+#include <monster/MonsterImgui.h>
 #include <Gui/GuiComponents/ToastComponent.h>
 
 // Fonts
@@ -103,6 +104,16 @@ public:
 
 	virtual void view() {};
 
+	void TextFloatP(float* float_p) {
+		if (float_p)
+		{
+			ImGui::Text(std::to_string(*float_p).c_str());
+		}
+		else {
+			ImGui::Text("NULL POINTER");
+		}
+	}
+
 	
 
 	// HELPING WIDGETS
@@ -171,22 +182,23 @@ public:
 
 // SELECTED VARIABLES (AN IMPLEMENTATION OF DOUBLE POINTERS)
 
-struct SelectedCase
-{
-	std::weak_ptr<Case> selCase;
-};
-struct SelectedScene
-{
-	std::weak_ptr<Scene> selScene;
-};
-struct SelectedObject
-{
-	std::weak_ptr<Object> selObject;
-};
-struct SelectedMaterial
-{
-	std::weak_ptr<Material> selMaterial;
-};
+//struct SelectedCase
+//{
+//	std::weak_ptr<Case> selCase;
+//};
+//struct SelectedScene
+//{
+//	std::weak_ptr<Scene> selScene;
+//};
+//struct SelectedObject
+//{
+//	std::weak_ptr<Object> selObject;
+//};
+//
+//struct SelectedMaterial
+//{
+//	std::weak_ptr<Material> selMaterial;
+//};
 
 
 // USED TO HANDLE FILE DIALOG 
@@ -200,7 +212,7 @@ struct ComInit
 // GDSource - IT IS THE CONNECTOR CLASS FOR THE GUI FRAMEWORK.
 // IT PROVIDES ACCESS TO OTHER PARTS OF THE SOFTWARE/
 // THIS CLASS SHOULD NOT BE DIRCETLY CONNECTED WITH THE VIEW CLASS AS IT PROVIDES LIMITLESS ACCESS OF OTHER CLASSES
-// TYPICALLY MODELCOMPONENT MUST BE USED IN BETWEEN TO FILTER AND MASK DATA.
+// TYPICALLY MODELCOMPONENT MUST BE USED IN BETWEEN TO FILTER AND MASK DATA INTO APPROPRIATE FORM.
 class GDSource {
 
 private:
@@ -208,67 +220,67 @@ private:
 
 	
 protected:
-	CaseHandler* scnHandler = nullptr;
+	//CaseHandler* scnHandler = nullptr;
 	ResourceHandler* resourceHandler = nullptr;
-	RSUS* shaderHandler = nullptr;
-	GDSystem* system = nullptr;
+	
+	/*RSUS* shaderHandler = nullptr;
+	GDSystem* system = nullptr;*/
 
 	// FILE DIALOG
 	CComPtr<IFileDialog> fileDialog;
 
 	//PlayerObserver* playerObserver = nullptr;
 
-	
-
-
 public:
+	ImguiDebugStats* _debugStats = nullptr;
 
-	GDSource(CaseHandler* casehan,  
-		ResourceHandler* resourceHan,
-		RSUS* rsus,GDSystem* system_p) {
-		this->scnHandler = casehan;
-		this->resourceHandler = resourceHan;
-		//this->feel = feelhan;
-		this->shaderHandler = rsus;
-		this->system = system_p;
+	GDSource(
+		//CaseHandler* casehan,  
+		ResourceHandler* resourceHan
+		//RSUS* rsus,GDSystem* system_p
+	) {
+		//this->scnHandler = casehan;
+		//this->resourceHandler = resourceHan;
+		////this->feel = feelhan;
+		//this->shaderHandler = rsus;
+		//this->system = system_p;
 
 		//loadFonts();
 
 		// initalize the file dialog COM library
-		ComInit com;
-		
-		fileDialog.CoCreateInstance(CLSID_FileOpenDialog);
+		//ComInit com;
+		//
+		//fileDialog.CoCreateInstance(CLSID_FileOpenDialog);
 
-		FILEOPENDIALOGOPTIONS opt{};
-		
-		fileDialog->GetOptions(&opt);
-		fileDialog->SetOptions(opt | FOS_PICKFOLDERS | FOS_PATHMUSTEXIST | FOS_FORCEFILESYSTEM);
+		//FILEOPENDIALOGOPTIONS opt{};
+		//
+		//fileDialog->GetOptions(&opt);
+		//fileDialog->SetOptions(opt | FOS_PICKFOLDERS | FOS_PATHMUSTEXIST | FOS_FORCEFILESYSTEM);
 
-		// SETS DEFUALT FOLDER TO THE SOURCE DIR.
-		CComPtr<IShellItem> psi;
-
-		SHCreateItemFromParsingName(this->resourceHandler->SourceDir.wstring().c_str(), nullptr, IID_PPV_ARGS(&psi));
-		fileDialog->SetFolder(psi);
+		//// SETS DEFUALT FOLDER TO THE SOURCE DIR.
+		//CComPtr<IShellItem> psi;
+		//SHCreateItemFromParsingName(this->resourceHandler->SourceDir.wstring().c_str(), nullptr, IID_PPV_ARGS(&psi));
+		//fileDialog->SetFolder(psi);
 
 	};
 
 	//void loadFonts();
 
-	CaseHandler* getCaseHandler() {
+	/*CaseHandler* getCaseHandler() {
 		return scnHandler;
-	}
+	}*/
 
 	ResourceHandler* getResourceHandler() {
 		return resourceHandler;
 	}
 
 
-	RSUS* getShaderHandler() {
+	/*RSUS* getShaderHandler() {
 		return shaderHandler;
 	}
 	GDSystem* getGdSystem() {
 		return system;
-	}
+	}*/
 
 	std::string openFolderSelectionDialog() {
 		
@@ -320,9 +332,9 @@ public:
 
 	//CASE IS DIRECTLY TAKEN FROM THE CASEHANDLER.
 
-	static SelectedScene* selectedScene;
-	static SelectedObject* selectedObject;
-	static SelectedMaterial* selectedMaterial;
+	//static SelectedScene* selectedScene;
+	//static SelectedObject* selectedObject;
+	//static SelectedMaterial* selectedMaterial;
 
 	// DEPENDENT RESOURCE DATA - These vectors are fetched from the resourcehandler!
 
@@ -331,18 +343,18 @@ public:
 	static std::vector<std::filesystem::path>* shaderDpVec;
 
 	static std::vector<std::filesystem::path>* textureDpVec;
-	static std::vector<Ogre::TexturePtr>* imageTextures;
+	//static std::vector<Ogre::TexturePtr>* imageTextures;
 
 	static std::vector<std::filesystem::path>* savedCaseFiles;
 
-	SunWindowSize* windowSize;
+	//SunWindowSize* windowSize;
 
 	ModelComponent(const char* name_p) {
 		name = name_p;
 
-		selectedScene = new SelectedScene();
+		/*selectedScene = new SelectedScene();
 		selectedObject = new SelectedObject();
-		selectedMaterial = new SelectedMaterial();
+		selectedMaterial = new SelectedMaterial();*/
 
 	}
 
@@ -353,10 +365,10 @@ public:
 		gdSource = source;
 
 		// SETUP DEPENDENT RESOURCE
-		meshDpVec = gdSource->getResourceHandler()->getRenderMeshLoaded();
+		/*meshDpVec = gdSource->getResourceHandler()->getRenderMeshLoaded();
 		materialDpVec = gdSource->getResourceHandler()->getMaterialsLoaded();
 		shaderDpVec = gdSource->getResourceHandler()->getShadersLoaded();
-		textureDpVec = gdSource->getResourceHandler()->getTexturesLoaded();
+		textureDpVec = gdSource->getResourceHandler()->getTexturesLoaded();*/
 		
 		refreshImageTextures();
 
@@ -377,7 +389,7 @@ public:
 		update(GUIUpdateEvent::CASE_UPDATE);
 	}*/
 
-	void selectScene(const std::weak_ptr<Scene>& scene_p) {
+	/*void selectScene(const std::weak_ptr<Scene>& scene_p) {
 		selectedScene->selScene = scene_p;
 		update(GUIUpdateEvent::SCENE_UPDATE);
 	}
@@ -392,16 +404,16 @@ public:
 			this->popMaterial();
 		}
 		update(GUIUpdateEvent::OBJECT_UPDATE);
-	}
+	}*/
 
-	void selectMaterial(const std::weak_ptr<Material>& material_p) {
+	/*void selectMaterial(const std::weak_ptr<Material>& material_p) {
 		selectedMaterial->selMaterial = material_p;
 		update(GUIUpdateEvent::MATERIAL_UPDATE);
 	}
 
 	void popMaterial() {
 		selectedMaterial->selMaterial.reset();
-	}
+	}*/
 
 	void refreshImageTextures();
 
@@ -446,8 +458,18 @@ protected:
 
 public:
 
-	GuiFramework(CaseHandler* casehan, ResourceHandler* resourcehan, RSUS* rsus, GDSystem* system_p) : 
-		GDSource(casehan,resourcehan,rsus,system_p) {
+	GuiFramework(
+		//CaseHandler* casehan,
+		ResourceHandler* resourcehan
+		//RSUS* rsus,
+		//GDSystem* system_p
+	) : 
+		GDSource(
+			//casehan,
+			resourcehan
+			//rsus,
+		//	system_p
+		) {
 		//resourcehan->setGuiRegen(this);
 	}
 
@@ -455,34 +477,34 @@ public:
 	
 
 	// CONVERTING OGRE::VECTORS TO FLOAT* 
-	float* convertOgreVec2(Ogre::Vector2 vec2_p) {
-		float float2[2] = {vec2_p[0],vec2_p[1]};
-		return float2;
-	}
-	float* convertOgreVec3(Ogre::Vector3 vec3_p) {
-		float float3[3] = { vec3_p[0],vec3_p[1],vec3_p[2]};
-		return float3;
-	}
-	float* convertOgreVec4(Ogre::Vector4 vec4_p) {
-		float float4[4] = { vec4_p[0],vec4_p[1],vec4_p[2],vec4_p[3]};
-		return float4;
-	}
-	// SET OGRE::VECTOR VALUE TO FLOAT*
-	void setOgreVec2(float* float2,Ogre::Vector2 vec2_p) {
-		float2[0] = vec2_p[0];
-		float2[1] = vec2_p[1];
-	}
-	void setOgreVec3(float* float3,Ogre::Vector3 vec3_p) {
-		float3[0] = vec3_p[0];
-		float3[1] = vec3_p[1];
-		float3[2] = vec3_p[2];
-	}
-	void setOgreVec4(float* float4,Ogre::Vector4 vec4_p) {
-		float4[0] = vec4_p[0];
-		float4[1] = vec4_p[1];
-		float4[2] = vec4_p[2];
-		float4[3] = vec4_p[3];
-	}
+	//float* convertOgreVec2(Ogre::Vector2 vec2_p) {
+	//	float float2[2] = {vec2_p[0],vec2_p[1]};
+	//	return float2;
+	//}
+	//float* convertOgreVec3(Ogre::Vector3 vec3_p) {
+	//	float float3[3] = { vec3_p[0],vec3_p[1],vec3_p[2]};
+	//	return float3;
+	//}
+	//float* convertOgreVec4(Ogre::Vector4 vec4_p) {
+	//	float float4[4] = { vec4_p[0],vec4_p[1],vec4_p[2],vec4_p[3]};
+	//	return float4;
+	//}
+	//// SET OGRE::VECTOR VALUE TO FLOAT*
+	//void setOgreVec2(float* float2,Ogre::Vector2 vec2_p) {
+	//	float2[0] = vec2_p[0];
+	//	float2[1] = vec2_p[1];
+	//}
+	//void setOgreVec3(float* float3,Ogre::Vector3 vec3_p) {
+	//	float3[0] = vec3_p[0];
+	//	float3[1] = vec3_p[1];
+	//	float3[2] = vec3_p[2];
+	//}
+	//void setOgreVec4(float* float4,Ogre::Vector4 vec4_p) {
+	//	float4[0] = vec4_p[0];
+	//	float4[1] = vec4_p[1];
+	//	float4[2] = vec4_p[2];
+	//	float4[3] = vec4_p[3];
+	//}
 
 	// RUNS AT INIT, USED DURING THE CREATION OF VIEW COMPONENTS
 	// MUST NOT BE RUN FROM OUTSIDE

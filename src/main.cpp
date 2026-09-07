@@ -55,6 +55,9 @@ int main() {
 	//fastgltf::Asset* asset = ResourceHandler::GetInstance()->loadGltfFile(skyBox);
 	//std::vector<hRes::Mesh> skyBoxMesh = ResourceHandler::GetInstance()->generateMesh(*asset);
 	
+	Gui* gui = new Gui(ResourceHandler::GetInstance());
+
+	gui->initGui();
 
 //	feel->initFeel(monster->sdlWindow,
 	//GDHANDLER
@@ -82,6 +85,8 @@ int main() {
 		Feel::GetInstance()->updateFeel();
 
 		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime, glock->getShaderTime());
+
+
 
 		glock->setEndTime();
 

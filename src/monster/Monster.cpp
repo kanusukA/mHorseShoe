@@ -34,6 +34,11 @@ void Monster::InitMonster() {
 	loadSkyBox();
 	loadOtherMesh();
 
+	gui = new Gui(ResourceHandler::GetInstance());
+
+	gui->initGui();
+	gui->_debugStats = &imDebugStats;
+
 	
 
 //	MonsterVulkan::loadAllMeshes();
@@ -71,8 +76,10 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, 
 
 	// Imgui Rendering
 
-	MonsterImgui::debugWindow();
+	//MonsterImgui::debugWindow();
 	skyBoxImguiMenu();
+
+	gui->updateGuiComponents();
 
 	ImGui::EndFrame();
 

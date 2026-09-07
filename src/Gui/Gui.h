@@ -35,7 +35,7 @@ private:
 	mFontSet* fontSet = new mFontSet();
 
 
-	Ogre::ImGuiOverlay* imOverlay = nullptr;
+	//Ogre::ImGuiOverlay* imOverlay = nullptr;
 
 	GUI_WINDOW_POS* guiWPos = new GUI_WINDOW_POS();
 
@@ -46,7 +46,7 @@ private:
 
 	void addModelComponent(ModelComponent* modelComponent) override {
 		modelComponent->setFramework(this);
-		modelComponent->windowSize = this->getGdSystem()->getWindowSize();
+		//modelComponent->windowSize = this->getGdSystem()->getWindowSize();
 		modelComponent->setSource(this);
 		modelComponent->init();
 		Models.push_back(modelComponent);
@@ -56,9 +56,19 @@ private:
 
 public:
 
-	Gui(CaseHandler* casehan, ResourceHandler* resourcehan, RSUS* rsus) : 
-		GuiFramework(casehan, resourcehan, rsus,casehan) 
+	Gui(
+		//CaseHandler* casehan,
+		ResourceHandler* resourcehan
+		//RSUS* rsus
+	) : 
+		GuiFramework(
+			//casehan,
+			resourcehan
+			//rsus,
+			//casehan
+		) 
 	{
+
 		ImGui::StyleColorsDark();
 		// INITALIZE SPECTER
 		//ImGui::Spectrum::StyleColorsSpectrum();
@@ -75,7 +85,8 @@ public:
 	ImGuiViewport* viewport;
 
 	// INIT
-	void initGui(Ogre::ImGuiOverlay* overlay);
+	//void initGui(Ogre::ImGuiOverlay* overlay);
+	void initGui();
 
 	// NEW FRAMEWORK
 	// Add ViewComponents / ModelComponents in this function

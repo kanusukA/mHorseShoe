@@ -14,7 +14,8 @@
 #endif
 
 
-#include <monster/MonsterImgui.h>
+//#include <monster/MonsterImgui.h>
+#include <Gui/Gui.h>
 
 #include <feel/feel.h>
 
@@ -26,6 +27,8 @@ class Monster : public FeelPollEventExtension, public MonsterImgui
 {
 
 private:
+
+	Gui* gui = nullptr;
 
 	uint32_t triangleShaderIndex;
 

@@ -139,8 +139,6 @@ set(OGRE_INSTALL_TOOLS TRUE CACHE BOOL "" FORCE)
 
 
 
-
-
 #target_compile_options(Plugin_GLSLangProgramManager PRIVATE $<$<CONFIG:Debug>:/MD>)
 
 #target_compile_options(OgreGLSupport PRIVATE $<$<CONFIG:Release>:/MD>)
@@ -186,7 +184,7 @@ FetchContent_MakeAvailable(gltf)
 set(SOURCES
 	#main.cpp
 	#src/imgui_stdlib.cpp
-	#	src/base/Mediator.cpp
+		src/base/Mediator.cpp
 	#src/CaseHandler/CaseHandler.cpp
 	#src/CaseHandler/CaseSaver.cpp
 	#	src/feel/Feel.cpp
@@ -200,7 +198,8 @@ set(SOURCES
 	#src/GDHandler/GDSystem.cpp
 	src/GDHandler/ResourceHandler.cpp
 	
-	#src/Gui/Gui.cpp
+	src/Gui/Gui.cpp
+	src/Gui/nGuiComponent/GuiVulkanUtils.cpp
 	#src/Gui/GuiButtons.cpp
 	#src/Gui/GuiTabs.cpp
 	#src/Gui/GuiComponents/AddTabComponent.cpp
@@ -242,7 +241,7 @@ set(SOURCES
 	src/main.cpp
 )
 
-add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  "src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" "src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp" "src/ResourceHandler/ResourceGltf.h" "src/ResourceHandler/ResourceGltf.cpp" "src/monster/VulkanUtils.h" "src/monster/MonsterBuffer.h" "src/monster/MonsterBuffer.cpp" "src/monster/MonsterSlang.h" "src/monster/MonsterSlang.cpp")
+add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  "src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" "src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp" "src/ResourceHandler/ResourceGltf.h" "src/ResourceHandler/ResourceGltf.cpp" "src/monster/VulkanUtils.h" "src/monster/MonsterBuffer.h" "src/monster/MonsterBuffer.cpp" "src/monster/MonsterSlang.h" "src/monster/MonsterSlang.cpp" "src/Gui/nGuiComponent/GuiVulkanUtils.h" "src/Gui/nGuiComponent/GuiVulkanUtils.cpp" "src/Gui/nGuiComponent/GuiGenStats.h" "src/Gui/nGuiComponent/GuiGenStats.cpp")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 
