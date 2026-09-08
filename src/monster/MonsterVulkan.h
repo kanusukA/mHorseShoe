@@ -179,7 +179,7 @@ public:
 
 	void importMesh(hRes::Mesh& mesh);
 	
-	std::weak_ptr<hRes::Mesh> createMesh();
+	std::weak_ptr<hRes::Mesh> createMesh(const char* name_p);
 
 	void addMesh(std::shared_ptr<hRes::Mesh> mesh);
 

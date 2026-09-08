@@ -6,10 +6,11 @@ class GuiGenStatsModelComponent : public ModelComponent
 {
 public:
 	ImguiDebugStats* debugStats;
-	GuiGenStatsModelComponent(const char* name_p) : ModelComponent(name_p) 
-	{
+	GuiGenStatsModelComponent(const char* name_p) : ModelComponent(name_p) {};
+
+	void init() override {
 		debugStats = this->gdSource->_debugStats;
-	};
+	}
 };
 
 

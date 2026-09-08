@@ -35,9 +35,10 @@ void Monster::InitMonster() {
 	loadOtherMesh();
 
 	gui = new Gui(ResourceHandler::GetInstance());
-
-	gui->initGui();
 	gui->_debugStats = &imDebugStats;
+	gui->mVulkan = this;
+	gui->initGui();
+	
 
 	
 

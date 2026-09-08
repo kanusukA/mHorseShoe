@@ -36,9 +36,9 @@ private:
 	void keyHit(MappedKey key) override;
 
 	// EXAMPLE
-	std::shared_ptr<hRes::SkyMesh> skyMesh = std::make_shared<hRes::SkyMesh>();
-	std::shared_ptr<hRes::SkyTexMesh> skyTexMesh = std::make_shared<hRes::SkyTexMesh>();
-	std::shared_ptr<hRes::SampleCube> sampleCube = std::make_shared<hRes::SampleCube>();
+	std::shared_ptr<hRes::SkyMesh> skyMesh = std::make_shared<hRes::SkyMesh>(static_cast<const char*>("SKY_MESH"));
+	std::shared_ptr<hRes::SkyTexMesh> skyTexMesh = std::make_shared<hRes::SkyTexMesh>(static_cast<const char*>("SKY_TEX_MESH"));
+	std::shared_ptr<hRes::SampleCube> sampleCube = std::make_shared<hRes::SampleCube>(static_cast<const char*>("SAMPLE_CUBE_MESH"));
 
 public:
 

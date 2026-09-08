@@ -1881,14 +1881,14 @@ void MonsterVulkan::loadMeshContainingShader(uint32_t meshIndex)
 void MonsterVulkan::importMesh(hRes::Mesh& mesh)
 {
 	hRes::Mesh* newMesh = new hRes::Mesh(mesh);
-	std::unique_ptr<hRes::Mesh> uniqMesh = std::make_unique<hRes::Mesh>();
+	std::unique_ptr<hRes::Mesh> uniqMesh = std::make_unique<hRes::Mesh>(mesh.name);
 	uniqMesh.reset(newMesh);
 	importedMeshes.push_back(std::move(uniqMesh));
 }
 
-std::weak_ptr<hRes::Mesh> MonsterVulkan::createMesh()
+std::weak_ptr<hRes::Mesh> MonsterVulkan::createMesh(const char* name_p)
 {
-	importedMeshes.push_back(std::move(std::make_shared<hRes::Mesh>()));
+	importedMeshes.push_back(std::move(std::make_shared<hRes::Mesh>(name_p)));
 
 	return importedMeshes.back();
 }

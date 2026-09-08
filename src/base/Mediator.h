@@ -222,6 +222,8 @@ private:
 protected:
 	//CaseHandler* scnHandler = nullptr;
 	ResourceHandler* resourceHandler = nullptr;
+
+	
 	
 	/*RSUS* shaderHandler = nullptr;
 	GDSystem* system = nullptr;*/
@@ -233,6 +235,7 @@ protected:
 
 public:
 	ImguiDebugStats* _debugStats = nullptr;
+	MonsterVulkan* mVulkan = nullptr;
 
 	GDSource(
 		//CaseHandler* casehan,  

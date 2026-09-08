@@ -55,9 +55,6 @@ int main() {
 	//fastgltf::Asset* asset = ResourceHandler::GetInstance()->loadGltfFile(skyBox);
 	//std::vector<hRes::Mesh> skyBoxMesh = ResourceHandler::GetInstance()->generateMesh(*asset);
 	
-	Gui* gui = new Gui(ResourceHandler::GetInstance());
-
-	gui->initGui();
 
 //	feel->initFeel(monster->sdlWindow,
 	//GDHANDLER

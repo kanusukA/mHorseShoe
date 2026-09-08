@@ -621,11 +621,14 @@ namespace hRes {
 
 	class Mesh {
 	private:
+		
 		std::shared_ptr<vulkanUtils::Shader> shaders = std::make_shared<vulkanUtils::Shader>();
 		std::vector<vk::DeviceSize> allocatingBufferSizes{sizeof(UniformBufferObject)};
 	public:
 
-		Mesh() {}
+		const char* name;
+
+		Mesh(const char* name_p) { name = name_p; }
 
 		glm::vec3 position = glm::vec3(0.0f);
 		glm::vec3 rotation = glm::vec3(0.0f);
@@ -634,8 +637,8 @@ namespace hRes {
 		std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
 		std::vector<uint16_t> indices = std::vector<uint16_t>();
 
-		uint32_t vertexBufferIndex; // Most likly they'll both be the same but fuck it let's have em both.
-		uint32_t indexBufferIndex;
+		uint32_t vertexBufferIndex = 0; // Most likly they'll both be the same but fuck it let's have em both.
+		uint32_t indexBufferIndex = 0;
 
 		bool isMeshVkLoaded = false;
 
@@ -709,6 +712,7 @@ namespace hRes {
 
 		Mesh(const Mesh& mesh) {
 			//this->graphicsPipelineIndex = mesh.graphicsPipelineIndex;
+			name = mesh.name;
 			this->indexBufferIndex = mesh.indexBufferIndex;
 			this->vertexBufferIndex - mesh.vertexBufferIndex;
 			this->indices = mesh.indices;
@@ -720,11 +724,13 @@ namespace hRes {
 	};
 
 	class SampleCube : public Mesh {
+	private:
+		SampleCube();
 	public:
 		//std::vector<MonsterBuffer> skyBuffers{};
 		ColorBufferObject colBufObj = ColorBufferObject();
 
-		SampleCube() {
+		SampleCube(const char* name_p) : Mesh(name_p) {
 			setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(ColorBufferObject) });
 		}
 
@@ -743,13 +749,15 @@ namespace hRes {
 
 	class SkyMesh : public Mesh
 	{
+	private:
+		SkyMesh();
 	public:
 
 		std::vector<MonsterBuffer> skyBuffers{};
 		SkyBufferObject skyBufObj = SkyBufferObject();
 		PushConstObject pushConstObj = PushConstObject();
 
-		SkyMesh() {
+		SkyMesh(const char* name_p) : Mesh(name_p) {
 			pushConstObj.time = 0.5f;
 			pushConstSize = sizeof(pushConstObj);
 			containsPushConstants = true;
@@ -777,12 +785,14 @@ namespace hRes {
 
 	class SkyTexMesh : public Mesh
 	{
+	private:
+		SkyTexMesh();
 	public:
 
 		std::vector<MonsterBuffer> skyTexBuffers{};
 		SkyTexBufferObject skyTexBufObj = SkyTexBufferObject();
 
-		SkyTexMesh() {
+		SkyTexMesh(const char* name_p) : Mesh(name_p) {
 			//rotation.y = 90.0f;
 			scale = glm::vec3(300.0f);
 			rotation.z = 180.f;
