@@ -591,7 +591,15 @@ class RenderMeshResource : public Resource
 
 public:
 
+	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
+	std::vector<uint16_t> indices = std::vector<uint16_t>();
+	
+	bool isMeshVkLoaded = false;
+
 	std::filesystem::path meshFile;
+
+	//std::shared_ptr<vulkanUtils::Shader> shaders;
+	std::vector<vk::DeviceSize> allocatingBufferSizes{}; // A default of UniformBuffer is recommanded for adding proper projection and transformation control
 
 	void setId(int index) override {
 
@@ -602,6 +610,7 @@ public:
 		_id = 10300000000 + index;
 
 	}
+
 	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p, std::filesystem::path meshFile_p) {
 		this->resourceHandlerCxt = context;
 		this->setName(meshName_p);
