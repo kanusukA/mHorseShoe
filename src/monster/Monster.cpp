@@ -74,6 +74,7 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, 
 	MonsterImgui::startImguiFrame();
 
 	skyMesh->pushConstObj.time = shaderTime;
+	skyTexMesh->pushConstObj.time = shaderTime;
 
 	// Imgui Rendering
 
@@ -142,10 +143,9 @@ void Monster::loadSkyBox()
 
 	skyMesh->setShader(sbs);
 
-	
-
 	skyMesh->vertices = meshData.vertices;
 	skyMesh->indices = meshData.indices;
+	
 
 	addMesh(skyMesh);
 	loadMeshContainingShader(0);
@@ -169,7 +169,11 @@ void Monster::loadSkyBox()
 	MonsterTexture starTextrue = MonsterTexture();
 	createTexture("../../../src/monster/shaders/stars.png", &starTextrue);
 
+	MonsterTexture fogTexture = MonsterTexture();
+	createTexture("../../../src/monster/shaders/far_fog_tex.png",&fogTexture);
+
 	top_shader->textures.push_back(std::move(starTextrue));
+	top_shader->textures.push_back(std::move(fogTexture));
 	//sbs->textures.push_back(std::move(starTextrue));
 
 	top_shader->colorBlending = true;
@@ -180,9 +184,9 @@ void Monster::loadSkyBox()
 	skyTexMesh->vertices = topMeshData.vertices;
 	skyTexMesh->indices = topMeshData.indices;
 
-	skyTexMesh->position = glm::vec3(0.0f, 150.0f, 0.0f);
+	skyTexMesh->position = glm::vec3(0.0f,550.0f, 0.0f);
 	skyTexMesh->rotation = glm::vec3(0.0f, 0.0f, 180.0f);
-	skyTexMesh->scale = glm::vec3(300.0f); 
+	//skyTexMesh->scale = glm::vec3(400.0f); 
 
 	
 	//load mesh
@@ -267,6 +271,14 @@ void Monster::skyBoxImguiMenu()
 	if (ImGui::DragFloat4("farFogColor", glm::value_ptr(skyMesh->skyBufObj.farFogColor), 0.0005f, 0.0f, 1.0f))
 	{
 		skyMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat3("farFogColor1", glm::value_ptr(skyTexMesh->skyTexBufObj.fogColq), 0.0005f, 0.0f, 1.0f))
+	{
+		skyTexMesh->updateBuffer();
+	}
+	if (ImGui::DragFloat3("farFogColor2", glm::value_ptr(skyTexMesh->skyTexBufObj.fogCol2), 0.0005f, 0.0f, 1.0f))
+	{
+		skyTexMesh->updateBuffer();
 	}
 	if (ImGui::DragFloat("starOffset", &skyTexMesh->skyTexBufObj.offset, 0.0005f, 0.0f, 1.0f))
 	{

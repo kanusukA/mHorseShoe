@@ -762,12 +762,13 @@ namespace hRes {
 			pushConstSize = sizeof(pushConstObj);
 			containsPushConstants = true;
 			//rotation.y = 90.0f;
-			scale = glm::vec3(160.f);
+			scale = glm::vec3(500.f);
+			position = glm::vec3(0, 200.f, 0);
 			setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(SkyBufferObject) });
 
 		}
 
-		virtual const void* getPushConst() { return &pushConstObj; }
+		const void* getPushConst() override { return &pushConstObj; }
 
 		void updateDescriptorWrites(vk::raii::Device* device) override {
 			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), fragBuffers, sizeof(SkyBufferObject));
@@ -791,15 +792,20 @@ namespace hRes {
 
 		std::vector<MonsterBuffer> skyTexBuffers{};
 		SkyTexBufferObject skyTexBufObj = SkyTexBufferObject();
+		PushConstObject pushConstObj = PushConstObject();
 
 		SkyTexMesh(const char* name_p) : Mesh(name_p) {
+			pushConstObj.time = 0.5f;
+			pushConstSize = sizeof(pushConstObj);
 			//rotation.y = 90.0f;
-			scale = glm::vec3(300.0f);
+			scale = glm::vec3(1300.0f);
 			rotation.z = 180.f;
 			setAllocatingBufferInfo({ sizeof(UniformBufferObject), sizeof(SkyTexBufferObject) });
 			skyTexBufObj.offset = 0.466f;
 			skyTexBufObj.smoothness = 0.413f;
 		}
+
+		const void* getPushConst() override { return &pushConstObj; }
 
 		void updateDescriptorWrites(vk::raii::Device* device) override {
 			getShader().lock()->_updateDescriptorWrites(device, transformBuffers, descritorSets.front(), fragBuffers, sizeof(SkyTexBufferObject));

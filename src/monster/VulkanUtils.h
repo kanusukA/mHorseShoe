@@ -37,6 +37,10 @@ struct ColorBufferObject {
 struct SkyTexBufferObject {
 	float offset;
 	float smoothness;
+	alignas(16)
+	glm::vec3 fogColq;
+	alignas(16)
+	glm::vec3 fogCol2;
 };
 
 struct PushConstObject {
@@ -176,16 +180,26 @@ namespace vulkanUtils {
 					}
 				);
 
-				uint32_t texIndex = 2;
+				
 
-				for (auto& texture: textures)
+				std::vector<vk::DescriptorImageInfo> images{};
+
+				for (size_t i = 0; i < textures.size(); i++)
 				{
 					vk::DescriptorImageInfo imageInfo{
-					.sampler = texture.textureSampler,
-					.imageView = texture.textureImageView,
+					.sampler = textures.at(i).textureSampler,
+					.imageView = textures.at(i).textureImageView,
 					.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
 					};
 
+					images.push_back(imageInfo);
+
+				}
+
+				uint32_t texIndex = 2;
+
+				for (size_t img = 0; img < images.size(); img++)
+				{
 					descriptorWrites.push_back(
 						{
 						.dstSet = sets[i],
@@ -193,15 +207,13 @@ namespace vulkanUtils {
 						.dstArrayElement = 0,
 						.descriptorCount = 1,
 						.descriptorType = vk::DescriptorType::eCombinedImageSampler,
-						.pImageInfo = &imageInfo
+						.pImageInfo = &images.at(img)
 						}
 					);
 
 					texIndex += 1;
-
 				}
 				
-
 				device->updateDescriptorSets(descriptorWrites, {});
 
 			}

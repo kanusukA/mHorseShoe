@@ -57,7 +57,7 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 	// UPDATE BUFFERS
 	for (const auto& mesh: importedMeshes)
 	{
-		mesh->updateTransformations(camera->getViewMatrix(), camera->getProjectionMatrix(static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 1000.0f));
+		mesh->updateTransformations(camera->getViewMatrix(), camera->getProjectionMatrix(static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 10000.0f));
 		//updateUniformBuffer(vkMonsterStats.frameIndex, mesh->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
 	}
 	
@@ -1851,7 +1851,7 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 	shader->shaderLoaded = true;
 	if (!importedMeshes[meshIndex]->vertices.empty() && !importedMeshes[meshIndex]->indices.empty())
 	{
-		importedMeshes[meshIndex]->isMeshVkLoaded = true;
+		importedMeshes[meshIndex]->isMeshVkLoaded = true; 
 	}
 
 	//set Color
