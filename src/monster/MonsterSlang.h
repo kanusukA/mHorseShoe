@@ -11,7 +11,7 @@ private:
 	Slang::ComPtr<slang::IGlobalSession> globalSession;
 	VulkanStatus* vkMonsterStats;
 
-	void _loadShader(std::shared_ptr<vulkanUtils::Shader> shader);
+	std::pair<vk::raii::ShaderModule,vk::raii::ShaderModule> _loadShader(std::filesystem::path& vertPath, std::filesystem::path& fragPath, std::string vertName, std::string fragName );
 
 public:
 	
@@ -26,9 +26,11 @@ public:
 	}
 
 	void loadShader(std::shared_ptr<vulkanUtils::Shader> shader);
+	void loadShaderResource(ShaderResource* shaderResource);
 
+	// for backwards compatability - use the ShaderResource function for future use
 	std::shared_ptr<vulkanUtils::Shader> loadShader(const std::string& shadername, std::filesystem::path& vertfilepath, std::filesystem::path& fragfilepath);
-
+	
 
 	std::vector<uint8_t> compileSlangFile(
 		const std::string& shadername,

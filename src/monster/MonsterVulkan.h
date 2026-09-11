@@ -42,6 +42,8 @@ public:
 	std::vector<uint32_t> loadedMeshes = std::vector<uint32_t>();
 	std::vector<uint32_t> passObjects = std::vector<uint32_t>();
 
+	std::vector<RenderMeshResource*> vkRenderMeshes{};
+
 	std::vector<vk::raii::Pipeline> pipes = std::vector<vk::raii::Pipeline>();
 
 	MonsterCamera camera = std::make_unique<Camera>();
@@ -173,6 +175,7 @@ public:
 	void loadMeshToVulkan(uint32_t meshIndex);
 	void loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex);
 	void loadMeshShader(uint32_t meshIndex);
+	void vkLoadShader(ShaderResource* shaderResource);
 
 	void loadMesh(uint32_t shaderIndex, uint32_t meshIndex);
 	void loadMeshContainingShader(uint32_t meshIndex);
@@ -182,6 +185,10 @@ public:
 	std::weak_ptr<hRes::Mesh> createMesh(const char* name_p);
 
 	void addMesh(std::shared_ptr<hRes::Mesh> mesh);
+
+	void addMesh(RenderMeshResource* meshResource);
+	void addLoadMesh(RenderMeshResource* meshResource);
+	
 
 	void loadAllMeshes();
 	// CAN BE USED LATER TO SYNC AND ALIGN THE GRAPHICS PIPELINE!!

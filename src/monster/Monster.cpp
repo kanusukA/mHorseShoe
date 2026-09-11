@@ -145,7 +145,6 @@ void Monster::loadSkyBox()
 
 	skyMesh->vertices = meshData.vertices;
 	skyMesh->indices = meshData.indices;
-	
 
 	addMesh(skyMesh);
 	loadMeshContainingShader(0);

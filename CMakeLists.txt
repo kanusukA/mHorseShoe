@@ -185,45 +185,43 @@ set(SOURCES
 	#main.cpp
 	#src/imgui_stdlib.cpp
 		src/base/Mediator.cpp
-	#src/CaseHandler/CaseHandler.cpp
+	src/CaseHandler/CaseHandler.cpp
 	#src/CaseHandler/CaseSaver.cpp
 	#	src/feel/Feel.cpp
 	#src/feel/KeyHandler.cpp
 	#src/feel/Keys.cpp
 	#src/feel/playerMovement.cpp
 	#src/GDHandler/GDHandler.cpp
-	#src/GDHandler/GDContext.cpp
+	src/GDHandler/GDContext.cpp
 	#src/GDHandler/GDNotifier.cpp
 	#src/GDHandler/GDNotifierHandler.cpp
 	#src/GDHandler/GDSystem.cpp
 	src/GDHandler/ResourceHandler.cpp
-	
 	src/Gui/Gui.cpp
 	src/Gui/nGuiComponent/GuiVulkanUtils.cpp
 	#src/Gui/GuiButtons.cpp
 	#src/Gui/GuiTabs.cpp
 	#src/Gui/GuiComponents/AddTabComponent.cpp
-	
 	#src/Gui/GuiComponents/ObjectTabComponent.cpp
 	#src/Gui/GuiComponents/ResourceTabComponent.cpp
 	#src/Gui/GuiComponents/RSUSTabComponent.cpp
 	#src/Gui/GuiComponents/StatusTabComponent.cpp
 	src/Gui/GuiComponents/ToastComponent.cpp
-	#src/Gui/GuiComponents/ToastTabComponent.cpp
+	src/Gui/GuiComponents/ToastTabComponent.cpp
 	#src/Gui/GuiComponents/_SceneTabComponent.cpp
 	src/monster/Monster.cpp
 	src/ResourceHandler/ResourceLoader.cpp
 	src/ResourceHandler/ResourceObjects.cpp
 	src/ResourceHandler/ResourceReader.cpp
 	src/ResourceHandler/ResourceSaver.cpp
-	#src/Stuffs/CaseObject.cpp
+	src/Stuffs/CaseObject.cpp
 	#src/Stuffs/ColliderMesh.cpp
 	#src/Stuffs/EntityObject.cpp
 	#src/Stuffs/ImageObject.cpp
 	#src/Stuffs/Material.cpp
-	#src/Stuffs/RenderMesh.cpp
-	#src/Stuffs/SceneObject.cpp
-	#src/Stuffs/ShaderObject.cpp
+	src/Stuffs/RenderMesh.cpp
+	src/Stuffs/SceneObject.cpp
+	src/Stuffs/ShaderObject.cpp
 	src/timer/glock.cpp
 	#src/vktest/main.cpp
 	#src/vktest/Monster.cpp

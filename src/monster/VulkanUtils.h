@@ -103,6 +103,7 @@ struct MonsterTexture {
 	vk::raii::ImageView textureImageView = nullptr;
 	vk::raii::Sampler textureSampler = nullptr;
 	VmaAllocation textureAlloc;
+
 };
 
 struct MonsterPipe {

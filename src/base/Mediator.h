@@ -6,6 +6,7 @@
 //Local
 #include<Gui/GuiConsts.h>
 //#include <GDHandler/Connector/MasterB.h>
+#include <CaseHandler/CaseHandler.h>
 #include <monster/MonsterImgui.h>
 #include <Gui/GuiComponents/ToastComponent.h>
 
@@ -222,7 +223,7 @@ private:
 protected:
 	//CaseHandler* scnHandler = nullptr;
 	ResourceHandler* resourceHandler = nullptr;
-
+	CaseHandler* caseHandler = nullptr;
 	
 	
 	/*RSUS* shaderHandler = nullptr;
@@ -239,9 +240,12 @@ public:
 
 	GDSource(
 		//CaseHandler* casehan,  
-		ResourceHandler* resourceHan
+		ResourceHandler* resourceHan,
+		CaseHandler* caseHan
 		//RSUS* rsus,GDSystem* system_p
 	) {
+		resourceHandler = resourceHan;
+		caseHandler = caseHan;
 		//this->scnHandler = casehan;
 		//this->resourceHandler = resourceHan;
 		////this->feel = feelhan;
@@ -277,6 +281,9 @@ public:
 		return resourceHandler;
 	}
 
+	CaseHandler* getCaseHandler() {
+		return caseHandler;
+	}
 
 	/*RSUS* getShaderHandler() {
 		return shaderHandler;
@@ -443,7 +450,6 @@ protected:
 	std::vector<ModelComponent*> Models = std::vector<ModelComponent*>();
 	std::vector<ViewComponent*> Views = std::vector<ViewComponent*>();
 
-	
 
 	ModelComponent* getModelByName(std::string name) {
 		for (int i = 0; i < Models.size(); i++)
@@ -459,21 +465,23 @@ protected:
 
 	};
 
+	
+	
+
 public:
+	std::shared_ptr<Cases> mCases;
+	std::shared_ptr<Scenes> mScenes;
+	std::shared_ptr<Objects> mObjects;
 
 	GuiFramework(
-		//CaseHandler* casehan,
-		ResourceHandler* resourcehan
-		//RSUS* rsus,
-		//GDSystem* system_p
-	) : 
-		GDSource(
-			//casehan,
-			resourcehan
-			//rsus,
-		//	system_p
-		) {
-		//resourcehan->setGuiRegen(this);
+		ResourceHandler* resourcehan,
+		CaseHandler* caseHandler
+	) : GDSource(resourcehan,caseHandler) {
+
+		mCases = caseHandler->mCases;
+		mScenes = caseHandler->mScenes;
+		mObjects = caseHandler->mObjects;
+
 	}
 
 	// GUI FUNCTIONS

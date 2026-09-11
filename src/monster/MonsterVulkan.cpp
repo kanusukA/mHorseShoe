@@ -1858,6 +1858,32 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 	/*importedMeshes[meshIndex]->setColor(glm::vec3(0.0f, 1.0f, 0.0f));*/
 }
 
+void MonsterVulkan::vkLoadShader(ShaderResource* shaderResource)
+{
+	std::vector<vk::DescriptorSetLayoutBinding> bindings = shaderResource->getBindings();
+
+	createDescriptorSetLayout(bindings, &shaderResource->shaderPipes.descriptorSetLayout);
+
+	//shader->descriptorSets = createDescriptorSets(shader->descriptorSetLayout);
+	createDescriptorSets(shaderResource->shaderPipes.descriptorSetLayout, &shaderResource->descriptorSets);
+
+	std::tie(shaderResource->shaderPipes.graphicsPipeline,
+		shaderResource->shaderPipes.descriptorPipeLayout) = createGraphicsPipeline(
+			shaderResource->vertexShader,
+			shaderResource->fragmentShader,
+			shaderResource->shaderPipes.descriptorSetLayout,
+			shaderResource->pushConstSize,
+			shaderResource->polyMode,
+			vk::CullModeFlagBits::eNone,
+			vk::FrontFace::eCounterClockwise,
+			shaderResource->colorBlending
+		);
+
+	shaderResource->isShaderVkLoaded = true;
+
+
+}
+
 void MonsterVulkan::loadMesh(uint32_t shaderIndex,uint32_t meshIndex)
 {
 	loadMeshToVulkan(meshIndex);
@@ -1869,6 +1895,7 @@ void MonsterVulkan::loadMesh(uint32_t shaderIndex,uint32_t meshIndex)
 	{
 		loadedMeshes.push_back(meshIndex);
 	}
+
 
 }
 
@@ -1896,6 +1923,50 @@ std::weak_ptr<hRes::Mesh> MonsterVulkan::createMesh(const char* name_p)
 void MonsterVulkan::addMesh(std::shared_ptr<hRes::Mesh> mesh)
 {
 	importedMeshes.push_back(mesh);
+}
+
+void MonsterVulkan::addMesh(RenderMeshResource* meshResource)
+{
+	vkRenderMeshes.push_back(meshResource);
+}
+
+void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
+{
+	vkRenderMeshes.push_back(meshResource);
+	if (meshResource->isMeshVkLoaded)
+	{
+		ToastComponent::GetInstance()->addMessage("MESH IS ALREADY LOADED");
+		return;
+	}
+	if (!meshResource->getShader())
+	{
+		ToastComponent::GetInstance()->addMessage("Mesh Shader is not set");
+		return;
+	}
+	if (!meshResource->getShader()->isShaderVkLoaded)
+	{
+		vkLoadShader(meshResource->getShader());
+	}
+
+	std::vector<std::vector<MonsterBuffer>> allocatedBuffers{};
+	auto allocatedBufInfo = meshResource->allocatingBufferSizes;
+	for (const auto& bufferInfo : allocatedBufInfo)
+	{
+		std::vector<MonsterBuffer> bufferVec{};
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			MonsterBuffer buffer = MonsterBuffer();
+			createMonsterBuffer(bufferInfo, &buffer);
+			bufferVec.push_back(std::move(buffer));
+		}
+		allocatedBuffers.push_back(std::move(bufferVec));
+
+	}
+	meshResource->allocateBufferInfo(allocatedBuffers);
+	meshResource->updateDescriptorWrite(&vkMonsterStats.device);
+
+	//Test 
+
 }
 
 void MonsterVulkan::loadAllMeshes()

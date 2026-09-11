@@ -11,6 +11,36 @@ void GDBuilderContext::startEngine()
 
 }
 
+void GDBuilderContext::loadRenderMesh(RenderMeshResource* meshResource)
+{
+	// verify object sanity
+	ToastComponent::GetInstance()->addMessage("Loading mesh : " + std::to_string(meshResource->getId()));
+	if (meshResource->meshFile.empty())
+	{
+		ToastComponent::GetInstance()->addMessage("Unable to Create Mesh: Invalid mesh FilePath");
+	}
+	if (!meshResource->getShader())
+	{
+		ToastComponent::GetInstance()->addMessage("Unable to Create Mesh: No Shader Set! ");
+	}
+	
+	fastgltf::Asset* asset = ResourceHandler::GetInstance()->loadGltfFile(meshResource->meshFile);
+	meshResource->mesh = resourceHandler->generateMesh(*asset);
+
+	if (meshResource->mesh.empty())
+	{
+		ToastComponent::GetInstance()->addMessage("Unable to Create Mesh: Mesh Data empty");
+	}
+	
+	// add files to shader
+
+}
+
+void GDBuilderContext::loadShader(ShaderResource* shaderResource)
+{
+	monster->loadShaderResource(shaderResource);
+}
+
 
 /*void GDBuilderContext::loadMaterialsDpToOgre()
 {

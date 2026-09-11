@@ -1,9 +1,11 @@
 #pragma once
 
-#include <GDHandler/objects.h>
+#include <Stuffs/CaseObject.h>
 
 
-
+typedef std::vector<Case> Cases;
+typedef std::vector<Scene> Scenes;
+typedef std::vector<Object> Objects;
 
 
 // setup imports
@@ -11,8 +13,6 @@
 // Manages Case. i.e all the Scenes in a single save file
 // Also manages the integration of ResourceScenes and Ogre::Scenes
 class CaseHandler : public GDBuilderContext{
-
-private:
 
 
 protected:
@@ -22,6 +22,12 @@ protected:
 
 
 public:
+
+	std::shared_ptr<Cases> mCases = std::make_shared<std::vector<Case>>();
+	std::shared_ptr<Scenes> mScenes = std::make_shared<std::vector<Scene>>();;
+	std::shared_ptr<Objects> mObjects = std::make_shared<std::vector<Object>>();;
+
+	// shaders and meshes are stored in monsterVulkan
 
 //	Ogre::SceneManager* oScnManager;
 
@@ -57,11 +63,15 @@ public:
 
 	};
 
+	void createCase(std::string name_p, std::string filename_p);
+	void createScene(std::string name_p);
+	void createObject(std::string name_p);
+	
+
 /*	bool resourceExists(std::string resourceName);
 
 
 	std::vector<std::shared_ptr<Case>>* fetchAllCases() { return caseVec; }
-
 
 	Case* CreateCase(std::string caseName_p);
 	Case* CreateCase(std::string caseName_p,std::string filename_p);

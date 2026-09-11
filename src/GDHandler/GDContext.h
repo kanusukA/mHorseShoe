@@ -2,8 +2,12 @@
 
 
 // Local
-#include <feel/playerMovement.h>
-#include <GDHandler/GDSystem.h>
+//#include <feel/playerMovement.h>
+//#include <GDHandler/GDSystem.h>
+
+#include <Gui/GuiComponents/ToastComponent.h>
+
+#include <monster/Monster.h>
 
 // Third
 
@@ -26,7 +30,7 @@ class Kint;
 // Primary Class.
 // Used to build object with all required contexts and initializations
 // CONNECTS MONSTER WITH CASE HANDLER
-class GDBuilderContext : public GDSystem
+class GDBuilderContext /*: public GDSystem*/
 {	
 protected:
 
@@ -38,7 +42,7 @@ protected:
 
 public:
 
-	GDBuilderContext(ResourceHandler* resourceHan_p, Monster* monster_p) : GDSystem(monster_p) {
+	GDBuilderContext(ResourceHandler* resourceHan_p, Monster* monster_p) /*: GDSystem(monster_p)*/ {
 		resourceHandler = resourceHan_p;
 		monster = monster_p;
 
@@ -47,6 +51,10 @@ public:
 	}
 
 	virtual void update(float deltaTime) {};
+
+	void loadRenderMesh(RenderMeshResource* meshResource);
+
+	void loadShader(ShaderResource* shaderResource);
 
 	//Ogre
 /*	void loadMaterialsDpToOgre();

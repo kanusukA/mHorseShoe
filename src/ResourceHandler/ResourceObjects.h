@@ -291,61 +291,21 @@ public:
 class SceneResource : public Resource
 {
 
-private:
-	int scnType; // Scene Type cannot change after being initalized.
-
 protected:
-
-	float* position = new float[3]{};
-	float* orientation = new float[4] {1.0,0.0,0.0,0.0};
-	float* scale = new float[3] {1.0,1.0,1.0};
-
+	ObjectResource* objectResource;
 
 public:
-
-	float* _getPosition() {
-		
-		return position;
-	}
-
-	float* _getOrientation() {
-		return orientation;
-	}
-
-	float* _getScale() {
-		return scale;
-	}
-
-	// UPDATES THE POSITION,ORIENTATION,SCALE WITH THE CORRESPONDING FLOAT*
-	// PRIMARILY USED FOR IMGUI INPUT
-	virtual void updatePosition() {}
-	virtual void updateOrientation() {}
-	virtual void updateScale() {}
-
 
 	void setId(int index) override {
 		if (index > 99999)
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
 		}
-		_id = 10100000000 + index + ((this->scnType) * 10000000); //  Assigns ID Based on SceneType
+		_id = 10100000000 + index; //  Assigns ID Based on SceneType
 	}
 
-	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, SceneType sceneType, glm::vec3  position_p, glm::vec4 orientation_p, glm::vec3 scale_p) {
+	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p ) {
 		this->resourceHandlerCxt = context;
-
-		scnType = sceneType;
-
-		position[0] = position_p[0];
-		position[1] = position_p[1];
-		position[2] = position_p[2];
-		orientation[0] = orientation_p[0];
-		orientation[1] = orientation_p[1];
-		orientation[2] = orientation_p[2];
-		orientation[3] = orientation_p[3];
-		scale[0] = scale_p[0];
-		scale[1] = scale_p[1];
-		scale[2] = scale_p[2];
 
 		this->setName(name_p);
 
@@ -354,21 +314,6 @@ public:
 
 	};
 
-	SceneResource(ResourceHandlerBuilderContext* context, std::string name_p, SceneType sceneType) {
-		this->resourceHandlerCxt = context;
-
-		scnType = sceneType;
-
-		this->setName(name_p);
-
-		setId(context->generateSceneID());
-		context->AddIndexToMaster(getId());
-
-	};
-
-	int getSceneType() {
-		return scnType;
-	}
 
 	~SceneResource() = default;
 
@@ -377,50 +322,30 @@ public:
 
 class ObjectResource : public Resource
 {
-
-private:
-	PhysXType physXType;
-
 protected:
-
-	float mass = 0;
-
-	std::string renderMeshName;
-
-	std::filesystem::path meshFilePath;
+	RenderMeshResource* meshResource;
 
 public:
+
+	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec3 scale;
+
+
 
 	void setId(int index) override {
 		if (index > 99999)
 		{
 			throw ResourceHandlerIDError("Id index exceeds maximum limit of 99,999!");
 		}
-		_id = 10200000000 + index + (this->physXType * 10000000);
+		_id = 10200000000 + index;
 	}
 
-	ObjectResource(ResourceHandlerBuilderContext* context, std::string name_p, PhysXType objectType,std::filesystem::path meshFilePath_p) {
+	ObjectResource(ResourceHandlerBuilderContext* context, std::string name_p, RenderMeshResource* meshResource_p) {
 		this->resourceHandlerCxt = context;
-		physXType = objectType;
 		this->setName(name_p);
-		meshFilePath = meshFilePath_p;
-		renderMeshName = meshFilePath.stem().string();
+		meshResource = meshResource_p;
 		setId(context->generateObjectID());
-	}
-
-	void setMass(float mass_p) {
-		mass = mass_p;
-	}
-
-	PhysXType getPhysxType() { return physXType; }
-	float getMass() { return mass; }
-	
-	const std::string _getMeshName() {
-		return renderMeshName;
-	}
-
-	const std::filesystem::path getMeshFilePath() {
-		return meshFilePath;
 	}
 
 	virtual ~ObjectResource() = default;
@@ -459,16 +384,38 @@ struct ShaderTexture
 class ShaderResource : public Resource {
 protected:
 	std::string ShaderName; 
-	std::string fileName;
 
 	ShaderType shaderType;
 
-	std::vector<ShaderTexture>* ShaderTextures = new std::vector<ShaderTexture>();
+	//std::vector<ShaderTexture>* ShaderTextures = new std::vector<ShaderTexture>();
 
-	// These Parameters contain pre-saved values of Material and must be cross checked with Ogre's Shader parameters for consistancy
+	// These are an outward prased view of the shader variables and must not be used to set the shader values themselves 
+	// as a shader can be used by multiple Meshes, having different values to the variables!
 	std::vector<ShaderVar>* ShaderParameters = new std::vector<ShaderVar>();
 
 public:
+
+	vk::raii::ShaderModule vertexShader = nullptr;
+	vk::raii::ShaderModule fragmentShader = nullptr;
+
+	std::filesystem::path vertPath;
+	std::filesystem::path fragPath;
+
+	bool isShaderVkLoaded = false;
+
+	bool colorBlending = false;
+
+	vk::PolygonMode polyMode = vk::PolygonMode::eFill;
+	vk::CullModeFlagBits culling = vk::CullModeFlagBits::eNone;
+	vk::FrontFace frontface = vk::FrontFace::eCounterClockwise;
+
+	MonsterPipe shaderPipes = MonsterPipe();
+
+	vk::DeviceSize pushConstSize = vk::DeviceSize(0);
+
+	vk::raii::DescriptorSets descriptorSets = nullptr;
+
+	std::vector<MonsterTexture> textures{};
 
 	void setId(int index) override {
 		if (index > 99999)
@@ -478,12 +425,132 @@ public:
 		_id = 10700000000 + index + (shaderType * 10000000);
 	}
 
-	ShaderResource(ResourceHandlerBuilderContext* context, std::string name_p, ShaderType shaderType_p, std::string shaderFileName) {
+	void _updateDescriptorWrites(
+		vk::raii::Device* device,
+		const std::vector<MonsterBuffer>& buffer,
+		const std::vector<MonsterBuffer>& fragBuf
+	) {
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			std::vector<vk::WriteDescriptorSet> descriptorWrites{};
+
+			vk::DescriptorBufferInfo bufferInfo{
+				.buffer = buffer.at(i).buffer,
+				.offset = vk::DeviceSize(0),
+				.range = sizeof(UniformBufferObject)
+			};
+
+			vk::DescriptorBufferInfo buffer2Info{
+				.buffer = fragBuf.at(i).buffer,
+				.offset = vk::DeviceSize(0),
+				.range = fragBuf.at(i).bufferSize
+			};
+
+
+			descriptorWrites.push_back({
+				.dstSet = descriptorSets.at(i),
+				.dstBinding = 0,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = vk::DescriptorType::eUniformBuffer,
+				.pBufferInfo = &bufferInfo
+				});
+
+			descriptorWrites.push_back(
+				{
+				.dstSet = descriptorSets[i],
+				.dstBinding = 1,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = vk::DescriptorType::eUniformBuffer,
+				.pBufferInfo = &buffer2Info
+				}
+			);
+
+
+
+			std::vector<vk::DescriptorImageInfo> images{};
+
+			for (size_t i = 0; i < textures.size(); i++)
+			{
+				vk::DescriptorImageInfo imageInfo{
+				.sampler = textures.at(i).textureSampler,
+				.imageView = textures.at(i).textureImageView,
+				.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+				};
+
+				images.push_back(imageInfo);
+
+			}
+
+			uint32_t texIndex = 2;
+
+			for (size_t img = 0; img < images.size(); img++)
+			{
+				descriptorWrites.push_back(
+					{
+					.dstSet = descriptorSets[i],
+					.dstBinding = texIndex,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+					.pImageInfo = &images.at(img)
+					}
+				);
+
+				texIndex += 1;
+			}
+
+			device->updateDescriptorSets(descriptorWrites, {});
+
+		}
+
+	}
+
+
+	std::vector<vk::DescriptorSetLayoutBinding> getBindings() {
+		std::vector<vk::DescriptorSetLayoutBinding> binds{};
+		binds.push_back(vk::DescriptorSetLayoutBinding{
+				.binding = 0,
+				.descriptorType = vk::DescriptorType::eUniformBuffer,
+				.descriptorCount = 1,
+				.stageFlags = vk::ShaderStageFlagBits::eVertex
+			});
+		binds.push_back(
+			vk::DescriptorSetLayoutBinding{
+				.binding = 1,
+				.descriptorType = vk::DescriptorType::eUniformBuffer,
+				.descriptorCount = 1,
+				.stageFlags = vk::ShaderStageFlagBits::eFragment
+			}
+		);
+
+		for (uint32_t i = 0; i < textures.size(); i++)
+		{
+			binds.push_back(
+				vk::DescriptorSetLayoutBinding{
+				.binding = 2 + i,
+				.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+				.descriptorCount = 1,
+				.stageFlags = vk::ShaderStageFlagBits::eFragment
+				}
+			);
+		}
+
+		return binds;
+
+	}
+
+	ShaderResource(ResourceHandlerBuilderContext* context, std::string name_p, ShaderType shaderType_p, std::filesystem::path vertFile_p, std::filesystem::path fragFile_p) {
 		this->setName(name_p);
 		this->resourceHandlerCxt = context;
 		shaderType = shaderType_p;
 		
-		ShaderName = shaderFileName;
+		vertPath = vertFile_p;
+		fragPath = fragFile_p;
+
+		ShaderName = name_p;
 			
 		setId(context->generateShaderID());
 
@@ -497,10 +564,6 @@ public:
 		return ShaderParameters;
 	}
 
-	std::vector<ShaderTexture>* getShaderTextures() {
-		return ShaderTextures;
-	}
-
 
 	ShaderType getShaderType() {
 		return shaderType;
@@ -508,10 +571,6 @@ public:
 
 	std::string getShaderName() {
 		return ShaderName;
-	}
-
-	std::string getShaderFileName() {
-		return fileName;
 	}
 
 	~ShaderResource() = default;
@@ -590,10 +649,9 @@ class RenderMeshResource : public Resource
 {
 
 public:
-
-	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
-	std::vector<uint16_t> indices = std::vector<uint16_t>();
 	
+	std::vector<MeshData> mesh{};
+
 	bool isMeshVkLoaded = false;
 
 	std::filesystem::path meshFile;
@@ -618,6 +676,17 @@ public:
 		setId(context->generateMeshID());
 	}
 
+	void setAllocatingBufferInfo(std::vector<vk::DeviceSize> buffers) { allocatingBufferSizes = buffers; }
+
+	virtual void allocateBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
+		throw std::runtime_error("BUFFERS MUST BE ALLOCATED TO HIGHER CLASS!");
+	}
+
+	virtual void updateDescriptorWrite(vk::raii::Device* device) {
+		throw std::runtime_error("BUFFERS MUST BE ALLOCATED TO HIGHER CLASS!");
+	}
+
+	virtual ShaderResource* getShader() { return nullptr; }
 
 	std::string getMeshName() { return name; }
 

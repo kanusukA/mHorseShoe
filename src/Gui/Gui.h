@@ -58,12 +58,14 @@ public:
 
 	Gui(
 		//CaseHandler* casehan,
-		ResourceHandler* resourcehan
+		ResourceHandler* resourcehan,
+		CaseHandler* caseHan
 		//RSUS* rsus
 	) : 
 		GuiFramework(
 			//casehan,
-			resourcehan
+			resourcehan,
+			caseHan
 			//rsus,
 			//casehan
 		) 

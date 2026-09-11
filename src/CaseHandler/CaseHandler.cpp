@@ -2,25 +2,14 @@
 
 
 
-std::unique_ptr<Case> CaseHandler::selectedCase;
+
 
 /*bool CaseHandler::resourceExists(std::string resourceName)
 {
 	return Ogre::ResourceGroupManager::getSingleton().resourceExistsInAnyGroup(resourceName);
 }
 */
-Case* CaseHandler::CreateCase(std::string caseName_p)
-{
-	Case* newCase = new Case(this, caseName_p);
-	return newCase;
 
-}
-
-Case* CaseHandler::CreateCase(std::string caseName_p, std::string filename_p)
-{
-	Case* newCase = new Case(this, caseName_p, filename_p);
-	return newCase;
-}
 
 
 /*Scene* CaseHandler::CreateScene(std::string scnName, SceneType scnType, Ogre::SceneNode* parentNode_p)
@@ -251,8 +240,20 @@ std::string CaseHandler::loadDefaultCase()
 
 }*/
 
+void CaseHandler::createCase(std::string name_p, std::string filename_p)
+{
+	mCases.push_back(std::make_shared<Case>(this, name_p, filename_p));
 
+}
 
+void CaseHandler::createScene(std::string name_p)
+{
+	mScenes.push_back(std::make_shared<Scene>(name_p));
+}
 
+void CaseHandler::createObject(std::string name_p)
+{
+	mObjects.push_back(std::make_shared<Object>(name_p));
+}
 
 

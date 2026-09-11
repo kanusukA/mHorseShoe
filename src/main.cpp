@@ -2,6 +2,8 @@
 //#include <GDHandler/GDHandler.h>
 #include <monster/Monster.h>
 
+#include <Stuffs/CaseObject.h>
+
 #include <timer/glock.h>
 #include <cons.h>
 
