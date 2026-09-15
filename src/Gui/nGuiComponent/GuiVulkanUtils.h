@@ -5,6 +5,7 @@
 class GuiVulkanUtilsComponent : public ModelComponent 
 {
 public:
+
 	std::vector<std::shared_ptr<hRes::Mesh>>* vulkanMeshes = nullptr;
 	GuiVulkanUtilsComponent(const char* name_p) : ModelComponent(name_p) {}
 
@@ -22,9 +23,7 @@ private:
 	// MODELS
 	GuiVulkanUtilsComponent* model;
 
-
 public:
-
 
 	GuiVulkanUtilsView(const char* name_p,
 		GuiVulkanUtilsComponent* vulkanComponent

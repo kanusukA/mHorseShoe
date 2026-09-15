@@ -1,8 +1,6 @@
 
 //#include <GDHandler/GDHandler.h>
-#include <monster/Monster.h>
-
-#include <Stuffs/CaseObject.h>
+#include <Gui/Gui.h>
 
 #include <timer/glock.h>
 #include <cons.h>
@@ -50,6 +48,8 @@ int main() {
 
 
 	std::cout << "Setting up Kint" << std::endl;
+
+	CaseHandler* caseHandler = new CaseHandler(monster);
 	// Physics INIT
 	/*kint = new Kint();
 	kint->InitPhysics();*/
@@ -73,6 +73,11 @@ int main() {
 
 	//monster->_createGrassBlade(0.3, 1);
 
+	Gui* gui = new Gui(ResourceHandler::GetInstance(), caseHandler);
+	gui->initGuiComponents();
+	gui->_debugStats = &monster->imDebugStats;
+
+
 	Glock* glock = new Glock();
 
 	// MAIN LOOP
@@ -83,8 +88,11 @@ int main() {
 
 		Feel::GetInstance()->updateFeel();
 
-		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime, glock->getShaderTime());
+		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime);
 
+		monster->startRenderingTillGui(glock->getShaderTime());
+		gui->updateGuiComponents();
+		monster->endRendering();
 
 
 		glock->setEndTime();

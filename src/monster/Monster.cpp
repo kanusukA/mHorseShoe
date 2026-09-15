@@ -34,10 +34,7 @@ void Monster::InitMonster() {
 	loadSkyBox();
 	loadOtherMesh();
 
-	gui = new Gui(ResourceHandler::GetInstance());
-	gui->_debugStats = &imDebugStats;
-	gui->mVulkan = this;
-	gui->initGui();
+	
 	
 
 	
@@ -54,7 +51,7 @@ void Monster::InitMonster() {
 
 }
 
-void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime, float shaderTime)
+void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime)
 {
 	// FRAME BUFFER RESIZED IS SEPERATE FROM POLL EVENTS AS IT MUST RUN BEFOR RENDERING THE FRAME ELSE SWAPCHAIN CAN FAIL, as sdl poll events are run without block main thread;
 	if (Feel::GetInstance()->mappedEvents.windowResize->eventState)
@@ -71,22 +68,33 @@ void Monster::updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, 
 	}
 
 	// rendering
-	MonsterImgui::startImguiFrame();
-
-	skyMesh->pushConstObj.time = shaderTime;
-	skyTexMesh->pushConstObj.time = shaderTime;
+	
 
 	// Imgui Rendering
 
 	//MonsterImgui::debugWindow();
-	skyBoxImguiMenu();
+	//skyBoxImguiMenu();
 
-	gui->updateGuiComponents();
+	
 
+
+
+
+}
+
+void Monster::endRendering()
+{
 	ImGui::EndFrame();
 
 	MonsterImgui::renderFrame();
+}
 
+void Monster::startRenderingTillGui(float shaderTime)
+{
+	MonsterImgui::startImguiFrame();
+
+	skyMesh->pushConstObj.time = shaderTime;
+	skyTexMesh->pushConstObj.time = shaderTime;
 
 }
 

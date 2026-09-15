@@ -1,3 +1,4 @@
+#pragma once
 
 #include <monster/MonsterSlang.h>
 

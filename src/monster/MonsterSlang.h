@@ -1,3 +1,5 @@
+#pragma once
+
 #include <monster/MonsterBuffer.h>
 
 #include <slang/slang.h>

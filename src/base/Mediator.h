@@ -4,10 +4,8 @@
 #define MEDIATOR_H
 
 //Local
-#include<Gui/GuiConsts.h>
-//#include <GDHandler/Connector/MasterB.h>
+#include <Gui/GuiConsts.h>
 #include <CaseHandler/CaseHandler.h>
-#include <monster/MonsterImgui.h>
 #include <Gui/GuiComponents/ToastComponent.h>
 
 // Fonts

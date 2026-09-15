@@ -7,7 +7,6 @@ private:
 	
 	GDBuilderContext* GDBuilderCxt;
 
-	// Sets Up shader type and assigns ShaderVars for this shader
 	
 
 	// READS AND SETS SHADER VARS FROM MATERIAL FILE

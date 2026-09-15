@@ -15,7 +15,7 @@
 
 
 //#include <monster/MonsterImgui.h>
-#include <Gui/Gui.h>
+#include <monster/MonsterImgui.h>
 
 #include <feel/feel.h>
 
@@ -28,7 +28,7 @@ class Monster : public FeelPollEventExtension, public MonsterImgui
 
 private:
 
-	Gui* gui = nullptr;
+
 
 	uint32_t triangleShaderIndex;
 
@@ -45,8 +45,9 @@ public:
 	void InitMonster();
 
 
-	void updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime, float shaderTime);
-
+	void updateMonster(glm::vec3 cameraPosition, glm::vec2 cameraRotation, float deltaTime);
+	void startRenderingTillGui(float shaderTime);
+	void endRendering();
 	/*Mesh loadMeshObj(std::filesystem::path& path);*/
 
 	void createRequiredShaders();

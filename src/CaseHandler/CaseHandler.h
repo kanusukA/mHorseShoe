@@ -23,9 +23,9 @@ protected:
 
 public:
 
-	std::shared_ptr<Cases> mCases = std::make_shared<std::vector<Case>>();
-	std::shared_ptr<Scenes> mScenes = std::make_shared<std::vector<Scene>>();;
-	std::shared_ptr<Objects> mObjects = std::make_shared<std::vector<Object>>();;
+	std::shared_ptr<std::vector<Case>> mCases = std::make_shared<std::vector<Case>>();
+	std::shared_ptr<std::vector<Scene>> mScenes = std::make_shared<std::vector<Scene>>();;
+	std::shared_ptr<std::vector<Object>> mObjects = std::make_shared<std::vector<Object>>();;
 
 	// shaders and meshes are stored in monsterVulkan
 

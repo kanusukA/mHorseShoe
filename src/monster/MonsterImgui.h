@@ -1,8 +1,8 @@
+#pragma once
 
 #include <monster/MonsterVulkan.h>
-#include <imgui.h>
 #include <monster/imgui-1.92.9b/backends/imgui_impl_sdl3.h>
-#include <monster/imgui-1.92.9b/backends/imgui_impl_vulkan.h>
+#include <imgui_stdlib.h>
 
 struct ImguiDebugStats {
 	float* mouseXrel;

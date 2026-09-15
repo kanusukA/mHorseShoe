@@ -236,10 +236,11 @@ set(SOURCES
 	src/monster/imgui-1.92.9b/imgui_widgets.cpp
 	src/monster/imgui-1.92.9b/backends/imgui_impl_vulkan.cpp
 	src/monster/imgui-1.92.9b/backends/imgui_impl_sdl3.cpp
+	src/monster/imgui-1.92.9b/misc/cpp/imgui_stdlib.cpp
 	src/main.cpp
 )
 
-add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  "src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" "src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp" "src/ResourceHandler/ResourceGltf.h" "src/ResourceHandler/ResourceGltf.cpp" "src/monster/VulkanUtils.h" "src/monster/MonsterBuffer.h" "src/monster/MonsterBuffer.cpp" "src/monster/MonsterSlang.h" "src/monster/MonsterSlang.cpp" "src/Gui/nGuiComponent/GuiVulkanUtils.h" "src/Gui/nGuiComponent/GuiVulkanUtils.cpp" "src/Gui/nGuiComponent/GuiGenStats.h" "src/Gui/nGuiComponent/GuiGenStats.cpp")
+add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  "src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" "src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp" "src/ResourceHandler/ResourceGltf.h" "src/ResourceHandler/ResourceGltf.cpp" "src/monster/VulkanUtils.h" "src/monster/MonsterBuffer.h" "src/monster/MonsterBuffer.cpp" "src/monster/MonsterSlang.h" "src/monster/MonsterSlang.cpp" "src/Gui/nGuiComponent/GuiVulkanUtils.h" "src/Gui/nGuiComponent/GuiVulkanUtils.cpp" "src/Gui/nGuiComponent/GuiGenStats.h" "src/Gui/nGuiComponent/GuiGenStats.cpp" "src/Gui/nGuiComponent/GuiAddStuff.h")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 

@@ -123,6 +123,10 @@ void Gui::initGuiComponents()
 	GuiGenStatsModelComponent* genStatModel = new GuiGenStatsModelComponent("GENERAL_STATS");
 	this->addModelComponent(genStatModel);
 
+	GuiAddStuffModel* stuffModel = new GuiAddStuffModel("GUI_STUFF_MODEL");
+	this->addModelComponent(stuffModel);
+	
+
 	// Views
 	/*SceneTabComponent* scnTab = new SceneTabComponent(GD_SCENE_TAB_VIEW_COMP_NAME,scnTabModel);
 	this->addViewComponent(scnTab);
@@ -159,6 +163,12 @@ void Gui::initGuiComponents()
 
 	GuiGenStatsView* genStatView = new GuiGenStatsView("GENERAL_STATS_VIEW", genStatModel);
 	this->addViewComponent(genStatView);
+
+	GuiAddCaseView* addCaseView = new GuiAddCaseView("ADD_CASE_VIEW", stuffModel);
+	this->addViewComponent(addCaseView);
+
+	GuiAddOverView* overView = new GuiAddOverView("ADD_OVER_VIEW", stuffModel);
+	this->addViewComponent(overView);
 }
 
 void Gui::updateGuiComponents()
