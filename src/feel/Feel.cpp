@@ -39,9 +39,15 @@ void Feel::setupDefaultEvents() {
 
 }
 
-glm::vec3 Feel::getCameraKeyInput()
+glm::vec3 Feel::getCameraKeyInput(bool guiCaptured)
 {
 	glm::vec3 updatePos = glm::vec3(0.0f);
+
+	if (guiCaptured)
+	{
+		return updatePos;
+	}
+
 	if (mappedKeys.upKey->pressed)
 	{
 		updatePos.y = 1.0f;

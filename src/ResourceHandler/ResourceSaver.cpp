@@ -120,7 +120,7 @@ void ResourceSaver::saveScene(SceneResource* scene_p, YAML::Emitter& out)
 {
 	
 	
-	out << YAML::BeginMap;
+	/*out << YAML::BeginMap;
 
 	out << YAML::Key << SCENE_NAME_KEY;
 	out << YAML::Value << scene_p->getName();
@@ -140,7 +140,7 @@ void ResourceSaver::saveScene(SceneResource* scene_p, YAML::Emitter& out)
 	out << YAML::Value << YAML::Flow << YAML::BeginSeq;
 	out << scene_p->_getScale()[0] << scene_p->_getScale()[1] << scene_p->_getScale()[2] << YAML::EndSeq;
 
-	
+	*/
 	
 	
 
@@ -316,7 +316,7 @@ void ResourceSaver::saveShader(ShaderResource* shader_p, ShaderType type, ResID 
 {
 	std::string section = std::to_string(shader_p->getId());
 	ini->SetValue(section.c_str(), SHADER_NAME_KEY, shader_p->getName().c_str());
-	ini->SetValue(section.c_str(), SHADER_FILE_KEY, shader_p->getShaderFileName().c_str());
+	//ini->SetValue(section.c_str(), SHADER_FILE_KEY, shader_p->getShaderFileName().c_str());
 	ini->SetValue(section.c_str(), SHADER_TYPE_KEY, std::to_string(shader_p->getShaderType()).c_str());
 
 	// Making Data String 
@@ -388,7 +388,7 @@ void ResourceSaver::saveImage(ImageResource* image_p)
 void ResourceSaver::saveObject(ObjectResource* obj_p, YAML::Emitter& out)
 {
 
-	out << YAML::BeginMap;
+	/*out << YAML::BeginMap;
 	
 	out << YAML::Key << OBJECT_NAME_KEY;
 	out << YAML::Value << obj_p->getName();
@@ -403,7 +403,7 @@ void ResourceSaver::saveObject(ObjectResource* obj_p, YAML::Emitter& out)
 	out << YAML::Value << obj_p->_getMeshName();
 
 	out << YAML::Key << OBJECT_MESHPATH_KEY;
-	out << YAML::Value << obj_p->getMeshFilePath().string();
+	out << YAML::Value << obj_p->getMeshFilePath().string();*/
 
 	//std::string section = std::to_string(obj_p->getId());
 

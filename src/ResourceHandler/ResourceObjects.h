@@ -413,7 +413,7 @@ public:
 
 	vk::DeviceSize pushConstSize = vk::DeviceSize(0);
 
-	vk::raii::DescriptorSets descriptorSets = nullptr;
+	std::vector<vk::raii::DescriptorSets> descriptorSets {};
 
 	std::vector<MonsterTexture> textures{};
 
@@ -449,7 +449,7 @@ public:
 
 
 			descriptorWrites.push_back({
-				.dstSet = descriptorSets.at(i),
+				.dstSet = descriptorSets.front().at(i),
 				.dstBinding = 0,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
@@ -459,7 +459,7 @@ public:
 
 			descriptorWrites.push_back(
 				{
-				.dstSet = descriptorSets[i],
+				.dstSet = descriptorSets.front()[i],
 				.dstBinding = 1,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
@@ -490,7 +490,7 @@ public:
 			{
 				descriptorWrites.push_back(
 					{
-					.dstSet = descriptorSets[i],
+					.dstSet = descriptorSets.front()[i],
 					.dstBinding = texIndex,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
@@ -643,6 +643,11 @@ public:
 		return imagePath;
 	}
 
+};
+
+struct MeshData {
+	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
+	std::vector<uint16_t> indices = std::vector<uint16_t>();
 };
 
 class RenderMeshResource : public Resource

@@ -8,12 +8,17 @@ void GuiVulkanUtilsView::view()
 
 	ImGui::Text("Meshes");
 
-	for (size_t i = 0; i < model->vulkanMeshes->size(); i++)
+	if (model->vulkanMeshes && model->vulkanMeshes->size() > 0)
 	{
-		ImGui::Text("Name : "); ImGui::SameLine();
-		ImGui::Text(model->vulkanMeshes->at(i)->name);
-		ImGui::Spacing();
+		for (size_t i = 0; i < model->vulkanMeshes->size(); i++)
+		{
+			ImGui::Text("Name : "); ImGui::SameLine();
+			ImGui::Text(model->vulkanMeshes->at(i)->name);
+			ImGui::Spacing();
+		}
 	}
+
+	
 
 	
 

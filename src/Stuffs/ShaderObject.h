@@ -10,7 +10,7 @@ private:
 	
 
 	// READS AND SETS SHADER VARS FROM MATERIAL FILE
-	void _setShaderVars();
+	void _setShaderVars() {};
 
 public:
 
@@ -23,7 +23,7 @@ public:
 
 	}
 
-	void loadShaderVar(std::vector<ShaderVar> vars_p);
+	void loadShaderVar(std::vector<ShaderVar> vars_p) {};
 
 	void loadShader();
 

@@ -96,7 +96,7 @@ public:
 	}
 
 
-	glm::vec3 getCameraKeyInput();
+	glm::vec3 getCameraKeyInput(bool guiCaptured);
 	glm::vec2 getCameraMouseInput();
 
 

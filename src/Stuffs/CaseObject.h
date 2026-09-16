@@ -27,8 +27,8 @@ public:
 		sceneVec.erase(sceneVec.begin() + index);
 	}
 
-	const std::vector<std::shared_ptr<Scene>>& getScenes() {
-		return sceneVec;
+	const std::vector<std::shared_ptr<Scene>>* getScenes() {
+		return &sceneVec;
 	}
 
 	~Case() {

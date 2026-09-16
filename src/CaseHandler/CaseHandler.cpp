@@ -242,18 +242,18 @@ std::string CaseHandler::loadDefaultCase()
 
 void CaseHandler::createCase(std::string name_p, std::string filename_p)
 {
-	mCases.push_back(std::make_shared<Case>(this, name_p, filename_p));
+	mCases->emplace_back(std::make_shared<Case>(this, name_p, filename_p));
 
 }
 
 void CaseHandler::createScene(std::string name_p)
 {
-	mScenes.push_back(std::make_shared<Scene>(name_p));
+	mScenes->emplace_back(std::make_shared<Scene>(this, name_p));
 }
 
-void CaseHandler::createObject(std::string name_p)
+void CaseHandler::createObject(std::string name_p, std::shared_ptr<RenderMesh> mesh)
 {
-	mObjects.push_back(std::make_shared<Object>(name_p));
+	mObjects->emplace_back(std::make_shared<Object>(this, name_p, mesh));
 }
 
 

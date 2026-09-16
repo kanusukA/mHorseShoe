@@ -114,8 +114,8 @@ void Gui::initGuiComponents()
 	/*TestingTabModelComponent* testModel = new TestingTabModelComponent("Testing tab model");
 	this->addModelComponent(testModel);*/
 
-	ToastTabModelComponent* toastModel = new ToastTabModelComponent(GD_TOAST_MODEL_COMP_NAME);
-	this->addModelComponent(toastModel);
+	/*ToastTabModelComponent* toastModel = new ToastTabModelComponent(GD_TOAST_MODEL_COMP_NAME);
+	this->addModelComponent(toastModel);*/
 
 	GuiVulkanUtilsComponent* vulkanUtilModel = new GuiVulkanUtilsComponent("VULKAN_UTIL_MODEL");
 	this->addModelComponent(vulkanUtilModel);
@@ -155,8 +155,8 @@ void Gui::initGuiComponents()
 	/*TestingTabComponent* testingTab = new TestingTabComponent("Test tab", testModel);
 	this->addViewComponent(testingTab);*/
 
-	ToastTabViewComponent* toastView = new ToastTabViewComponent(GD_TOAST_COMP_NAME, toastModel);
-	this->addViewComponent(toastView);
+	/*ToastTabViewComponent* toastView = new ToastTabViewComponent(GD_TOAST_COMP_NAME, toastModel);
+	this->addViewComponent(toastView);*/
 
 	GuiVulkanUtilsView* vulkanUtilView = new GuiVulkanUtilsView("VULKAN_UTIL_VIEW", vulkanUtilModel);
 	this->addViewComponent(vulkanUtilView);
@@ -169,6 +169,9 @@ void Gui::initGuiComponents()
 
 	GuiAddOverView* overView = new GuiAddOverView("ADD_OVER_VIEW", stuffModel);
 	this->addViewComponent(overView);
+
+	GuiAddSceneView* sceneView = new GuiAddSceneView("ADD_SCENE_VIEW", stuffModel);
+	this->addViewComponent(sceneView);
 }
 
 void Gui::updateGuiComponents()

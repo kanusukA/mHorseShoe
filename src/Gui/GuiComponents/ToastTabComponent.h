@@ -32,7 +32,7 @@ public:
 		toastModel = model_p;
 	}
 
-	void view() override {};
+	void view() override;
 
 
 };

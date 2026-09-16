@@ -13,10 +13,7 @@
 #include <fastgltf/math.hpp>
 
 
-struct MeshData {
-	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
-	std::vector<uint16_t> indices = std::vector<uint16_t>();
-};
+
 
 class ResourceGltf {
 public:

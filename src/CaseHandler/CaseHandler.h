@@ -3,9 +3,9 @@
 #include <Stuffs/CaseObject.h>
 
 
-typedef std::vector<Case> Cases;
-typedef std::vector<Scene> Scenes;
-typedef std::vector<Object> Objects;
+typedef std::vector<std::shared_ptr<Case>> SCases;
+typedef std::vector<std::shared_ptr<Scene>> SScenes;
+typedef std::vector<std::shared_ptr<Object>> SObjects;
 
 
 // setup imports
@@ -23,9 +23,9 @@ protected:
 
 public:
 
-	std::shared_ptr<std::vector<Case>> mCases = std::make_shared<std::vector<Case>>();
-	std::shared_ptr<std::vector<Scene>> mScenes = std::make_shared<std::vector<Scene>>();;
-	std::shared_ptr<std::vector<Object>> mObjects = std::make_shared<std::vector<Object>>();;
+	std::shared_ptr<SCases> mCases = std::make_shared<SCases>();
+	std::shared_ptr<SScenes> mScenes = std::make_shared<SScenes>();
+	std::shared_ptr<SObjects> mObjects = std::make_shared<SObjects>();
 
 	// shaders and meshes are stored in monsterVulkan
 
@@ -65,7 +65,7 @@ public:
 
 	void createCase(std::string name_p, std::string filename_p);
 	void createScene(std::string name_p);
-	void createObject(std::string name_p);
+	void createObject(std::string name_p, std::shared_ptr<RenderMesh> mesh);
 	
 
 /*	bool resourceExists(std::string resourceName);

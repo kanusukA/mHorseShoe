@@ -74,8 +74,11 @@ int main() {
 	//monster->_createGrassBlade(0.3, 1);
 
 	Gui* gui = new Gui(ResourceHandler::GetInstance(), caseHandler);
-	gui->initGuiComponents();
 	gui->_debugStats = &monster->imDebugStats;
+	gui->mVulkan = monster;
+	gui->initGuiComponents();
+	
+	
 
 
 	Glock* glock = new Glock();
@@ -88,7 +91,7 @@ int main() {
 
 		Feel::GetInstance()->updateFeel();
 
-		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime);
+		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(monster->keyboardCapture), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime);
 
 		monster->startRenderingTillGui(glock->getShaderTime());
 		gui->updateGuiComponents();

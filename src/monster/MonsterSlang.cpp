@@ -89,8 +89,10 @@ std::shared_ptr<vulkanUtils::Shader> MonsterSlang::loadShader(const std::string&
 	
 	std::shared_ptr<vulkanUtils::Shader> shader = std::make_shared<vulkanUtils::Shader>();
 
-	_loadShader(vertfilepath,fragfilepath,shadername+"_vert",shadername+"_frag");
+	std::tie(shader->vertexShader, shader->fragmentShader) = _loadShader(vertfilepath,fragfilepath,shadername+"_vert",shadername+"_frag");
 	
+	shader->vertShaderName = shadername + "_vert";
+	shader->fragShaderName = shadername + "_frag";
 
 	shaders.push_back(std::move(shader));
 	return shaders.back();

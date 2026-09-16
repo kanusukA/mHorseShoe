@@ -239,6 +239,8 @@ void MonsterImgui::createImguiPipeline()
 
 void MonsterImgui::startImguiFrame()
 {
+    keyboardCapture = ImGui::GetIO().WantCaptureKeyboard;
+
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();

@@ -6,7 +6,7 @@
 //Local
 #include <Gui/GuiConsts.h>
 #include <CaseHandler/CaseHandler.h>
-#include <Gui/GuiComponents/ToastComponent.h>
+//#include <Gui/GuiComponents/ToastComponent.h>
 
 // Fonts
 #include <defaultFonts/Ubuntu_bold.h>
@@ -234,7 +234,7 @@ protected:
 
 public:
 	ImguiDebugStats* _debugStats = nullptr;
-	MonsterVulkan* mVulkan = nullptr;
+	MonsterImgui* mVulkan = nullptr;
 
 	GDSource(
 		//CaseHandler* casehan,  
@@ -467,9 +467,9 @@ protected:
 	
 
 public:
-	std::shared_ptr<Cases> mCases;
-	std::shared_ptr<Scenes> mScenes;
-	std::shared_ptr<Objects> mObjects;
+	std::shared_ptr<SCases> mCases;
+	std::shared_ptr<SScenes> mScenes;
+	std::shared_ptr<SObjects> mObjects;
 
 	GuiFramework(
 		ResourceHandler* resourcehan,

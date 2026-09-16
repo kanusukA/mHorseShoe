@@ -18,6 +18,8 @@ public:
 
 	ImguiDebugStats imDebugStats = ImguiDebugStats();
 
+	bool keyboardCapture = false;
+
 	void InitMonsterImgui();
 
 	void createImguiPipeline();
