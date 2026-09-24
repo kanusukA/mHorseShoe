@@ -19,9 +19,11 @@ public:
 	std::shared_ptr<Shader> shader;
 
 
-	RenderMesh(GDBuilderContext* builderCxt_p, const char* name_p, std::filesystem::path meshPath ) : 
+	RenderMesh(GDBuilderContext* builderCxt_p, std::string name_p, std::filesystem::path meshPath, std::shared_ptr<Shader> shader_p ) : 
 		RenderMeshResource(ResourceHandler::GetInstance(), name_p , meshPath) {
 		builderCxt = builderCxt_p;
+
+		shader = shader_p;
 
 	}
 

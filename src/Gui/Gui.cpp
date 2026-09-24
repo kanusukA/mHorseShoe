@@ -172,6 +172,9 @@ void Gui::initGuiComponents()
 
 	GuiAddSceneView* sceneView = new GuiAddSceneView("ADD_SCENE_VIEW", stuffModel);
 	this->addViewComponent(sceneView);
+
+	GuiAddObjectView* objectAddView = new GuiAddObjectView("ADD_OBJECT_VIEW", stuffModel);
+	this->addViewComponent(objectAddView);
 }
 
 void Gui::updateGuiComponents()

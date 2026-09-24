@@ -13,6 +13,23 @@ void SceneViewer(const std::vector<std::shared_ptr<Scene>>* scenes,GuiAddStuffMo
 					model->selectedScene = scenes->at(i);
 					model->showAddSceneToScene = true;
 				}
+				if (ImGui::Button("Add Object##"))
+				{
+					model->selectedScene = scenes->at(i);
+					model->showAddObject = true;
+				}
+
+				if (scenes->at(i)->getObjects() || !scenes->at(i)->getObjects()->empty())
+				{
+					for (size_t objIdx = 0; objIdx < scenes->at(i)->getObjects()->size(); objIdx++)
+					{
+						if (ImGui::Selectable(scenes->at(i)->getObjects()->at(objIdx)->getName().c_str(), false))
+						{
+							model->selecetdObject = scenes->at(i)->getObjects()->at(objIdx);
+						}
+					}
+				}
+
 				SceneViewer(scenes->at(i)->getAttachedScenes(), model);
 
 				ImGui::TreePop();
@@ -21,6 +38,32 @@ void SceneViewer(const std::vector<std::shared_ptr<Scene>>* scenes,GuiAddStuffMo
 		}
 	
 	
+}
+
+int ResourceSelector(std::vector<std::filesystem::path>* paths, const std::string label, int selectedIndex) {
+	int selection = selectedIndex;
+	if (paths && paths->size() > 0)
+	{
+		if (ImGui::BeginCombo(label.c_str(), paths->at(selectedIndex).filename().string().c_str()))
+		{
+			for (size_t i = 0; i < paths->size(); i++)
+			{
+				if (ImGui::Selectable(paths->at(i).filename().string().c_str(),selectedIndex == i))
+				{
+					selection = i;
+				}
+				ImGui::SetItemTooltip(paths->at(i).string().c_str());
+			}
+
+			ImGui::EndCombo();
+		}
+	}
+	else {
+		ImGui::Text("Paths Invalid!");
+	}
+
+	return selection;
+
 }
 
 
@@ -52,6 +95,7 @@ void GuiAddOverView::view() {
 				SceneViewer(model->caseHandler->mCases->at(i)->getScenes(), model);
 
 				ImGui::TreePop();
+
 			}
 			
 		}
@@ -115,5 +159,37 @@ void GuiAddSceneView::view()
 		}
 
 		ImGui::End();
+	}
+}
+
+void GuiAddObjectView::view()
+{
+	if (model->showAddObject)
+	{
+		ImGui::Begin("Add New Object");
+
+		ImGui::Text(("Attach To Scene : " + model->selectedScene->getName()).c_str());
+
+		ImGui::InputText("Name", &objectName);
+
+		ImGui::Text("RenderMesh");
+		
+		selectedRenderMesh = ResourceSelector(model->renderMeshes, "Render Mesh", selectedRenderMesh);
+
+		selectedVertShader = ResourceSelector(model->shaders, "Vert Shaders", selectedVertShader);
+		selectedFragShader = ResourceSelector(model->shaders, "Frag Shaders", selectedFragShader);
+
+		if (ImGui::Button("Create Object"))
+		{
+			model->addObject(objectName, model->selectedScene, 
+				&model->renderMeshes->at(selectedRenderMesh), 
+				&model->shaders->at(selectedVertShader), 
+				&model->shaders->at(selectedFragShader)
+			);
+
+		}
+
+		ImGui::End();
+
 	}
 }

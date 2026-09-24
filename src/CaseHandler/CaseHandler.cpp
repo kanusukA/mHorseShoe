@@ -256,4 +256,46 @@ void CaseHandler::createObject(std::string name_p, std::shared_ptr<RenderMesh> m
 	mObjects->emplace_back(std::make_shared<Object>(this, name_p, mesh));
 }
 
+void CaseHandler::createObject(std::string name_p, std::filesystem::path* mesh, std::filesystem::path* vertPath, std::filesystem::path* fragPath)
+{
+	createShader(name_p + "_SHADER", vertPath, fragPath);
+	createRenderMesh(name_p + "_MESH", mesh, mShader->back());
+
+	createObject(name_p, mRenderMesh->back());
+
+}
+
+bool CaseHandler::createShader(std::string name_p, std::filesystem::path* vertPath, std::filesystem::path* fragPath)
+{
+	// verify paths
+
+	if (std::filesystem::exists(*vertPath) && std::filesystem::exists(*fragPath))
+	{
+		mShader->emplace_back(std::make_shared<Shader>(this, name_p, ShaderType::Vertex, *vertPath, *fragPath));
+		this->loadShader(mShader->back().get());
+		return true;
+
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Invaild vert/frag Paths provided for Shader creation!");
+		return false;
+
+	}
+
+}
+
+bool CaseHandler::createRenderMesh(std::string name_p, std::filesystem::path* mesh, std::shared_ptr<Shader> shader)
+{
+	if (std::filesystem::exists(*mesh))
+	{
+		mRenderMesh->emplace_back(std::make_shared<RenderMesh>(this, name_p, *mesh,shader));
+		this->loadRenderMesh(mRenderMesh->back().get());
+		return true;
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("Invaild mesh Path provided for RenderMesh creation!");
+		return false;
+	}
+}
+
 

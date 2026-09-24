@@ -10,15 +10,22 @@ public:
 
 	std::shared_ptr<Scene> selectedScene;
 	std::shared_ptr<Case> selectedCase;
+	std::shared_ptr<Object> selecetdObject;
+
+	std::vector<std::filesystem::path>* renderMeshes = nullptr;
+	std::vector<std::filesystem::path>* shaders = nullptr;
 
 	bool showAddCase = false;
 	bool showAddSceneToCase = false;
 	bool showAddSceneToScene = false;
+	bool showAddObject = false;
 
 	GuiAddStuffModel(const char* name_p) : ModelComponent(name_p) {}
 
 	void init() override {
 		caseHandler = this->gdSource->getCaseHandler();
+		renderMeshes = this->gdSource->getResourceHandler()->fetchResourceGroupVecByIndex(ResourceGroup::RENDER_MESH_PATH);
+		shaders = this->gdSource->getResourceHandler()->fetchResourceGroupVecByIndex(ResourceGroup::SHADER);
 	}
 
 	void addCase(std::string caseName, std::string fileName) {
@@ -53,6 +60,13 @@ public:
 		pScene->attachNewScene(caseHandler->mScenes->back());
 		showAddSceneToScene = false;
 		
+	}
+
+	void addObject(std::string name_p, std::shared_ptr<Scene> scn, std::filesystem::path* renderMesh, std::filesystem::path* vertPath, std::filesystem::path* fragPath) {
+		caseHandler->createObject(name_p, renderMesh, vertPath, fragPath);
+		scn->attachNewObject(caseHandler->mObjects->back());
+
+		showAddObject = false;
 	}
 
 };
@@ -98,5 +112,23 @@ public:
 
 	void view() override;
 
+
+};
+
+class GuiAddObjectView : public ViewComponent {
+public:
+	GuiAddStuffModel* model;
+
+	std::string objectName = "";
+
+	int selectedRenderMesh = 0;
+	int selectedVertShader = 0;
+	int selectedFragShader = 0;
+
+	GuiAddObjectView(const char* name_p, GuiAddStuffModel* model_p) : ViewComponent(name_p) {
+		model = model_p;
+	}
+
+	void view() override;
 
 };

@@ -80,7 +80,8 @@ void MonsterSlang::loadShader(std::shared_ptr<vulkanUtils::Shader> shader)
 
 void MonsterSlang::loadShaderResource(ShaderResource* shaderResource)
 {
-	std::tie(shaderResource->vertexShader, shaderResource->fragmentShader) = _loadShader(shaderResource->vertPath, shaderResource->fragPath, shaderResource->getShaderName() + "_vert", shaderResource->getShaderName() + "_frag");
+	std::tie(shaderResource->vertexShader, shaderResource->fragmentShader) = 
+		_loadShader(shaderResource->vertPath, shaderResource->fragPath, shaderResource->getShaderName() + "_vert", shaderResource->getShaderName() + "_frag");
 
 }
 

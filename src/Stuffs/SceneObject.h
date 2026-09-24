@@ -10,8 +10,8 @@ class Scene : public SceneResource {
 private:
 	GDBuilderContext* GDBuilderCxt;
 
-	std::vector<std::shared_ptr<Scene>> sceneVec; // linked
-	std::vector<std::shared_ptr<Object>> objVec;
+	std::vector<std::shared_ptr<Scene>> sceneVec{}; // linked
+	std::vector<std::shared_ptr<Object>> objVec {};
 
 
 public:
@@ -23,7 +23,7 @@ public:
 	}
 	
 	// Object
-	std::weak_ptr<Object> attachNewObject(std::shared_ptr<Object> obj_p) {
+	void attachNewObject(std::shared_ptr<Object> obj_p) {
 		objVec.push_back(obj_p);
 	}
 
@@ -49,7 +49,7 @@ public:
 		return &sceneVec;
 	}
 
-	const std::vector <std::shared_ptr<Object>>* getObjects() {
+	const std::vector<std::shared_ptr<Object>>* getObjects() {
 		return &objVec;
 	}
 

@@ -7,6 +7,9 @@ typedef std::vector<std::shared_ptr<Case>> SCases;
 typedef std::vector<std::shared_ptr<Scene>> SScenes;
 typedef std::vector<std::shared_ptr<Object>> SObjects;
 
+typedef std::vector<std::shared_ptr<Shader>> SShader;
+typedef std::vector<std::shared_ptr<RenderMesh>> SRenderMesh;
+
 
 // setup imports
 
@@ -26,6 +29,10 @@ public:
 	std::shared_ptr<SCases> mCases = std::make_shared<SCases>();
 	std::shared_ptr<SScenes> mScenes = std::make_shared<SScenes>();
 	std::shared_ptr<SObjects> mObjects = std::make_shared<SObjects>();
+
+
+	std::shared_ptr<SShader> mShader = std::make_shared<SShader>();
+	std::shared_ptr<SRenderMesh> mRenderMesh = std::make_shared<SRenderMesh>();
 
 	// shaders and meshes are stored in monsterVulkan
 
@@ -65,7 +72,14 @@ public:
 
 	void createCase(std::string name_p, std::string filename_p);
 	void createScene(std::string name_p);
+
+	// combination of createShader() and createRenderMesh()
 	void createObject(std::string name_p, std::shared_ptr<RenderMesh> mesh);
+	void createObject(std::string name_p, std::filesystem::path* mesh, std::filesystem::path* vertPath, std::filesystem::path* fragPath);
+
+	// Returns bool as these Functions have a higher susceptability to go invaild
+	bool createShader(std::string name_p, std::filesystem::path* vertPath, std::filesystem::path* fragPath);
+	bool createRenderMesh(std::string name_p, std::filesystem::path* mesh, std::shared_ptr<Shader> shader);
 	
 
 /*	bool resourceExists(std::string resourceName);
