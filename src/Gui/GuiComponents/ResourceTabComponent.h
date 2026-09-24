@@ -8,17 +8,17 @@
 class ResourceTabModelComponent : public ModelComponent {
 public:
 
-	std::vector<std::filesystem::path>* renderMeshes;
+	/*std::vector<std::filesystem::path>* renderMeshes;
 	std::vector<std::filesystem::path>* materials;
 	std::vector<std::filesystem::path>* images;
-	std::vector<std::filesystem::path>* shaders;
+	std::vector<std::filesystem::path>* shaders;*/
 	
 	int selectedMasterGroup = 0;
 
 	
 
 	// PATHS
-	std::vector<std::string>* paths;
+	//std::vector<std::string>* paths;
 
 	std::vector<ResourceMasterGroup*>* masterResourceVector;
 
@@ -32,6 +32,7 @@ public:
 	std::string emptyLoadPathName = "";
 	std::string emptyLoadPaths = "";
 	std::string emptyLoadPathExtensions = "";
+
 	bool showAddLoadPath = false;
 
 	std::string* inputPath = new std::string("");
@@ -45,13 +46,13 @@ public:
 	}
 
 	void init() override {
-		renderMeshes = gdSource->getResourceHandler()->getRenderMeshLoaded();
-		//colliderMeshes = gdSource->getResourceHandler()->getColliderMeshLoaded();
-		materials = gdSource->getResourceHandler()->getMaterialsLoaded();
-		images = gdSource->getResourceHandler()->getTexturesLoaded();
-		shaders = gdSource->getResourceHandler()->getShadersLoaded();
+		//renderMeshes = gdSource->getResourceHandler()->getRenderMeshLoaded();
+		////colliderMeshes = gdSource->getResourceHandler()->getColliderMeshLoaded();
+		//materials = gdSource->getResourceHandler()->getMaterialsLoaded();
+		//images = gdSource->getResourceHandler()->getTexturesLoaded();
+		//shaders = gdSource->getResourceHandler()->getShadersLoaded();
 
-		paths = gdSource->getResourceHandler()->getPaths();
+		//paths = gdSource->getResourceHandler()->getPaths();
 		loadPaths = gdSource->getResourceHandler()->getLoadPaths();
 		masterResourceVector = gdSource->getResourceHandler()->getMasterResourceVector();
 
@@ -66,7 +67,7 @@ public:
 	}
 
 	void editPath(int pathPos) {
-		*inputPath = paths->at(pathPos);
+		//*inputPath = paths->at(pathPos);
 		edit = pathPos;
 	}
 
@@ -83,7 +84,7 @@ public:
 	void setPath() {
 		try
 		{
-			this->gdSource->getResourceHandler()->setPath(*inputPath, edit);
+			//this->gdSource->getResourceHandler()->setPath(*inputPath, edit);
 		}
 		catch (...)
 		{
@@ -207,7 +208,7 @@ public:
 	}
 
 	void saveLoadPaths() {
-		
+		this->gdSource->getResourceHandler()->saveLoadPaths();
 	}
 
 };

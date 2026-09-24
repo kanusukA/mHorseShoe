@@ -251,21 +251,8 @@ public:
 		//this->system = system_p;
 
 		//loadFonts();
-
-		// initalize the file dialog COM library
-		//ComInit com;
-		//
-		//fileDialog.CoCreateInstance(CLSID_FileOpenDialog);
-
-		//FILEOPENDIALOGOPTIONS opt{};
-		//
-		//fileDialog->GetOptions(&opt);
-		//fileDialog->SetOptions(opt | FOS_PICKFOLDERS | FOS_PATHMUSTEXIST | FOS_FORCEFILESYSTEM);
-
-		//// SETS DEFUALT FOLDER TO THE SOURCE DIR.
-		//CComPtr<IShellItem> psi;
-		//SHCreateItemFromParsingName(this->resourceHandler->SourceDir.wstring().c_str(), nullptr, IID_PPV_ARGS(&psi));
-		//fileDialog->SetFolder(psi);
+		loadFileSelectionDialog();
+		
 
 	};
 
@@ -289,6 +276,23 @@ public:
 	GDSystem* getGdSystem() {
 		return system;
 	}*/
+
+	void loadFileSelectionDialog() {
+		// initalize the file dialog COM library
+		ComInit com;
+		//
+		fileDialog.CoCreateInstance(CLSID_FileOpenDialog);
+
+		FILEOPENDIALOGOPTIONS opt{};
+		
+		fileDialog->GetOptions(&opt);
+		fileDialog->SetOptions(opt | FOS_PICKFOLDERS | FOS_PATHMUSTEXIST | FOS_FORCEFILESYSTEM);
+
+		//// SETS DEFUALT FOLDER TO THE SOURCE DIR.
+		CComPtr<IShellItem> psi;
+		SHCreateItemFromParsingName(this->resourceHandler->SourceDir.wstring().c_str(), nullptr, IID_PPV_ARGS(&psi));
+		fileDialog->SetFolder(psi);
+	}
 
 	std::string openFolderSelectionDialog() {
 		

@@ -91,10 +91,10 @@ void Gui::initGuiComponents()
 {
 	// Models
 	/*SceneTabModelComponent* scnTabModel = new SceneTabModelComponent(GD_SCENE_TAB_MODEL_COMP_NAME);
-	this->addModelComponent(scnTabModel);
+	this->addModelComponent(scnTabModel);*/
 
 	ResourceTabModelComponent* resourceTabModel = new ResourceTabModelComponent(GD_RESOURCE_TAB_MODEL_COMP_NAME);
-	this->addModelComponent(resourceTabModel);*/
+	this->addModelComponent(resourceTabModel);
 
 	///*StatusTabModelComponent* statusModel = new StatusTabModelComponent("Status tab Model");
 	//this->addModelComponent(statusModel);*/
@@ -129,10 +129,10 @@ void Gui::initGuiComponents()
 
 	// Views
 	/*SceneTabComponent* scnTab = new SceneTabComponent(GD_SCENE_TAB_VIEW_COMP_NAME,scnTabModel);
-	this->addViewComponent(scnTab);
+	this->addViewComponent(scnTab);*/
 
 	ResourceTabComponent* resourceTab = new ResourceTabComponent(GD_RESOURCE_TAB_VIEW_COMP_NAME, resourceTabModel);
-	this->addViewComponent(resourceTab);*/
+	this->addViewComponent(resourceTab);
 
 	///*StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
 	//this->addViewComponent(statusTab);*/

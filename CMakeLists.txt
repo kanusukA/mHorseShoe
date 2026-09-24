@@ -203,7 +203,7 @@ set(SOURCES
 	#src/Gui/GuiTabs.cpp
 	#src/Gui/GuiComponents/AddTabComponent.cpp
 	#src/Gui/GuiComponents/ObjectTabComponent.cpp
-	#src/Gui/GuiComponents/ResourceTabComponent.cpp
+	src/Gui/GuiComponents/ResourceTabComponent.cpp
 	#src/Gui/GuiComponents/RSUSTabComponent.cpp
 	#src/Gui/GuiComponents/StatusTabComponent.cpp
 	src/Gui/GuiComponents/ToastComponent.cpp

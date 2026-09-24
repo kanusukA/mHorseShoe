@@ -9,7 +9,7 @@ void pathViewComponent(
 
 
 
-		for (int i = 0; i < model->paths->size(); i++)
+		/*for (int i = 0; i < model->paths->size(); i++)
 		{
 			if (model->edit == i)
 			{
@@ -32,7 +32,7 @@ void pathViewComponent(
 			}
 
 
-		}
+		}*/
 	}
 
 }
@@ -175,7 +175,7 @@ void ResourceTabComponent::view()
 	masterResourcePaths(resourceTabModel);
 
 
-	if (ImGui::CollapsingHeader("Materials"))
+	/*if (ImGui::CollapsingHeader("Materials"))
 	{
 		for (int i = 0; i < resourceTabModel->materials->size(); i++)
 		{
@@ -202,7 +202,7 @@ void ResourceTabComponent::view()
 		{
 			ImGui::Text(resourceTabModel->shaders->at(i).filename().string().c_str());
 		}
-	}
+	}*/
 
 
 	ImGui::End();

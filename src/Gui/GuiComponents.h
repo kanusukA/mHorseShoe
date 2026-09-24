@@ -12,8 +12,9 @@
 #include <Gui/nGuiComponent/GuiVulkanUtils.h>
 #include <Gui/nGuiComponent/GuiGenStats.h>
 
+
 //#include<Gui/GuiComponents/ToastTabComponent.h>
 #include<Gui/nGuiComponent/GuiAddStuff.h>
-//#include "GuiComponents/ResourceTabComponent.h"
+#include "GuiComponents/ResourceTabComponent.h"
 
 
