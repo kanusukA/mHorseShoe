@@ -357,6 +357,11 @@ public:
 	static std::vector<std::filesystem::path>* textureDpVec;
 	//static std::vector<Ogre::TexturePtr>* imageTextures;
 
+
+	static std::shared_ptr<Scene> selectedScene;
+	static std::shared_ptr<Object> selectedObject;
+	static std::shared_ptr<Case> selectedCase;
+
 	static std::vector<std::filesystem::path>* savedCaseFiles;
 
 	//SunWindowSize* windowSize;

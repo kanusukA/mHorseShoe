@@ -8,10 +8,6 @@ class GuiAddStuffModel : public ModelComponent {
 public:
 	CaseHandler* caseHandler;
 
-	std::shared_ptr<Scene> selectedScene;
-	std::shared_ptr<Case> selectedCase;
-	std::shared_ptr<Object> selecetdObject;
-
 	std::vector<std::filesystem::path>* renderMeshes = nullptr;
 	std::vector<std::filesystem::path>* shaders = nullptr;
 

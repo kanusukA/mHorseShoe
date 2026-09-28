@@ -25,7 +25,7 @@ void SceneViewer(const std::vector<std::shared_ptr<Scene>>* scenes,GuiAddStuffMo
 					{
 						if (ImGui::Selectable(scenes->at(i)->getObjects()->at(objIdx)->getName().c_str(), false))
 						{
-							model->selecetdObject = scenes->at(i)->getObjects()->at(objIdx);
+							model->selectedObject = scenes->at(i)->getObjects()->at(objIdx);
 						}
 					}
 				}
