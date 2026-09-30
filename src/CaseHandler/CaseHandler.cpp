@@ -258,8 +258,8 @@ void CaseHandler::createObject(std::string name_p, std::shared_ptr<RenderMesh> m
 
 void CaseHandler::createObject(std::string name_p, std::filesystem::path* mesh, std::filesystem::path* vertPath, std::filesystem::path* fragPath)
 {
-	createShader(name_p + "_SHADER", vertPath, fragPath);
-	createRenderMesh(name_p + "_MESH", mesh, mShader->back());
+	createShader(vertPath->filename().string(), vertPath, fragPath);
+	createRenderMesh(mesh->filename().string(), mesh, mShader->back());
 
 	createObject(name_p, mRenderMesh->back());
 

@@ -226,7 +226,7 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p
 	
 	if (vert_p)
 	{
-		_shaderYaml(vert_p->getShaderVars(), out);
+		//_shaderYaml(vert_p->getShaderVars(), out);
 	}
 	else {
 		out << YAML::Value << "";
@@ -236,7 +236,7 @@ void ResourceSaver::saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p
 
 	if (vert_p)
 	{
-		_shaderYaml(frag_p->getShaderVars(), out);
+		//_shaderYaml(frag_p->getShaderVars(), out);
 	}
 	else {
 		out << YAML::Value << "";
@@ -323,46 +323,46 @@ void ResourceSaver::saveShader(ShaderResource* shader_p, ShaderType type, ResID 
 	// Its an continuous string of shaderName, shaderVarType, and its value.
 	std::string data = "";
 	std::string key = "";
-	for (int vindex = 0; vindex < shader_p->getShaderVars()->size(); vindex++)
-	{
-		/*data += std::to_string(vindex);
-		data += "I";*/
-		data += shader_p->getShaderVars()->at(vindex).varName;
-		key += std::to_string(data.length()-1) + "N";
-		key += std::to_string(shader_p->getShaderVars()->at(vindex).varType) + "F";
+	//for (int vindex = 0; vindex < shader_p->getShaderVars()->size(); vindex++)
+	//{
+	//	/*data += std::to_string(vindex);
+	//	data += "I";*/
+	//	data += shader_p->getShaderVars()->at(vindex).varName;
+	//	key += std::to_string(data.length()-1) + "N";
+	//	key += std::to_string(shader_p->getShaderVars()->at(vindex).varType) + "F";
 
-		switch (shader_p->getShaderVars()->at(vindex).varType)
-		{
-		case ShaderVarType::INTEGER:
-			data += std::to_string(*shader_p->getShaderVars()->at(vindex).varInt);
-			break;
-		case ShaderVarType::FLOAT0:
-			data += std::to_string(*shader_p->getShaderVars()->at(vindex).varFloat);
-			break;
-		case ShaderVarType::FLOAT2:
-			data += std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[0]) +"|"+ 
-				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[1]);
-			break;
-		case ShaderVarType::FLOAT3:
-			data += std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[0]) +"|"+
-				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[1]) + "|" +
-				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[2]);
-			break;
-		case ShaderVarType::FLOAT4:
-			data += std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[0]) + "|" +
-				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[1]) + "|" +
-				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[2]) + "|" + 
-				std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[3]);
-			break;
-		default:
-			break;
-		}
+	//	switch (shader_p->getShaderVars()->at(vindex).varType)
+	//	{
+	//	case ShaderVarType::INTEGER:
+	//		data += std::to_string(*shader_p->getShaderVars()->at(vindex).varInt);
+	//		break;
+	//	case ShaderVarType::FLOAT0:
+	//		data += std::to_string(*shader_p->getShaderVars()->at(vindex).varFloat);
+	//		break;
+	//	case ShaderVarType::FLOAT2:
+	//		data += std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[0]) +"|"+ 
+	//			std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[1]);
+	//		break;
+	//	case ShaderVarType::FLOAT3:
+	//		data += std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[0]) +"|"+
+	//			std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[1]) + "|" +
+	//			std::to_string(shader_p->getShaderVars()->at(vindex).varFloat2[2]);
+	//		break;
+	//	case ShaderVarType::FLOAT4:
+	//		data += std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[0]) + "|" +
+	//			std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[1]) + "|" +
+	//			std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[2]) + "|" + 
+	//			std::to_string(shader_p->getShaderVars()->at(vindex).varFloat3[3]);
+	//		break;
+	//	default:
+	//		break;
+	//	}
 
-		key += std::to_string(data.length() - 1) + "V";
-	}
+	//	key += std::to_string(data.length() - 1) + "V";
+//	}
 
-	ini->SetValue(section.c_str(), SHADER_VAR_KEY, data.c_str()); // Complete this system
-	ini->SetValue(section.c_str(), SHADER_VALUE_KEY, key.c_str());
+	//ini->SetValue(section.c_str(), SHADER_VAR_KEY, data.c_str()); // Complete this system
+	//ini->SetValue(section.c_str(), SHADER_VALUE_KEY, key.c_str());
 }
 
 void ResourceSaver::saveShaderVar(std::string sectionName, std::string varName, std::string type)
@@ -426,7 +426,7 @@ void ResourceSaver::saveResourceLoadPaths(std::vector<ResourceLoadPath>* loadPat
 
 	YAML::Emitter out;
 	out << YAML::BeginSeq;
-	for (int i = 0; i < loadPaths->size(); i++)
+	/*for (int i = 0; i < loadPaths->size(); i++)
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << LOAD_PATH_GROUP_NAME_KEY;
@@ -454,7 +454,7 @@ void ResourceSaver::saveResourceLoadPaths(std::vector<ResourceLoadPath>* loadPat
 	out << YAML::EndSeq;
 
 	this->writeToSaveFile(out.c_str());
-	this->outStreamFile.close();
+	this->outStreamFile.close();*/
 	
 
 }
@@ -615,7 +615,7 @@ void ResourceSaver::saveShaders(std::vector<ShaderResource*>* shader_res, std::s
 			this->loadIniFile(shaderVarIniPath);
 		}
 
-		for (int j = 0; j < shader_res->at(i)->getShaderVars()->size(); j++)
+	/*	for (int j = 0; j < shader_res->at(i)->getShaderVars()->size(); j++)
 		{
 			this->saveShaderVar(sectionName, shader_res->at(i)->getShaderVars()->at(j).varName, std::to_string(shader_res->at(i)->getShaderVars()->at(j).varType));
 		}
@@ -630,7 +630,7 @@ void ResourceSaver::saveShaders(std::vector<ShaderResource*>* shader_res, std::s
 		for (int j = 0; j < shader_res->at(i)->getShaderVars()->size(); j++)
 		{
 			this->saveShaderValue(sectionName, shader_res->at(i)->getShaderVars()->at(j).varName,convertShaderVarValueToStr(shader_res->at(i)->getShaderVars()->at(j)));
-		}
+		}*/
 		this->saveIni(shaderValueIniPath);
 		this->resetIni();
 		this->loadIniFile(shaderIniPath);

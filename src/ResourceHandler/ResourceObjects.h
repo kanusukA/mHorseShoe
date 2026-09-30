@@ -391,9 +391,12 @@ protected:
 
 	// These are an outward prased view of the shader variables and must not be used to set the shader values themselves 
 	// as a shader can be used by multiple Meshes, having different values to the variables!
-	std::vector<ShaderVar>* ShaderParameters = new std::vector<ShaderVar>();
+	
 
 public:
+
+	std::vector<ShaderVar>* vertShaderParameters = new std::vector<ShaderVar>();
+	std::vector<ShaderVar>* fragShaderParameters = new std::vector<ShaderVar>();
 
 	vk::raii::ShaderModule vertexShader = nullptr;
 	vk::raii::ShaderModule fragmentShader = nullptr;
@@ -556,13 +559,13 @@ public:
 
 	}
 
-	void addShaderParameter(ShaderVar variable) {
+	/*void addShaderParameter(ShaderVar variable) {
 		ShaderParameters->push_back(variable);	
 	}
 
 	std::vector<ShaderVar>* getShaderVars() {
 		return ShaderParameters;
-	}
+	}*/
 
 
 	ShaderType getShaderType() {

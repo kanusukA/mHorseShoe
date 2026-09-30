@@ -126,6 +126,8 @@ void Gui::initGuiComponents()
 	GuiAddStuffModel* stuffModel = new GuiAddStuffModel("GUI_STUFF_MODEL");
 	this->addModelComponent(stuffModel);
 	
+	ObjectViewerModel* objViewerModel = new ObjectViewerModel("OBJECT_VIEWER");
+	this->addModelComponent(objViewerModel);
 
 	// Views
 	/*SceneTabComponent* scnTab = new SceneTabComponent(GD_SCENE_TAB_VIEW_COMP_NAME,scnTabModel);
@@ -133,6 +135,9 @@ void Gui::initGuiComponents()
 
 	ResourceTabComponent* resourceTab = new ResourceTabComponent(GD_RESOURCE_TAB_VIEW_COMP_NAME, resourceTabModel);
 	this->addViewComponent(resourceTab);
+
+	
+	
 
 	///*StatusTabComponent* statusTab = new StatusTabComponent("Status Tab", statusModel);
 	//this->addViewComponent(statusTab);*/
@@ -175,6 +180,9 @@ void Gui::initGuiComponents()
 
 	GuiAddObjectView* objectAddView = new GuiAddObjectView("ADD_OBJECT_VIEW", stuffModel);
 	this->addViewComponent(objectAddView);
+
+	ObjectViewerView* objViewerView = new ObjectViewerView("OBJECT_VIEWER_VIEW", objViewerModel);
+	this->addViewComponent(objViewerView);
 }
 
 void Gui::updateGuiComponents()

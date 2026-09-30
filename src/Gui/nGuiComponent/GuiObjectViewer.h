@@ -4,6 +4,9 @@
 
 class ObjectViewerModel : public ModelComponent {
 
+public:
+
+
 
 	ObjectViewerModel(const char* name_p) : ModelComponent(name_p) {}
 
@@ -19,6 +22,8 @@ class ObjectViewerModel : public ModelComponent {
 class ObjectViewerView : public ViewComponent {
 
 	ObjectViewerModel* model;
+
+public:
 
 
 	ObjectViewerView(const char* name_p, ObjectViewerModel* model_p) : ViewComponent(name_p){

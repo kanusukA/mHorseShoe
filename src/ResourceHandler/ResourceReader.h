@@ -11,15 +11,15 @@
 #include <filesystem>
 #include <vector>
 
-
+// DO NOT CHANGE THE ORDER!!!!!!!
 enum ShaderVarType
 {
+	BLANK,
 	INTEGER,
 	FLOAT0,
 	FLOAT2,
 	FLOAT3,
 	FLOAT4,
-	RBOOL
 };
 
 struct ShaderVar {
@@ -32,6 +32,8 @@ struct ShaderVar {
 	float varFloat2[2] = { 0.0,0.0 };
 	float varFloat3[3] = { 0.0, 0.0, 0.0 };
 	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };
+
+	int padding; // to align with memory layout
 
 };
 

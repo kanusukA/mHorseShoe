@@ -4,11 +4,15 @@ struct VSInput {
     float2 inTexCoord;
 };
 
+
+
 struct VertexOutput {
     float4 sv_position : SV_Position;
     float4 color;
     float2 texCoord;
 };
+
+
 
 struct UniformBuffer {
     float4x4 model;
@@ -17,9 +21,10 @@ struct UniformBuffer {
 };
 ConstantBuffer<UniformBuffer> ubo;
 
+
+
 [shader("vertex")]
 VertexOutput vertMain(VSInput input) {
-
     VertexOutput output;
     float4 mvpPosition = mul(ubo.proj, (mul(ubo.view, mul(ubo.model, float4(input.inPosition, 1.0f)))));
     output.sv_position = mvpPosition;

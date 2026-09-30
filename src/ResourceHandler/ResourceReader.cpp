@@ -102,7 +102,7 @@ void ResourceReader::readShaderFile(std::filesystem::path shaderPath_p, std::vec
 				else {
 					// skips the coming constants
 
-					if (word == "uniform") {
+					if (word == "UniformBuffer") {
 
 						//std::cout << "uniform" << std::endl;
 						uniFound = true;
@@ -185,7 +185,7 @@ void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std:
 
 	std::string word = "";
 
-	bool OgreUniformsFound = false;
+	bool slangUnifromBuf = false;
 	int type;
 
 	ShaderVar shaderVar = ShaderVar();
@@ -194,18 +194,18 @@ void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std:
 		while (std::getline(inStream, line))
 		{
 			//std::cout << line << std::endl;
-			if (!OgreUniformsFound && line.find("OgreUniforms") != std::string::npos)
+			if (!slangUnifromBuf && line.find("UniformBuffer") != std::string::npos)
 			{
-				OgreUniformsFound = true;
+				slangUnifromBuf = true;
 				continue;
 			}
 
-			if (OgreUniformsFound && line.find("}") != std::string::npos)
+			if (slangUnifromBuf && line.find("}") != std::string::npos)
 			{
 				break;
 			}
 
-			if (OgreUniformsFound)
+			if (slangUnifromBuf)
 			{
 				// ltrim
 				line.erase(line.begin(), std::ranges::find_if_not(line, [](unsigned char c) {
@@ -239,20 +239,20 @@ void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std:
 					shaderVar.varType = ShaderVarType::FLOAT0;
 					shaderVar.varFloat = new float(0.0);
 				}
-				else if (type == "vec2")
+				else if (type == "float2")
 				{
 					shaderVar.varType = ShaderVarType::FLOAT2;
 					shaderVar.varFloat2[0] = 0.0f;
 					shaderVar.varFloat2[1] = 0.0f;
 				}
-				else if (type == "vec3")
+				else if (type == "float3")
 				{
 					shaderVar.varType = ShaderVarType::FLOAT3;
 					shaderVar.varFloat3[0] = 0.0f;
 					shaderVar.varFloat3[1] = 0.0f;
 					shaderVar.varFloat3[2] = 0.0f;
 				}
-				else if (type == "vec4")
+				else if (type == "float4")
 				{
 					shaderVar.varType = ShaderVarType::FLOAT4;
 					shaderVar.varFloat4[0] = 0.0f;

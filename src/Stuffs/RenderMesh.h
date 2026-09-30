@@ -29,7 +29,7 @@ public:
 
 	// Expose functions to the underlying variables
 	void loadRenderMesh() { 
-		builderCxt->loadRenderMesh(this); 
+		builderCxt->loadRenderMesh(this);
 	};
 
 	void allocateBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) override {

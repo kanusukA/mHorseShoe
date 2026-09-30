@@ -104,12 +104,11 @@ public:
 
 	std::filesystem::path getSourceDir();
 
-
-
 	void shutdown() {
 		this->saveLoadPaths();
 		this->resource_loader_shutdown();
 	}
+
 };
 
 

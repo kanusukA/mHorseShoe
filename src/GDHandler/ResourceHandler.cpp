@@ -19,6 +19,9 @@ ResourceHandler::ResourceHandler()
 	// Load contents in load_path
 	this->initResourceLoader(&ini, SourceDir, SourceDir.string() + DATA_DIRECTORY, this->SourceDir.string() + RESOURCELOADER_DATA);
 
+	/*std::vector<ShaderVar> shaders{};
+	this->readGLSLShaderFile("C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/required/assets/meshes/Materials/newVulkanShaders/sky_frag.slang", &shaders);*/
+
 	// SETUP MASTER RESOURCE VECTOR
 	this->setMasterLoadPaths();
 	

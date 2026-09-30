@@ -12,6 +12,10 @@ std::vector<std::filesystem::path>* ModelComponent::materialDpVec;
 std::vector<std::filesystem::path>* ModelComponent::shaderDpVec;
 std::vector<std::filesystem::path>* ModelComponent::textureDpVec;
 
+std::shared_ptr<Scene> ModelComponent::selectedScene;
+std::shared_ptr<Object> ModelComponent::selectedObject;
+std::shared_ptr<Case> ModelComponent::selectedCase;
+
 //std::vector<Ogre::TexturePtr>* ModelComponent::imageTextures;
 
 //std::vector<std::shared_ptr<Case>>* ModelComponent::caseVec;
