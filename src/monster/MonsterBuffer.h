@@ -15,8 +15,10 @@ public:
 
 	void createVertexBuffer();
 	uint32_t createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
+	std::pair<vk::raii::Buffer, VmaAllocation> createGetVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
 	void createIndexBuffer();
 	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
+	std::pair<vk::raii::Buffer, VmaAllocation> createGetIndexBuffer(std::vector<uint16_t> indices);
 	void createUniformBuffers();
 	uint32_t createUniformBuffers(vk::DeviceSize bufferSize);
 	void createMonsterBuffer(vk::DeviceSize bufferSize, MonsterBuffer* buffer);

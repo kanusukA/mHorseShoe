@@ -31,6 +31,7 @@ public:
 			return;
 		}
 		caseHandler->createCase(caseName, fileName);
+		selectedCase = caseHandler->mCases->front();
 		showAddCase = false;
 	}
 

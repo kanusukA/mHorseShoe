@@ -40,10 +40,11 @@ class MonsterVulkan :public MonsterSlang , public MonsterSDL {
 public:
 
 	std::vector<std::shared_ptr<hRes::Mesh>> importedMeshes = std::vector<std::shared_ptr<hRes::Mesh>>();
+	
 	std::vector<uint32_t> loadedMeshes = std::vector<uint32_t>();
 	std::vector<uint32_t> passObjects = std::vector<uint32_t>();
 
-	std::vector<RenderMeshResource*> vkRenderMeshes{};
+	std::vector<RenderMeshResource*> renderMeshes{};
 
 	std::vector<vk::raii::Pipeline> pipes = std::vector<vk::raii::Pipeline>();
 
@@ -176,7 +177,7 @@ public:
 	void loadMeshToVulkan(uint32_t meshIndex);
 	void loadMeshShaders(uint32_t shaderIndex,uint32_t meshIndex);
 	void loadMeshShader(uint32_t meshIndex);
-	void vkLoadShader(ShaderResource* shaderResource);
+	void vkLoadShader(ShaderResource* shaderResource, std::vector<vk::raii::DescriptorSets>* descriptorSets);
 
 	void loadMesh(uint32_t shaderIndex, uint32_t meshIndex);
 	void loadMeshContainingShader(uint32_t meshIndex);

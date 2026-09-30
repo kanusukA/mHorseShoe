@@ -80,6 +80,9 @@ public:
 	// Returns bool as these Functions have a higher susceptability to go invaild
 	bool createShader(std::string name_p, std::filesystem::path* vertPath, std::filesystem::path* fragPath);
 	bool createRenderMesh(std::string name_p, std::filesystem::path* mesh, std::shared_ptr<Shader> shader);
+
+
+	void loadCase(std::shared_ptr<Case> case_p);
 	
 
 /*	bool resourceExists(std::string resourceName);

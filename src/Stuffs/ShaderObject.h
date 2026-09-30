@@ -36,6 +36,7 @@ public:
 		//ResourceHandler::GetInstance()->readGLSLShaderFile(vertPath, vertShaderParameters); // Unifrom buffers are not yet read as they might collide with the transformation buffer
 		ResourceHandler::GetInstance()->readGLSLShaderFile(fragPath, fragShaderParameters);
 		alignShaderVar();
+		calShaderDeviceSizes();
 	}
 
 	void alignShaderVar() {
@@ -48,6 +49,7 @@ public:
 		if (fragShaderParameters->empty() || fragShaderParameters->size() == 1){
 			return; // No Alignment needed
 		}
+		
 
 		// The largest element will always be at the end of the vector, due to the way it's defined in the shader code.
 		// IF BY CHANCE THIS RULE IS NOT FOLLOWED, AMEND IS TO BE MADE IN THE SHADER NOT IN THIS FUNCTION!
@@ -97,6 +99,7 @@ public:
 				if (type < ShaderVarType::FLOAT2)
 				{
 					sum += 4;
+					fragShaderSize += 4;
 					
 				}
 				else if (type == ShaderVarType::FLOAT2)
@@ -131,10 +134,32 @@ public:
 			}
 		}
 
-		std::cout << "DONE" << std::endl;
-		
-		
+	}
 
+	void calShaderDeviceSizes() {
+		for (const auto& var : *fragShaderParameters)
+		{
+			switch (var.varType) {
+			case ShaderVarType::FLOAT0:
+				fragShaderSize += 4;
+				break;
+			case ShaderVarType::FLOAT2:
+				fragShaderSize += 8;
+				break;
+			case ShaderVarType::FLOAT3:
+				fragShaderSize += 12;
+				break;
+			case ShaderVarType::FLOAT4:
+				fragShaderSize += 16;
+				break;
+			default:
+				throw std::runtime_error("INVALID VAR");
+			}
+
+			fragShaderSize += var.padding;
+
+		}
+		std::cout << "Frag Size : " << fragShaderSize << std::endl;
 	}
 
 	void loadShader();

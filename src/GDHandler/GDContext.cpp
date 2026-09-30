@@ -18,10 +18,12 @@ void GDBuilderContext::loadRenderMesh(RenderMeshResource* meshResource)
 	if (meshResource->meshFile.empty())
 	{
 		ToastComponent::GetInstance()->addMessage("Unable to Create Mesh: Invalid mesh FilePath");
+		return;
 	}
 	if (!meshResource->getShader())
 	{
 		ToastComponent::GetInstance()->addMessage("Unable to Create Mesh: No Shader Set! ");
+		return;
 	}
 	
 	fastgltf::Asset* asset = ResourceHandler::GetInstance()->loadGltfFile(meshResource->meshFile);
@@ -30,9 +32,14 @@ void GDBuilderContext::loadRenderMesh(RenderMeshResource* meshResource)
 	if (meshResource->mesh.empty())
 	{
 		ToastComponent::GetInstance()->addMessage("Unable to Create Mesh: Mesh Data empty");
+		return;
 	}
 	
 	// add files to shader
+	if (meshResource->getShader()->fragShaderSize > 0)
+	{
+		meshResource->allocatingBufferSizes.push_back(meshResource->getShader()->fragShaderSize);
+	}
 
 }
 

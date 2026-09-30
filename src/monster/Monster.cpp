@@ -34,10 +34,6 @@ void Monster::InitMonster() {
 	loadSkyBox();
 	loadOtherMesh();
 
-	
-	
-
-	
 
 //	MonsterVulkan::loadAllMeshes();
 //	MonsterVulkan::loadMeshToPassObject();
@@ -127,7 +123,7 @@ void Monster::loadSkyBox()
 	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/Sphere_s.glb");
 	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
 
-	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
+	MeshData meshData = std::move(ResourceHandler::GetInstance()->generateMesh(*skyAsset).front());
 
 	// get mesh from monstervulkan
 	std::shared_ptr<vulkanUtils::SkyBoxShader> sbs = std::make_shared<vulkanUtils::SkyBoxShader>();
@@ -158,12 +154,11 @@ void Monster::loadSkyBox()
 	loadMeshContainingShader(0);
 
 	// top half
-	
 
 	std::filesystem::path topPath = std::filesystem::path("../../../src/monster/shaders/top.glb");
 	fastgltf::Asset* topAsset = ResourceHandler::GetInstance()->loadGltfFile(topPath);
 
-	MeshData topMeshData = ResourceHandler::GetInstance()->generateMesh(*topAsset).front();
+	MeshData topMeshData = std::move(ResourceHandler::GetInstance()->generateMesh(*topAsset).front());
 
 
 	std::shared_ptr<vulkanUtils::Shader> top_shader = std::make_shared<vulkanUtils::Shader>();
@@ -310,7 +305,7 @@ void Monster::loadOtherMesh()
 	std::filesystem::path skyboxPath = std::filesystem::path("../../../src/monster/shaders/box.glb");
 	fastgltf::Asset* skyAsset = ResourceHandler::GetInstance()->loadGltfFile(skyboxPath);
 
-	MeshData meshData = ResourceHandler::GetInstance()->generateMesh(*skyAsset).front();
+	MeshData meshData = std::move(ResourceHandler::GetInstance()->generateMesh(*skyAsset).front());
 
 	// get mesh from monstervulkan
 	
@@ -329,4 +324,9 @@ void Monster::loadOtherMesh()
 	meshes[0].shaders.fragShaderFilePath = new std::filesystem::path("../../../src/monster/shaders/triangle.spv");*/
 
 	//MonsterVulkan::importMesh(meshes.at(0));
+}
+
+void Monster::clearVulkan()
+{
+
 }

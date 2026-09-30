@@ -401,6 +401,9 @@ public:
 	vk::raii::ShaderModule vertexShader = nullptr;
 	vk::raii::ShaderModule fragmentShader = nullptr;
 
+	vk::DeviceSize vertexShaderSize = 0;
+	vk::DeviceSize fragShaderSize = 0;
+
 	std::filesystem::path vertPath;
 	std::filesystem::path fragPath;
 
@@ -416,7 +419,7 @@ public:
 
 	vk::DeviceSize pushConstSize = vk::DeviceSize(0);
 
-	std::vector<vk::raii::DescriptorSets> descriptorSets {};
+	//std::vector<vk::raii::DescriptorSets> descriptorSets {}; // MUST BE SPECIFIC TO THE MESH AND HAS TO BE CREATED FROM THE SAME PIPELINELAYOUT
 
 	std::vector<MonsterTexture> textures{};
 
@@ -430,6 +433,7 @@ public:
 
 	void _updateDescriptorWrites(
 		vk::raii::Device* device,
+		std::vector<vk::raii::DescriptorSets>* descriptorSets,
 		const std::vector<MonsterBuffer>& buffer,
 		const std::vector<MonsterBuffer>& fragBuf
 	) {
@@ -452,7 +456,7 @@ public:
 
 
 			descriptorWrites.push_back({
-				.dstSet = descriptorSets.front().at(i),
+				.dstSet = descriptorSets->front().at(i),
 				.dstBinding = 0,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
@@ -462,7 +466,7 @@ public:
 
 			descriptorWrites.push_back(
 				{
-				.dstSet = descriptorSets.front()[i],
+				.dstSet = descriptorSets->front()[i],
 				.dstBinding = 1,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
@@ -493,7 +497,7 @@ public:
 			{
 				descriptorWrites.push_back(
 					{
-					.dstSet = descriptorSets.front()[i],
+					.dstSet = descriptorSets->front()[i],
 					.dstBinding = texIndex,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
@@ -649,14 +653,26 @@ public:
 };
 
 struct MeshData {
+
 	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
 	std::vector<uint16_t> indices = std::vector<uint16_t>();
+
+	vk::raii::Buffer vertexBuffer = nullptr;
+	vk::raii::Buffer indexBuffer = nullptr;
+
 };
 
 class RenderMeshResource : public Resource
 {
 
 public:
+
+	std::vector<MonsterBuffer> transformBuffers{};
+	std::vector<MonsterBuffer> fragBuffers{};
+
+	glm::vec3 position = glm::vec3(0.0f);
+	glm::vec3 rotation = glm::vec3(0.0f);
+	glm::vec3 scale = glm::vec3(1.0f);
 	
 	std::vector<MeshData> mesh{};
 
@@ -664,8 +680,15 @@ public:
 
 	std::filesystem::path meshFile;
 
+	std::vector<vk::raii::DescriptorSets> descritorSets{};
+
+	bool containsPushConstants = false;
+	uint32_t pushConstSize = uint32_t(0);
+
+	virtual const void* getPushConst() { return nullptr; }
+
 	//std::shared_ptr<vulkanUtils::Shader> shaders;
-	std::vector<vk::DeviceSize> allocatingBufferSizes{}; // A default of UniformBuffer is recommanded for adding proper projection and transformation control
+	std::vector<vk::DeviceSize> allocatingBufferSizes{sizeof(UniformBufferObject)}; // A default of UniformBuffer is recommanded for adding proper projection and transformation control
 
 	void setId(int index) override {
 
@@ -686,12 +709,70 @@ public:
 
 	void setAllocatingBufferInfo(std::vector<vk::DeviceSize> buffers) { allocatingBufferSizes = buffers; }
 
-	virtual void allocateBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
-		throw std::runtime_error("BUFFERS MUST BE ALLOCATED TO HIGHER CLASS!");
+	void allocateBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
+		transformBuffers = buffers.at(0);
+		if (buffers.size() > 1)
+		{
+			fragBuffers = buffers.at(1);
+		}
 	}
 
 	virtual void updateDescriptorWrite(vk::raii::Device* device) {
 		throw std::runtime_error("BUFFERS MUST BE ALLOCATED TO HIGHER CLASS!");
+	}
+
+	void updateTransformations(const glm::mat4& view, const glm::mat4& proj) {
+		UniformBufferObject ubo{};
+		ubo.model = glm::mat4(1.0f);
+		ubo.model = glm::translate(ubo.model, position);
+		ubo.model = glm::rotate(ubo.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		ubo.model = glm::rotate(ubo.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = glm::rotate(ubo.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = glm::scale(ubo.model, scale);
+		ubo.view = view;
+		ubo.proj = proj;
+		ubo.model = glm::transpose(ubo.model);
+		ubo.view = glm::transpose(ubo.view);
+		ubo.proj = glm::transpose(ubo.proj);
+		for (auto& tBuffer : transformBuffers)
+		{
+			memcpy(tBuffer.allocInfo.pMappedData, &ubo, sizeof(ubo));
+		}
+
+	}
+
+	void updateBuffer(const std::vector<ShaderVar>& fragVars) {
+		for (auto& fragBuf : fragBuffers)
+		{
+			int64_t align = 0;
+
+			for (auto& var : fragVars)
+			{
+				switch (var.varType) {
+				case ShaderVarType::FLOAT0:
+					memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat, sizeof(fragBuf.bufferSize));
+					align += 4;
+					break;
+				case ShaderVarType::FLOAT2:
+					memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat2, sizeof(fragBuf.bufferSize));
+					align += 8;
+					break;
+				case ShaderVarType::FLOAT3:
+					memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat3, sizeof(fragBuf.bufferSize));
+					align += 16; // NO 12 Byte Offset!
+					break;
+				case ShaderVarType::FLOAT4:
+					memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat4, sizeof(fragBuf.bufferSize));
+					align += 16;
+					break;
+				default:
+					throw std::runtime_error("Invalid type!");
+				}
+				align += var.padding;
+
+			}
+
+		}
 	}
 
 	virtual ShaderResource* getShader() { return nullptr; }
@@ -794,6 +875,40 @@ namespace hRes {
 				memcpy(tBuffer.allocInfo.pMappedData, &ubo, sizeof(ubo));
 			}
 
+		}
+
+		void updateBuffer(const std::vector<ShaderVar>& fragVars) {
+			for (auto& fragBuf : fragBuffers)
+			{
+				int64_t align = 0;
+
+				for (auto& var : fragVars)
+				{
+					switch (var.varType) {
+					case ShaderVarType::FLOAT0:
+						memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat, sizeof(fragBuf.bufferSize));
+						align += 4;
+						break;
+					case ShaderVarType::FLOAT2:
+						memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat2, sizeof(fragBuf.bufferSize));
+						align += 8;
+						break;
+					case ShaderVarType::FLOAT3:
+						memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat3, sizeof(fragBuf.bufferSize));
+						align += 16; // NO 12 Byte Offset!
+						break;
+					case ShaderVarType::FLOAT4:
+						memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat4, sizeof(fragBuf.bufferSize));
+						align += 16;
+						break;
+					default:
+						throw std::runtime_error("Invalid type!");
+					}
+					align += var.padding;
+					
+				}
+				
+			}
 		}
 
 		Mesh(const Mesh& mesh) {

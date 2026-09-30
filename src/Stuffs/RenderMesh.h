@@ -12,9 +12,9 @@ private:
 
 public:
 
-	// Buffers
-	std::vector<MonsterBuffer> transformBuffers{};
-	std::vector<MonsterBuffer> fragBuffers{};
+	bool isMeshLoaded = false;
+
+	MeshData renderMeshData;
 
 	std::shared_ptr<Shader> shader;
 
@@ -25,24 +25,19 @@ public:
 
 		shader = shader_p;
 
+
 	}
 
 	// Expose functions to the underlying variables
 	void loadRenderMesh() { 
+
 		builderCxt->loadRenderMesh(this);
+		isMeshLoaded = true;
+
 	};
 
-	void allocateBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) override {
-		if (buffers.size() != this->allocatingBufferSizes.size())
-		{
-			throw std::runtime_error("IMPROPER BUFFER ALLOCATION");
-		}
-		transformBuffers = std::move(buffers.at(0));
-		fragBuffers = std::move(buffers.at(1));
-	}
-
 	void updateDescriptorWrite(vk::raii::Device* device) override {
-		shader->_updateDescriptorWrites(device, transformBuffers, fragBuffers);
+		shader->_updateDescriptorWrites(device, &descritorSets, transformBuffers, fragBuffers);
 	}
 
 	ShaderResource* getShader() override { return shader.get(); }

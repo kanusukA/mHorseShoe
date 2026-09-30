@@ -55,12 +55,16 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 	vkMonsterStats.device.resetFences(*vkSyncStats.inFlightFences[vkMonsterStats.frameIndex]);
 
 	// UPDATE BUFFERS
-	for (const auto& mesh: importedMeshes)
+	//for (const auto& mesh: importedMeshes)
+	//{
+	//	mesh->updateTransformations(camera->getViewMatrix(), camera->getProjectionMatrix(static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 10000.0f));
+	//	//updateUniformBuffer(vkMonsterStats.frameIndex, mesh->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
+	//}
+	for (const auto& mesh : renderMeshes)
 	{
 		mesh->updateTransformations(camera->getViewMatrix(), camera->getProjectionMatrix(static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 10000.0f));
-		//updateUniformBuffer(vkMonsterStats.frameIndex, mesh->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
+		updateUniformBuffer(vkMonsterStats.frameIndex, mesh->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
 	}
-	
 
 	// RESET COMMAND BUFFERS
 	vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].reset();
@@ -1320,11 +1324,11 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 	
 
 	int32_t instance = 1;
-	for (auto& passObj: importedMeshes)
+	for (auto& passObj: renderMeshes)
 	{
 		//hRes::Mesh* passObj = importedMeshes[passObjIndex];
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, passObj->getShader().lock()->monsterPipe.graphicsPipeline);
+		/*vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, passObj->getShader().lock()->monsterPipe.graphicsPipeline);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
@@ -1349,7 +1353,36 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*vkMemAlloc.indexBuffer[passObj->indexBufferIndex], 0, vk::IndexType::eUint16);
 		
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(passObj->indices.size(), instance, 0, 0, 1);
+		instance++;*/
+
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, passObj->getShader()->shaderPipes.graphicsPipeline);
+
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
+
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
+			vk::PipelineBindPoint::eGraphics, passObj->getShader()->shaderPipes.descriptorPipeLayout, 0, *passObj->descritorSets.front()[vkMonsterStats.frameIndex], nullptr
+		);
+
+		if (passObj->containsPushConstants)
+		{
+			vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].pushConstants(
+				*passObj->getShader()->shaderPipes.descriptorPipeLayout,
+				vk::ShaderStageFlagBits::eFragment,
+				0,
+				passObj->pushConstSize,
+				passObj->getPushConst()
+			);
+
+		}
+
+
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *passObj->mesh.front().vertexBuffer, {0});
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*passObj->mesh.front().indexBuffer, 0, vk::IndexType::eUint16);
+
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(passObj->mesh.front().indices.size(), instance, 0, 0, 1);
 		instance++;
+
 	}
 
 
@@ -1858,14 +1891,14 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 	/*importedMeshes[meshIndex]->setColor(glm::vec3(0.0f, 1.0f, 0.0f));*/
 }
 
-void MonsterVulkan::vkLoadShader(ShaderResource* shaderResource)
+void MonsterVulkan::vkLoadShader(ShaderResource* shaderResource, std::vector<vk::raii::DescriptorSets>* descriptorSets)
 {
 	std::vector<vk::DescriptorSetLayoutBinding> bindings = shaderResource->getBindings();
 
 	createDescriptorSetLayout(bindings, &shaderResource->shaderPipes.descriptorSetLayout);
 
 	//shader->descriptorSets = createDescriptorSets(shader->descriptorSetLayout);
-	createDescriptorSets(shaderResource->shaderPipes.descriptorSetLayout, &shaderResource->descriptorSets);
+	createDescriptorSets(shaderResource->shaderPipes.descriptorSetLayout, descriptorSets);
 	
 	std::tie(shaderResource->shaderPipes.graphicsPipeline,
 		shaderResource->shaderPipes.descriptorPipeLayout) = createGraphicsPipeline(
@@ -1927,12 +1960,12 @@ void MonsterVulkan::addMesh(std::shared_ptr<hRes::Mesh> mesh)
 
 void MonsterVulkan::addMesh(RenderMeshResource* meshResource)
 {
-	vkRenderMeshes.push_back(meshResource);
+	renderMeshes.push_back(meshResource);
 }
 
 void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 {
-	vkRenderMeshes.push_back(meshResource);
+	renderMeshes.push_back(meshResource);
 	if (meshResource->isMeshVkLoaded)
 	{
 		ToastComponent::GetInstance()->addMessage("MESH IS ALREADY LOADED");
@@ -1945,8 +1978,11 @@ void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 	}
 	if (!meshResource->getShader()->isShaderVkLoaded)
 	{
-		vkLoadShader(meshResource->getShader());
+		vkLoadShader(meshResource->getShader(), &meshResource->descritorSets);
 	}
+
+	meshResource->mesh.front().vertexBuffer = std::move(createGetVertexBuffer(meshResource->mesh.front().vertices).first);
+	meshResource->mesh.front().indexBuffer = std::move(createGetIndexBuffer(meshResource->mesh.front().indices).first);
 
 	std::vector<std::vector<MonsterBuffer>> allocatedBuffers{};
 	auto allocatedBufInfo = meshResource->allocatingBufferSizes;
@@ -1965,7 +2001,7 @@ void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 	meshResource->allocateBufferInfo(allocatedBuffers);
 	meshResource->updateDescriptorWrite(&vkMonsterStats.device);
 
-	//Test 
+	meshResource->isMeshVkLoaded = true;
 
 }
 

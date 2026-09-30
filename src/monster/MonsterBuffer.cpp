@@ -44,6 +44,34 @@ uint32_t MonsterBufferManager::createVertexBuffer(std::vector<vulkanUtils::Verte
 	return vkMemAlloc.vertexBuffer.size() - 1;
 }
 
+std::pair<vk::raii::Buffer, VmaAllocation> MonsterBufferManager::createGetVertexBuffer(std::vector<vulkanUtils::Vertex> vertices)
+{
+	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+	// Create a staging buffer (stored in the CPU for quick access and change)
+	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eTransferSrc,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+		VMA_MEMORY_USAGE_AUTO
+	);
+
+	// add data to the staging buffer
+	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, vertices.data(), stagingBufferAlloc, 0, bufferSize);
+
+	// create the device_local(graphics crad memory) buffer
+	auto [vkBuffer, vkBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+		VMA_MEMORY_USAGE_AUTO
+	);
+
+	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
+
+	return { vk::raii::Buffer(vkMonsterStats->device, vkBuffer) , vkBufferAlloc };
+}
+	
+
 void MonsterBufferManager::createIndexBuffer() {
 	createIndexBuffer(p_indices);
 
@@ -78,6 +106,34 @@ uint32_t MonsterBufferManager::createIndexBuffer(std::vector<uint16_t> indices) 
 	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
 
 	return vkMemAlloc.indexBuffer.size() - 1;
+}
+
+std::pair<vk::raii::Buffer, VmaAllocation> MonsterBufferManager::createGetIndexBuffer(std::vector<uint16_t> indices)
+{
+
+	vk::DeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+	// Create a staging buffer (stored in the CPU for quick access and change)
+	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eTransferSrc,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
+		VMA_MEMORY_USAGE_AUTO
+	);
+
+	// add data to the staging buffer
+	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, indices.data(), stagingBufferAlloc, 0, bufferSize);
+
+	// create the device_local(graphics card memory) buffer
+	auto [vkBuffer, vkBufferAlloc] = createBuffer(
+		bufferSize,
+		vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+		VMA_MEMORY_USAGE_AUTO
+	);
+
+	copyBuffer(stagingBuffer, vkBuffer, bufferSize);
+
+	return { vk::raii::Buffer(vkMonsterStats->device, vkBuffer) , vkBufferAlloc};
 }
 
 void MonsterBufferManager::createUniformBuffers()

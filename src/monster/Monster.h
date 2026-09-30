@@ -57,6 +57,8 @@ public:
 
 	void loadOtherMesh();
 
+	void clearVulkan();
+
 
 	void Shutdown();
 

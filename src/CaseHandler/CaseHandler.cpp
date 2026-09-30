@@ -298,4 +298,24 @@ bool CaseHandler::createRenderMesh(std::string name_p, std::filesystem::path* me
 	}
 }
 
+void CaseHandler::loadCase(std::shared_ptr<Case> case_p)
+{
+	// refresh Vulkan
+	if (case_p->getScenes())
+	{
+		for (auto& scene : *case_p->getScenes())
+		{
+			for (auto& obj : *scene->getObjects())
+			{
+				auto mesh = obj->mesh;
+				monster->addLoadMesh(mesh.get());
+			
+			}
+
+		}
+	}
+
+
+}
+
 

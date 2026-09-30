@@ -101,6 +101,11 @@ void GuiAddOverView::view() {
 		}
 	}
 
+	if (ImGui::Button("load case"))
+	{
+		model->caseHandler->loadCase(model->selectedCase);
+	}
+
 	ImGui::End();
 }
 
@@ -186,7 +191,6 @@ void GuiAddObjectView::view()
 				&model->shaders->at(selectedVertShader), 
 				&model->shaders->at(selectedFragShader)
 			);
-
 		}
 
 		ImGui::End();
