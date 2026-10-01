@@ -28,8 +28,6 @@ class Monster : public FeelPollEventExtension, public MonsterImgui
 
 private:
 
-
-
 	uint32_t triangleShaderIndex;
 
 	void pollEvent(SDL_Event& event) override;

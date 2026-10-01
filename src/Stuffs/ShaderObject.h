@@ -34,10 +34,13 @@ public:
 	void loadShaderVar() 
 	{
 		//ResourceHandler::GetInstance()->readGLSLShaderFile(vertPath, vertShaderParameters); // Unifrom buffers are not yet read as they might collide with the transformation buffer
-		ResourceHandler::GetInstance()->readGLSLShaderFile(fragPath, fragShaderParameters);
+		ResourceHandler::GetInstance()->readGLSLShaderFile(fragPath, &fragShaderParameters);
 		alignShaderVar();
 		calShaderDeviceSizes();
 	}
+
+
+	// NOTHING BELOW THIS SHOULD BE DISTUREBED! --------------------------------------------------------------------------------------------------------------------------------------
 
 	void alignShaderVar() {
 		// "largest" in this function refers to the byte size of variables NOT their containts
@@ -46,7 +49,7 @@ public:
 		// if 16 is the exact sum it resets and loop continus and 
 		// if at any point the sum exceeds 16, then the difference is padded to the previous element and the alignment continus
 
-		if (fragShaderParameters->empty() || fragShaderParameters->size() == 1){
+		if (fragShaderParameters.empty() || fragShaderParameters.size() == 1){
 			return; // No Alignment needed
 		}
 		
@@ -57,11 +60,11 @@ public:
 		uint32_t sum = 0;
 
 		// align to 8 bytes
-		if (fragShaderParameters->back().varType == ShaderVarType::FLOAT2)
+		if (fragShaderParameters.back().varType == ShaderVarType::FLOAT2)
 		{
-			for (size_t i = 0; i < fragShaderParameters->size(); i++)
+			for (size_t i = 0; i < fragShaderParameters.size(); i++)
 			{
-				ShaderVarType type = fragShaderParameters->at(i).varType;
+				ShaderVarType type = fragShaderParameters.at(i).varType;
 				if (type < ShaderVarType::FLOAT2)
 				{
 					sum += 4;
@@ -77,7 +80,7 @@ public:
 				}
 				else if (sum > 8)
 				{
-					fragShaderParameters->at(i - 1).padding = sum - 8;
+					fragShaderParameters.at(i - 1).padding = sum - 8;
 					sum = 0;
 				}
 				
@@ -85,21 +88,20 @@ public:
 		}
 
 		// align to 16 bytes
-		else if (fragShaderParameters->back().varType == ShaderVarType::FLOAT3 || fragShaderParameters->back().varType == ShaderVarType::FLOAT4)
+		else if (fragShaderParameters.back().varType == ShaderVarType::FLOAT3 || fragShaderParameters.back().varType == ShaderVarType::FLOAT4)
 		{
-			for (size_t i = 0; i < fragShaderParameters->size(); i++)
+			for (size_t i = 0; i < fragShaderParameters.size(); i++)
 			{
-				ShaderVarType type = fragShaderParameters->at(i).varType;
+				ShaderVarType type = fragShaderParameters.at(i).varType;
 				
 				if (type == ShaderVarType::FLOAT3)
 				{
-					fragShaderParameters->at(i).padding += 4; // padding is added to align 12 to 16
+					fragShaderParameters.at(i).padding += 4; // padding is added to align 12 to 16
 				}
 
 				if (type < ShaderVarType::FLOAT2)
 				{
 					sum += 4;
-					fragShaderSize += 4;
 					
 				}
 				else if (type == ShaderVarType::FLOAT2)
@@ -107,7 +109,7 @@ public:
 					sum += 8;
 					if (sum > 16)
 					{
-						fragShaderParameters->at(i - 1).padding =  16 - (sum - 8);
+						fragShaderParameters.at(i - 1).padding =  16 - (sum - 8);
 						sum = 0;
 					}
 				}
@@ -116,7 +118,7 @@ public:
 					sum += 16;
 					if (sum > 16)
 					{
-						fragShaderParameters->at(i - 1).padding = 16 - (sum - 16);
+						fragShaderParameters.at(i - 1).padding = 16 - (sum - 16);
 						sum = 0;
 					}
 				}
@@ -137,7 +139,8 @@ public:
 	}
 
 	void calShaderDeviceSizes() {
-		for (const auto& var : *fragShaderParameters)
+		fragShaderSize = 0;
+		for (const auto& var : fragShaderParameters)
 		{
 			switch (var.varType) {
 			case ShaderVarType::FLOAT0:

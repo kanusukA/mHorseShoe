@@ -11,6 +11,8 @@
 #include <filesystem>
 #include <vector>
 
+#include <glm/glm.hpp>
+
 // DO NOT CHANGE THE ORDER!!!!!!!
 enum ShaderVarType
 {
@@ -29,13 +31,19 @@ struct ShaderVar {
 
 	int* varInt = new int(0);
 	float* varFloat = new float(0.0);
-	float varFloat2[2] = { 0.0,0.0 };
+	/*float varFloat2[2] = { 0.0,0.0 };
 	float varFloat3[3] = { 0.0, 0.0, 0.0 };
-	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };
+	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };*/
+
+	glm::vec2 varFloat2 = glm::vec2(0.0f);
+	glm::vec3 varFloat3 = glm::vec3(0.0f);
+	glm::vec4 varFloat4 = glm::vec4(0.0f);
 
 	int padding; // to align with memory layout
 
 };
+
+
 
 enum ShaderType {
 	Vertex,

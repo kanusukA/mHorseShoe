@@ -25,6 +25,7 @@ public:
 
 		shader = shader_p;
 
+		fragParameters = shader->getFragParameters();
 
 	}
 

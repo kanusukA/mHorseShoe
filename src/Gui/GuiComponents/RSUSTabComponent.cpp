@@ -1,5 +1,7 @@
 #include "RSUSTabComponent.h"
 
+// LEGACY CODE!
+
 inline int ImageComboView(int index, const char* selectedImage) {
 	int selValue = -1;
 	if(!ModelComponent::imageTextures->empty()){

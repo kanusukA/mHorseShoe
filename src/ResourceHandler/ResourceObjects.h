@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#include <glm/gtc/type_ptr.hpp>
+
 
 // The Path storage in vectors are as follows
 enum ResourcePaths {
@@ -391,12 +393,16 @@ protected:
 
 	// These are an outward prased view of the shader variables and must not be used to set the shader values themselves 
 	// as a shader can be used by multiple Meshes, having different values to the variables!
+
+	std::vector<ShaderVar> vertShaderParameters{};
+	std::vector<ShaderVar> fragShaderParameters{};
 	
 
 public:
 
-	std::vector<ShaderVar>* vertShaderParameters = new std::vector<ShaderVar>();
-	std::vector<ShaderVar>* fragShaderParameters = new std::vector<ShaderVar>();
+	// Sync up with Render Mesh to use them in thier respective descriptor sets. 
+	const std::vector<ShaderVar>& getFragParameters() { return fragShaderParameters; }
+	const std::vector<ShaderVar>& getVertParameters() { return vertShaderParameters; }
 
 	vk::raii::ShaderModule vertexShader = nullptr;
 	vk::raii::ShaderModule fragmentShader = nullptr;
@@ -667,6 +673,8 @@ class RenderMeshResource : public Resource
 
 public:
 
+	std::vector<ShaderVar> fragParameters{};
+
 	std::vector<MonsterBuffer> transformBuffers{};
 	std::vector<MonsterBuffer> fragBuffers{};
 
@@ -750,19 +758,19 @@ public:
 			{
 				switch (var.varType) {
 				case ShaderVarType::FLOAT0:
-					memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat, sizeof(fragBuf.bufferSize));
+					memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat, 4);
 					align += 4;
 					break;
 				case ShaderVarType::FLOAT2:
-					memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat2, sizeof(fragBuf.bufferSize));
+					memcpy((char*)fragBuf.allocInfo.pMappedData + align, glm::value_ptr(var.varFloat2), 8);
 					align += 8;
 					break;
 				case ShaderVarType::FLOAT3:
-					memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat3, sizeof(fragBuf.bufferSize));
+					memcpy((char*)fragBuf.allocInfo.pMappedData + align, glm::value_ptr(var.varFloat3), 16);
 					align += 16; // NO 12 Byte Offset!
 					break;
 				case ShaderVarType::FLOAT4:
-					memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat4, sizeof(fragBuf.bufferSize));
+					memcpy((char*)fragBuf.allocInfo.pMappedData + align, glm::value_ptr(var.varFloat4), 16);
 					align += 16;
 					break;
 				default:
@@ -890,15 +898,15 @@ namespace hRes {
 						align += 4;
 						break;
 					case ShaderVarType::FLOAT2:
-						memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat2, sizeof(fragBuf.bufferSize));
+						memcpy((char*)fragBuf.allocInfo.pMappedData + align, glm::value_ptr(var.varFloat2), sizeof(fragBuf.bufferSize));
 						align += 8;
 						break;
 					case ShaderVarType::FLOAT3:
-						memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat3, sizeof(fragBuf.bufferSize));
+						memcpy((char*)fragBuf.allocInfo.pMappedData + align, glm::value_ptr(var.varFloat3), sizeof(fragBuf.bufferSize));
 						align += 16; // NO 12 Byte Offset!
 						break;
 					case ShaderVarType::FLOAT4:
-						memcpy((char*)fragBuf.allocInfo.pMappedData + align, var.varFloat4, sizeof(fragBuf.bufferSize));
+						memcpy((char*)fragBuf.allocInfo.pMappedData + align, glm::value_ptr(var.varFloat4), sizeof(fragBuf.bufferSize));
 						align += 16;
 						break;
 					default:
