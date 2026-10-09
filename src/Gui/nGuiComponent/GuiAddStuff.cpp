@@ -105,6 +105,10 @@ void GuiAddOverView::view() {
 	{
 		model->caseHandler->loadCase(model->selectedCase);
 	}
+	if (ImGui::Button("save case"))
+	{
+		model->caseHandler->saveCase(model->selectedCase);
+	}
 
 	ImGui::End();
 }

@@ -13,7 +13,6 @@ private:
 	std::vector<std::shared_ptr<Scene>> sceneVec{}; // linked
 	std::vector<std::shared_ptr<Object>> objVec {};
 
-
 public:
 
 	Scene(GDBuilderContext* GDBuilderCxt_p, std::string name_p) :

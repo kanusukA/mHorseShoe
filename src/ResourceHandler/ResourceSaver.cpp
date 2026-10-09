@@ -82,99 +82,175 @@ void ResourceSaver::saveMasterList(std::string instanceName, std::vector<ResID>*
 
 }
 
-std::string ResourceSaver::saveCase(CaseResource* case_p)
+std::string ResourceSaver::startSaveCase(CaseResource* case_p, YAML::Emitter& out)
 {
 	// YAML REFORM ------------------------------------------------------------
-	std::string outputFileDir = this->saveLocation + "/" + case_p->getName() + std::to_string((unsigned long long)getCurrentTime()) + ".yml";
+	std::string outputFileDir = this->saveLocation + "/" + case_p->getName() + ".yml";
 
 	if (this->openSaveFile(outputFileDir))
 	{
-		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << CASE_NAME_KEY;
 		out << YAML::Value << case_p->getName();
-		out << YAML::EndMap;
 		
-		outStreamFile << out.c_str() << "\n";
 
 	}
 	
 	return outputFileDir;
 	// -------------------------------------------------------------------------
 
-	/*std::string sectionName = std::to_string(case_p->getId());
+}
 
-	ini->SetValue(sectionName.c_str(), CASE_NAME_KEY , case_p->getName().c_str());*/
+void ResourceSaver::SaveCase(YAML::Emitter& out)
+{
+	out << YAML::EndMap;
+	outStreamFile << out.c_str();
+	outStreamFile.close();
+}
 
-	/*std::string scenes = "";
+YAML::Emitter& ResourceSaver::startSceneSave(YAML::Emitter& out)
+{
+	out << YAML::Key << CASE_SCENES_KEY;
+	out << YAML::Value;
+	out << YAML::BeginSeq;
 
-	for (int i = 0; i < case_p->getScenesIdInCase()->size(); i++)
+	return out;
+
+}
+
+YAML::Emitter& ResourceSaver::endSceneSave(YAML::Emitter& out)
+{
+	out << YAML::EndSeq;
+	return out;
+
+}
+
+YAML::Emitter& ResourceSaver::startSceneObjSave(SceneResource* scene_p, YAML::Emitter& out)
+{
+	out << YAML::Key << SCENE_OBJECTS_KEY;
+	out << YAML::Value;
+	out << YAML::BeginSeq;
+	return out;
+
+}
+
+YAML::Emitter& ResourceSaver::endSceneObjSave(SceneResource* scene_p, YAML::Emitter& out)
+{
+	out << YAML::EndSeq;
+	return out;
+}
+
+YAML::Emitter& ResourceSaver::saveScnObj(ObjectResource* obj, YAML::Emitter& out)
+{
+	out << YAML::BeginMap;
+	out << YAML::Key << OBJECT_NAME_KEY;
+	out << YAML::Value << obj->getName();
+	out << YAML::Key << OBJECT_RENDERMESH_KEY;
+	out << YAML::Value;
+	return saveRenderMesh(obj->meshResource, out) 
+		<< YAML::EndMap;
+}
+
+YAML::Emitter& ResourceSaver::saveRenderMesh(RenderMeshResource* mesh, YAML::Emitter& out)
+{
+	out << YAML::BeginMap;
+
+	out << YAML::Key << RM_NAME;
+	out << YAML::Value << mesh->getName();
+
+	out << YAML::Key << RM_POSITION << YAML::Value;
+	glm3Save(mesh->position, out);
+
+	out << YAML::Key << RM_ROTATION << YAML::Value;
+	glm3Save(mesh->rotation, out);
+
+	out << YAML::Key << RM_SCALE << YAML::Value;
+	glm3Save(mesh->scale, out);
+
+	out << YAML::Key << RM_MESH_PATH;
+	out << YAML::Value << mesh->meshFile.string().c_str();
+
+	out << YAML::Key << RM_SHADER;
+	out << YAML::Value;
+	saveShader(mesh->shaderResource, out);
+
+	out << YAML::Key << RM_SHADER_VARS;
+	out << YAML::Value;
+	startShaderVarSave(out);
+	for (size_t i = 0; i < mesh->fragParameters.size(); i++)
 	{
-		scenes += std::to_string(case_p->getScenesIdInCase()->at(i)) + "|";
+		shaderVarSave(mesh->fragParameters.at(i), out);
 	}
-	ini->SetValue(sectionName.c_str(), CASE_SCENE_KEY, scenes.c_str());*/
+	endShaderVarSave(out);
+
+	out << YAML::EndMap;
+
+	return out;
+	
+}
+
+YAML::Emitter& ResourceSaver::saveShader(ShaderResource* shader, YAML::Emitter& out)
+{
+	out << YAML::BeginMap;
+	out << YAML::Key << SHADER_NAME_KEY;
+	out << YAML::Value << shader->getName();
+
+	out << YAML::Key << SHADER_VERT_PATH;
+	out << YAML::Value << shader->vertPath.string().c_str();
+
+	out << YAML::Key << SHADER_FRAG_PATH;
+	out << YAML::Value << shader->fragPath.string().c_str();
+
+	out << YAML::EndMap;
+
+	return out;
+
+	// fetch fresh vars
 
 }
 
-void ResourceSaver::saveScene(SceneResource* scene_p, YAML::Emitter& out)
-{
-	
-	
-	/*out << YAML::BeginMap;
 
+YAML::Emitter& ResourceSaver::endSceneScnSave(YAML::Emitter& out)
+{
+	out << YAML::EndMap;
+	return out;
+}
+
+YAML::Emitter& ResourceSaver::saveScnScn(SceneResource* scn, YAML::Emitter& out)
+{
+	out << YAML::BeginMap;
 	out << YAML::Key << SCENE_NAME_KEY;
-	out << YAML::Value << scene_p->getName();
+	out << YAML::Value << scn->getName();
 
-	out << YAML::Key << SCENE_TYPE_KEY;
-	out << YAML::Value << scene_p->getSceneType();
-
-	out << YAML::Key << SCENE_POS_KEY;
-	out << YAML::Value << YAML::Flow;
-	out << YAML::BeginSeq << scene_p->_getPosition()[0] << scene_p->_getPosition()[1] << scene_p->_getPosition()[2] << YAML::EndSeq;
-	
-	out << YAML::Key << SCENE_ROT_KEY;
-	out << YAML::Value << YAML::Flow;
-	out << YAML::BeginSeq << scene_p->_getOrientation()[0] << scene_p->_getOrientation()[1] << scene_p->_getOrientation()[2] << scene_p->_getOrientation()[3] << YAML::EndSeq;
-	
-	out << YAML::Key << SCENE_SCALE_KEY;
-	out << YAML::Value << YAML::Flow << YAML::BeginSeq;
-	out << scene_p->_getScale()[0] << scene_p->_getScale()[1] << scene_p->_getScale()[2] << YAML::EndSeq;
-
-	*/
-	
-	
+	return out;
 
 	
-	
 
-
-	//std::string sectionName = std::to_string(scene_p->getId());
-
-	//ini->SetValue(sectionName.c_str(), SCENE_NAME_KEY, scene_p->getName().c_str());
-
-	//ini->SetValue(sectionName.c_str(), SCENE_TYPE_KEY, std::to_string(scene_p->getSceneType()).c_str());
-
-	//// TODO FIX THIS POSITION TO STRING !!!!!!!!!!!!!!!!!!
-	//ini->SetValue(sectionName.c_str(), SCENE_POS_KEY, convertFloatPtrToString(scene_p->_getPosition(),3).c_str());
-	//ini->SetValue(sectionName.c_str(), SCENE_SCALE_KEY, convertFloatPtrToString(scene_p->_getScale(),3).c_str());
-	//ini->SetValue(sectionName.c_str(), SCENE_ROT_KEY, convertFloatPtrToString(scene_p->_getOrientation(),4).c_str());
-
-	//ini->SetValue(sectionName.c_str(), SCENE_ATTACHED_TO, std::to_string(attachedTo).c_str());
-	//ini->SetValue(sectionName.c_str(), SCENE_ATTACHED_CASE, std::to_string(parentCase).c_str());
-	
 }
 
-void ResourceSaver::saveScnObj(std::string sectionName, ResID objectID)
-{
-	ini->SetValue(sectionName.c_str(), std::to_string(objectID).c_str(), NULL );
-}
+//void ResourceSaver::saveScene(SceneResource* scene_p, YAML::Emitter& out)
+//{
+//	
+//	out << YAML::BeginMap;
+//
+//	out << YAML::Key << SCENE_NAME_KEY;
+//	out << YAML::Value << scene_p->getName();
+//	
+//
+//	
+//}
+//
+//void ResourceSaver::saveScnObj(std::string sectionName, ResID objectID)
+//{
+//	ini->SetValue(sectionName.c_str(), std::to_string(objectID).c_str(), NULL );
+//}
 
 inline void _shaderYaml(std::vector<ShaderVar>* shadervars, YAML::Emitter& out) {
 	out << YAML::Value << YAML::BeginSeq;
 	for (int i = 0; i < shadervars->size(); i++)
 	{
 		out << YAML::BeginMap << YAML::Key << SHADER_NAME_KEY << YAML::Value << shadervars->at(i).varName;
-		out << YAML::Key << SHADER_VALUE_KEY;
+		//out << YAML::Key << SHADER_VALUE_KEY;
 		switch (shadervars->at(i).varType)
 		{
 		case ShaderVarType::INTEGER:
@@ -476,7 +552,7 @@ void ResourceSaver::saveCases(std::vector<CaseResource*>* case_res, std::string 
 	for (int i = 0; i < case_res->size(); i++)
 	{
 	
-		this->saveCase(case_res->at(i));
+		//this->startSaveCase(case_res->at(i));
 		
 	}
 	this->saveIni(caseInipath);
@@ -654,3 +730,94 @@ void ResourceSaver::saveImages(std::vector<ImageResource*>* image_res, std::stri
 	this->saveIni(imageIniPath);
 	this->resetIni();
 }
+
+YAML::Emitter& ResourceSaver::glm2Save(glm::vec2& vec, YAML::Emitter& out)
+{
+	out << YAML::BeginMap;
+	out << YAML::Key << "X";
+	out << YAML::Value << vec.x;
+	out << YAML::Key << "Y";
+	out << YAML::Value << vec.y;
+	out << YAML::EndMap;
+	return out;
+}
+
+YAML::Emitter& ResourceSaver::glm3Save(glm::vec3& vec, YAML::Emitter& out)
+{
+	out << YAML::BeginMap;
+	out << YAML::Key << "X";
+	out << YAML::Value << vec.x;
+	out << YAML::Key << "Y";
+	out << YAML::Value << vec.y;
+	out << YAML::Key << "Z";
+	out << YAML::Value << vec.z;
+	out << YAML::EndMap;
+
+	return out;
+}
+
+YAML::Emitter& ResourceSaver::glm4Save(glm::vec4& vec, YAML::Emitter& out)
+{
+	out << YAML::BeginMap;
+	out << YAML::Key << "W";
+	out << YAML::Value << vec.w;
+	out << YAML::Key << "X";
+	out << YAML::Value << vec.x;
+	out << YAML::Key << "Y";
+	out << YAML::Value << vec.y;
+	out << YAML::Key << "Z";
+	out << YAML::Value << vec.z;
+	out << YAML::EndMap;
+
+	return out;
+}
+
+YAML::Emitter& ResourceSaver::startShaderVarSave(YAML::Emitter& out)
+{
+	out << YAML::BeginSeq;
+	return out;
+}
+
+YAML::Emitter& ResourceSaver::shaderVarSave(ShaderVar& var, YAML::Emitter& out)
+{
+	out << YAML::BeginMap;
+	out << YAML::Key << SHADER_VAR_NAME;
+	out << YAML::Value << var.varName;
+
+	out << YAML::Key << SHADER_VAR_TYPE;
+	out << YAML::Value << var.varType;
+
+	switch (var.varType) {
+	case ShaderVarType::FLOAT0:
+		out << YAML::Key << "FLOAT0";
+		out << YAML::Value << *var.varFloat;
+		break;
+	case ShaderVarType::FLOAT2:
+		out << YAML::Key << "FLOAT2";
+		out << YAML::Value;
+		glm2Save(var.varFloat2, out);
+		break;
+	case ShaderVarType::FLOAT3:
+		out << YAML::Key << "FLOAT3";
+		out << YAML::Value;
+		glm3Save(var.varFloat3, out);
+		break;
+	case ShaderVarType::FLOAT4:
+		out << YAML::Key << "FLOAT4";
+		out << YAML::Value;
+		glm4Save(var.varFloat4, out);
+		break;
+	}
+
+	out << YAML::EndMap;
+	return out;
+}
+
+YAML::Emitter& ResourceSaver::endShaderVarSave(YAML::Emitter& out)
+{
+	out << YAML::EndSeq;
+	return out;
+}
+
+
+// TEST THE NEW CASE SYSTEM

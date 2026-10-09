@@ -167,6 +167,42 @@ std::filesystem::path* ResourceHandler::fetchFileInGroup(std::string filename_p,
 	return nullptr;
 }
 
+void ResourceHandler::readCaseFile(std::filesystem::path& filepath)
+{
+	if (std::filesystem::exists(filepath))
+	{
+		// Case
+		YAML::Node node = YAML::LoadFile(filepath.string().c_str());
+
+		std::string caseName = node[CASE_NAME_KEY].as<std::string>();
+
+		std::vector<SceneResource> scenes{};
+
+		if (node[CASE_SCENES_KEY].IsSequence())
+		{
+			for (size_t i = 0; i < node[CASE_SCENES_KEY].size(); i++)
+			{
+				YAML::Node scene = node[CASE_SCENES_KEY][i];
+
+
+
+			}
+		}
+
+	}
+}
+
+SceneResource ResourceHandler::readSceneNode(YAML::Node& node)
+{
+	std::string scnName = node[SCENE_NAME_KEY].as<std::string>();
+
+	if (node[CASE_SCENES_KEY].IsSequence())
+	{
+
+	}
+
+}
+
 std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByIndex(int masterIndex)
 {
 	if (masterResourceVector && masterIndex < masterResourceVector->size())

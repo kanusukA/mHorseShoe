@@ -279,6 +279,11 @@ void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std:
 
 }
 
+void ResourceReader::readCaseFile(std::filesystem::path filePath)
+{
+	
+}
+
 const std::string& ResourceReader::readFileContents(const std::filesystem::path& filePath)
 {
 	std::ifstream file(filePath, std::ios::ate | std::ios::binary);

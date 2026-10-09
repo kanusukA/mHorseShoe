@@ -247,8 +247,6 @@ private:
 
 	std::string* caseFileName = nullptr;
 
-	std::vector<ResID>* Scenes = new std::vector<ResID>();
-
 protected:
 
 
@@ -280,10 +278,8 @@ public:
 
 
 	// CASE METHODS
-
-	std::vector<ResID>* getScenesIdInCase() {
-		return Scenes;
-	}
+	
+	
 
 	virtual ~CaseResource() = default;
 
@@ -292,9 +288,6 @@ public:
 
 class SceneResource : public Resource
 {
-
-protected:
-	ObjectResource* objectResource;
 
 public:
 
@@ -324,15 +317,14 @@ public:
 
 class ObjectResource : public Resource
 {
-protected:
-	RenderMeshResource* meshResource;
 
 public:
+
+	RenderMeshResource* meshResource;
 
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 scale;
-
 
 
 	void setId(int index) override {
@@ -673,6 +665,8 @@ class RenderMeshResource : public Resource
 
 public:
 
+	ShaderResource* shaderResource;
+
 	std::vector<ShaderVar> fragParameters{};
 
 	std::vector<MonsterBuffer> transformBuffers{};
@@ -708,10 +702,13 @@ public:
 
 	}
 
-	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p, std::filesystem::path meshFile_p) {
+	RenderMeshResource(ResourceHandlerBuilderContext* context, std::string meshName_p, std::filesystem::path meshFile_p, ShaderResource* shaderRes_p) {
 		this->resourceHandlerCxt = context;
 		this->setName(meshName_p);
 		meshFile = meshFile_p;
+
+		shaderResource = shaderRes_p;
+
 		setId(context->generateMeshID());
 	}
 

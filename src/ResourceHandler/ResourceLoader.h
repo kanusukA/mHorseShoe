@@ -78,8 +78,6 @@ private:
 
 protected:
 
-	
-
 	void resource_loader_shutdown() {
 		this->~ResourceLoader();
 	}
@@ -155,6 +153,11 @@ public:
 	bool openLoadFile(std::string filepath);
 
 	std::string fetchNodeByMapKey(std::string key);
+
+	// new loading functions
+
+	virtual void readCaseFile(std::filesystem::path& filepath) { throw std::runtime_error("NOT ME!"); }
+	virtual SceneResource readSceneNode(YAML::Node& node) {};
 
 
 

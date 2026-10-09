@@ -13,6 +13,8 @@
 
 #include <glm/glm.hpp>
 
+
+
 // DO NOT CHANGE THE ORDER!!!!!!!
 enum ShaderVarType
 {
@@ -31,6 +33,7 @@ struct ShaderVar {
 
 	int* varInt = new int(0);
 	float* varFloat = new float(0.0);
+
 	/*float varFloat2[2] = { 0.0,0.0 };
 	float varFloat3[3] = { 0.0, 0.0, 0.0 };
 	float varFloat4[4] = { 0.0, 0.0, 0.0, 0.0 };*/
@@ -42,7 +45,6 @@ struct ShaderVar {
 	int padding; // to align with memory layout
 
 };
-
 
 
 enum ShaderType {
@@ -65,6 +67,8 @@ public:
 
 	void readShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p);
 	void readGLSLShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p);
+
+	void readCaseFile(std::filesystem::path filePath);
 
 	const std::string& readFileContents(const std::filesystem::path& filePath);
 	const std::vector<char>& readFileContentsChar(const std::filesystem::path& filePath);

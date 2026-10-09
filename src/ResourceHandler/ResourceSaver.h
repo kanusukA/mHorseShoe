@@ -46,10 +46,23 @@ public:
 
 	// Runs OpenSaveFile(). make sure to close it.
 	// returns the filename. this can be passed on to same content in the same file!
-	std::string saveCase(CaseResource* case_p);
+	std::string startSaveCase(CaseResource* case_p, YAML::Emitter& out);
+	void SaveCase(YAML::Emitter& out);
 
-	void saveScene(SceneResource* scene_p, YAML::Emitter& out);
-	void saveScnObj(std::string sectionName, ResID objectID);
+	YAML::Emitter& startSceneSave( YAML::Emitter& out);
+	YAML::Emitter& endSceneSave( YAML::Emitter& out);
+	YAML::Emitter& startSceneObjSave(SceneResource* scene_p, YAML::Emitter& out);
+	YAML::Emitter& endSceneObjSave(SceneResource* scene_p, YAML::Emitter& out);
+	YAML::Emitter& saveScnObj(ObjectResource* obj, YAML::Emitter& out);
+	YAML::Emitter& saveRenderMesh(RenderMeshResource* mesh, YAML::Emitter& out);
+	YAML::Emitter& saveShader(ShaderResource* shader, YAML::Emitter& out);
+	//YAML::Emitter& startSceneScnSave(SceneResource* scene_p, YAML::Emitter& out);
+	YAML::Emitter& endSceneScnSave(YAML::Emitter& out);
+	YAML::Emitter& saveScnScn(SceneResource* scn, YAML::Emitter& out);
+	
+
+	//void saveScene(SceneResource* scene_p, YAML::Emitter& out);
+	//void saveScnObj(std::string sectionName, ResID objectID);
 
 	void saveMaterial(MaterialResource* mat_p, ShaderResource* vert_p, ShaderResource* frag_p,YAML::Emitter& out);
 	void saveMaterialTexture(std::string sectionName, std::string textureName, int pos);
@@ -82,6 +95,14 @@ public:
 
 	void saveImages(std::vector<ImageResource*>* image_res, std::string imageIniPath, bool overwrite = true);
 	
+
+	// helper
+	YAML::Emitter& glm2Save(glm::vec2& vec, YAML::Emitter& out);
+	YAML::Emitter& glm3Save(glm::vec3& vec, YAML::Emitter& out);
+	YAML::Emitter& glm4Save(glm::vec4& vec, YAML::Emitter& out);
+	YAML::Emitter& startShaderVarSave(YAML::Emitter& out);
+	YAML::Emitter& shaderVarSave(ShaderVar& var, YAML::Emitter& out);
+	YAML::Emitter& endShaderVarSave(YAML::Emitter& out);
 
 public:
 

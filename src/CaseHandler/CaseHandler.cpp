@@ -318,4 +318,65 @@ void CaseHandler::loadCase(std::shared_ptr<Case> case_p)
 
 }
 
+void CaseHandler::saveScenes(const std::vector<std::shared_ptr<Scene>>* scenesVec, YAML::Emitter& out)
+{
+	
+	for (size_t i = 0; i < scenesVec->size(); i++)
+	{
+		std::shared_ptr<Scene> scn = scenesVec->at(i);
+
+		resourceHandler->saveScnScn(scn.get(), out);
+
+		// scn in scn
+		if (scn->getAttachedScenes() && scn->getAttachedScenes()->size() > 0)
+		{
+			resourceHandler->startSceneSave(out);
+			saveScenes(scn->getAttachedScenes(), out);
+			resourceHandler->endSceneSave(out);
+		}
+
+		// object in scn
+		if (scn->getObjects() && scn->getObjects()->size() > 0)
+		{
+			resourceHandler->startSceneObjSave(scn.get(), out);
+
+			for (size_t j = 0; j < scn->getObjects()->size(); j++)
+			{
+				resourceHandler->saveScnObj(scn->getObjects()->at(j).get(), out);
+			}
+
+			resourceHandler->endSceneObjSave(scn.get(), out);
+
+		}
+
+
+		resourceHandler->endSceneScnSave(out);
+
+	}
+	
+}
+
+void CaseHandler::saveCase(std::shared_ptr<Case> case_p)
+{
+	YAML::Emitter out = YAML::Emitter();
+
+	if (case_p)
+	{
+		resourceHandler->startSaveCase(case_p.get(), out);
+
+		if (case_p->getScenes() && case_p->getScenes()->size() > 0)
+		{
+			resourceHandler->startSceneSave(out);
+			saveScenes(case_p->getScenes(), out);
+			resourceHandler->endSceneSave(out);
+		}
+
+		resourceHandler->SaveCase(out);
+	}
+	else {
+		ToastComponent::GetInstance()->addMessage("NO CASE SELECTED!");
+	}
+
+}
+
 

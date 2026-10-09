@@ -1,7 +1,5 @@
 #pragma once
 
-//#include <Stuffs/ColliderMesh.h>
-
 #include <Stuffs/ShaderObject.h>
 
 
@@ -18,9 +16,8 @@ public:
 
 	std::shared_ptr<Shader> shader;
 
-
 	RenderMesh(GDBuilderContext* builderCxt_p, std::string name_p, std::filesystem::path meshPath, std::shared_ptr<Shader> shader_p ) : 
-		RenderMeshResource(ResourceHandler::GetInstance(), name_p , meshPath) {
+		RenderMeshResource(ResourceHandler::GetInstance(), name_p , meshPath, shader_p.get()) {
 		builderCxt = builderCxt_p;
 
 		shader = shader_p;

@@ -83,6 +83,9 @@ public:
 
 
 	void loadCase(std::shared_ptr<Case> case_p);
+
+	void saveScenes(const std::vector<std::shared_ptr<Scene>>* scenesVec, YAML::Emitter& out);
+	void saveCase(std::shared_ptr<Case> case_p);
 	
 
 /*	bool resourceExists(std::string resourceName);
