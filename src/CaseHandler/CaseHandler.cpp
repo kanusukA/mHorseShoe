@@ -379,4 +379,51 @@ void CaseHandler::saveCase(std::shared_ptr<Case> case_p)
 
 }
 
+void CaseHandler::openCase(std::filesystem::path& path)
+{
+	CaseResource caseRes = resourceHandler->readCaseFile(path);
+
+	createCase(caseRes.getName(), *caseRes.getFileName());
+	std::shared_ptr<Case> caseObj = mCases->back();
+	for (size_t i = 0; i < caseRes._scenes.size(); i++)
+	{
+		 caseObj->attachNewScene(openScene(caseRes._scenes.at(i)));
+	}
+
+}
+
+std::shared_ptr<Scene> CaseHandler::openScene(SceneResource resource)
+{
+	createScene(resource.getName());
+	std::shared_ptr<Scene> scn = mScenes->back();
+	for (size_t i = 0; i < resource._scenes.size(); i++)
+	{
+		scn.get()->attachNewScene(openScene(resource._scenes.at(i)));
+		
+	}
+	//objects
+	for (size_t i = 0; i < resource._objects.size(); i++)
+	{
+		ObjectResource obj = resource._objects.at(i);
+		RenderMeshResource* mesh = obj.meshResource;
+		if (!mesh)
+		{
+			throw std::runtime_error("INVALID MESH!");
+		}
+		ShaderResource* shader = mesh->shaderResource;
+		if (!shader)
+		{
+			throw std::runtime_error("INVALID SHADER!");
+		}
+
+		createShader(shader->getName(), &shader->vertPath, &shader->fragPath);
+		createRenderMesh(mesh->getName(), &mesh->meshFile, mShader->back());
+		createObject(obj.getName(), mRenderMesh->back());
+
+		scn->attachNewObject(mObjects->back());
+	}
+
+	return scn;
+}
+
 

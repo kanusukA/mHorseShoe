@@ -72,6 +72,30 @@ void GuiAddOverView::view() {
 	ImGui::SetNextWindowSize(ImVec2(300, 500));
 	ImGui::Begin("Stack");
 
+	ImGui::Text("SAVED CASES");
+	if (model->savedCaseFiles && model->savedCaseFiles->size() > 0)
+	{
+		if (ImGui::BeginCombo("Cases",model->savedCaseFiles->at(model->selectedSavedCaseFile).filename().string().c_str()))
+		{
+			for (size_t i = 0; i < model->savedCaseFiles->size(); i++)
+			{
+				if (ImGui::Selectable(model->savedCaseFiles->at(i).filename().string().c_str(),model->selectedSavedCaseFile == i))
+				{
+					model->selectedSavedCaseFile = i;
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		if (ImGui::Button("Open Case"))
+		{
+			model->openCase();
+		}
+	}
+	else {
+		ImGui::Text("NO SAVED CASES");
+	}
+
 	ImGui::Text("Cases"); ImGui::SameLine();
 	if (ImGui::Button("Add Case"))
 	{

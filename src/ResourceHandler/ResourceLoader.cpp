@@ -246,9 +246,7 @@ RLCase ResourceLoader::fetchCaseData(std::filesystem::path yamlFilePath)
 
 void ResourceLoader::loadSavedCases()
 {
-	
 	fetchPathContents(dataDirPath.string(), ".yml", &caseFileNames);
-	
 }
 
 
@@ -272,6 +270,65 @@ std::string ResourceLoader::fetchNodeByMapKey(std::string key)
 		return loadFile[key].as<std::string>();
 	}
 	return "";
+}
+
+std::vector<ShaderVar> ResourceLoader::readShaderVarsNode(YAML::Node& node)
+{
+	std::vector<ShaderVar> shaderVars{};
+	if (node.IsSequence())
+	{
+		for (size_t i = 0; i < node.size(); i++)
+		{
+			ShaderVar var = ShaderVar();
+			var.varName = node[i][SHADER_VAR_NAME].as<std::string>();
+			var.varType = ShaderVarType(node[i][SHADER_VAR_TYPE].as<int>());
+			switch (var.varType) {
+			case ShaderVarType::FLOAT0:
+				var.varFloat = new float(node[i]["FLOAT0"].as<float>());
+				break;
+			case ShaderVarType::FLOAT2:{
+				YAML::Node f2 = node[i]["FLOAT2"];
+				var.varFloat2 = readVec2(f2);
+				break;
+			}
+			case ShaderVarType::FLOAT3:{
+				YAML::Node f3 = node[i]["FLOAT3"];
+				var.varFloat3 = readVec3(f3);
+				break;
+			}
+			case ShaderVarType::FLOAT4:{
+				YAML::Node f4 = node[i]["FLOAT4"];
+				var.varFloat4 = readVec4(f4);
+				break;
+			}
+			default:
+				throw std::runtime_error("INVALID VALUE FOUND!");
+				break;
+
+			}
+
+			shaderVars.push_back(std::move(var));
+		}
+	}
+
+	return shaderVars;
+
+	
+}
+
+glm::vec2 ResourceLoader::readVec2(YAML::Node& node)
+{
+	return {node["X"].as<float>(),node["Y"].as<float>()};
+}
+
+glm::vec3 ResourceLoader::readVec3(YAML::Node& node)
+{
+	return { node["X"].as<float>(),node["Y"].as<float>(),node["Z"].as<float>() };
+}
+
+glm::vec4 ResourceLoader::readVec4(YAML::Node& node)
+{
+	return { node["W"].as<float>(), node["X"].as<float>(),node["Y"].as<float>(),node["Z"].as<float>() };
 }
 
 

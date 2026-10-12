@@ -10,7 +10,7 @@ class Scene : public SceneResource {
 private:
 	GDBuilderContext* GDBuilderCxt;
 
-	std::vector<std::shared_ptr<Scene>> sceneVec{}; // linked
+	std::vector<std::shared_ptr<Scene>> sceneVec{}; 
 	std::vector<std::shared_ptr<Object>> objVec {};
 
 public:

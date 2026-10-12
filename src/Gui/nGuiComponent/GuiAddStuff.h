@@ -11,6 +11,9 @@ public:
 	std::vector<std::filesystem::path>* renderMeshes = nullptr;
 	std::vector<std::filesystem::path>* shaders = nullptr;
 
+	int selectedSavedCaseFile = 0;
+
+
 	bool showAddCase = false;
 	bool showAddSceneToCase = false;
 	bool showAddSceneToScene = false;
@@ -64,6 +67,11 @@ public:
 		scn->attachNewObject(caseHandler->mObjects->back());
 
 		showAddObject = false;
+	}
+
+	void openCase() {
+		gdSource->getCaseHandler()->openCase(savedCaseFiles->at(selectedSavedCaseFile));
+		selectedCase = gdSource->getCaseHandler()->mCases->back();
 	}
 
 };

@@ -128,7 +128,7 @@ public:
 		resourceLoaderIniPath = resourceLoaderIniPath_p;
 		dataDirPath = dataDirPath_p;
 		loadSavedPaths();
-		/*loadSavedCases(); */
+		loadSavedCases();
 
 	}
 
@@ -137,7 +137,6 @@ public:
 	RLCase fetchCaseData(std::filesystem::path yamlFilePath);
 
 	
-
 	// LOADING FILES AND FOLDERS
 	void fetchPathContents(std::string path, std::string extension, std::vector<std::filesystem::path>* output, bool searchFolders = false);
 
@@ -156,11 +155,17 @@ public:
 
 	// new loading functions
 
-	virtual void readCaseFile(std::filesystem::path& filepath) { throw std::runtime_error("NOT ME!"); }
-	virtual SceneResource readSceneNode(YAML::Node& node) {};
+	virtual CaseResource readCaseFile(std::filesystem::path& filepath) { throw std::runtime_error("NOT ME!"); }
+	virtual SceneResource readSceneNode(YAML::Node& node) { throw std::runtime_error("NOT ME!"); };
+	virtual ObjectResource readObjectNode(YAML::Node& node) { throw std::runtime_error("NOT ME!"); };
+	virtual RenderMeshResource* readMeshNode(YAML::Node& node) { throw std::runtime_error("NOT ME!"); };
+	virtual ShaderResource* readShaderNode(YAML::Node& node) { throw std::runtime_error("NOT ME!"); };
+	
 
-
-
+	std::vector<ShaderVar> readShaderVarsNode(YAML::Node& node);
+	glm::vec2 readVec2(YAML::Node& node);
+	glm::vec3 readVec3(YAML::Node& node);
+	glm::vec4 readVec4(YAML::Node& node);
 	
 
 };

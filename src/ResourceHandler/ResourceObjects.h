@@ -252,6 +252,8 @@ protected:
 
 public:
 
+	std::vector<SceneResource> _scenes{};
+
 	// RESOURCE SPECIFIC FUNCTIONS
 	void setId(int index) override {
 		if (index > 99999)
@@ -291,6 +293,10 @@ class SceneResource : public Resource
 
 public:
 
+
+	std::vector<SceneResource> _scenes{};
+	std::vector<ObjectResource> _objects{};
+
 	void setId(int index) override {
 		if (index > 99999)
 		{
@@ -322,9 +328,9 @@ public:
 
 	RenderMeshResource* meshResource;
 
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
+	glm::vec3 position{0.0f,0.0f,0.0f};
+	glm::vec3 rotation{0.0f,0.0f,0.0f};
+	glm::vec3 scale{1.0f,1.0f,1.0f};
 
 
 	void setId(int index) override {

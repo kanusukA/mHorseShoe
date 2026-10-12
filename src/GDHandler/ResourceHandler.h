@@ -90,8 +90,11 @@ public:
 	std::filesystem::path SourceDir;
 
 	// Resource Loader
-	void readCaseFile(std::filesystem::path& filepath) override;
+	CaseResource readCaseFile(std::filesystem::path& filepath) override;
 	SceneResource readSceneNode(YAML::Node& node) override;
+	ObjectResource readObjectNode(YAML::Node& node) override;
+	RenderMeshResource* readMeshNode(YAML::Node& node) override;
+	ShaderResource* readShaderNode(YAML::Node& node) override;
 
 	//HELPING FUNCTIONS
 	bool fileExists(std::string path) { return std::filesystem::exists(path); }

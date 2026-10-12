@@ -167,7 +167,7 @@ std::filesystem::path* ResourceHandler::fetchFileInGroup(std::string filename_p,
 	return nullptr;
 }
 
-void ResourceHandler::readCaseFile(std::filesystem::path& filepath)
+CaseResource ResourceHandler::readCaseFile(std::filesystem::path& filepath)
 {
 	if (std::filesystem::exists(filepath))
 	{
@@ -183,24 +183,107 @@ void ResourceHandler::readCaseFile(std::filesystem::path& filepath)
 			for (size_t i = 0; i < node[CASE_SCENES_KEY].size(); i++)
 			{
 				YAML::Node scene = node[CASE_SCENES_KEY][i];
-
-
+				SceneResource scnRes = ResourceHandler::readSceneNode(scene);
+				scenes.push_back(std::move(scnRes));
 
 			}
 		}
 
+		CaseResource caseResource = CaseResource(this, caseName, filepath.filename().string());
+		caseResource._scenes = std::move(scenes);
+		return caseResource;
 	}
+
+	throw std::runtime_error("FILE DOES NOT EXISTS");
+
+	
 }
 
 SceneResource ResourceHandler::readSceneNode(YAML::Node& node)
 {
 	std::string scnName = node[SCENE_NAME_KEY].as<std::string>();
 
+	SceneResource sceneResource = SceneResource(this, scnName);
+
+	// has scenes
 	if (node[CASE_SCENES_KEY].IsSequence())
 	{
+		for (size_t i = 0; i < node[CASE_SCENES_KEY].size(); i++)
+		{
+			YAML::Node scene = node[CASE_SCENES_KEY][i];
+			SceneResource scnRes = ResourceHandler::readSceneNode(scene);
+			sceneResource._scenes.push_back(std::move(scnRes));
 
+		}
+		
+	}
+	// has objects
+	if (node[SCENE_OBJECTS_KEY].IsSequence())
+	{
+		for (size_t i = 0; i < node[SCENE_OBJECTS_KEY].size(); i++)
+		{
+			YAML::Node obj = node[SCENE_OBJECTS_KEY][i];
+			ObjectResource objRes = ResourceHandler::readObjectNode(obj);
+			sceneResource._objects.push_back(std::move(objRes));
+
+		}
 	}
 
+	return sceneResource;
+
+}
+
+ObjectResource ResourceHandler::readObjectNode(YAML::Node& node)
+{
+	std::string objName = node[OBJECT_NAME_KEY].as<std::string>();
+	YAML::Node meshNode = node[OBJECT_RENDERMESH_KEY];
+	RenderMeshResource* meshRes = ResourceHandler::readMeshNode(meshNode); // TODO GRABAGE COLLECT HERE
+	ObjectResource objRes = ObjectResource(this, objName, std::move(meshRes));
+
+	return objRes;
+
+
+}
+
+RenderMeshResource* ResourceHandler::readMeshNode(YAML::Node& node)
+{
+	std::string meshName = node[RM_NAME].as<std::string>();
+	YAML::Node positionNode = node[RM_POSITION];
+	glm::vec3 position = readVec3(positionNode);
+	YAML::Node rotationNode = node[RM_ROTATION];
+	glm::vec3 rotation = readVec3(rotationNode);
+	YAML::Node scaleNode = node[RM_SCALE];
+	glm::vec3 scale = readVec3(scaleNode);
+
+	std::string path = node[RM_MESH_PATH].as<std::string>();
+
+	if (!std::filesystem::exists(path))
+	{
+		throw std::runtime_error("MESH DOES NOT EXISTS");
+	}
+	YAML::Node shaderNode = node[RM_SHADER];
+
+	ShaderResource* shaderRes = ResourceHandler::readShaderNode(shaderNode);
+	RenderMeshResource* meshRes = new RenderMeshResource(this,meshName,std::filesystem::path(path),std::move(shaderRes));
+	YAML::Node shaderVarNode = node[RM_SHADER_VARS];
+	meshRes->fragParameters = readShaderVarsNode(shaderVarNode);
+
+	return meshRes;
+}
+
+ShaderResource* ResourceHandler::readShaderNode(YAML::Node& node)
+{
+	std::string shaderName = node[SHADER_NAME_KEY].as<std::string>();
+	std::string vertPath = node[SHADER_VERT_PATH].as<std::string>();
+	std::string fragPath = node[SHADER_FRAG_PATH].as<std::string>();
+
+	if (!std::filesystem::exists(vertPath) || !std::filesystem::exists(fragPath))
+	{
+		throw std::runtime_error("SHADER PATHS NOT FOUND!");
+	}
+
+	return new ShaderResource(this, shaderName, ShaderType::Fragment, std::filesystem::path(vertPath), std::filesystem::path(fragPath));
+	
 }
 
 std::vector<std::filesystem::path>* ResourceHandler::fetchResourceGroupVecByIndex(int masterIndex)

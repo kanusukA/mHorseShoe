@@ -86,6 +86,9 @@ public:
 
 	void saveScenes(const std::vector<std::shared_ptr<Scene>>* scenesVec, YAML::Emitter& out);
 	void saveCase(std::shared_ptr<Case> case_p);
+
+	void openCase(std::filesystem::path& path);
+	std::shared_ptr<Scene> openScene(SceneResource resource);
 	
 
 /*	bool resourceExists(std::string resourceName);
