@@ -51,6 +51,16 @@ void ObjectViewerView::view() {
 		ImGui::Text("Name : "); ImGui::SameLine();
 		ImGui::Text(model->selectedObject->getName().c_str());
 
+		ImGui::Text("ID : "); ImGui::SameLine();
+		ImGui::Text(getAddrChar(model->selectedObject->meshResource));
+
+		if (ImGui::DragFloat3("Position", glm::value_ptr(model->selectedObject->meshResource->position), 0.25f))
+		{
+			std::cout << model->selectedObject->meshResource->position.x << std::endl;
+		};
+		ImGui::DragFloat3("Rotation", glm::value_ptr(model->selectedObject->meshResource->rotation), 0.25f);
+		ImGui::DragFloat3("Scale", glm::value_ptr(model->selectedObject->meshResource->scale), 0.25f);
+
 		ImGui::Text("Render Mesh : "); ImGui::SameLine();
 		if (model->selectedObject->mesh)
 		{

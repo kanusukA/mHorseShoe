@@ -305,16 +305,25 @@ void CaseHandler::loadCase(std::shared_ptr<Case> case_p)
 	{
 		for (auto& scene : *case_p->getScenes())
 		{
-			for (auto& obj : *scene->getObjects())
-			{
-				auto mesh = obj->mesh;
-				monster->addLoadMesh(mesh.get());
-			
-			}
+			loadScene(scene);
 
 		}
 	}
 
+
+}
+
+void CaseHandler::loadScene(std::shared_ptr<Scene> scene_p)
+{
+	for (auto& scene : *scene_p->getAttachedScenes())
+	{
+		loadScene(scene); //// RECURSIVE ------------------|
+	}
+	for (auto& obj : *scene_p->getObjects())
+	{
+		auto mesh = obj->mesh;
+		monster->addLoadMesh(mesh.get());
+	}
 
 }
 
@@ -398,7 +407,7 @@ std::shared_ptr<Scene> CaseHandler::openScene(SceneResource resource)
 	std::shared_ptr<Scene> scn = mScenes->back();
 	for (size_t i = 0; i < resource._scenes.size(); i++)
 	{
-		scn.get()->attachNewScene(openScene(resource._scenes.at(i)));
+		scn.get()->attachNewScene(openScene(resource._scenes.at(i))); ///// RECURSIVE------------|
 		
 	}
 	//objects
@@ -418,12 +427,41 @@ std::shared_ptr<Scene> CaseHandler::openScene(SceneResource resource)
 
 		createShader(shader->getName(), &shader->vertPath, &shader->fragPath);
 		createRenderMesh(mesh->getName(), &mesh->meshFile, mShader->back());
+		auto renderMesh = mRenderMesh->back();
+		renderMesh->fragParameters = mesh->fragParameters;
+		renderMesh->position = mesh->position;
+		renderMesh->rotation = mesh->rotation;
+		renderMesh->scale = mesh->scale;
 		createObject(obj.getName(), mRenderMesh->back());
 
 		scn->attachNewObject(mObjects->back());
 	}
 
 	return scn;
+}
+
+void CaseHandler::loadSlugObject(const std::filesystem::path& fontPath)
+{
+	if (slugMesh->obj)
+	{
+		throw std::runtime_error("SLUGHORN CAN ONLY BE MADE ONCE!");
+	}
+	std::shared_ptr<SlugShader> shader = std::make_shared<SlugShader>(this, "SLUG_SHADER", ShaderType::Fragment, "", "");
+	mShader->push_back(shader);
+	SlugMesh* mesh = new SlugMesh(this, "SLUG_MESH", shader);
+	slugMesh->obj.reset(mesh);
+	slugMesh->obj->initFontAtlas(fontPath);
+	mRenderMesh->push_back(slugMesh->obj);
+	createObject("SLUG", slugMesh->obj);
+}
+
+void CaseHandler::attachSlugToCase(std::shared_ptr<Case> selCase)
+{
+	createScene("Slug");
+	createObject("SlugObj",slugMesh->obj);
+	mScenes->back()->attachNewObject(mObjects->back());
+	selCase->attachNewScene(mScenes->back());
+
 }
 
 

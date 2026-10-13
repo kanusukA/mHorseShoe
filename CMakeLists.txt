@@ -229,6 +229,13 @@ set(SOURCES
 	#src/vktest/MonsterVulkan.cpp
 	src/feel/movement.cpp
 
+	#SLUGHORN
+	src/slughorn/freetype.hpp
+	src/slughorn/slughorn.cpp
+	src/slughorn/slughorn.hpp
+	src/slughorn/tessellate.hpp
+	src/slughorn/slughorn.hpp
+
 	#Imgui
 	src/monster/imgui-1.92.9b/imgui.cpp
 	src/monster/imgui-1.92.9b/imgui_draw.cpp
@@ -240,7 +247,16 @@ set(SOURCES
 	src/main.cpp
 )
 
-add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  "src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" "src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" "src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp" "src/ResourceHandler/ResourceGltf.h" "src/ResourceHandler/ResourceGltf.cpp" "src/monster/VulkanUtils.h" "src/monster/MonsterBuffer.h" "src/monster/MonsterBuffer.cpp" "src/monster/MonsterSlang.h" "src/monster/MonsterSlang.cpp" "src/Gui/nGuiComponent/GuiVulkanUtils.h" "src/Gui/nGuiComponent/GuiVulkanUtils.cpp" "src/Gui/nGuiComponent/GuiGenStats.h" "src/Gui/nGuiComponent/GuiGenStats.cpp" "src/Gui/nGuiComponent/GuiAddStuff.h" "src/Gui/nGuiComponent/GuiAddStuff.cpp" "src/Gui/nGuiComponent/GuiObjectViewer.h" "src/Gui/nGuiComponent/GuiObjectViewer.cpp")
+add_executable(mHorseShoee ${SOURCES}  "src/Camera.h" "src/Camera.cpp"  "src/monster/VulkanStats.h"  
+"src/monster/stb_image.h" "src/monster/MonsterVulkan.h" "src/monster/MonsterVulkan.cpp" "src/monster/MonsterSDL.cpp" 
+"src/monster/MonsterSDL.h" "src/vk_mem_alloc.h" "src/stb_image.h" "src/monster/MonsterImgui.h" "src/monster/MonsterImgui.cpp" 
+"src/feel/feel.cpp" "src/feel/feel.h" "src/feel/keys.h" "src/feel/movement.h" "src/monster/MonsterRapid.cpp" 
+"src/ResourceHandler/ResourceGltf.h" "src/ResourceHandler/ResourceGltf.cpp" "src/monster/VulkanUtils.h" 
+"src/monster/MonsterBuffer.h" "src/monster/MonsterBuffer.cpp" "src/monster/MonsterSlang.h" 
+"src/monster/MonsterSlang.cpp" "src/Gui/nGuiComponent/GuiVulkanUtils.h" "src/Gui/nGuiComponent/GuiVulkanUtils.cpp" 
+"src/Gui/nGuiComponent/GuiGenStats.h" "src/Gui/nGuiComponent/GuiGenStats.cpp" "src/Gui/nGuiComponent/GuiAddStuff.h" 
+"src/Gui/nGuiComponent/GuiAddStuff.cpp" "src/Gui/nGuiComponent/GuiObjectViewer.h" "src/Gui/nGuiComponent/GuiObjectViewer.cpp" 
+"src/Stuffs/Custom/SlugMesh.h" "src/Stuffs/Custom/SlugMesh.cpp" "src/Stuffs/Custom/CustomMeshInc.h" "src/Stuffs/Custom/SlugShader.h" "src/Gui/nGuiComponent/GuiSlugViewer.h" "src/Gui/nGuiComponent/GuiSlugViewer.cpp")
 
 # target_compile_features(mHorseShoee PUBLIC cxx_std_20)
 
@@ -268,6 +284,8 @@ target_link_libraries(mHorseShoee PRIVATE slang::slang)
 
 target_include_directories(mHorseShoee PUBLIC "src/" )
 
+target_include_directories(mHorseShoee PUBLIC "C:/Users/lenovo/source/req/freetype/freetype/include")
+
 target_include_directories(mHorseShoee PUBLIC "src/monster/imgui-1.92.9b")
 
 target_link_libraries(mHorseShoee PRIVATE glm::glm)
@@ -289,6 +307,7 @@ target_link_libraries(mHorseShoee PRIVATE ktx)
 #target_link_libraries(mHorseShoee PRIVATE Plugin_OctreeSceneManager)
 target_link_libraries(mHorseShoee PRIVATE yaml-cpp)
 target_link_libraries(mHorseShoee PRIVATE SDL3::SDL3)
+target_link_libraries(mHorseShoee PRIVATE "C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/slughorn/libs/freetype.lib")
 #target_link_libraries(mHorseShoee PRIVATE Codec_FreeImage)
 #target_link_libraries(mHorseShoee PRIVATE Plugin_DotScene)
 #target_link_libraries(mHorseShoee PRIVATE Plugin_GLSLangProgramManager)

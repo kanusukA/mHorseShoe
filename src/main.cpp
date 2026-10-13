@@ -8,6 +8,7 @@
 
 
 
+
 // Rendering
 // Physics
 // GUI
@@ -21,6 +22,39 @@ int main() {
 //	ctx.initApp();
 
 	std::cout << "Ogre started : " << std::endl;
+
+	/*slughorn::Atlas atlas;
+
+	slughorn::freetype::loadAsciiFont("C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/slughorn/viaoda_libre.ttf", atlas);
+
+	atlas.build();
+
+	if (atlas.isBuilt())
+	{
+		std::cout << "ATLAS BUILT!!!!!" << std::endl;
+
+		auto texData = atlas.getCurveTextureData();
+		auto bandData = atlas.getBandTextureData();
+
+		std::ofstream texOut("TexData.txt");
+		std::ofstream bandOut("BandData.txt");
+		for (auto& byte: texData.bytes)
+		{
+			texOut << byte;
+		}
+		for (auto& byte: bandData.bytes)
+		{
+			bandOut << byte;
+		}
+
+		auto shape = atlas.getCompositeShape(slughorn::Key::Key("A"));
+		
+		
+		texOut.close();
+		bandOut.close();
+
+		
+	}*/
 
 //	ResourceHandler::GetInstance();
 

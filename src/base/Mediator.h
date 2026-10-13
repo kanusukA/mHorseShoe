@@ -9,17 +9,18 @@
 //#include <Gui/GuiComponents/ToastComponent.h>
 
 // Fonts
-#include <defaultFonts/Ubuntu_bold.h>
-#include <defaultFonts/Ubuntu_Regular.h>
+//#include <defaultFonts/Ubuntu_bold.h>
+//#include <defaultFonts/Ubuntu_Regular.h>
 
 //Third
 
 
 //STL
 //#include <string>
+#if defined(_WIN32)
 #include <ShObjIdl.h>
 #include <atlbase.h>
-
+#endif
 
 enum mFontType
 {
@@ -111,6 +112,12 @@ public:
 		else {
 			ImGui::Text("NULL POINTER");
 		}
+	}
+
+	const char* getAddrChar(void* ptr) {
+		std::ostringstream oss;
+		oss << ptr;
+		return oss.str().c_str();
 	}
 
 	
@@ -228,7 +235,9 @@ protected:
 	GDSystem* system = nullptr;*/
 
 	// FILE DIALOG
+#ifdef _WIN32
 	CComPtr<IFileDialog> fileDialog;
+#endif // _WIN32
 
 	//PlayerObserver* playerObserver = nullptr;
 
@@ -278,13 +287,14 @@ public:
 	}*/
 
 	void loadFileSelectionDialog() {
+#ifdef _WIN32
 		// initalize the file dialog COM library
 		ComInit com;
 		//
 		fileDialog.CoCreateInstance(CLSID_FileOpenDialog);
 
 		FILEOPENDIALOGOPTIONS opt{};
-		
+
 		fileDialog->GetOptions(&opt);
 		fileDialog->SetOptions(opt | FOS_PICKFOLDERS | FOS_PATHMUSTEXIST | FOS_FORCEFILESYSTEM);
 
@@ -292,26 +302,30 @@ public:
 		CComPtr<IShellItem> psi;
 		SHCreateItemFromParsingName(this->resourceHandler->SourceDir.wstring().c_str(), nullptr, IID_PPV_ARGS(&psi));
 		fileDialog->SetFolder(psi);
+#endif // _WIN32
+
+		
 	}
 
 	std::string openFolderSelectionDialog() {
-		
-		if (SUCCEEDED( fileDialog.p->Show(nullptr) ))
+
+#ifdef _WIN32
+		if (SUCCEEDED(fileDialog.p->Show(nullptr)))
 		{
-			
+
 
 			CComPtr<IShellItem> pSelectedItem;
 			fileDialog->GetResult(&pSelectedItem);
 
 			CComHeapPtr<wchar_t> pPath;
 			pSelectedItem->GetDisplayName(SIGDN_FILESYSPATH, &pPath);
-			
+
 			size_t size = wcstombs(nullptr, pPath.m_pData, 0);
 			std::vector<char> buffer(size + 1);
 			// Perform conversion
 			wcstombs(buffer.data(), pPath.m_pData, size);
 			std::string str(buffer.data());
-			
+
 
 			std::wcout << L"Selected folder: " << pPath.m_pData << std::endl;
 
@@ -320,6 +334,7 @@ public:
 		}
 
 		return "";
+#endif // _WIN32
 
 	}
 };
@@ -366,6 +381,8 @@ public:
 
 	//SunWindowSize* windowSize;
 
+	// USED TO INITALIZE PREDEFINED DATA AND VARIABLE OF THE COMPONENT
+	// DO NOT USE CONSTRUCTOR AS GDSOURCE IS INITALIZED AFTER THE OBJECT IS CREATED
 	ModelComponent(const char* name_p) {
 		name = name_p;
 

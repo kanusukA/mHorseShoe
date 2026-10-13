@@ -2,6 +2,7 @@
 
 #include <base/Mediator.h>
 
+// add texture viewer and such | 
 
 class GuiAddStuffModel : public ModelComponent {
 
@@ -72,6 +73,10 @@ public:
 	void openCase() {
 		gdSource->getCaseHandler()->openCase(savedCaseFiles->at(selectedSavedCaseFile));
 		selectedCase = gdSource->getCaseHandler()->mCases->back();
+	}
+
+	void addSlug(std::shared_ptr<Case> selectedCase) {
+		gdSource->getCaseHandler()->attachSlugToCase(selectedCase);
 	}
 
 };

@@ -115,6 +115,11 @@ void GuiAddOverView::view() {
 					model->selectedCase = model->caseHandler->mCases->at(i);
 					model->showAddSceneToCase = true;
 				}
+				if (ImGui::Button("Add Slug"))
+				{
+					model->selectedCase = model->caseHandler->mCases->at(i);
+					model->addSlug(model->selectedCase);
+				}
 
 				SceneViewer(model->caseHandler->mCases->at(i)->getScenes(), model);
 

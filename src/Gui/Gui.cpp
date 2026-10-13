@@ -129,6 +129,11 @@ void Gui::initGuiComponents()
 	ObjectViewerModel* objViewerModel = new ObjectViewerModel("OBJECT_VIEWER");
 	this->addModelComponent(objViewerModel);
 
+	GuiSlugViewerModel* slugModel = new GuiSlugViewerModel("SLUG_VIEWER");
+	this->addModelComponent(slugModel);
+
+	
+
 	// Views
 	/*SceneTabComponent* scnTab = new SceneTabComponent(GD_SCENE_TAB_VIEW_COMP_NAME,scnTabModel);
 	this->addViewComponent(scnTab);*/
@@ -183,6 +188,9 @@ void Gui::initGuiComponents()
 
 	ObjectViewerView* objViewerView = new ObjectViewerView("OBJECT_VIEWER_VIEW", objViewerModel);
 	this->addViewComponent(objViewerView);
+
+	GuiSlugViewerView* slugView = new GuiSlugViewerView(slugModel,"SLUG_VIEWER");
+	this->addViewComponent(slugView);
 }
 
 void Gui::updateGuiComponents()

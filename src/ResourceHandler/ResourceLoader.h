@@ -129,7 +129,6 @@ public:
 		dataDirPath = dataDirPath_p;
 		loadSavedPaths();
 		loadSavedCases();
-
 	}
 
 	void loadSavedCases();

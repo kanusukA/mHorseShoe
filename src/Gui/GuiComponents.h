@@ -13,6 +13,7 @@
 #include <Gui/nGuiComponent/GuiGenStats.h>
 
 #include <Gui/nGuiComponent/GuiObjectViewer.h>
+#include <Gui/nGuiComponent/GuiSlugViewer.h>
 
 
 //#include<Gui/GuiComponents/ToastTabComponent.h>

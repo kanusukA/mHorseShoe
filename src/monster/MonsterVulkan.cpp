@@ -63,7 +63,7 @@ void MonsterVulkan::renderVulkanFrame(ImDrawData* drawData) {
 	for (const auto& mesh : renderMeshes)
 	{
 		mesh->updateTransformations(camera->getViewMatrix(), camera->getProjectionMatrix(static_cast<float>(vkMonsterStats.swapChainExtent.width) / static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.1f, 10000.0f));
-		updateUniformBuffer(vkMonsterStats.frameIndex, mesh->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
+		//updateUniformBuffer(vkMonsterStats.frameIndex, mesh->transformBuffers.at(vkMonsterStats.frameIndex).allocInfo.pMappedData);
 	}
 
 	// RESET COMMAND BUFFERS
@@ -1966,6 +1966,7 @@ void MonsterVulkan::addMesh(RenderMeshResource* meshResource)
 void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 {
 	renderMeshes.push_back(meshResource);
+
 	if (meshResource->isMeshVkLoaded)
 	{
 		ToastComponent::GetInstance()->addMessage("MESH IS ALREADY LOADED");

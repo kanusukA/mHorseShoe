@@ -1,6 +1,8 @@
 #pragma once
 
+#include <Stuffs/Custom/CustomMeshInc.h>
 #include <Stuffs/CaseObject.h>
+
 
 
 typedef std::vector<std::shared_ptr<Case>> SCases;
@@ -9,6 +11,13 @@ typedef std::vector<std::shared_ptr<Object>> SObjects;
 
 typedef std::vector<std::shared_ptr<Shader>> SShader;
 typedef std::vector<std::shared_ptr<RenderMesh>> SRenderMesh;
+
+//typedef std::shared_ptr<std::shared_ptr<SlugMesh>> ObSlugMesh;
+
+template <typename T>
+struct Observ {
+	std::shared_ptr<T> obj;
+};
 
 
 // setup imports
@@ -33,6 +42,9 @@ public:
 
 	std::shared_ptr<SShader> mShader = std::make_shared<SShader>();
 	std::shared_ptr<SRenderMesh> mRenderMesh = std::make_shared<SRenderMesh>();
+
+	// UNIQUE OBJECTS
+	std::shared_ptr<Observ<SlugMesh>> slugMesh = std::make_shared<Observ<SlugMesh>>();
 
 	// shaders and meshes are stored in monsterVulkan
 
@@ -83,12 +95,17 @@ public:
 
 
 	void loadCase(std::shared_ptr<Case> case_p);
+	void loadScene(std::shared_ptr<Scene> scene_p);
 
 	void saveScenes(const std::vector<std::shared_ptr<Scene>>* scenesVec, YAML::Emitter& out);
 	void saveCase(std::shared_ptr<Case> case_p);
 
 	void openCase(std::filesystem::path& path);
 	std::shared_ptr<Scene> openScene(SceneResource resource);
+
+	void loadSlugObject(const std::filesystem::path& fontPath);
+
+	void attachSlugToCase(std::shared_ptr<Case> selCase);
 	
 
 /*	bool resourceExists(std::string resourceName);
