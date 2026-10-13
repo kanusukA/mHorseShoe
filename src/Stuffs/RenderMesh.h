@@ -6,9 +6,11 @@
 class RenderMesh : public RenderMeshResource {
 
 private:
-	GDBuilderContext* builderCxt;
+	
 
 public:
+
+	GDBuilderContext* builderCxt;
 
 	bool isMeshLoaded = false;
 

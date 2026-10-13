@@ -117,21 +117,45 @@ struct MonsterPipe {
 namespace vulkanUtils {
 
 	struct Vertex {
-		uint32_t index;
 		glm::vec3 pos;
 		glm::vec3 color;
 		glm::vec2 texCoord;
 
-		static vk::VertexInputBindingDescription getBindingDescription() {
+		virtual vk::VertexInputBindingDescription getBindingDescription() {
 			return { .binding = 0, .stride = sizeof(Vertex), .inputRate = vk::VertexInputRate::eVertex };
 		}
 
-		static std::array<vk::VertexInputAttributeDescription, 4> getAttributeDescriptions() {
+		virtual	std::vector<vk::VertexInputAttributeDescription> getAttributeDescriptions() {
 			return { {
-				{.location = 0, .binding = 0, .format = vk::Format::eR32Uint, .offset = offsetof(Vertex, index)},
 				{.location = 1, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(Vertex, pos)},
 				{.location = 2, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(Vertex,color)},
 				{.location = 3, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(Vertex,texCoord)},
+				} };
+		}
+	};
+
+	struct SlugVertex: public Vertex {
+		uint32_t index;
+		glm::vec4 pos;
+		glm::vec4 tex;
+		glm::vec4 jac;
+		glm::vec4 ban;
+		glm::vec3 color;
+		glm::vec2 texCoord;
+
+		vk::VertexInputBindingDescription getBindingDescription() override {
+			return { .binding = 0, .stride = sizeof(SlugVertex), .inputRate = vk::VertexInputRate::eVertex };
+		}
+
+		std::vector<vk::VertexInputAttributeDescription> getAttributeDescriptions() override {
+			return { {
+				{.location = 0, .binding = 0, .format = vk::Format::eR32Uint, .offset = offsetof(SlugVertex, index)},
+				{.location = 1, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex, pos)},
+				{.location = 2, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex, tex)},
+				{.location = 3, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex, jac)},
+				{.location = 4, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex, ban)},
+				{.location = 5, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex,color)},
+				{.location = 6, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(SlugVertex,texCoord)},
 				} };
 		}
 	};

@@ -589,6 +589,16 @@ vk::raii::ImageView MonsterVulkan::createImageView(vk::Image const& image, vk::F
 	return std::move(imageView);
 }
 
+MonsterTexture MonsterVulkan::createRawTexture(uint32_t width,uint32_t height,vk::Format format,vk::ImageUsageFlagBits usage, vk::ImageAspectFlags flags)
+{
+	MonsterTexture texture = MonsterTexture();
+	std::tie(texture.textureImage,texture.textureAlloc)=
+		createImage(width, height, format, vk::ImageTiling::eLinear, usage,VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_MAPPED_BIT,VmaMemoryUsage::VMA_MEMORY_USAGE_AUTO);
+	texture.textureImageView = createImageView(*texture.textureImage, format, flags);
+	return texture;
+
+}
+
 void MonsterVulkan::createDescriptorSetLayout()
 {
 	std::vector<vk::DescriptorSetLayoutBinding> bindings(2);
@@ -803,6 +813,7 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGraphicsPipeline(
 	const vk::ShaderModule& vertShaderModule, 
 	const vk::ShaderModule& fragShaderModule, 
+	const vulkanUtils::Vertex& vertex,
 	const vk::raii::DescriptorSetLayout& setLayout, 
 	const uint32_t& pushConstantSize,
 	vk::PolygonMode polygonMode, 
@@ -1375,7 +1386,6 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 			);
 
 		}
-
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *passObj->mesh.front().vertexBuffer, {0});
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*passObj->mesh.front().indexBuffer, 0, vk::IndexType::eUint16);
@@ -1987,6 +1997,7 @@ void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 
 	std::vector<std::vector<MonsterBuffer>> allocatedBuffers{};
 	auto allocatedBufInfo = meshResource->allocatingBufferSizes;
+
 	for (const auto& bufferInfo : allocatedBufInfo)
 	{
 		std::vector<MonsterBuffer> bufferVec{};
@@ -1997,8 +2008,8 @@ void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 			bufferVec.push_back(std::move(buffer));
 		}
 		allocatedBuffers.push_back(std::move(bufferVec));
-
 	}
+
 	meshResource->allocateBufferInfo(allocatedBuffers);
 	meshResource->updateDescriptorWrite(&vkMonsterStats.device);
 

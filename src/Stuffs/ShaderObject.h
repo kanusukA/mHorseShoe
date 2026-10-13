@@ -14,12 +14,14 @@ struct test {
 class Shader : public ShaderResource {
 private:
 	
-	GDBuilderContext* GDBuilderCxt;
+	
 
 	// READS AND SETS SHADER VARS FROM MATERIAL FILE
 	void _setShaderVars() {};
 
 public:
+
+	GDBuilderContext* GDBuilderCxt;
 
 	Shader(GDBuilderContext* GDBuilderCxt_p,std::string name_p,ShaderType shaderType ,std::filesystem::path vertPath, std::filesystem::path fragPath) : 
 		ShaderResource(ResourceHandler::GetInstance(), name_p, shaderType, vertPath, fragPath)

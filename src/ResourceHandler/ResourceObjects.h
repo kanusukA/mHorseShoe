@@ -398,6 +398,9 @@ protected:
 
 public:
 
+	// Used to pass different vertex input types check vulkanUtils
+	vulkanUtils::Vertex* vertex = new vulkanUtils::Vertex();
+
 	// Sync up with Render Mesh to use them in thier respective descriptor sets. 
 	const std::vector<ShaderVar>& getFragParameters() { return fragShaderParameters; }
 	const std::vector<ShaderVar>& getVertParameters() { return vertShaderParameters; }
@@ -434,11 +437,15 @@ public:
 		}
 		_id = 10700000000 + index + (shaderType * 10000000);
 	}
-
+	// 0 - transform bindings
+	// 1 - fragment bindings
+	// 2 - vertex bindings
+	// >2 - image Bindings
 	void _updateDescriptorWrites(
 		vk::raii::Device* device,
 		std::vector<vk::raii::DescriptorSets>* descriptorSets,
 		const std::vector<MonsterBuffer>& buffer,
+		const std::vector<MonsterBuffer>& vertBuf,
 		const std::vector<MonsterBuffer>& fragBuf
 	) {
 
@@ -452,13 +459,6 @@ public:
 				.range = sizeof(UniformBufferObject)
 			};
 
-			vk::DescriptorBufferInfo buffer2Info{
-				.buffer = fragBuf.at(i).buffer,
-				.offset = vk::DeviceSize(0),
-				.range = fragBuf.at(i).bufferSize
-			};
-
-
 			descriptorWrites.push_back({
 				.dstSet = descriptorSets->front().at(i),
 				.dstBinding = 0,
@@ -468,16 +468,46 @@ public:
 				.pBufferInfo = &bufferInfo
 				});
 
-			descriptorWrites.push_back(
-				{
-				.dstSet = descriptorSets->front()[i],
-				.dstBinding = 1,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = vk::DescriptorType::eUniformBuffer,
-				.pBufferInfo = &buffer2Info
-				}
-			);
+			if (!fragBuf.empty())
+			{
+
+				vk::DescriptorBufferInfo buffer2Info{
+				.buffer = fragBuf.at(i).buffer,
+				.offset = vk::DeviceSize(0),
+				.range = fragBuf.at(i).bufferSize
+				};
+
+				descriptorWrites.push_back(
+					{
+					.dstSet = descriptorSets->front()[i],
+					.dstBinding = 1,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = vk::DescriptorType::eUniformBuffer,
+					.pBufferInfo = &buffer2Info
+					}
+				);
+
+			}
+
+			if (!vertBuf.empty())
+			{
+				vk::DescriptorBufferInfo buffer2Info{
+				.buffer = vertBuf.at(i).buffer,
+				.offset = vk::DeviceSize(0),
+				.range = vertBuf.at(i).bufferSize
+				};
+				descriptorWrites.push_back(
+					{
+					.dstSet = descriptorSets->front()[i],
+					.dstBinding = 2,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = vk::DescriptorType::eUniformBuffer,
+					.pBufferInfo = &buffer2Info
+					}
+				);
+			}
 
 
 
@@ -495,7 +525,7 @@ public:
 
 			}
 
-			uint32_t texIndex = 2;
+			uint32_t texIndex = descriptorWrites.size();
 
 			for (size_t img = 0; img < images.size(); img++)
 			{
@@ -520,22 +550,39 @@ public:
 	}
 
 
-	std::vector<vk::DescriptorSetLayoutBinding> getBindings() {
+	std::vector<vk::DescriptorSetLayoutBinding> getBindings(const bool& enableFrag = true, const bool& enableVert = true) {
 		std::vector<vk::DescriptorSetLayoutBinding> binds{};
+		// transform bindings - Vertex
 		binds.push_back(vk::DescriptorSetLayoutBinding{
 				.binding = 0,
 				.descriptorType = vk::DescriptorType::eUniformBuffer,
 				.descriptorCount = 1,
 				.stageFlags = vk::ShaderStageFlagBits::eVertex
 			});
-		binds.push_back(
-			vk::DescriptorSetLayoutBinding{
-				.binding = 1,
-				.descriptorType = vk::DescriptorType::eUniformBuffer,
-				.descriptorCount = 1,
-				.stageFlags = vk::ShaderStageFlagBits::eFragment
-			}
-		);
+		// fragment shader binding
+		if (enableFrag)
+		{
+			binds.push_back(
+				vk::DescriptorSetLayoutBinding{
+					.binding = 1,
+					.descriptorType = vk::DescriptorType::eUniformBuffer,
+					.descriptorCount = 1,
+					.stageFlags = vk::ShaderStageFlagBits::eFragment
+				}
+			);
+		}
+		// Uniform Buffer - vertex
+		if (enableVert)
+		{
+			binds.push_back(
+				vk::DescriptorSetLayoutBinding{
+					.binding = 2,
+					.descriptorType = vk::DescriptorType::eUniformBuffer,
+					.descriptorCount = 1,
+					.stageFlags = vk::ShaderStageFlagBits::eVertex
+				}
+			);
+		}
 
 		for (uint32_t i = 0; i < textures.size(); i++)
 		{
@@ -658,7 +705,7 @@ public:
 
 struct MeshData {
 
-	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>();
+	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>(); // TYPE CASTE FOR DIFERENT VERTEX TYPES!!
 	std::vector<uint16_t> indices = std::vector<uint16_t>();
 
 	vk::raii::Buffer vertexBuffer = nullptr;
@@ -677,6 +724,7 @@ public:
 
 	std::vector<MonsterBuffer> transformBuffers{};
 	std::vector<MonsterBuffer> fragBuffers{};
+	std::vector<MonsterBuffer> vertexBuffer{};
 
 	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 rotation = glm::vec3(0.0f);

@@ -15,7 +15,7 @@ struct UniformBuffer {
 ConstantBuffer<UniformBuffer> ubo;
 
 struct SlugBuffer {
-    float2 viewport;
+    float4 viewport;
     float4 pos;
     float4 tex;
     float4 jac;
@@ -98,7 +98,7 @@ VertexOutput vertMain(VSInput input) {
         matrax[0], 
         matrax[1], 
         matrax[2], 
-        slugBuffer.viewport, 
+        slugBuffer.viewport.xy, 
         p
     );
 

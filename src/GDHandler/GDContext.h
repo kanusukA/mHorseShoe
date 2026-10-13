@@ -34,13 +34,15 @@ class GDBuilderContext /*: public GDSystem*/
 {	
 protected:
 
-	ResourceHandler* resourceHandler;
-	Monster* monster;
+	
 
 	void startEngine();
 
 
 public:
+
+	ResourceHandler* resourceHandler;
+	Monster* monster;
 
 	GDBuilderContext(ResourceHandler* resourceHan_p, Monster* monster_p) /*: GDSystem(monster_p)*/ {
 		resourceHandler = resourceHan_p;
@@ -49,6 +51,8 @@ public:
 		//startEngine();
 		
 	}
+
+	
 
 	virtual void update(float deltaTime) {};
 

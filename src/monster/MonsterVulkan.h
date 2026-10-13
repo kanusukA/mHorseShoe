@@ -69,6 +69,8 @@ public:
 	void createSwapchain();
 	void createImageView();
 	vk::raii::ImageView createImageView(vk::Image const& image, vk::Format format, vk::ImageAspectFlags flags);
+	// NOTE: THIS FUNCTION WILL NOT PROVIDE A SAMPLER AND IS INTENDED FOR PIPING DATA STREAM TO VULKAN (EXAMPLE USE: SLUG TEXEL AND CURVE DATA)
+	MonsterTexture createRawTexture(uint32_t width, uint32_t height, vk::Format format,vk::ImageUsageFlagBits usage, vk::ImageAspectFlags flags);
 	void createDescriptorSetLayout();
 	uint32_t createDescriptorSetLayout(const std::vector<vk::DescriptorSetLayoutBinding>& bindings);
 	void createDescriptorSetLayout(const std::vector<vk::DescriptorSetLayoutBinding>& bindings, vk::raii::DescriptorSetLayout* descriptorLayout);
@@ -85,6 +87,7 @@ public:
 	std::pair<vk::raii::Pipeline,vk::raii::PipelineLayout> createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
 		const vk::ShaderModule& fragShaderModule,
+		const vulkanUtils::Vertex& vertex,
 		const vk::raii::DescriptorSetLayout& setLayout,
 		const uint32_t& pushConstantSize = uint32_t(0),
 		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
