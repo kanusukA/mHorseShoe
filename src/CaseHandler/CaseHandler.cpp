@@ -289,7 +289,7 @@ bool CaseHandler::createRenderMesh(std::string name_p, std::filesystem::path* me
 	if (std::filesystem::exists(*mesh))
 	{
 		mRenderMesh->emplace_back(std::make_shared<RenderMesh>(this, name_p, *mesh,shader));
-		this->loadRenderMesh(mRenderMesh->back().get());
+		mRenderMesh->back()->loadRenderMesh();
 		return true;
 	}
 	else {
@@ -446,11 +446,16 @@ void CaseHandler::loadSlugObject(const std::filesystem::path& fontPath)
 	{
 		throw std::runtime_error("SLUGHORN CAN ONLY BE MADE ONCE!");
 	}
-	std::shared_ptr<SlugShader> shader = std::make_shared<SlugShader>(this, "SLUG_SHADER", ShaderType::Fragment, "", "");
+	std::shared_ptr<SlugShader> shader = std::make_shared<SlugShader>(this, "SLUG_SHADER", ShaderType::Fragment,
+		"C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/required/assets/meshes/Materials/newVulkanShaders/slug_vert.slang",
+		"C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/required/assets/meshes/Materials/newVulkanShaders/slug_frag.slang"
+	); // SHADER MODELS ARE NULL 
+	this->loadShader(shader.get());
 	mShader->push_back(shader);
 	SlugMesh* mesh = new SlugMesh(this, "SLUG_MESH", shader);
 	slugMesh->obj.reset(mesh);
 	slugMesh->obj->initFontAtlas(fontPath);
+	slugMesh->obj->loadRenderMesh();
 	mRenderMesh->push_back(slugMesh->obj);
 	createObject("SLUG", slugMesh->obj);
 }

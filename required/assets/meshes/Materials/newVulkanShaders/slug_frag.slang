@@ -261,10 +261,10 @@ struct VertexResult {
 };
 
 
-[[vk::binding(0,0)]]
+[[vk::binding(2,0)]]
 Texture2D<float4> texData;
 
-[[vk::binding(1, 0)]]
+[[vk::binding(3, 0)]]
 Texture2D<uint4> curveData;
 
 

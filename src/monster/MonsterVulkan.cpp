@@ -591,10 +591,15 @@ vk::raii::ImageView MonsterVulkan::createImageView(vk::Image const& image, vk::F
 
 MonsterTexture MonsterVulkan::createRawTexture(uint32_t width,uint32_t height,vk::Format format,vk::ImageUsageFlagBits usage, vk::ImageAspectFlags flags)
 {
+	
 	MonsterTexture texture = MonsterTexture();
-	std::tie(texture.textureImage,texture.textureAlloc)=
-		createImage(width, height, format, vk::ImageTiling::eLinear, usage,VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_MAPPED_BIT,VmaMemoryUsage::VMA_MEMORY_USAGE_AUTO);
+	
+	std::tie(texture.textureImage,texture.textureAlloc) =
+		createImage(width, height, format, vk::ImageTiling::eLinear, usage,VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_MAPPED_BIT ,VmaMemoryUsage::VMA_MEMORY_USAGE_AUTO);
 	texture.textureImageView = createImageView(*texture.textureImage, format, flags);
+	
+	createTextureSampler(&texture.textureSampler);
+
 	return texture;
 
 }
@@ -679,13 +684,14 @@ void MonsterVulkan::createGraphicsPipeline() {
 	ResourceHandler::GetInstance()->readFileContents("../../../src/monster/shaders/triangle.spv", &shaderCode);
 
 	vk::raii::ShaderModule shaderModule = createShaderModule(shaderCode);
-
-	vkMonsterStats.graphicsPipeline = createGraphicsPipeline(*shaderModule, *shaderModule, 0);
+	vulkanUtils::Vertex vertex = vulkanUtils::Vertex();
+	vkMonsterStats.graphicsPipeline = createGraphicsPipeline(*shaderModule, *shaderModule, vertex, 0);
 }
 
 vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 	const vk::ShaderModule& vertShaderModule, // function name must start with vertMain
 	const vk::ShaderModule& fragShaderModule, // function name must start with fragMain
+	vulkanUtils::Vertex& vertex,
 	uint32_t pipelineLayoutIndex,
 	vk::PolygonMode polygonMode ,
 	vk::CullModeFlags cullingModes ,
@@ -718,8 +724,8 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
 
 	// vertex input
-	auto bindingDescription = vulkanUtils::Vertex::getBindingDescription();
-	auto attributeDescription = vulkanUtils::Vertex::getAttributeDescriptions();
+	auto bindingDescription = vertex.getBindingDescription();
+	auto attributeDescription = vertex.getAttributeDescriptions();
 	vk::PipelineVertexInputStateCreateInfo vertexInputCreateInfo{
 		.vertexBindingDescriptionCount = 1,
 		.pVertexBindingDescriptions = &bindingDescription,
@@ -813,7 +819,7 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGraphicsPipeline(
 	const vk::ShaderModule& vertShaderModule, 
 	const vk::ShaderModule& fragShaderModule, 
-	const vulkanUtils::Vertex& vertex,
+	vulkanUtils::Vertex& vertex,
 	const vk::raii::DescriptorSetLayout& setLayout, 
 	const uint32_t& pushConstantSize,
 	vk::PolygonMode polygonMode, 
@@ -840,10 +846,10 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 	// Dynamic state
 	std::vector<vk::DynamicState> dynamicStates{ vk::DynamicState::eViewport, vk::DynamicState::eScissor };
 	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
-
+	
 	// vertex input
-	auto bindingDescription = vulkanUtils::Vertex::getBindingDescription();
-	auto attributeDescription = vulkanUtils::Vertex::getAttributeDescriptions();
+	auto bindingDescription = vertex.getBindingDescription();
+	auto attributeDescription = vertex.getAttributeDescriptions();
 	vk::PipelineVertexInputStateCreateInfo vertexInputCreateInfo{
 		.vertexBindingDescriptionCount = 1,
 		.pVertexBindingDescriptions = &bindingDescription,
@@ -1371,6 +1377,7 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setViewport(0, vk::Viewport(0.0f, 0.0f, static_cast<float>(vkMonsterStats.swapChainExtent.width), static_cast<float>(vkMonsterStats.swapChainExtent.height), 0.0f, 1.0f));
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].setScissor(0, vk::Rect2D(vk::Offset2D(0, 0), vkMonsterStats.swapChainExtent));
 
+
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindDescriptorSets(
 			vk::PipelineBindPoint::eGraphics, passObj->getShader()->shaderPipes.descriptorPipeLayout, 0, *passObj->descritorSets.front()[vkMonsterStats.frameIndex], nullptr
 		);
@@ -1387,8 +1394,8 @@ void MonsterVulkan::recordCommandBuffer(uint32_t imageIndex, ImDrawData* drawDat
 
 		}
 
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *passObj->mesh.front().vertexBuffer, {0});
-		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*passObj->mesh.front().indexBuffer, 0, vk::IndexType::eUint16);
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindVertexBuffers(0, *passObj->vertexBuffer, {0});
+		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].bindIndexBuffer(*passObj->indexBuffer, 0, vk::IndexType::eUint16);
 
 		vkMonsterStats.commandBuffers[vkMonsterStats.frameIndex].drawIndexed(passObj->mesh.front().indices.size(), instance, 0, 0, 1);
 		instance++;
@@ -1874,13 +1881,14 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 	importedMeshes[meshIndex]->updateDescriptorWrites(&vkMonsterStats.device);*/
 	// descriptor Sets
 	//updateDescriptorSets({  });
-
+	vulkanUtils::Vertex vertex = vulkanUtils::Vertex();
 	// load graphics pipeline
 	//pipes.push_back(createGraphicsPipeline(shader->vertexShader, shader->fragmentShader, shader->descriptorSetLayout));
 	std::tie(shader->monsterPipe.graphicsPipeline,
 		shader->monsterPipe.descriptorPipeLayout) = createGraphicsPipeline(
 			shader->vertexShader,
 			shader->fragmentShader,
+			vertex, 
 			shader->monsterPipe.descriptorSetLayout,
 			importedMeshes[meshIndex]->pushConstSize,
 			shader->mode,
@@ -1914,6 +1922,7 @@ void MonsterVulkan::vkLoadShader(ShaderResource* shaderResource, std::vector<vk:
 		shaderResource->shaderPipes.descriptorPipeLayout) = createGraphicsPipeline(
 			shaderResource->vertexShader,
 			shaderResource->fragmentShader,
+			*shaderResource->vertex, // THE KIND OF VERTEX INPUT TO USE (WILL NOT USE THE VALUES HERE)
 			shaderResource->shaderPipes.descriptorSetLayout,
 			shaderResource->pushConstSize,
 			shaderResource->polyMode,
@@ -1992,8 +2001,7 @@ void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 		vkLoadShader(meshResource->getShader(), &meshResource->descritorSets);
 	}
 
-	meshResource->mesh.front().vertexBuffer = std::move(createGetVertexBuffer(meshResource->mesh.front().vertices).first);
-	meshResource->mesh.front().indexBuffer = std::move(createGetIndexBuffer(meshResource->mesh.front().indices).first);
+	meshResource->_loadVertexIndexBuffers();
 
 	std::vector<std::vector<MonsterBuffer>> allocatedBuffers{};
 	auto allocatedBufInfo = meshResource->allocatingBufferSizes;

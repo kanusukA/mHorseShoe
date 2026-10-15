@@ -2,9 +2,10 @@
 //#include <GDHandler/GDHandler.h>
 #include <Gui/Gui.h>
 
-#include <timer/glock.h>
 #include <cons.h>
 
+
+#include <bitset>
 
 
 
@@ -17,6 +18,14 @@
 int main() {
 
 	std::cout << "Start : " << std::endl;
+
+	uint16_t x = 16;
+	uint16_t y = 13;
+	uint32_t xy = x | (y << 16);
+
+
+
+	std::cout << "XY: " << xy << " BITS : " << std::bitset<32>(xy) << std::endl;
 
 //	OgreBites::ApplicationContext ctx(INSTANCE_NAME);
 //	ctx.initApp();
@@ -112,27 +121,23 @@ int main() {
 	gui->mVulkan = monster;
 	gui->initGuiComponents();
 	
-	
-
-
-	Glock* glock = new Glock();
 
 	// MAIN LOOP
 	
 	while (!Feel::GetInstance()->mappedEvents.quitApplication->eventState) {
 
-		glock->setStartTime();
+		Glock::GetInstance()->setStartTime();
 
 		Feel::GetInstance()->updateFeel();
 
-		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(monster->keyboardCapture), Feel::GetInstance()->getCameraMouseInput(),glock->deltaTime);
+		monster->updateMonster(Feel::GetInstance()->getCameraKeyInput(monster->keyboardCapture), Feel::GetInstance()->getCameraMouseInput(),Glock::GetInstance()->deltaTime);
 
-		monster->startRenderingTillGui(glock->getShaderTime());
+		monster->startRenderingTillGui(Glock::GetInstance()->getShaderTime());
 		gui->updateGuiComponents();
 		monster->endRendering();
 
 
-		glock->setEndTime();
+		Glock::GetInstance()->setEndTime();
 
 		//std::cout << glock->getShaderTime() << std::endl;
 		

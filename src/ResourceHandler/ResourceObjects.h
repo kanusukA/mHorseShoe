@@ -395,8 +395,12 @@ protected:
 	std::vector<ShaderVar> vertShaderParameters{};
 	std::vector<ShaderVar> fragShaderParameters{};
 	
+	
 
 public:
+
+	std::vector<ShaderVar> vertPushConsts{};
+	std::vector<ShaderVar> fragPushConsts{};
 
 	// Used to pass different vertex input types check vulkanUtils
 	vulkanUtils::Vertex* vertex = new vulkanUtils::Vertex();
@@ -449,6 +453,8 @@ public:
 		const std::vector<MonsterBuffer>& fragBuf
 	) {
 
+		uint32_t binding = 0;
+
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
 			std::vector<vk::WriteDescriptorSet> descriptorWrites{};
@@ -461,12 +467,13 @@ public:
 
 			descriptorWrites.push_back({
 				.dstSet = descriptorSets->front().at(i),
-				.dstBinding = 0,
+				.dstBinding = binding,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = vk::DescriptorType::eUniformBuffer,
 				.pBufferInfo = &bufferInfo
 				});
+			binding += 1;
 
 			if (!fragBuf.empty())
 			{
@@ -480,13 +487,15 @@ public:
 				descriptorWrites.push_back(
 					{
 					.dstSet = descriptorSets->front()[i],
-					.dstBinding = 1,
+					.dstBinding = binding,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
 					.descriptorType = vk::DescriptorType::eUniformBuffer,
 					.pBufferInfo = &buffer2Info
 					}
 				);
+
+				binding += 1;
 
 			}
 
@@ -500,13 +509,14 @@ public:
 				descriptorWrites.push_back(
 					{
 					.dstSet = descriptorSets->front()[i],
-					.dstBinding = 2,
+					.dstBinding = binding,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
 					.descriptorType = vk::DescriptorType::eUniformBuffer,
 					.pBufferInfo = &buffer2Info
 					}
 				);
+				binding += 1;
 			}
 
 
@@ -518,82 +528,91 @@ public:
 				vk::DescriptorImageInfo imageInfo{
 				.sampler = textures.at(i).textureSampler,
 				.imageView = textures.at(i).textureImageView,
-				.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+				.imageLayout = textures.at(i).imgLayout
 				};
 
 				images.push_back(imageInfo);
 
 			}
 
-			uint32_t texIndex = descriptorWrites.size();
+			
 
 			for (size_t img = 0; img < images.size(); img++)
 			{
 				descriptorWrites.push_back(
 					{
 					.dstSet = descriptorSets->front()[i],
-					.dstBinding = texIndex,
+					.dstBinding = binding,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
-					.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+					.descriptorType = textures.front().descriptorType,
 					.pImageInfo = &images.at(img)
 					}
 				);
-
-				texIndex += 1;
+				binding += 1;
 			}
 
 			device->updateDescriptorSets(descriptorWrites, {});
+
 
 		}
 
 	}
 
+	bool enableFrag = true;
+	bool enableVert = true;
 
-	std::vector<vk::DescriptorSetLayoutBinding> getBindings(const bool& enableFrag = true, const bool& enableVert = true) {
+
+	std::vector<vk::DescriptorSetLayoutBinding> getBindings() {
 		std::vector<vk::DescriptorSetLayoutBinding> binds{};
+
+		uint32_t binding = 0;
 		// transform bindings - Vertex
 		binds.push_back(vk::DescriptorSetLayoutBinding{
-				.binding = 0,
+				.binding = binding,
 				.descriptorType = vk::DescriptorType::eUniformBuffer,
 				.descriptorCount = 1,
 				.stageFlags = vk::ShaderStageFlagBits::eVertex
 			});
+		binding += 1;
 		// fragment shader binding
 		if (enableFrag)
 		{
 			binds.push_back(
 				vk::DescriptorSetLayoutBinding{
-					.binding = 1,
+					.binding = binding,
 					.descriptorType = vk::DescriptorType::eUniformBuffer,
 					.descriptorCount = 1,
 					.stageFlags = vk::ShaderStageFlagBits::eFragment
 				}
 			);
+			binding += 1;
 		}
 		// Uniform Buffer - vertex
 		if (enableVert)
 		{
 			binds.push_back(
 				vk::DescriptorSetLayoutBinding{
-					.binding = 2,
+					.binding = binding,
 					.descriptorType = vk::DescriptorType::eUniformBuffer,
 					.descriptorCount = 1,
 					.stageFlags = vk::ShaderStageFlagBits::eVertex
 				}
 			);
+			binding += 1;
 		}
 
 		for (uint32_t i = 0; i < textures.size(); i++)
 		{
 			binds.push_back(
 				vk::DescriptorSetLayoutBinding{
-				.binding = 2 + i,
-				.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+				.binding = binding,
+				.descriptorType = textures[i].descriptorType,
 				.descriptorCount = 1,
 				.stageFlags = vk::ShaderStageFlagBits::eFragment
 				}
 			);
+			binding += 1;
 		}
 
 		return binds;
@@ -708,9 +727,6 @@ struct MeshData {
 	std::vector<vulkanUtils::Vertex> vertices = std::vector<vulkanUtils::Vertex>(); // TYPE CASTE FOR DIFERENT VERTEX TYPES!!
 	std::vector<uint16_t> indices = std::vector<uint16_t>();
 
-	vk::raii::Buffer vertexBuffer = nullptr;
-	vk::raii::Buffer indexBuffer = nullptr;
-
 };
 
 class RenderMeshResource : public Resource
@@ -724,11 +740,14 @@ public:
 
 	std::vector<MonsterBuffer> transformBuffers{};
 	std::vector<MonsterBuffer> fragBuffers{};
-	std::vector<MonsterBuffer> vertexBuffer{};
+	std::vector<MonsterBuffer> vertexUboBuffer{};
 
 	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 rotation = glm::vec3(0.0f);
 	glm::vec3 scale = glm::vec3(1.0f);
+
+	vk::raii::Buffer vertexBuffer = nullptr;
+	vk::raii::Buffer indexBuffer = nullptr;
 	
 	std::vector<MeshData> mesh{};
 
@@ -743,7 +762,7 @@ public:
 
 	virtual const void* getPushConst() { return nullptr; }
 
-	//std::shared_ptr<vulkanUtils::Shader> shaders;
+
 	std::vector<vk::DeviceSize> allocatingBufferSizes{sizeof(UniformBufferObject)}; // A default of UniformBuffer is recommanded for adding proper projection and transformation control
 
 	void setId(int index) override {
@@ -768,11 +787,15 @@ public:
 
 	void setAllocatingBufferInfo(std::vector<vk::DeviceSize> buffers) { allocatingBufferSizes = buffers; }
 
-	void allocateBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
+	virtual void allocateBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
 		transformBuffers = buffers.at(0);
 		if (buffers.size() > 1)
 		{
 			fragBuffers = buffers.at(1);
+		}
+		if (buffers.size() > 2)
+		{
+			vertexUboBuffer = buffers.at(2);
 		}
 	}
 
@@ -833,6 +856,8 @@ public:
 
 		}
 	}
+
+	virtual void _loadVertexIndexBuffers() {}
 
 	virtual ShaderResource* getShader() { return nullptr; }
 

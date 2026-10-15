@@ -171,7 +171,7 @@ void ResourceReader::readShaderFile(std::filesystem::path shaderPath_p, std::vec
 
 }
 
-void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p)
+void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p,const std::string& structName)
 {
 
 	if (inStream.is_open())
@@ -194,7 +194,7 @@ void ResourceReader::readGLSLShaderFile(std::filesystem::path shaderPath_p, std:
 		while (std::getline(inStream, line))
 		{
 			//std::cout << line << std::endl;
-			if (!slangUnifromBuf && line.find("UniformBuffer") != std::string::npos)
+			if (!slangUnifromBuf && line.find(structName) != std::string::npos)
 			{
 				slangUnifromBuf = true;
 				continue;

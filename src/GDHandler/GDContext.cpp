@@ -46,6 +46,7 @@ void GDBuilderContext::loadRenderMesh(RenderMeshResource* meshResource)
 void GDBuilderContext::loadShader(ShaderResource* shaderResource)
 {
 	monster->loadShaderResource(shaderResource);
+	
 }
 
 

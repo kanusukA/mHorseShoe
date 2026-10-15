@@ -16,6 +16,7 @@ public:
 	void createVertexBuffer();
 	uint32_t createVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
 	std::pair<vk::raii::Buffer, VmaAllocation> createGetVertexBuffer(std::vector<vulkanUtils::Vertex> vertices);
+	std::pair<vk::raii::Buffer, VmaAllocation> createGetVertexBuffer(const vk::DeviceSize& bufSize, void* data);
 	void createIndexBuffer();
 	uint32_t createIndexBuffer(std::vector<uint16_t> indices);
 	std::pair<vk::raii::Buffer, VmaAllocation> createGetIndexBuffer(std::vector<uint16_t> indices);

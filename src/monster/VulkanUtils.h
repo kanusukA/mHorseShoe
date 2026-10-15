@@ -106,6 +106,9 @@ struct MonsterTexture {
 	vk::raii::Sampler textureSampler = nullptr;
 	VmaAllocation textureAlloc;
 
+	vk::DescriptorType descriptorType = vk::DescriptorType::eCombinedImageSampler;
+	vk::ImageLayout imgLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
 };
 
 struct MonsterPipe {
@@ -116,38 +119,50 @@ struct MonsterPipe {
 
 namespace vulkanUtils {
 
-	struct Vertex {
+	class Vertex {
+	public:
 		glm::vec3 pos;
 		glm::vec3 color;
 		glm::vec2 texCoord;
 
-		virtual vk::VertexInputBindingDescription getBindingDescription() {
+		Vertex() {};
+		Vertex(glm::vec3 pos_p, glm::vec3 color_p, glm::vec2 texCoord_p) {
+			pos = pos_p;
+			color = color_p;
+			texCoord = texCoord_p;
+		}
+
+		
+
+		virtual vk::VertexInputBindingDescription const getBindingDescription() {
 			return { .binding = 0, .stride = sizeof(Vertex), .inputRate = vk::VertexInputRate::eVertex };
 		}
 
-		virtual	std::vector<vk::VertexInputAttributeDescription> getAttributeDescriptions() {
+		virtual std::vector<vk::VertexInputAttributeDescription> const getAttributeDescriptions() {
 			return { {
-				{.location = 1, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(Vertex, pos)},
-				{.location = 2, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(Vertex,color)},
-				{.location = 3, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(Vertex,texCoord)},
+				{.location = 0, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(Vertex, pos)},
+				{.location = 1, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(Vertex,color)},
+				{.location = 2, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(Vertex,texCoord)},
 				} };
 		}
 	};
 
-	struct SlugVertex: public Vertex {
+	class SlugVertex: public Vertex {
+	public:
 		uint32_t index;
+		glm::vec2 texCoord;
+		glm::vec3 color;
 		glm::vec4 pos;
 		glm::vec4 tex;
 		glm::vec4 jac;
 		glm::vec4 ban;
-		glm::vec3 color;
-		glm::vec2 texCoord;
+		
 
-		vk::VertexInputBindingDescription getBindingDescription() override {
+		const vk::VertexInputBindingDescription const getBindingDescription() override {
 			return { .binding = 0, .stride = sizeof(SlugVertex), .inputRate = vk::VertexInputRate::eVertex };
 		}
 
-		std::vector<vk::VertexInputAttributeDescription> getAttributeDescriptions() override {
+		const std::vector<vk::VertexInputAttributeDescription> const getAttributeDescriptions() override {
 			return { {
 				{.location = 0, .binding = 0, .format = vk::Format::eR32Uint, .offset = offsetof(SlugVertex, index)},
 				{.location = 1, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex, pos)},
@@ -235,7 +250,7 @@ namespace vulkanUtils {
 						.dstBinding = texIndex,
 						.dstArrayElement = 0,
 						.descriptorCount = 1,
-						.descriptorType = vk::DescriptorType::eCombinedImageSampler,
+						.descriptorType = textures.front().descriptorType,
 						.pImageInfo = &images.at(img)
 						}
 					);

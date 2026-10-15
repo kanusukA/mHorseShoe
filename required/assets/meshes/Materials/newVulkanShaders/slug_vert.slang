@@ -3,9 +3,18 @@ struct VSInput {
     float3 inPosition;
     float3 inColor;
     float2 inTexCoord;
+    float4 pos;
+    float4 tex;
+    float4 jac;
+    float4 band;
+    float4 col;
 };
 
-
+struct SlugUniformBuffer {
+    float4 viewport;
+};
+[[vk::binding(1, 0)]]
+ConstantBuffer<SlugUniformBuffer> slugBuffer;
 
 struct UniformBuffer {
     float4x4 model;
@@ -14,16 +23,7 @@ struct UniformBuffer {
 };
 ConstantBuffer<UniformBuffer> ubo;
 
-struct SlugBuffer {
-    float4 viewport;
-    float4 pos;
-    float4 tex;
-    float4 jac;
-    float4 band;
-    float4 col;
-};
-[[vk::binding(1, 0)]]
-ConstantBuffer<SlugBuffer> slugBuffer;
+
 
 // pos.xy = object-space vertex coordinates.
 // pos.zw = object-space normal vector.
@@ -92,9 +92,9 @@ VertexOutput vertMain(VSInput input) {
     // Apply dynamic dilation to vertex position. Returns new em-space sample position.
 
     vresult.texCoord = SlugDilate(
-        slugBuffer.pos, 
-        slugBuffer.tex, 
-        slugBuffer.jac, 
+        input.pos, 
+        input.tex, 
+        input.jac, 
         matrax[0], 
         matrax[1], 
         matrax[2], 
@@ -110,7 +110,7 @@ VertexOutput vertMain(VSInput input) {
 
     // Unpack or pass through remaining vertex data.
 
-    SlugUnpack(slugBuffer.tex, slugBuffer.band, vresult.banding, vresult.glyph);
-    vresult.color = slugBuffer.col;
+    SlugUnpack(input.tex, input.band, vresult.banding, vresult.glyph);
+    vresult.color = input.col;
     return (vresult);
 }

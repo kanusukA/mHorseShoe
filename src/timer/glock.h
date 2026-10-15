@@ -6,6 +6,7 @@
 #include<chrono>
 #include<stdio.h>
 #include<iostream>
+#include <mutex>
 
 #include <glm/glm.hpp>
 
@@ -20,13 +21,30 @@ class Glock {
 	std::chrono::steady_clock::time_point startTime;
 	std::chrono::steady_clock::time_point endTime;
 	std::chrono::steady_clock::time_point initTime;
+
+	static Glock* pinstance_;
+	static std::mutex mutex_;
+
+protected:
+	Glock() {
+		initTime = std::chrono::steady_clock::now();
+	};
+	~Glock() {
+
+	};
+
 public:
+
+	static Glock* GetInstance();
+
+	// Class should not be cloneable
+	Glock(Glock& copy) = delete;
+
+	// Class should not be assignable
+	void operator=(const Glock&) = delete;
 
 	double deltaTime = 0;
 
-	Glock() {
-		initTime = std::chrono::steady_clock::now();
-	}
 
 	void setStartTime() {
 		startTime = std::chrono::steady_clock::now();

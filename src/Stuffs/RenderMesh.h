@@ -29,15 +29,36 @@ public:
 	}
 
 	// Expose functions to the underlying variables
-	void loadRenderMesh() { 
+	virtual void loadRenderMesh() {
 
 		builderCxt->loadRenderMesh(this);
+		checkPushConsts();
 		isMeshLoaded = true;
 
+
 	};
+	// TODO MAKE IT GENERALIZED
+	void checkPushConsts() {
+		if (!shader->fragPushConsts.empty())
+		{
+			pushConstSize = shader->pushConstSize;
+			containsPushConstants = true;
+		}
+	}
+
+	const void* getPushConst() override {
+		float time = Glock::GetInstance()->getShaderTime();
+		return &time;
+		
+	}
+
+	void _loadVertexIndexBuffers() override {
+		vertexBuffer = builderCxt->monster->createGetVertexBuffer(mesh.front().vertices).first;
+		indexBuffer = builderCxt->monster->createGetIndexBuffer(mesh.front().indices).first;
+	}
 
 	void updateDescriptorWrite(vk::raii::Device* device) override {
-		shader->_updateDescriptorWrites(device, &descritorSets, transformBuffers, fragBuffers);
+		shader->_updateDescriptorWrites(device, &descritorSets, transformBuffers, {}, fragBuffers); // vertex UBO is empty by default!
 	}
 
 	ShaderResource* getShader() override { return shader.get(); }

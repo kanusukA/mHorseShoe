@@ -10,12 +10,12 @@ struct VertexOutput {
     float2 texCoord;
 };
 
-struct UniformBuffer {
+struct tBuffer {
     float4x4 model;
     float4x4 view;
     float4x4 proj;
 };
-ConstantBuffer<UniformBuffer> ubo;
+ConstantBuffer<tBuffer> ubo;
 
 [shader("vertex")]
 VertexOutput vertMain(VSInput input) {

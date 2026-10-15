@@ -66,7 +66,7 @@ public:
 	std::string readMaterialName(std::filesystem::path mat_path_p);
 
 	void readShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p);
-	void readGLSLShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p);
+	void readGLSLShaderFile(std::filesystem::path shaderPath_p, std::vector<ShaderVar>* output_p, const std::string& structName = "UniformBuffer");
 
 	void readCaseFile(std::filesystem::path filePath);
 

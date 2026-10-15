@@ -18,11 +18,14 @@ public:
 	Scene(GDBuilderContext* GDBuilderCxt_p, std::string name_p) :
 		SceneResource(ResourceHandler::GetInstance(), name_p) {
 		GDBuilderCxt = GDBuilderCxt_p;
-
 	}
 	
 	// Object
 	void attachNewObject(std::shared_ptr<Object> obj_p) {
+		if (!obj_p)
+		{
+			throw std::runtime_error("ATTEMPTING TO ADD A NULL OBJECT?");
+		}
 		objVec.push_back(obj_p);
 	}
 
@@ -41,9 +44,6 @@ public:
 	}
 
 	
-	
-
-
 	const std::vector<std::shared_ptr<Scene>>* getAttachedScenes() {
 		return &sceneVec;
 	}

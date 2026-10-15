@@ -46,7 +46,12 @@ uint32_t MonsterBufferManager::createVertexBuffer(std::vector<vulkanUtils::Verte
 
 std::pair<vk::raii::Buffer, VmaAllocation> MonsterBufferManager::createGetVertexBuffer(std::vector<vulkanUtils::Vertex> vertices)
 {
-	vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+	return createGetVertexBuffer(sizeof(vertices.front()) * vertices.size(), vertices.data());
+}
+
+std::pair<vk::raii::Buffer, VmaAllocation> MonsterBufferManager::createGetVertexBuffer(const vk::DeviceSize& bufSize, void* data)
+{
+	vk::DeviceSize bufferSize = bufSize;
 	// Create a staging buffer (stored in the CPU for quick access and change)
 	auto [stagingBuffer, stagingBufferAlloc] = createBuffer(
 		bufferSize,
@@ -56,7 +61,7 @@ std::pair<vk::raii::Buffer, VmaAllocation> MonsterBufferManager::createGetVertex
 	);
 
 	// add data to the staging buffer
-	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, vertices.data(), stagingBufferAlloc, 0, bufferSize);
+	vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, data, stagingBufferAlloc, 0, bufferSize);
 
 	// create the device_local(graphics crad memory) buffer
 	auto [vkBuffer, vkBufferAlloc] = createBuffer(

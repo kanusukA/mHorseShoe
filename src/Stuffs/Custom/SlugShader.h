@@ -16,6 +16,10 @@ public:
 		// TEXTURE DATA COMPLETE
 		MonsterTexture texTexture = GDBuilderCxt->monster->createRawTexture(texDataW, texDataH, formatTex, vk::ImageUsageFlagBits::eStorage, vk::ImageAspectFlagBits::eColor);
 		MonsterTexture curveTexture = GDBuilderCxt->monster->createRawTexture(curveDataW, curveDataH, formatCurve, vk::ImageUsageFlagBits::eStorage, vk::ImageAspectFlagBits::eColor);
+		texTexture.descriptorType = vk::DescriptorType::eStorageImage;
+		curveTexture.descriptorType = vk::DescriptorType::eStorageImage;
+		texTexture.imgLayout = vk::ImageLayout::eGeneral;
+		curveTexture.imgLayout = vk::ImageLayout::eGeneral;
 		textures.push_back(std::move(texTexture));
 		textures.push_back(std::move(curveTexture));
 

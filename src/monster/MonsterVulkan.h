@@ -78,6 +78,7 @@ public:
 	vk::raii::Pipeline createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
 		const vk::ShaderModule& fragShaderModule,
+		vulkanUtils::Vertex& vertex,
 		uint32_t pipelineLayoutIndex,
 		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
 		vk::CullModeFlags cullingModes = vk::CullModeFlagBits::eNone,
@@ -87,7 +88,7 @@ public:
 	std::pair<vk::raii::Pipeline,vk::raii::PipelineLayout> createGraphicsPipeline(
 		const vk::ShaderModule& vertShaderModule,
 		const vk::ShaderModule& fragShaderModule,
-		const vulkanUtils::Vertex& vertex,
+		vulkanUtils::Vertex& vertex,
 		const vk::raii::DescriptorSetLayout& setLayout,
 		const uint32_t& pushConstantSize = uint32_t(0),
 		vk::PolygonMode polygonMode = vk::PolygonMode::eFill,
