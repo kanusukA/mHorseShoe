@@ -597,8 +597,11 @@ MonsterTexture MonsterVulkan::createRawTexture(uint32_t width,uint32_t height,vk
 	std::tie(texture.textureImage,texture.textureAlloc) =
 		createImage(width, height, format, vk::ImageTiling::eLinear, usage,VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_MAPPED_BIT ,VmaMemoryUsage::VMA_MEMORY_USAGE_AUTO);
 	texture.textureImageView = createImageView(*texture.textureImage, format, flags);
+	if (usage != vk::ImageUsageFlagBits::eSampled)
+	{
+		createTextureSampler(&texture.textureSampler);
+	}
 	
-	createTextureSampler(&texture.textureSampler);
 
 	return texture;
 
@@ -723,6 +726,9 @@ vk::raii::Pipeline MonsterVulkan::createGraphicsPipeline(
 	std::vector<vk::DynamicState> dynamicStates{ vk::DynamicState::eViewport, vk::DynamicState::eScissor };
 	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
 
+	ToastComponent::GetInstance()->addMessage("BINDINGS : " + std::to_string(vertex.getBindingDescription().stride));
+	ToastComponent::GetInstance()->addMessage("ATTER : " + std::to_string(vertex.getAttributeDescriptions().size()));
+
 	// vertex input
 	auto bindingDescription = vertex.getBindingDescription();
 	auto attributeDescription = vertex.getAttributeDescriptions();
@@ -846,6 +852,9 @@ std::pair<vk::raii::Pipeline, vk::raii::PipelineLayout> MonsterVulkan::createGra
 	// Dynamic state
 	std::vector<vk::DynamicState> dynamicStates{ vk::DynamicState::eViewport, vk::DynamicState::eScissor };
 	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo{ .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data() };
+
+	ToastComponent::GetInstance()->addMessage("BINDINGS : " + std::to_string(vertex.getBindingDescription().stride));
+	ToastComponent::GetInstance()->addMessage("ATTER : " + std::to_string(vertex.getAttributeDescriptions().size()));
 	
 	// vertex input
 	auto bindingDescription = vertex.getBindingDescription();
@@ -1093,26 +1102,43 @@ void MonsterVulkan::createTextureImage(const std::filesystem::path& path, vk::ra
 		throw std::runtime_error("Failed to load image");
 	}
 
+	_createTextureImage(texWidth, texHeight, vkMonsterStats.swapChainSurfaceFormat.format, vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageUsageFlagBits::eSampled, imageSize, pixels, image);
+	
+
+	stbi_image_free(pixels);
+}
+// TODO MAKE SURE REST OF THE TEXTURE CREATE HAPPEND THROUGH THIS BLOCK
+void MonsterVulkan::_createTextureImage(
+	const uint32_t width,
+	const uint32_t height,
+	const vk::Format format,
+	const vk::ImageLayout layout,
+	const vk::ImageUsageFlagBits usage,
+	const vk::DeviceSize size,
+	const void* data_p, 
+	vk::raii::Image* image
+)
+{
 	// staging buffer for texture
 	auto [stagingBuffer, stagingAlloc] =
-		createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,
+		createBuffer(size, vk::BufferUsageFlagBits::eTransferSrc,
 			VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
 			VMA_MEMORY_USAGE_AUTO
 		);
 
 	void* data = nullptr;
 	vmaMapMemory(vkMemAlloc.vmaAllocator, stagingAlloc, &data);
-	memcpy(data, pixels, imageSize);
+	memcpy(data, data_p, size);
 	vmaUnmapMemory(vkMemAlloc.vmaAllocator, stagingAlloc);
 
 	//vmaCopyMemoryToAllocation(vkMemAlloc.vmaAllocator, pixels, stagingAlloc, 0, imageSize);
 
 	std::tie(*image, vkTextures.textureAlloc) = createImage(
-		texWidth,
-		texHeight,
-		vkMonsterStats.swapChainSurfaceFormat.format,
+		width,
+		height,
+		format,
 		vk::ImageTiling::eOptimal,
-		vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
+		vk::ImageUsageFlagBits::eTransferDst | usage,
 		0,
 		VMA_MEMORY_USAGE_AUTO
 	);
@@ -1123,15 +1149,13 @@ void MonsterVulkan::createTextureImage(const std::filesystem::path& path, vk::ra
 		commandBuffer,
 		stagingBuffer,
 		*image,
-		static_cast<uint32_t>(texWidth),
-		static_cast<uint32_t>(texHeight)
+		static_cast<uint32_t>(width),
+		static_cast<uint32_t>(height)
 	);
-	transitionImageLayout(commandBuffer, *image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+	transitionImageLayout(commandBuffer, *image, vk::ImageLayout::eTransferDstOptimal, layout);
 	endSingleTimeCommands(std::move(commandBuffer));
 
 	vmaDestroyBuffer(vkMemAlloc.vmaAllocator, stagingBuffer, stagingAlloc);
-
-	stbi_image_free(pixels);
 }
 
 void MonsterVulkan::createTextureImageView()
@@ -1474,7 +1498,7 @@ void MonsterVulkan::recreateSwapChain() {
 void MonsterVulkan::createDescriptorPool()
 {
 
-	std::array<vk::DescriptorPoolSize, 2>poolSize{ {
+	std::array<vk::DescriptorPoolSize, 3>poolSize{ {
 		{.type = vk::DescriptorType::eUniformBuffer,
 		.descriptorCount = MAX_FRAMES_IN_FLIGHT * 20,
 		},
@@ -1489,6 +1513,10 @@ void MonsterVulkan::createDescriptorPool()
 		{
 		.type = vk::DescriptorType::eCombinedImageSampler,
 		.descriptorCount = MAX_FRAMES_IN_FLIGHT * 20
+		},
+		{
+			.type = vk::DescriptorType::eSampledImage,
+			.descriptorCount = MAX_FRAMES_IN_FLIGHT * 20
 		}
 	} };
 
@@ -1624,7 +1652,8 @@ std::pair<vk::raii::Image, VmaAllocation> MonsterVulkan::createImage(uint32_t wi
 		.samples = vk::SampleCountFlagBits::e1,
 		.tiling = tiling,
 		.usage = usage,
-		.sharingMode = vk::SharingMode::eExclusive
+		.sharingMode = vk::SharingMode::eExclusive,
+		
 	};
 
 	VmaAllocationCreateInfo allocInfo{
@@ -1637,6 +1666,7 @@ std::pair<vk::raii::Image, VmaAllocation> MonsterVulkan::createImage(uint32_t wi
 
 	VkImage vkImage;
 
+	
 
 	vmaCreateImage(vkMemAlloc.vmaAllocator, imageInfo, &allocInfo, &vkImage, &allocation, nullptr);
 
@@ -1912,6 +1942,11 @@ void MonsterVulkan::loadMeshShader(uint32_t meshIndex)
 void MonsterVulkan::vkLoadShader(ShaderResource* shaderResource, std::vector<vk::raii::DescriptorSets>* descriptorSets)
 {
 	std::vector<vk::DescriptorSetLayoutBinding> bindings = shaderResource->getBindings();
+	ToastComponent::GetInstance()->addMessage("Bindings for " + shaderResource->getName() + " : ");
+	for (auto& bind : bindings)
+	{
+		ToastComponent::GetInstance()->addMessage("Bind : " + std::to_string(bind.binding));
+	}
 
 	createDescriptorSetLayout(bindings, &shaderResource->shaderPipes.descriptorSetLayout);
 
@@ -1984,6 +2019,7 @@ void MonsterVulkan::addMesh(RenderMeshResource* meshResource)
 
 void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 {
+	ToastComponent::GetInstance()->addMessage("LOADING MESH : " + meshResource->getName());
 	renderMeshes.push_back(meshResource);
 
 	if (meshResource->isMeshVkLoaded)
@@ -2001,13 +2037,18 @@ void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 		vkLoadShader(meshResource->getShader(), &meshResource->descritorSets);
 	}
 
+	ToastComponent::GetInstance()->addMessage("LOADED MESH SHADER : " + meshResource->getName());
+
 	meshResource->_loadVertexIndexBuffers();
+
+	ToastComponent::GetInstance()->addMessage("LOADED MESH VERT INDEX BUFFER : " + meshResource->getName());
 
 	std::vector<std::vector<MonsterBuffer>> allocatedBuffers{};
 	auto allocatedBufInfo = meshResource->allocatingBufferSizes;
 
 	for (const auto& bufferInfo : allocatedBufInfo)
 	{
+		ToastComponent::GetInstance()->addMessage("ALLOCATING BUFFER : " + std::to_string(bufferInfo));
 		std::vector<MonsterBuffer> bufferVec{};
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
@@ -2018,10 +2059,14 @@ void MonsterVulkan::addLoadMesh(RenderMeshResource* meshResource)
 		allocatedBuffers.push_back(std::move(bufferVec));
 	}
 
+	ToastComponent::GetInstance()->addMessage("ALLOCATED BUFFERS : " + meshResource->getName());
+
 	meshResource->allocateBufferInfo(allocatedBuffers);
 	meshResource->updateDescriptorWrite(&vkMonsterStats.device);
 
 	meshResource->isMeshVkLoaded = true;
+
+	ToastComponent::GetInstance()->addMessage("LOADED MESH : " + meshResource->getName());
 
 }
 

@@ -103,6 +103,16 @@ public:
 	void createTextureImage();
 	void createTexture(const std::filesystem::path& path, MonsterTexture* texture);
 	void createTextureImage(const std::filesystem::path& path, vk::raii::Image* image);
+	void _createTextureImage(
+		const uint32_t width,
+		const uint32_t height,
+		const vk::Format format,
+		const vk::ImageLayout layout,
+		const vk::ImageUsageFlagBits usage,
+		const vk::DeviceSize size,
+		const void* data_p,
+		vk::raii::Image* image
+	);
 	void createTextureImageView();
 	void createTextureImageView(const vk::raii::Image& image, vk::raii::ImageView* imageView);
 	void createTextureSampler();

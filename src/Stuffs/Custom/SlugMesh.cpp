@@ -15,7 +15,21 @@ void SlugMesh::initFontAtlas(const std::filesystem::path& fontPath)
 		{
 			slughorn::Atlas::TextureData texData = fontAtlas.getBandTextureData();
 			slughorn::Atlas::TextureData curveData = fontAtlas.getCurveTextureData();
-			slugShader->initSlugShader(texData.width, texData.height, curveData.width, curveData.height, slugToVkFormat(texData.format), slugToVkFormat(curveData.format));
+			vk::DeviceSize texSize = texData.bytes.size() * sizeof(uint8_t);
+			vk::DeviceSize curveSize = curveData.bytes.size() * sizeof(uint8_t);
+			
+			slugShader->initSlugShader(
+				texData.width, 
+				texData.height, 
+				texSize,
+				texData.bytes.data(),
+				curveData.width, 
+				curveData.height, 
+				curveSize,
+				curveData.bytes.data(),
+				slugToVkFormat(texData.format), 
+				slugToVkFormat(curveData.format)
+			);
 
 			return;
 		}

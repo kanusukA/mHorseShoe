@@ -149,13 +149,11 @@ namespace vulkanUtils {
 
 	class SlugVertex: public Vertex {
 	public:
-		uint32_t index;
-		glm::vec2 texCoord;
-		glm::vec3 color;
 		glm::vec4 pos;
 		glm::vec4 tex;
 		glm::vec4 jac;
 		glm::vec4 ban;
+		glm::vec4 color;
 		
 
 		const vk::VertexInputBindingDescription const getBindingDescription() override {
@@ -164,13 +162,12 @@ namespace vulkanUtils {
 
 		const std::vector<vk::VertexInputAttributeDescription> const getAttributeDescriptions() override {
 			return { {
-				{.location = 0, .binding = 0, .format = vk::Format::eR32Uint, .offset = offsetof(SlugVertex, index)},
-				{.location = 1, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex, pos)},
-				{.location = 2, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex, tex)},
-				{.location = 3, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex, jac)},
-				{.location = 4, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex, ban)},
-				{.location = 5, .binding = 0, .format = vk::Format::eR32G32B32Sfloat, .offset = offsetof(SlugVertex,color)},
-				{.location = 6, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(SlugVertex,texCoord)},
+				{.location = 0, .binding = 0, .format = vk::Format::eR32G32B32A32Sfloat, .offset = offsetof(SlugVertex, pos)},
+				{.location = 1, .binding = 0, .format = vk::Format::eR32G32B32A32Sfloat, .offset = offsetof(SlugVertex, tex)},
+				{.location = 2, .binding = 0, .format = vk::Format::eR32G32B32A32Sfloat, .offset = offsetof(SlugVertex, jac)},
+				{.location = 3, .binding = 0, .format = vk::Format::eR32G32B32A32Sfloat, .offset = offsetof(SlugVertex, ban)},
+				{.location = 4, .binding = 0, .format = vk::Format::eR32G32B32A32Sfloat, .offset = offsetof(SlugVertex,color)},
+				//{.location = 6, .binding = 0, .format = vk::Format::eR32G32Sfloat, .offset = offsetof(SlugVertex,texCoord)},
 				} };
 		}
 	};

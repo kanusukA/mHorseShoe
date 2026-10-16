@@ -1,8 +1,4 @@
 struct VSInput {
-    uint inIndex;
-    float3 inPosition;
-    float3 inColor;
-    float2 inTexCoord;
     float4 pos;
     float4 tex;
     float4 jac;
@@ -22,8 +18,6 @@ struct UniformBuffer {
     float4x4 proj;
 };
 ConstantBuffer<UniformBuffer> ubo;
-
-
 
 // pos.xy = object-space vertex coordinates.
 // pos.zw = object-space normal vector.
@@ -56,7 +50,7 @@ void SlugUnpack(float4 tex, float4 bnd, out float4 vbnd, out int4 vgly)
     vbnd = bnd;
 }
 
-float2 SlugDilate(float4 pos, float4 tex, float4 jac, float4 m0, float4 m1, float4 m3, float2 dim, out float2 vpos)
+float4 SlugDilate(float4 pos, float4 tex, float4 jac, float4 m0, float4 m1, float4 m3, float2 dim)
 {
     float2 n = normalize(pos.zw);
     float s = dot(m3.xy, pos.xy) + m3.w;
@@ -70,8 +64,8 @@ float2 SlugDilate(float4 pos, float4 tex, float4 jac, float4 m0, float4 m1, floa
     float uv = u * u + v * v;
     float2 d = pos.zw * (s2 * (st + sqrt(uv)) / (uv - st * st));
 
-    vpos = pos.xy + d;
-    return (float2(tex.x + dot(d, jac.xy), tex.y + dot(d, jac.zw)));
+    float2 vpos = pos.xy + d;
+    return (float4(tex.x + dot(d, jac.xy), tex.y + dot(d, jac.zw), vpos));
 }
 
 struct VertexOutput {
@@ -88,29 +82,37 @@ VertexOutput vertMain(VSInput input) {
     float2 p;
     VertexOutput vresult;
 
-    float4x4 matrax = ubo.proj * ubo.view * ubo.model;
+    float4x4 matrax = mul(ubo.model,mul(ubo.view,ubo.proj));
+    
     // Apply dynamic dilation to vertex position. Returns new em-space sample position.
 
-    vresult.texCoord = SlugDilate(
+    float4 dilate = SlugDilate(
         input.pos, 
         input.tex, 
         input.jac, 
-        matrax[0], 
+        matrax[3], 
         matrax[1], 
-        matrax[2], 
-        slugBuffer.viewport.xy, 
-        p
+        matrax[0],
+        slugBuffer.viewport.xy
     );
 
+    vresult.texCoord = dilate.xy;
+    p = dilate.zw;
+
     // Apply MVP matrix to dilated vertex position.
-    vresult.sv_position.x = p.x * matrax[0].x + p.y * matrax[0].y + matrax[0].w;
-    vresult.sv_position.y = p.x * matrax[1].x + p.y * matrax[1].y + matrax[1].w;
-    vresult.sv_position.z = p.x * matrax[2].x + p.y * matrax[2].y + matrax[2].w;
-    vresult.sv_position.w = p.x * matrax[3].x + p.y * matrax[3].y + matrax[3].w;
+    // vresult.sv_position.x = p.x * matrax[0].x + p.y * matrax[0].y + matrax[0].w;
+    // vresult.sv_position.y = p.x * matrax[1].x + p.y * matrax[1].y + matrax[1].w;
+    // vresult.sv_position.z = p.x * matrax[2].x + p.y * matrax[2].y + matrax[2].w;
+    // vresult.sv_position.w = p.x * matrax[3].x + p.y * matrax[3].y + matrax[3].w;
+    // vresult.sv_position = matrax[0];
+    // vresult.sv_position = mul()
+    vresult.sv_position = mul(ubo.proj, mul(ubo.view, mul(ubo.model, float4(input.pos.x,0, input.pos.y,1))));
+    
 
     // Unpack or pass through remaining vertex data.
 
     SlugUnpack(input.tex, input.band, vresult.banding, vresult.glyph);
+
     vresult.color = input.col;
-    return (vresult);
+    return vresult;
 }

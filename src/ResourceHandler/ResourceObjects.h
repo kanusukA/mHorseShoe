@@ -453,10 +453,16 @@ public:
 		const std::vector<MonsterBuffer>& fragBuf
 	) {
 
-		uint32_t binding = 0;
+		ToastComponent::GetInstance()->addMessage("UPDATING DESCRIPTOR WRITES : " + getName());
+		ToastComponent::GetInstance()->addMessage("vertBuf : " + std::to_string(vertBuf.size()));
+		ToastComponent::GetInstance()->addMessage("fragBuf : " + std::to_string(fragBuf.size()));
+
+		
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
+			uint32_t binding = 0;
+
 			std::vector<vk::WriteDescriptorSet> descriptorWrites{};
 
 			vk::DescriptorBufferInfo bufferInfo{
@@ -474,6 +480,8 @@ public:
 				.pBufferInfo = &bufferInfo
 				});
 			binding += 1;
+
+			ToastComponent::GetInstance()->addMessage("SET TRANSFROMS : " + getName());
 
 			if (!fragBuf.empty())
 			{
@@ -497,6 +505,8 @@ public:
 
 				binding += 1;
 
+				ToastComponent::GetInstance()->addMessage("SET FRAG : " + getName());
+
 			}
 
 			if (!vertBuf.empty())
@@ -517,6 +527,8 @@ public:
 					}
 				);
 				binding += 1;
+
+				ToastComponent::GetInstance()->addMessage("SET VERT : " + getName());
 			}
 
 
@@ -532,6 +544,7 @@ public:
 				};
 
 				images.push_back(imageInfo);
+
 
 			}
 
@@ -550,7 +563,11 @@ public:
 					}
 				);
 				binding += 1;
+
+				ToastComponent::GetInstance()->addMessage("SET TEXTURE : " + getName());
 			}
+
+			ToastComponent::GetInstance()->addMessage("WRITING TO DESCRIPTORS : " + getName());
 
 			device->updateDescriptorSets(descriptorWrites, {});
 
@@ -802,6 +819,8 @@ public:
 	virtual void updateDescriptorWrite(vk::raii::Device* device) {
 		throw std::runtime_error("BUFFERS MUST BE ALLOCATED TO HIGHER CLASS!");
 	}
+
+	virtual void updateObj() {}
 
 	void updateTransformations(const glm::mat4& view, const glm::mat4& proj) {
 		UniformBufferObject ubo{};

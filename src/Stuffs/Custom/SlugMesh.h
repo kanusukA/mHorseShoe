@@ -7,7 +7,7 @@
 #include <slughorn/slughorn.hpp>
 
 
-const static std::vector<glm::vec2> QuadFormat = { {0,1}, {1,1}, {1,0}, {0,0} };
+const static std::vector<glm::vec2> QuadFormat = { {0,3}, {3,3}, {3,0}, {0,0} };
 
 struct SlugVertexUBO {
 	glm::vec4 viewport;
@@ -65,6 +65,9 @@ public:
 		slugShader = slugShader_p;
 
 		allocatingBufferSizes = { sizeof(UniformBufferObject), sizeof(SlugVertexUBO) };
+
+		rotation.x = 90.0f;
+		position.z = -15.0f;
 	
 	}
 
@@ -74,7 +77,16 @@ public:
 		if (isMeshLoaded) return;
 		// DOES NOT LOAD A NORMAL MESH
 		setString("KanusukA");
+		updateSlugBuf();
 		isMeshLoaded = true;
+
+	}
+
+	void updateObj() override {
+		for (auto& buff : vertexUboBuffer)
+		{
+			memcpy(buff.allocInfo.pMappedData, &slugVertUbo,sizeof(slugVertUbo));
+		}
 	}
 
 	void _loadVertexIndexBuffers() override {
@@ -89,6 +101,7 @@ public:
 	virtual void allocateBufferInfo(std::vector<std::vector<MonsterBuffer>>& buffers) {
 		transformBuffers = buffers.at(0);
 		vertexUboBuffer = buffers.at(1);
+		updateObj();
 	}
 
 	void updateSlugBuf() {
@@ -101,7 +114,7 @@ public:
 	// runs and sets vertex buffer for this string
 	void setString(const std::string& str) {
 
-		int m_advance = 0;
+		float m_advance = 0;
 
 		int index = 0;
 
@@ -109,45 +122,56 @@ public:
 		
 		for (size_t i = 0; i < str.size(); i++)
 		{
+			auto shape = fontAtlas.getShape(slughorn::Key(str[i]));
 			// per vertex
-			for (size_t vert = 0; vert < 2; vert++)
+			for (size_t vert = 0; vert < 4; vert++)
 			{
 				
-				
 				vulkanUtils::SlugVertex slugVert = vulkanUtils::SlugVertex();
-
-				auto shape = fontAtlas.getShape(slughorn::Key(str[i]));
-				slugVert.pos.x = m_advance + (QuadFormat[vert].x); // model position x
-				slugVert.pos.y = shape->height * QuadFormat[vert].y; // model position y
-				slugVert.pos.z = 1.0f; // model normal x
-				slugVert.pos.w = 1.0f; // model normal y
-
-				m_advance += shape->advance;
+				
+				slugVert.pos.x = (m_advance + (shape->width * QuadFormat[vert].x)); // model position x
+				slugVert.pos.y = (shape->height * QuadFormat[vert].y); // model position y  // TODO minus 8 is for testing only and should be removed 
+				//slugVert.pos.z = 1.0f; // model normal x
+				//slugVert.pos.w = 0.0f; // model normal y
+				slugVert.pos.z = QuadFormat[vert].x < 0.0f ? -1.0f : 1.0f;
+				slugVert.pos.w = QuadFormat[vert].y < 0.0f ? -1.0f : 1.0f;
 
 				// location of band in texture
 				// 31       16       0
 				// | band Y | band X |
 				// 31       16       0
-				slugVert.tex.z = static_cast<uint16_t>(shape->bandTexX) | (static_cast<uint16_t>(shape->bandTexY) << 16);
-
+				//slugVert.tex.z = static_cast<uint16_t>(shape->bandTexX) | (static_cast<uint16_t>(shape->bandTexY) << 16);
+				
 				// band index and flags
-				slugVert.tex.w = static_cast<char>(shape->bandMaxX) | (static_cast<char>(shape->bandMaxY) << 16);
+				//slugVert.tex.w = static_cast<char>(shape->bandMaxX) | (static_cast<char>(shape->bandMaxY) << 16);
+
+				uint32_t packed_tex_z = static_cast<uint16_t>(shape->bandTexX) | (static_cast<uint16_t>(shape->bandTexY) << 16);
+				uint32_t packed_tex_w = static_cast<uint32_t>(shape->bandMaxX) | (static_cast<uint32_t>(shape->bandMaxY) << 16);
+
+				slugVert.tex.z = std::bit_cast<float>(packed_tex_z);
+				slugVert.tex.w = std::bit_cast<float>(packed_tex_w);
 
 				slugVert.tex.x = QuadFormat[vert].x;
 				slugVert.tex.y = QuadFormat[vert].y;
 
 				slugVert.jac = {1.0f, 0.0f, 0.0f, 1.0f};
 
-				slugVert.ban = { shape->bandScaleX, shape->bandScaleY, shape->bandOffsetX, shape->bandScaleX };
+				slugVert.ban = { shape->bandScaleX, shape->bandScaleY, shape->bandOffsetX, shape->bandOffsetY };
 
-				slugVert.color = { 0.5f, 0.1f, 0.1f };
+				slugVert.color = { 0.5f, 0.1f, 0.1f, 1.0f };
 
 				slugVertices.push_back(std::move(slugVert));
-				mesh.front().indices.push_back(static_cast<uint16_t>(index));
-				index += 1;
-
 
 			}
+
+			mesh.front().indices.push_back(static_cast<uint16_t>(slugVertices.size() - 4));
+			mesh.front().indices.push_back(static_cast<uint16_t>(slugVertices.size() - 3));
+			mesh.front().indices.push_back(static_cast<uint16_t>(slugVertices.size() - 2));
+			mesh.front().indices.push_back(static_cast<uint16_t>(slugVertices.size() - 2));
+			mesh.front().indices.push_back(static_cast<uint16_t>(slugVertices.size() - 1));
+			mesh.front().indices.push_back(static_cast<uint16_t>(slugVertices.size() - 4));
+
+			m_advance += shape->advance * QuadFormat[0].y;
 			
 			
 		}

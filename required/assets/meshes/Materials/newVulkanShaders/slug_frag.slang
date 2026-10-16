@@ -262,16 +262,16 @@ struct VertexResult {
 
 
 [[vk::binding(2,0)]]
-Texture2D<float4> texData;
+Texture2D<uint4> texData;
 
 [[vk::binding(3, 0)]]
-Texture2D<uint4> curveData;
+Texture2D<float4> curveData;
 
 
 [shader("fragment")]
 float4 fragMain(VertexResult vresult) : SV_Target {
 
-    float coverage = SlugRender(texData, curveData, vresult.texCoord, vresult.banding, vresult.glyph);
+    float coverage = SlugRender(curveData, texData, vresult.texCoord, vresult.banding, vresult.glyph);
     return (vresult.color * coverage);
 
 }
