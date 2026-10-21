@@ -249,6 +249,7 @@ float SlugRender(Texture2D curveData, Texture2D<uint4> bandData, float2 renderCo
     }
 
     return (CalcCoverage(xcov, ycov, xwgt, ywgt, glyphData.w));
+    //return float4(abs(xcov), abs(ycov), 0, 1);
 }
 
 
@@ -271,7 +272,10 @@ Texture2D<float4> curveData;
 [shader("fragment")]
 float4 fragMain(VertexResult vresult) : SV_Target {
 
-    float coverage = SlugRender(curveData, texData, vresult.texCoord, vresult.banding, vresult.glyph);
-    return (vresult.color * coverage);
+     float coverage = SlugRender(curveData, texData, vresult.texCoord, vresult.banding, vresult.glyph);
+     return (vresult.color * coverage);
+  //  return SlugRender(curveData, texData, vresult.texCoord, vresult.banding, vresult.glyph);
+     //return float4((vresult.texCoord), 0, 1);
+   
 
 }

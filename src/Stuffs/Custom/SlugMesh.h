@@ -7,7 +7,7 @@
 #include <slughorn/slughorn.hpp>
 
 
-const static std::vector<glm::vec2> QuadFormat = { {0,3}, {3,3}, {3,0}, {0,0} };
+const static std::vector<glm::vec2> QuadFormat = { {0,1}, {1,1}, {1,0}, {0,0} };
 
 struct SlugVertexUBO {
 	glm::vec4 viewport;
@@ -123,18 +123,41 @@ public:
 		for (size_t i = 0; i < str.size(); i++)
 		{
 			auto shape = fontAtlas.getShape(slughorn::Key(str[i]));
+
+			/*const float extX = float(shape->bandMaxX + 1) / shape->bandScaleX;
+			const float extY = float(shape->bandMaxY + 1) / shape->bandScaleY;
+
+			const float minX = -shape->bandOffsetX / shape->bandScaleX;
+			const float minY = -shape->bandOffsetY / shape->bandScaleY;*/
 			// per vertex
 			for (size_t vert = 0; vert < 4; vert++)
 			{
 				
 				vulkanUtils::SlugVertex slugVert = vulkanUtils::SlugVertex();
+
+				const float sx = QuadFormat[vert].x;   // 0 = min edge, 1 = max edge
+				const float sy = QuadFormat[vert].y;
+
 				
-				slugVert.pos.x = (m_advance + (shape->width * QuadFormat[vert].x)); // model position x
-				slugVert.pos.y = (shape->height * QuadFormat[vert].y); // model position y  // TODO minus 8 is for testing only and should be removed 
+
+				const float emX = shape->bearingX + sx * shape->width;
+				const float emY = (shape->bearingY - shape->height) + sy * shape->height;
+
+				slugVert.tex.x = emX;
+				slugVert.tex.y = emY;
+
+				// 1 - fontScale
+				/*slugVert.pos.x = m_advance + (emX - shape->originX) * 1;
+				slugVert.pos.y = (emY - shape->originY) * 1;*/
+				slugVert.pos.x = m_advance + emX;
+				slugVert.pos.y = emY;
+				//slugVert.pos.x = (m_advance + (shape->width * QuadFormat[vert].x)); // model position x
+				//slugVert.pos.y = (shape->height * QuadFormat[vert].y); // model position y  // TODO minus 8 is for testing only and should be removed 
 				//slugVert.pos.z = 1.0f; // model normal x
 				//slugVert.pos.w = 0.0f; // model normal y
-				slugVert.pos.z = QuadFormat[vert].x < 0.0f ? -1.0f : 1.0f;
-				slugVert.pos.w = QuadFormat[vert].y < 0.0f ? -1.0f : 1.0f;
+
+				slugVert.pos.z = sx * 2.0f - 1.0f;
+				slugVert.pos.w = sy * 2.0f - 1.0f;
 
 				// location of band in texture
 				// 31       16       0
@@ -151,8 +174,6 @@ public:
 				slugVert.tex.z = std::bit_cast<float>(packed_tex_z);
 				slugVert.tex.w = std::bit_cast<float>(packed_tex_w);
 
-				slugVert.tex.x = QuadFormat[vert].x;
-				slugVert.tex.y = QuadFormat[vert].y;
 
 				slugVert.jac = {1.0f, 0.0f, 0.0f, 1.0f};
 

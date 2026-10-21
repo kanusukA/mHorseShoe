@@ -84,6 +84,7 @@ public:
 
 	// Use RESOURCE_MASTER_GROUP_INDEX to fecth predefined groups.
 	std::filesystem::path* fetchFileInGroup(std::string filename_p, std::string group_p);
+	std::filesystem::path* fetchFileInGroup(std::string filename_p, int masterIndex);
 
 
 	// Resources

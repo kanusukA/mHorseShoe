@@ -167,6 +167,22 @@ std::filesystem::path* ResourceHandler::fetchFileInGroup(std::string filename_p,
 	return nullptr;
 }
 
+std::filesystem::path* ResourceHandler::fetchFileInGroup(std::string filename_p, int masterIndex)
+{
+	std::vector<std::filesystem::path>* groupVec = this->fetchResourceGroupVecByIndex(masterIndex);
+	if (groupVec)
+	{
+		for (size_t i = 0; i < groupVec->size(); i++)
+		{
+			if (groupVec->at(i).filename().string() == filename_p || groupVec->at(i).stem().string() == filename_p)
+			{
+				return &groupVec->at(i);
+			}
+		}
+	}
+	return nullptr;
+}
+
 CaseResource ResourceHandler::readCaseFile(std::filesystem::path& filepath)
 {
 	if (std::filesystem::exists(filepath))

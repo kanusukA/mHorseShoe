@@ -27,6 +27,7 @@ if(MSVC)
 endif()
 
 set(slang_DIR "$ENV{SLANG_DIR}")
+set(freetype_DIR "$ENV{FREETYPE_DIR}")
 
 
 #set(CMAKE_CONFIGURATION_TYPES "Debug" CACHE STRING "" FORCE)
@@ -284,9 +285,9 @@ target_link_libraries(mHorseShoee PRIVATE slang::slang)
 
 target_include_directories(mHorseShoee PUBLIC "src/" )
 
-target_include_directories(mHorseShoee PUBLIC "C:/Users/lenovo/source/req/freetype/freetype/include")
+target_include_directories(mHorseShoee PUBLIC "${freetype_DIR}/include")
 
-target_include_directories(mHorseShoee PUBLIC "src/monster/imgui-1.92.9b")
+target_include_directories(mHorseShoee PUBLIC "${CMAKE_SOURCE_DIR}/src/monster/imgui-1.92.9b")
 
 target_link_libraries(mHorseShoee PRIVATE glm::glm)
 
@@ -307,7 +308,7 @@ target_link_libraries(mHorseShoee PRIVATE ktx)
 #target_link_libraries(mHorseShoee PRIVATE Plugin_OctreeSceneManager)
 target_link_libraries(mHorseShoee PRIVATE yaml-cpp)
 target_link_libraries(mHorseShoee PRIVATE SDL3::SDL3)
-target_link_libraries(mHorseShoee PRIVATE "C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/slughorn/libs/freetype.lib")
+target_link_libraries(mHorseShoee PRIVATE "${CMAKE_SOURCE_DIR}/src/slughorn/libs/freetype.lib")
 #target_link_libraries(mHorseShoee PRIVATE Codec_FreeImage)
 #target_link_libraries(mHorseShoee PRIVATE Plugin_DotScene)
 #target_link_libraries(mHorseShoee PRIVATE Plugin_GLSLangProgramManager)

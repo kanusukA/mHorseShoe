@@ -16,7 +16,7 @@ public:
 	}
 
 	void loadSlugMesh() {
-		this->gdSource->getCaseHandler()->loadSlugObject("C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/src/slughorn/viaoda_libre.ttf");
+		this->gdSource->getCaseHandler()->loadSlugObject("C:/Users/Administrator/src/repo/mHorseShoe/src/slughorn/viaoda_libre.ttf");
 	}
 	
 };

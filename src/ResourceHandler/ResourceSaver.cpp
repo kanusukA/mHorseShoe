@@ -502,7 +502,7 @@ void ResourceSaver::saveResourceLoadPaths(std::vector<ResourceLoadPath>* loadPat
 
 	YAML::Emitter out;
 	out << YAML::BeginSeq;
-	/*for (int i = 0; i < loadPaths->size(); i++)
+	for (int i = 0; i < loadPaths->size(); i++)
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << LOAD_PATH_GROUP_NAME_KEY;
@@ -530,7 +530,7 @@ void ResourceSaver::saveResourceLoadPaths(std::vector<ResourceLoadPath>* loadPat
 	out << YAML::EndSeq;
 
 	this->writeToSaveFile(out.c_str());
-	this->outStreamFile.close();*/
+	this->outStreamFile.close();
 	
 
 }

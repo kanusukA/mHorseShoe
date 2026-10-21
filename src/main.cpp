@@ -93,6 +93,7 @@ int main() {
 	std::cout << "Setting up Kint" << std::endl;
 
 	CaseHandler* caseHandler = new CaseHandler(monster);
+	caseHandler->loadSlugObject("C:/Users/Administrator/src/repo/mHorseShoe/src/slughorn/viaoda_libre.ttf");
 	// Physics INIT
 	/*kint = new Kint();
 	kint->InitPhysics();*/

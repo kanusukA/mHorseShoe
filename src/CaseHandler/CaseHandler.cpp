@@ -446,9 +446,13 @@ void CaseHandler::loadSlugObject(const std::filesystem::path& fontPath)
 	{
 		throw std::runtime_error("SLUGHORN CAN ONLY BE MADE ONCE!");
 	}
+
+	auto slugVert = ResourceHandler::GetInstance()->fetchFileInGroup("slug_vert.slang", ResourceGroup::SHADER);
+	auto slugFrag = ResourceHandler::GetInstance()->fetchFileInGroup("slug_frag.slang", ResourceGroup::SHADER);
+
 	std::shared_ptr<SlugShader> shader = std::make_shared<SlugShader>(this, "SLUG_SHADER", ShaderType::Fragment,
-		"C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/required/assets/meshes/Materials/newVulkanShaders/slug_vert.slang",
-		"C:/Users/lenovo/source/repos/mHorseShoeeVCmake/mHorseShoe/required/assets/meshes/Materials/newVulkanShaders/slug_frag.slang"
+		*slugVert,
+		*slugFrag
 	); // SHADER MODELS ARE NULL 
 	this->loadShader(shader.get());
 	mShader->push_back(shader);
